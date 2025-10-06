@@ -98,6 +98,6 @@ body:has(.landing-page) .fern-card > * {
     z-index: 1;
 }
 
-#fern-sidebar-scroll-area {
+/* #fern-sidebar-scroll-area {
     background-color: blue;
-  }
+  } */
