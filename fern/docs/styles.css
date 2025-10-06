@@ -1,0 +1,12 @@
+
+.fern-header-content .fern-button {
+    border-radius: 0px !important;
+}
+
+.fern-card {
+    border-radius: 0px !important;
+}
+
+:root {
+    --radius: 0px;
+}

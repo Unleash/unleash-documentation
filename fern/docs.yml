@@ -232,13 +232,15 @@ navbar-links:
       
 colors:
   accentPrimary:
-    dark: "#55D799"
-    light: "#0D9373"
+    dark: "#1a4049"
+    light: "#1a4049"
 
 logo:
   dark: docs/assets/logo-dark.svg
   light: docs/assets/logo-light.svg
-  height: 20
+  height: 35
   href: https://www.getunleash.io/
 
 favicon: docs/assets/favicon.svg
+
+css: docs/styles.css
