@@ -1,12 +1,103 @@
 
+.landing-page { 
+    margin-left: 4rem !important;
+    margin-right: 4rem !important;
+}
+
+.hero {
+  margin-top: 2rem;
+  padding-bottom: 2.5rem;
+}
+
+
+body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
+    display: none !important;
+}
+
+body:has(.landing-page) .fern-page-actions {
+    display: none !important;
+}
+
+/* Hero section styles */
+.hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-video {
+    flex: 0 0 500px;
+    margin-top: 5rem;
+}
+
+.hero-video iframe {
+    border-radius: 12px;
+}
+
 .fern-header-content .fern-button {
-    border-radius: 0px !important;
+    border-radius: 0px;
 }
 
-.fern-card {
-    border-radius: 0px !important;
+/* Card bottom stripe styles */
+body:has(.landing-page) .fern-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+    padding-bottom: 3rem;
 }
 
-:root {
-    --radius: 0px;
+body:has(.landing-page) .fern-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: #6c64e5;
+    border-radius: 0 0 8px 8px;
 }
+
+/* Card background */
+body:has(.landing-page) .fern-card:before {
+    content: "";
+    z-index: -1;
+    background-image: url(https://unleash-images.s3.us-east-1.amazonaws.com/card-background.png);
+    background-size: cover;
+    border-top-right-radius: 12px;
+    width: 60%;
+    height: 85%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.8;
+}
+
+/* Adjust background visibility for light mode */
+@media (prefers-color-scheme: light) {
+    body:has(.landing-page) .fern-card:before {
+        opacity: 0.6;
+        filter: brightness(0.5) contrast(1.5);
+    }
+}
+
+/* Ensure background is visible in dark mode */
+@media (prefers-color-scheme: dark) {
+    body:has(.landing-page) .fern-card:before {
+        opacity: 0.6;
+    }
+}
+
+/* Ensure card content is positioned above background */
+body:has(.landing-page) .fern-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+#fern-sidebar-scroll-area {
+    background-color: blue;
+  }
