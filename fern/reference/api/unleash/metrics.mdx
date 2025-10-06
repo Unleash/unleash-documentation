@@ -1,0 +1,82 @@
+---
+title: "Metrics"
+description: "Register, read, or delete metrics recorded by Unleash."
+---
+
+<CardGroup>
+  <Card title="📄️Gets usage data![Unleash Enterprise](/openapi-static/Enterprise.svg) **Enterprise feature**" href="/reference/api/unleash/get-requests-per-second">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get aggregated traffic data for a given time period.![Unleash Enterprise](/openapi-static/Enterprise.svg) **Enterprise feature**" href="/reference/api/unleash/get-traffic-data-usage-for-period">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Create an application to connect reported metricsIs used to report usage as well which sdk the application uses" href="/reference/api/unleash/create-application">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Delete an applicationDelete the application specified in the request URL. Returns 200 OK if the application was successfully deleted or if it didn't exist" href="/reference/api/unleash/delete-application">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get application dataReturns data about the specified application (`appName`). The data contains information on the name of the application, sdkVersion (which sdk reported these metrics, typically `unleash-client-node:3.4.1` or `unleash-client-java:7.1.0`), as well as data about how to display this application in a list." href="/reference/api/unleash/get-application">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get all applicationsReturns all applications registered with Unleash. Applications can be created via metrics reporting or manual creation" href="/reference/api/unleash/get-applications">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get application overviewReturns an overview of the specified application (`appName`)." href="/reference/api/unleash/get-application-overview">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get application environment instances (Last 24h)Returns an overview of the instances for the given `appName` and `environment` that have received traffic in the last 24 hours." href="/reference/api/unleash/get-application-environment-instances">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get outdated SDKsReturns a list of the outdated SDKS with the applications using them." href="/reference/api/unleash/get-outdated-sdks">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get feature metricsGet usage metrics for a specific feature for the last 48 hours, grouped by hour" href="/reference/api/unleash/get-raw-feature-metrics">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Last hour of usage and a list of applications that have reported seeing this feature flagSeparate counts for yes (enabled), no (disabled), as well as how many times each variant was selected during the last hour" href="/reference/api/unleash/get-feature-usage-summary">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get stored custom metricsRetrieves the stored custom metrics data." href="/reference/api/unleash/get-custom-metrics">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get metrics in Prometheus formatExposes all custom metrics in Prometheus text format for scraping." href="/reference/api/unleash/get-prometheus-metrics">
+    ##
+  </Card>
+</CardGroup>

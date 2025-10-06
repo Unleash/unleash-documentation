@@ -1,10 +1,10 @@
 # yaml-language-server: $schema=https://schema.buildwithfern.dev/docs-yml.json
 
 instances:
-  - url: plantstore.docs.buildwithfern.com # update this to {yourorg}.docs.buildwithfern.com
-    # custom-domain: plantstore.dev # specify your custom domain when you are ready to go live
+  - url: unleash.docs.buildwithfern.com
+    # custom-domain: docs.getunleash.io # specify your custom domain when you are ready to go live
 
-title: Plant Store
+title: Unleash Documentation
 
 layout:
   searchbar-placement: header
@@ -18,49 +18,227 @@ tabs:
   guides:
     display-name: Guides
     icon: book
-  API Reference:
+  api:
     display-name: API Reference
     icon: puzzle
+  edge:
+    display-name: Unleash Edge
+    icon: fa-solid fa-bolt
+  deploy:
+    display-name: Deploy & Integrate
+    icon: fa-solid fa-rocket
+  support:
+    display-name: Support
+    icon: fa-solid fa-life-ring
 
 navigation:
   - tab: home
     layout:
-      - section: Get Started
+      - section: Get started
         contents:
-          - page: Welcome
-            path: docs/pages/welcome.mdx
+          - page: Quickstart
+            path: quickstart.mdx
+          - page: What is a feature flag
+            path: what-is-a-feature-flag.mdx
+          - page: Unleash overview
+            path: understanding-unleash/unleash-overview.mdx
+      
+      - section: Core concepts
+        contents:
+          - page: The anatomy of Unleash
+            path: understanding-unleash/the-anatomy-of-unleash.mdx
+          - page: Projects
+            path: reference/projects.mdx
+          - page: Feature toggles
+            path: reference/feature-toggles.mdx
+          - page: API tokens and client keys
+            path: reference/api-tokens-and-client-keys.mdx
+          - page: Technical debt
+            path: reference/technical-debt.mdx
+          - page: Impression data
+            path: reference/impression-data.mdx
+          - page: Applications
+            path: reference/applications.mdx
+          - page: Login history
+            path: reference/login-history.mdx
+
   - tab: guides
     layout:
-      - section: Learn
+      - section: Tutorials and guides
         contents:
-          - page: Concepts
-            path: docs/pages/concepts.mdx
-          - page: SDKs
-            path: docs/pages/sdks.mdx
-            slug: sdks
-  - tab: API Reference
+          - page: Feature flag best practices
+            path: topics/feature-flags/feature-flag-best-practices.mdx
+          - page: How to create a feature flag
+            path: how-to-create-feature-flag.mdx
+          - page: User management, access controls, and auditing
+            path: feature-flag-tutorials/use-cases/user-management-access-controls-auditing.mdx
+          - page: A/B testing
+            path: feature-flag-tutorials/use-cases/a-b-testing.mdx
+          - page: React tutorial
+            path: feature-flag-tutorials/react.mdx
+      
+      - section: SDKs
+        contents:
+          - page: SDKs overview
+            path: reference/sdks.mdx
+  
+  - tab: api
     layout:
-      - api: API Reference
+      - section: API reference
+        contents:
+          - page: API overview
+            path: api-overview.mdx
+          - page: Unleash API
+            path: reference/api/unleash/unleash-api.mdx
+          - page: Addons
+            path: reference/api/unleash/addons.mdx
+          - page: Admin UI
+            path: reference/api/unleash/admin-ui.mdx
+          - page: API tokens
+            path: reference/api/unleash/api-tokens.mdx
+          - page: Archive
+            path: reference/api/unleash/archive.mdx
+          - page: Auth
+            path: reference/api/unleash/auth.mdx
+          - page: Banners
+            path: reference/api/unleash/banners.mdx
+          - page: Change requests
+            path: reference/api/unleash/change-requests.mdx
+          - page: Client
+            path: reference/api/unleash/client.mdx
+          - page: Context
+            path: reference/api/unleash/context.mdx
+          - page: Dependencies
+            path: reference/api/unleash/dependencies.mdx
+          - page: Environments
+            path: reference/api/unleash/environments.mdx
+          - page: Events
+            path: reference/api/unleash/events.mdx
+          - page: Feature types
+            path: reference/api/unleash/feature-types.mdx
+          - page: Features
+            path: reference/api/unleash/features.mdx
+          - page: Frontend API
+            path: reference/api/unleash/frontend-api.mdx
+          - page: Import/Export
+            path: reference/api/unleash/import-export.mdx
+          - page: Instance admin
+            path: reference/api/unleash/instance-admin.mdx
+          - page: Maintenance
+            path: reference/api/unleash/maintenance.mdx
+          - page: Metrics
+            path: reference/api/unleash/metrics.mdx
+          - page: Notifications
+            path: reference/api/unleash/notifications.mdx
+          - page: Operational
+            path: reference/api/unleash/operational.mdx
+          - page: Personal access tokens
+            path: reference/api/unleash/personal-access-tokens.mdx
+          - page: Playground
+            path: reference/api/unleash/playground.mdx
+          - page: Projects
+            path: reference/api/unleash/projects.mdx
+          - page: Public signup tokens
+            path: reference/api/unleash/public-signup-tokens.mdx
+          - page: Release templates
+            path: reference/api/unleash/release-templates.mdx
+          - page: Search
+            path: reference/api/unleash/search.mdx
+          - page: Segments
+            path: reference/api/unleash/segments.mdx
+          - page: Service accounts
+            path: reference/api/unleash/service-accounts.mdx
+          - page: Strategies
+            path: reference/api/unleash/strategies.mdx
+          - page: Tags
+            path: reference/api/unleash/tags.mdx
+          - page: Telemetry
+            path: reference/api/unleash/telemetry.mdx
+          - page: Unknown flags
+            path: reference/api/unleash/unknown-flags.mdx
+          - page: Unleash Edge
+            path: reference/api/unleash/unleash-edge.mdx
+          - page: Unstable
+            path: reference/api/unleash/unstable.mdx
+          - page: Users
+            path: reference/api/unleash/users.mdx
+
+  - tab: edge
+    layout:
+      - section: Unleash Edge
+        contents:
+          - page: Overview
+            path: reference/unleash-edge.mdx
+          - page: Concepts
+            path: reference/unleash-edge/concepts.mdx
+          - page: Deploying
+            path: reference/unleash-edge/deploying.mdx
+          - page: Benchmarking
+            path: reference/unleash-edge/benchmarking.mdx
+          - page: CLI
+            path: reference/unleash-edge/cli.mdx
+          - page: Development guide
+            path: reference/unleash-edge/development-guide.mdx
+          - page: Migration guide
+            path: reference/unleash-edge/migration-guide.mdx
+
+  - tab: deploy
+    layout:
+      - section: Integrate and deploy
+        contents:
+          - page: Hosting options
+            path: understanding-unleash/hosting-options.mdx
+          - page: Getting started
+            path: using-unleash/deploy/getting-started.mdx
+          - page: How to add SSO (OpenID Connect)
+            path: how-to/how-to-add-sso-open-id-connect.mdx
+          - page: How to setup provisioning with Okta
+            path: how-to/how-to-setup-provisioning-with-okta.mdx
+          - page: Integrations
+            path: reference/integrations.mdx
+      
+      - section: Data privacy and compliance
+        contents:
+          - page: Data collection
+            path: understanding-unleash/data-collection.mdx
+          - page: Compliance overview
+            path: using-unleash/compliance/compliance-overview.mdx
+
+  - tab: support
+    layout:
+      - section: Support and community
+        contents:
+          - page: Troubleshooting
+            path: troubleshooting.mdx
+          - page: Availability
+            path: availability.mdx
+          - page: Developer guide
+            path: contributing/developer-guide.mdx
+      
+      - section: Unleash Academy
+        contents:
+          - page: Introduction
+            path: unleash-academy/introduction.mdx
 
 navbar-links:
   - type: minimal
-    text: Fork this repo
-    url: https://github.com/fern-api/docs-starter
+    text: GitHub
+    url: https://github.com/Unleash/unleash
   - type: filled
-    text: Get a demo
-    url: https://buildwithfern.com/contact?utm_campaign=demo&utm_medium=plantstore&utm_source=navbar
+    text: Get started
+    url: https://www.getunleash.io/
   - type: github
-    value: https://github.com/fern-api/fern
+    value: https://github.com/Unleash/unleash
       
 colors:
   accentPrimary:
-    dark: "#81C784"
-    light: "#1B5E20"
+    dark: "#55D799"
+    light: "#0D9373"
 
 logo:
   dark: docs/assets/logo-dark.svg
   light: docs/assets/logo-light.svg
   height: 20
-  href: https://buildwithfern.com/?utm_campaign=demo&utm_medium=plantstore&utm_source=logo
+  href: https://www.getunleash.io/
 
 favicon: docs/assets/favicon.svg

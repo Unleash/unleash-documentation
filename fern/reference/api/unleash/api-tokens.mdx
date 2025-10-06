@@ -1,0 +1,34 @@
+---
+title: "API tokens"
+description: "Create, update, and delete ."
+---
+
+<CardGroup>
+  <Card title="📄️Get API tokensRetrieves all API tokens that exist in the Unleash instance." href="/reference/api/unleash/get-all-api-tokens">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Create API tokenCreate an API token of a specific type: one of client, admin, frontend, backend." href="/reference/api/unleash/create-api-token">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get API tokens by nameRetrieves all API tokens that match a given token name. Because token names are not unique, this endpoint will always return a list. If no tokens with the provided name exist, the list will be empty. Otherwise, it will contain all the tokens with the given name." href="/reference/api/unleash/get-api-tokens-by-name">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Update API tokenUpdates an existing API token with a new expiry date. The `token` path parameter is the token's `secret`. If the token does not exist, this endpoint returns a 200 OK, but does nothing." href="/reference/api/unleash/update-api-token">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Delete API tokenDeletes an existing API token. The `token` path parameter is the token's `secret`. If the token does not exist, this endpoint returns a 200 OK, but does nothing." href="/reference/api/unleash/delete-api-token">
+    ##
+  </Card>
+</CardGroup>

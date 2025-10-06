@@ -1,0 +1,52 @@
+---
+title: "Segments"
+description: "Create, update, delete, and manage ."
+---
+
+<CardGroup>
+  <Card title="📄️Validates if a segment name existsUses the name provided in the body of the request to validate if the given name exists or not" href="/reference/api/unleash/validate-segment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get strategy segmentsRetrieve all segments that are referenced by the specified strategy. Returns an empty list of segments if the strategy ID doesn't exist." href="/reference/api/unleash/get-segments-by-strategy-id">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get strategies that reference segmentRetrieve all strategies that reference the specified segment." href="/reference/api/unleash/get-strategies-by-segment-id">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Deletes a segment by idDeletes a segment by its id, if not found returns a 409 error" href="/reference/api/unleash/remove-segment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Update segment by idUpdates the content of the segment with the provided payload. Requires `name` and `constraints` to be present. If `project` is not present, it will be set to `null`. Any other fields not specified will be left untouched." href="/reference/api/unleash/update-segment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get a segmentRetrieves a segment based on its ID." href="/reference/api/unleash/get-segment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Create a new segmentCreates a new segment using the payload provided" href="/reference/api/unleash/create-segment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get all segmentsRetrieves all segments that exist in this Unleash instance." href="/reference/api/unleash/get-segments">
+    ##
+  </Card>
+</CardGroup>

@@ -1,0 +1,226 @@
+---
+title: "Features"
+description: "Create, update, and delete ."
+---
+
+<CardGroup>
+  <Card title="📄️Move feature to project![Unleash Enterprise](/openapi-static/Enterprise.svg) **Enterprise feature**" href="/reference/api/unleash/change-project">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Validate a feature flag name.Validates a feature flag name: checks whether the name is URL-friendly and whether a feature with the given name already exists. Returns 200 if the feature name is compliant and unused." href="/reference/api/unleash/validate-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get all tags for a feature.Retrieves all the tags for a feature name. If the feature does not exist it returns an empty list." href="/reference/api/unleash/list-tags">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Adds a tag to a feature.Adds a tag to a feature if the feature and tag type exist in the system. The operation is idempotent, so adding an existing tag will result in a successful response." href="/reference/api/unleash/add-tag">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Updates multiple tags for a feature.Receives a list of tags to add and a list of tags to remove that are mandatory but can be empty. All tags under addedTags are first added to the feature and then all tags under removedTags are removed from the feature." href="/reference/api/unleash/update-tags">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Removes a tag from a feature.Removes a tag from a feature. If the feature exists but the tag does not, it returns a successful response." href="/reference/api/unleash/remove-tag">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get a feature environmentInformation about the enablement status and strategies for a feature flag in specified environment." href="/reference/api/unleash/get-feature-environment">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Disable a feature flagDisable a feature flag in the specified environment." href="/reference/api/unleash/toggle-feature-environment-off">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Enable a feature flagEnable a feature flag in the specified environment." href="/reference/api/unleash/toggle-feature-environment-on">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Bulk enable a list of featuresThis endpoint enables multiple feature flags." href="/reference/api/unleash/bulk-toggle-features-environment-on">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Bulk disable a list of featuresThis endpoint disables multiple feature flags." href="/reference/api/unleash/bulk-toggle-features-environment-off">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get feature flag strategiesGet strategies defined for a feature flag in the specified environment." href="/reference/api/unleash/get-feature-strategies">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Add a strategy to a feature flagAdd a strategy to a feature flag in the specified environment." href="/reference/api/unleash/add-feature-strategy">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get a strategy configurationGet a strategy configuration for an environment in a feature flag." href="/reference/api/unleash/get-feature-strategy">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Update a strategyReplace strategy configuration for a feature flag in the specified environment." href="/reference/api/unleash/update-feature-strategy">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Change specific properties of a strategyChange specific properties of a strategy configuration in a feature flag." href="/reference/api/unleash/patch-feature-strategy">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Delete a strategy from a feature flagDelete a strategy configuration from a feature flag in the specified environment." href="/reference/api/unleash/delete-feature-strategy">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Set strategy sort orderSet the sort order of the provided list of strategies." href="/reference/api/unleash/set-strategy-sort-order">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get all features in a projectA list of all features for the specified project." href="/reference/api/unleash/get-features">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Add a new feature flagCreate a new feature flag in a specified project." href="/reference/api/unleash/create-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Clone a feature flagCreates a copy of the specified feature flag. The copy can be created in any project." href="/reference/api/unleash/clone-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get a featureThis endpoint returns the information about the requested feature if the feature belongs to the specified project." href="/reference/api/unleash/get-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Update a feature flagUpdates the specified feature if the feature belongs to the specified project. Only the provided properties are updated; any feature properties left out of the request body are left untouched." href="/reference/api/unleash/update-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Modify a feature flagChange specific properties of a feature flag." href="/reference/api/unleash/patch-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Archive a feature flagThis endpoint archives the specified feature if the feature belongs to the specified project." href="/reference/api/unleash/archive-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Mark features as stale / not staleThis endpoint marks the provided list of features as either [stale](https://docs.getunleash.io/reference/technical-debt#stale-and-potentially-stale-flags) or not stale depending on the request body you send. Any provided features that don't exist are ignored." href="/reference/api/unleash/stale-features">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Get variants for a feature in an environmentReturns the variants for a feature in a specific environment. If the feature has no variants it will return an empty array of variants" href="/reference/api/unleash/get-environment-feature-variants">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Patch a feature's variants in an environmentApply a list of patches to the features environments in the specified environment. The patch objects should conform to the [JSON-patch format (RFC 6902)](https://www.rfc-editor.org/rfc/rfc6902)." href="/reference/api/unleash/patch-environments-feature-variants">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Create (overwrite) variants for a feature in an environmentThis overwrites the current variants for the feature flag in the :featureName parameter for the :environment parameter." href="/reference/api/unleash/overwrite-environment-feature-variants">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Create (overwrite) variants for a feature flag in multiple environmentsThis overwrites the current variants for the feature flag in the :featureName parameter for the :environment parameter." href="/reference/api/unleash/overwrite-feature-variants-on-environments">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Validates archive featuresThis endpoint return info about the archive features impact." href="/reference/api/unleash/validate-archive-features">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Archives a list of featuresThis endpoint archives the specified features. Any features that are already archived or that don't exist are ignored. All existing features (whether already archived or not) that are provided must belong to the specified project." href="/reference/api/unleash/archive-features">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Validate constraintValidates a constraint definition. Checks whether the context field exists and whether the applied configuration is valid. Additional properties are not allowed on data objects that you send to this endpoint." href="/reference/api/unleash/validate-constraint">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Add feature to favoritesThis endpoint marks the feature in the url as favorite" href="/reference/api/unleash/add-favorite-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Remove feature from favoritesThis endpoint removes the feature in the url from favorites" href="/reference/api/unleash/remove-favorite-feature">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Add project to favoritesThis endpoint marks the project in the url as favorite" href="/reference/api/unleash/add-favorite-project">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Remove project from favoritesThis endpoint removes the project in the url from favorites" href="/reference/api/unleash/remove-favorite-project">
+    ##
+  </Card>
+</CardGroup>

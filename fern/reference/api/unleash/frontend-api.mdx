@@ -1,0 +1,28 @@
+---
+title: "Frontend API"
+description: "The  is used for connecting client-side (frontend) applications to Unleash."
+---
+
+<CardGroup>
+  <Card title="📄️Retrieve enabled feature flags for the provided context.This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context. Context values are provided as query parameters. If the Frontend API is disabled 404 is returned." href="/reference/api/unleash/get-frontend-features">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Retrieve enabled feature flags for the provided context, using POST.This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context, using POST. Context values are provided as a `context` property in the request body. If the Frontend API is disabled 404 is returned." href="/reference/api/unleash/get-frontend-api-features-with-post">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Register client usage metricsRegisters usage metrics. Stores information about how many times each flag was evaluated to enabled and disabled within a time frame. If provided, this operation will also store data on how many times each feature flag's variants were displayed to the end user. If the Frontend API is disabled 404 is returned." href="/reference/api/unleash/register-frontend-metrics">
+    ##
+  </Card>
+</CardGroup>
+
+<CardGroup>
+  <Card title="📄️Register a client SDKThis is for future use. Currently Frontend client registration is not supported. Returning 200 for clients that expect this status code. If the Frontend API is disabled 404 is returned." href="/reference/api/unleash/register-frontend-client">
+    ##
+  </Card>
+</CardGroup>
