@@ -371,11 +371,11 @@ navbar-links:
       
 colors:
   accent-primary:
-    dark: "#1a4049"
-    light: "#1a4049"
+    dark: "#817afe"
+    light: "#817afe"
   background:
     dark: "#1a1924"
-    light: "#eaeaed"
+    light: "#ffffff"
 
 logo:
   dark: docs/assets/logo-dark.svg
