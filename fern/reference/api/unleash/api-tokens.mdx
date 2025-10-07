@@ -4,24 +4,24 @@ description: "Create, update, and delete ."
 ---
 
 <CardGroup col={2}>
-  <Card title="Get API tokens" href="/reference/api/unleash/get-all-api-tokens" icon="code">
+  <Card title="Get API tokens" href="/api-reference/api-tokens/get-all-api-tokens" icon="code">
     Retrieves all API tokens that exist in the Unleash instance.
   </Card>
 
-  <Card title="Create API token" href="/reference/api/unleash/create-api-token" icon="code">
+  <Card title="Create API token" href="/api-reference/api-tokens/create-api-token" icon="code">
     Create an API token of a specific type: one of client, admin, frontend, backend.
   </Card>
 
-  <Card title="Get API tokens by name" href="/reference/api/unleash/get-api-tokens-by-name" icon="code">
+  <Card title="Get API tokens by name" href="/api-reference/api-tokens/get-api-tokens-by-name" icon="code">
     Retrieves all API tokens that match a given token name. Because token names are not unique, this endpoint will always return a list. If no tokens with the provided name exist, the list will be empty. Otherwise, it will contain all the tokens with the given name.
   </Card>
 
-  <Card title="Update API token" href="/reference/api/unleash/update-api-token" icon="code">
+  <Card title="Update API token" href="/api-reference/api-tokens/update-api-token" icon="code">
     Updates an existing API token with a new expiry date. The `token` path parameter is the token's `secret`. If the token does not exist, this endpoint returns a 200 OK, but does nothing.
   </Card>
 
 
-  <Card title="Delete API token" href="/reference/api/unleash/delete-api-token" icon="code">
+  <Card title="Delete API token" href="/api-reference/api-tokens/delete-api-token" icon="code">
     Deletes an existing API token. The `token` path parameter is the token's `secret`. If the token does not exist, this endpoint returns a 200 OK, but does nothing.
   </Card>
 </CardGroup>

@@ -107,84 +107,203 @@ navigation:
   
   - tab: api
     layout:
-      - section: API reference
-        contents:
-          - page: API overview
-            path: api-overview.mdx
-          - page: Unleash API
-            path: reference/api/unleash/unleash-api.mdx
-          - page: Addons
-            path: reference/api/unleash/addons.mdx
-          - page: Admin UI
-            path: reference/api/unleash/admin-ui.mdx
-          - page: API tokens
-            path: reference/api/unleash/api-tokens.mdx
-          - page: Archive
-            path: reference/api/unleash/archive.mdx
-          - page: Auth
-            path: reference/api/unleash/auth.mdx
-          - page: Banners
-            path: reference/api/unleash/banners.mdx
-          - page: Change requests
-            path: reference/api/unleash/change-requests.mdx
-          - page: Client
-            path: reference/api/unleash/client.mdx
-          - page: Context
-            path: reference/api/unleash/context.mdx
-          - page: Dependencies
-            path: reference/api/unleash/dependencies.mdx
-          - page: Environments
-            path: reference/api/unleash/environments.mdx
-          - page: Events
-            path: reference/api/unleash/events.mdx
-          - page: Feature types
-            path: reference/api/unleash/feature-types.mdx
-          - page: Features
-            path: reference/api/unleash/features.mdx
-          - page: Frontend API
-            path: reference/api/unleash/frontend-api.mdx
-          - page: Import/Export
-            path: reference/api/unleash/import-export.mdx
-          - page: Instance admin
-            path: reference/api/unleash/instance-admin.mdx
-          - page: Maintenance
-            path: reference/api/unleash/maintenance.mdx
-          - page: Metrics
-            path: reference/api/unleash/metrics.mdx
-          - page: Notifications
-            path: reference/api/unleash/notifications.mdx
-          - page: Operational
-            path: reference/api/unleash/operational.mdx
-          - page: Personal access tokens
-            path: reference/api/unleash/personal-access-tokens.mdx
-          - page: Playground
-            path: reference/api/unleash/playground.mdx
-          - page: Projects
-            path: reference/api/unleash/projects.mdx
-          - page: Public signup tokens
-            path: reference/api/unleash/public-signup-tokens.mdx
-          - page: Release templates
-            path: reference/api/unleash/release-templates.mdx
-          - page: Search
-            path: reference/api/unleash/search.mdx
-          - page: Segments
-            path: reference/api/unleash/segments.mdx
-          - page: Service accounts
-            path: reference/api/unleash/service-accounts.mdx
-          - page: Strategies
-            path: reference/api/unleash/strategies.mdx
-          - page: Tags
-            path: reference/api/unleash/tags.mdx
-          - page: Telemetry
-            path: reference/api/unleash/telemetry.mdx
-          - page: Unknown flags
-            path: reference/api/unleash/unknown-flags.mdx
-          - page: Unleash Edge
-            path: reference/api/unleash/unleash-edge.mdx
-          - page: Unstable
-            path: reference/api/unleash/unstable.mdx
-          - page: Users
-            path: reference/api/unleash/users.mdx
+      - api: API Reference
+        skip-slug: true
+        layout:
+          - section: API Overview
+            skip-slug: true
+            summary: api-overview.mdx
+            contents: 
+              - page: Authentication
+                path: reference/api/unleash/unleash-api.mdx
+                hidden: true
+          - section: Authentication
+            skip-slug: true
+            summary: reference/api/unleash/unleash-api.mdx
+            contents: 
+              - page: Authentication
+                path: reference/api/unleash/unleash-api.mdx             
+                hidden: true
+          - section: "Addons"
+            summary: reference/api/unleash/addons.mdx
+            referenced-packages:
+              - addons
+            contents: []
+          - section: "Admin UI"
+            summary: reference/api/unleash/admin-ui.mdx
+            referenced-packages:
+              - adminUi
+            contents: []
+          - section: "API Tokens"
+            summary: reference/api/unleash/api-tokens.mdx
+            referenced-packages:
+              - apiTokens
+            contents: []
+          - section: "Archive"
+            summary: reference/api/unleash/archive.mdx
+            referenced-packages:
+              - archive
+            contents: []
+          - section: "Auth"
+            summary: reference/api/unleash/auth.mdx
+            referenced-packages:
+              - auth
+            contents: []
+          - section: "Banners"
+            summary: reference/api/unleash/banners.mdx
+            referenced-packages:
+              - banners
+            contents: []
+          - section: "Change Requests"
+            summary: reference/api/unleash/change-requests.mdx
+            referenced-packages:
+              - changeRequests
+            contents: []
+          - section: "Client"
+            summary: reference/api/unleash/client.mdx
+            referenced-packages:
+              - client
+            contents: []
+          - section: "Context"
+            summary: reference/api/unleash/context.mdx
+            referenced-packages:
+              - context
+            contents: []
+          - section: "Dependencies"
+            summary: reference/api/unleash/dependencies.mdx
+            referenced-packages:
+              - dependencies
+            contents: []
+          - section: "Environments"
+            summary: reference/api/unleash/environments.mdx
+            referenced-packages:
+              - environments
+            contents: []
+          - section: "Events"
+            summary: reference/api/unleash/events.mdx
+            referenced-packages:
+              - events
+            contents: []
+          - section: "Feature Types"
+            summary: reference/api/unleash/feature-types.mdx
+            referenced-packages:
+              - featureTypes
+            contents: []
+          - section: "Features"
+            summary: reference/api/unleash/features.mdx
+            referenced-packages:
+              - features
+            contents: []
+          - section: "Frontend API"
+            summary: reference/api/unleash/frontend-api.mdx
+            referenced-packages:
+              - frontendApi
+            contents: []
+          - section: "Import/Export"
+            summary: reference/api/unleash/import-export.mdx
+            referenced-packages:
+              - importExport
+            contents: []
+          - section: "Instance Admin"
+            summary: reference/api/unleash/instance-admin.mdx
+            referenced-packages:
+              - instanceAdmin
+            contents: []
+          - section: "Maintenance"
+            summary: reference/api/unleash/maintenance.mdx
+            referenced-packages:
+              - maintenance
+            contents: []
+          - section: "Metrics"
+            summary: reference/api/unleash/metrics.mdx
+            referenced-packages:
+              - metrics
+            contents: []
+          - section: "Notifications"
+            summary: reference/api/unleash/notifications.mdx
+            referenced-packages:
+              - notifications
+            contents: []
+          - section: "Operational"
+            summary: reference/api/unleash/operational.mdx
+            referenced-packages:
+              - operational
+            contents: []
+          - section: "Personal Access Tokens"
+            summary: reference/api/unleash/personal-access-tokens.mdx
+            referenced-packages:
+              - personalAccessTokens
+            contents: []
+          - section: "Playground"
+            summary: reference/api/unleash/playground.mdx
+            referenced-packages:
+              - playground
+            contents: []
+          - section: "Projects"
+            summary: reference/api/unleash/projects.mdx
+            referenced-packages:
+              - projects
+            contents: []
+          - section: "Public Signup Tokens"
+            summary: reference/api/unleash/public-signup-tokens.mdx
+            referenced-packages:
+              - publicSignupTokens
+            contents: []
+          - section: "Release Templates"
+            summary: reference/api/unleash/release-templates.mdx
+            referenced-packages:
+              - releaseTemplates
+            contents: []
+          - section: "Search"
+            summary: reference/api/unleash/search.mdx
+            referenced-packages:
+              - search
+            contents: []
+          - section: "Segments"
+            summary: reference/api/unleash/segments.mdx
+            referenced-packages:
+              - segments
+            contents: []
+          - section: "Service Accounts"
+            summary: reference/api/unleash/service-accounts.mdx
+            referenced-packages:
+              - serviceAccounts
+            contents: []
+          - section: "Strategies"
+            summary: reference/api/unleash/strategies.mdx
+            referenced-packages:
+              - strategies
+            contents: []
+          - section: "Tags"
+            summary: reference/api/unleash/tags.mdx
+            referenced-packages:
+              - tags
+            contents: []
+          - section: "Telemetry"
+            summary: reference/api/unleash/telemetry.mdx
+            referenced-packages:
+              - telemetry
+            contents: []
+          - section: "Unknown Flags"
+            summary: reference/api/unleash/unknown-flags.mdx
+            referenced-packages:
+              - unknownFlags
+            contents: []
+          - section: "Unleash Edge"
+            summary: reference/api/unleash/unleash-edge.mdx
+            referenced-packages:
+              - unleashEdge
+            contents: []
+          - section: "Unstable"
+            summary: reference/api/unleash/unstable.mdx
+            referenced-packages:
+              - unstable
+            contents: []
+          - section: "Users"
+            summary: reference/api/unleash/users.mdx
+            referenced-packages:
+              - users
+            contents: []
 
   - tab: edge
     layout:
@@ -244,9 +363,6 @@ navigation:
             path: unleash-academy/introduction.mdx
 
 navbar-links:
-  - type: minimal
-    text: Sign in
-    url: https://app.unleash-hosted.com/sign-in?__hstc=152011494.04e0011dec80a73688b63a3b182e6aac.1759773026073.1759773026073.1759779203752.2&__hssc=152011494.32.1759779203752&__hsfp=3975824757&_gl=1*1p992ix*_gcl_au*NzQzNTAwMzY3LjE3NTk3NzMwMjYuMjAyNjQwMjcxOC4xNzU5Nzc5NDA0LjE3NTk3Nzk0MDQ.*_ga*MTg5ODEwNjQ2Ni4xNzU5NzczMDI2*_ga_492KEZQRT8*czE3NTk3NzY4NTUkbzIkZzEkdDE3NTk3ODQ0NzkkajYwJGwwJGgw
   - type: filled
     text: Start Free Trial
     url: https://www.getunleash.io/plans/enterprise-payg
@@ -260,7 +376,6 @@ colors:
   background:
     dark: "#1a1924"
     light: "#ffffff"
-
 
 logo:
   dark: docs/assets/logo-dark.svg
