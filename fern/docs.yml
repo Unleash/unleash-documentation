@@ -304,84 +304,6 @@ navigation:
             referenced-packages:
               - users
             contents: []
-      # - section: API reference
-      #   contents:
-      #     - page: API overview
-      #       path: api-overview.mdx
-      #     - page: Unleash API
-      #       path: reference/api/unleash/unleash-api.mdx
-      #     - page: Addons
-      #       path: reference/api/unleash/addons.mdx
-      #     - page: Admin UI
-      #       path: reference/api/unleash/admin-ui.mdx
-      #     - page: API tokens
-      #       path: reference/api/unleash/api-tokens.mdx
-      #     - page: Archive
-      #       path: reference/api/unleash/archive.mdx
-      #     - page: Auth
-      #       path: reference/api/unleash/auth.mdx
-      #     - page: Banners
-      #       path: reference/api/unleash/banners.mdx
-      #     - page: Change requests
-      #       path: reference/api/unleash/change-requests.mdx
-      #     - page: Client
-      #       path: reference/api/unleash/client.mdx
-      #     - page: Context
-      #       path: reference/api/unleash/context.mdx
-      #     - page: Dependencies
-      #       path: reference/api/unleash/dependencies.mdx
-      #     - page: Environments
-      #       path: reference/api/unleash/environments.mdx
-      #     - page: Events
-      #       path: reference/api/unleash/events.mdx
-      #     - page: Feature types
-      #       path: reference/api/unleash/feature-types.mdx
-      #     - page: Features
-      #       path: reference/api/unleash/features.mdx
-      #     - page: Frontend API
-      #       path: reference/api/unleash/frontend-api.mdx
-      #     - page: Import/Export
-      #       path: reference/api/unleash/import-export.mdx
-      #     - page: Instance admin
-      #       path: reference/api/unleash/instance-admin.mdx
-      #     - page: Maintenance
-      #       path: reference/api/unleash/maintenance.mdx
-      #     - page: Metrics
-      #       path: reference/api/unleash/metrics.mdx
-      #     - page: Notifications
-      #       path: reference/api/unleash/notifications.mdx
-      #     - page: Operational
-      #       path: reference/api/unleash/operational.mdx
-      #     - page: Personal access tokens
-      #       path: reference/api/unleash/personal-access-tokens.mdx
-      #     - page: Playground
-      #       path: reference/api/unleash/playground.mdx
-      #     - page: Projects
-      #       path: reference/api/unleash/projects.mdx
-      #     - page: Public signup tokens
-      #       path: reference/api/unleash/public-signup-tokens.mdx
-      #     - page: Release templates
-      #       path: reference/api/unleash/release-templates.mdx
-      #     - page: Search
-      #       path: reference/api/unleash/search.mdx
-      #     - page: Segments
-      #       path: reference/api/unleash/segments.mdx
-      #     - page: Service accounts
-      #       path: reference/api/unleash/service-accounts.mdx
-      #     - page: Strategies
-      #       path: reference/api/unleash/strategies.mdx
-      #     - page: Tags
-      #       path: reference/api/unleash/tags.mdx
-      #     - page: Telemetry
-      #       path: reference/api/unleash/telemetry.mdx
-      #     - page: Unknown flags
-      #       path: reference/api/unleash/unknown-flags.mdx
-      #     - page: Unleash Edge
-      #       path: reference/api/unleash/unleash-edge.mdx
-      #     - page: Unstable
-      #       path: reference/api/unleash/unstable.mdx
-      #     - page: Users
-      #       path: reference/api/unleash/users.mdx
 
   - tab: edge
     layout:
@@ -441,9 +363,6 @@ navigation:
             path: unleash-academy/introduction.mdx
 
 navbar-links:
-  # - type: minimal
-  #   text: Sign in
-  #   url: https://app.unleash-hosted.com/sign-in?__hstc=152011494.04e0011dec80a73688b63a3b182e6aac.1759773026073.1759773026073.1759779203752.2&__hssc=152011494.32.1759779203752&__hsfp=3975824757&_gl=1*1p992ix*_gcl_au*NzQzNTAwMzY3LjE3NTk3NzMwMjYuMjAyNjQwMjcxOC4xNzU5Nzc5NDA0LjE3NTk3Nzk0MDQ.*_ga*MTg5ODEwNjQ2Ni4xNzU5NzczMDI2*_ga_492KEZQRT8*czE3NTk3NzY4NTUkbzIkZzEkdDE3NTk3ODQ0NzkkajYwJGwwJGgw
   - type: filled
     text: Start Free Trial
     url: https://www.getunleash.io/plans/enterprise-payg
@@ -457,10 +376,6 @@ colors:
   background:
     dark: "#1a1924"
     light: "#eaeaed"
-  # sidebar-background:
-  #   light: "#f5f5f7"
-  #   dark: "#222130"
-
 
 logo:
   dark: docs/assets/logo-dark.svg
