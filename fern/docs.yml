@@ -255,14 +255,11 @@ navbar-links:
       
 colors:
   accent-primary:
-    dark: "#1a4049"
-    light: "#1a4049"
+    dark: "#817afe"
+    light: "#817afe"
   background:
     dark: "#1a1924"
-    light: "#eaeaed"
-  # sidebar-background:
-  #   light: "#f5f5f7"
-  #   dark: "#222130"
+    light: "#ffffff"
 
 
 logo:

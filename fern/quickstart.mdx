@@ -1,15 +1,24 @@
 ---
 title: "Overview"
-description: "The easiest way to get started with Unleash is through a . This gives you a ready-to-use instance, so you can explore all Unleash features without any local setup."
+description: "Unleash quickstart."
 ---
+
+The easiest way to get started with Unleash is through a cloud-hosted free trial. This gives you a ready-to-use instance, so you can explore all Unleash features without any local setup.
 
 In this guide, you'll:
 
-1. **Sign up** for a free, cloud-hosted Unleash Enterprise instance.
-
-2. **Create your first feature flag** using the Unleash Admin UI.
-
-3. **Connect Unleash to your application** by integrating an SDK into your codebase.
+<Steps toc={false}>
+  <Step title="Sign up for a free trial">
+    Sign up for a free, cloud-hosted [Unleash Enterprise](#sign-up) instance.
+  </Step>
+  <Step title="Create a flag">
+    Create your first feature flag using the Unleash Admin UI.
+  </Step>
+  
+  <Step title="Connect an SDK">
+    Connect Unleash to your application by integrating an SDK into your codebase.
+  </Step>
+</Steps>
 
 ![The Unleash Admin UI onboarding experience](images/assets/images/onboarding-experience-ff8cec681a2b5c822db3e28873dc6916.png)
 
@@ -17,11 +26,15 @@ If you prefer to manage your own infrastructure, see the [self-hosted setup guid
 
 ## Sign up for an Unleash Enterprise Cloud trial[​](#sign-up-for-an-unleash-enterprise-cloud-trial "Direct link to Sign up for an Unleash Enterprise Cloud trial")
 
-Start by signing up for a [free 14-day trial](https://www.getunleash.io/plans/enterprise-payg) of Unleash Enterprise Cloud. After you submit the form, you will receive a confirmation email. Follow the link in the email to set your password and log in to your Unleash instance.
+Start by signing up for a [free 14-day trial](https://www.getunleash.io/plans/enterprise-payg) of Unleash Enterprise Cloud.
+
+<Button intent="primary">Start free trial</Button>
+
+After you submit the form, you will receive a confirmation email. Follow the link in the email to set your password and log in to your Unleash instance.
 
 ## Create your first feature flag[​](#create-your-first-feature-flag "Direct link to Create your first feature flag")
 
-Once you've logged in, it's time to create your first feature flag:
+Once you've logged in, it's time to create your first <Tooltip tip="Feature flags let you turn functionality on or off without redeploying code.">feature flag</Tooltip>:
 
 1. In the Unleash Admin UI, open the **Default** project.
 2. Click **New feature flag**.
@@ -37,10 +50,9 @@ Next, use one of the client or backend [SDKs](/reference/sdks) to connect Unleas
   Explore our SDK examples directly in your browser with CodeSandbox. Check out the [Unleash SDK Examples](https://github.com/Unleash/unleash-sdk-examples) repository to try one now.
 </Accordion>
 
-* Connect a frontend SDK
-* Connect a backend SDK
-
-1. **Create an API token**
+<Tabs>
+  <Tab title="Connect a frontend SDK">
+    1. **Create an API token**
 
    In the Unleash Admin UI, create a [frontend API token](/reference/api-tokens-and-client-keys#frontend-tokens) in **Admin settings > Access control > API access**.
 
@@ -54,13 +66,29 @@ Next, use one of the client or backend [SDKs](/reference/sdks) to connect Unleas
 
 The following example shows how to use the [JavaScript SDK](/reference/sdks/javascript-browser) to connect to your Unleash instance:
 
-JavaScript SDK
+```javascript title="JavaScript SDK"
+import { UnleashClient } from "unleash-proxy-client";
+
+const unleash = new UnleashClient({
+    url: "https://<YOUR_UNLEASH_INSTANCE>/api/frontend",
+    clientKey: "<YOUR_TOKEN>",
+    appName: "<YOUR_APP_NAME>",
+});
+
+unleash.on("synchronized", () => {
+    // Unleash is ready to serve updated feature flags.
+
+    // Check a feature flag
+    if (unleash.isEnabled("some-flag")) {
+        // do cool new things when the flag is enabled
+    }
+});
 
 ```
-import { UnleashClient } from "unleash-proxy-client";const unleash = new UnleashClient({    url: "https://<YOUR_UNLEASH_INSTANCE>/api/frontend",    clientKey: "<YOUR_TOKEN>",    appName: "<YOUR_APP_NAME>",});unleash.on("synchronized", () => {    // Unleash is ready to serve updated feature flags.    // Check a feature flag    if (unleash.isEnabled("some-flag")) {        // do cool new things when the flag is enabled    }});
-```
 
-1. **Create an API token**
+  </Tab>
+  <Tab title="Connect a backend SDK">
+    1. **Create an API token**
 
    In the Unleash Admin UI, create a [backend token](/reference/api-tokens-and-client-keys#backend-tokens) in **Admin settings > Access control > API access**.
 
@@ -74,11 +102,30 @@ import { UnleashClient } from "unleash-proxy-client";const unleash = new Unleash
 
 The following example shows how to use the [Node.js SDK](/reference/sdks/node) to connect to your Unleash instance:
 
-Node.js SDK
+```javascript title="NodeJS SDK"
+const { initialize } = require("unleash-client");
 
+const unleash = initialize({
+    url: "https://<YOUR_UNLEASH_INSTANCE>/api",
+    appName: "<YOUR_APP_NAME>",
+    customHeaders: {
+        Authorization: "<YOUR_TOKEN>",
+    },
+});
+
+unleash.on("synchronized", () => {
+    // Unleash is ready to serve updated feature flags.
+
+    if (unleash.isEnabled("some-flag")) {
+        // do cool new things when the flag is enabled
+    }
+});
 ```
-const { initialize } = require("unleash-client");const unleash = initialize({    url: "https://<YOUR_UNLEASH_INSTANCE>/api",    appName: "<YOUR_APP_NAME>",    customHeaders: {        Authorization: "<YOUR_TOKEN>",    },});unleash.on("synchronized", () => {    // Unleash is ready to serve updated feature flags.    if (unleash.isEnabled("some-flag")) {        // do cool new things when the flag is enabled    }});
-```
+  </Tab>
+</Tabs>
+
+
+
 
 For examples that show how to connect to Unleash in other programming languages, see the [Unleash SDK Examples repository](https://github.com/Unleash/unleash-sdk-examples).
 
@@ -90,4 +137,40 @@ You have successfully connected Unleash to your application. To continue explori
 * **Developer guides**: Explore feature flag [best practices](/topics/feature-flags/feature-flag-best-practices) and [language-specific tutorials](/feature-flag-tutorials/react).
 * **Join the community**: Have questions or feedback? Join the [Unleash community on Slack](https://slack.unleash.run) to connect with other developers and the Unleash team.
 
-[Edit this page](https://github.com/Unleash/unleash/edit/main/website/docs/quickstart.mdx)
+
+## FAQs
+
+
+<AccordionGroup>
+  <Accordion title="How can we synchronize flag configurations between different environments?">
+    For your day-to-day workflow, you typically configure the flag's activation strategies in each of the target environments manually. 
+    If you want to bootstrap a whole new environment, you can clone an existing environment and tweak the flag configurations as needed. 
+    For full automation, you can use the Unleash API to build scripts that read the configuration from a source environment and apply it to a target.
+  </Accordion>
+
+  <Accordion title="Can I restrict a user's access to only one environment within a project?">
+    Yes. This is a core use case for custom project roles. 
+    You can create a new role (for example, "QA Engineer") and grant it permissions, such as UPDATE_FEATURE_STRATEGY, only for the testing environment. 
+    For all other environments like development and production, you would grant no permissions or read-only permissions. 
+    This ensures the user can only make changes in their designated environment.
+  </Accordion>
+
+  <Accordion title="How many environments should we have?">
+    It depends on your release process. A typical setup for a large organization is three to five environments:
+    
+    - development: For local developer machines and CI builds.  
+    - test or QA: A shared, stable environment for dedicated testing by the QA team.  
+    - staging or pre-prod: A production-like environment for final validation, performance testing, and release rehearsals.  
+    - production: The live environment for your end users.  
+
+    Some organizations add more specialized environments, such as one for demo purposes or a hotfix environment for emergency patches.
+  </Accordion>
+
+  <Accordion title="How is Unleash's environment model different from other tools like LaunchDarkly?">
+    Unleash uses a unified flag model where a single flag is a persistent entity across all environments, with only its configuration (strategies, variants) changing per environment. 
+    This provides a holistic, end-to-end view of a feature's lifecycle from a single dashboard.
+
+    Other tools may treat flags in each environment as more distinct, separate objects, which can sometimes make it harder to trace a single feature's entire journey. 
+    The key benefit of the Unleash model is simplified management, clear traceability, and a more intuitive structure for applying environment-specific RBAC.
+  </Accordion>
+</AccordionGroup>
