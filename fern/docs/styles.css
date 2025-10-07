@@ -51,6 +51,14 @@ body:has(.landing-page) .fern-card {
     padding-bottom: 3rem;
 }
 
+body:has(.landing-page) .fern-card:hover {
+    background-color: #f5f6fa80 !important; /* very light shade for light mode, transparent */
+}
+
+.dark body:has(.landing-page) .fern-card:hover {
+    background-color: #23233a80 !important; /* lighter shade for dark mode, transparent */
+}
+
 body:has(.landing-page) .fern-card::after {
     content: '';
     position: absolute;
