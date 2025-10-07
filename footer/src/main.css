@@ -1,10 +1,10 @@
 :root {
-  --footer-background-color: #f5f5f7;
+  --footer-background-color: #ffffff;
   --contact-support-hover-color: #232323;
   --text-color: #202021;
   --link-color: #606770;
   --customer-support-background-color: #F5F5F5;
-  --border-color: #ebebee;
+  --border-color: #d9d9d9;
 
 }
 .dark {
@@ -13,7 +13,7 @@
    --text-color: #e3e3e3;
    --link-color: #DADDE1;
    --customer-support-background-color: #141414;
-   --border-color: #1a1925;
+   --border-color: #333333;
 
 }
 
@@ -37,7 +37,7 @@
 /* Top Container - Main Navigation */
 #fern-footer .top-container {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
   gap: 2rem;
   padding-top: 1.5rem;
   padding-right: 2rem;
@@ -53,13 +53,35 @@
   flex-direction: column;
 }
 
+/* Explicit grid positioning for navigation sections */
+#fern-footer .footer-section:nth-child(2) { /* Server SDKs */
+  grid-column: 3;
+}
+
+#fern-footer .footer-section:nth-child(3) { /* Frontend SDKs */
+  grid-column: 4;
+}
+
+#fern-footer .footer-section:nth-child(4) { /* Feature Flag use cases */
+  grid-column: 5;
+}
+
+#fern-footer .footer-section:nth-child(5) { /* Product */
+  grid-column: 6;
+}
+
+#fern-footer .footer-section:nth-child(6) { /* Support */
+  grid-column: 7;
+}
+
 
 /* Logo section styling */
 #fern-footer .logo-section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 13rem;
+  gap: 10rem;
+  grid-column: 1;
 }
 
 #fern-footer .logo-and-text {
@@ -116,9 +138,9 @@
 /* Section titles */
 #fern-footer .section-title {
   font-size: 12px;
-  font-weight: 400;
+  font-weight: bold !important;
   color: var(--text-color);
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 /* Footer links */
@@ -128,7 +150,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.35em;
 }
 
 #fern-footer .footer-links li {
@@ -136,10 +158,7 @@
 }
 
 #fern-footer .footer-links li a {
-  /* text-decoration: underline; */
-  /* text-underline-offset: 3px; */
   color: var(--link-color);
-  font-weight: 500 !important;
   font-size: 12px !important;
 }
 
@@ -168,7 +187,7 @@
 }
 
 #fern-footer .copyright-section {
-  color: var(--grayscale-8);
+  color: var(--text-color);
   font-size: 12px;
   display: flex;
   flex-direction: row;
@@ -297,6 +316,7 @@
   
   #fern-footer .section-title {
     margin-bottom: 1rem;
+    font-weight: bold !important; 
   }
   
   #fern-footer .footer-links {
