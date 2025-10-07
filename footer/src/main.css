@@ -1,0 +1,319 @@
+:root {
+  --footer-background-color: #f5f5f7;
+  --contact-support-hover-color: #232323;
+  --text-color: #202021;
+  --link-color: #606770;
+  --customer-support-background-color: #F5F5F5;
+  --border-color: #ebebee;
+
+}
+.dark {
+  --footer-background-color: #222130;
+  --contact-support-hover-color: #f3f4f6;
+   --text-color: #e3e3e3;
+   --link-color: #DADDE1;
+   --customer-support-background-color: #141414;
+   --border-color: #1a1925;
+
+}
+
+/* Unleash Footer Styles */
+#fern-footer {
+  width: 100%;
+  clear: both;
+  margin-top: auto;
+}
+
+#fern-footer footer {
+  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; */
+  line-height: 1.6;
+  color: #374151;
+  font-size: 14px;
+  background: var(--footer-background-color);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Top Container - Main Navigation */
+#fern-footer .top-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 2rem;
+  padding-top: 1.5rem;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 2rem;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/* Footer sections */
+#fern-footer .footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Logo section styling */
+#fern-footer .logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13rem;
+}
+
+#fern-footer .logo-and-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+#fern-footer .logo-container {
+  flex-shrink: 0;
+}
+
+#fern-footer .unleash-logo {
+  width: 48px;
+  height: 48px;
+}
+
+/* Social links under logo and text */
+#fern-footer .logo-section .social-links {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  margin-left: 4rem;
+}
+
+#fern-footer .unleash-logo-dark {
+  display: block;
+}
+
+#fern-footer .unleash-logo-light {
+  display: none;
+}
+
+/* Also support explicit dark mode class if Fern uses it */
+[data-theme="dark"] #fern-footer .unleash-logo-dark,
+.dark #fern-footer .unleash-logo-dark {
+  display: none;
+}
+
+[data-theme="dark"] #fern-footer .unleash-logo-light,
+.dark #fern-footer .unleash-logo-light {
+  display: block;
+}
+
+#fern-footer .company-description {
+  color: var(--text-color);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* Section titles */
+#fern-footer .section-title {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-color);
+  margin: 0 0 1.5rem 0;
+}
+
+/* Footer links */
+#fern-footer .footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#fern-footer .footer-links li {
+  margin: 0;
+}
+
+#fern-footer .footer-links li a {
+  /* text-decoration: underline; */
+  /* text-underline-offset: 3px; */
+  color: var(--link-color);
+  font-weight: 500 !important;
+  font-size: 12px !important;
+}
+
+#fern-footer .footer-links a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 12px !important;
+  transition: color 0.2s ease;
+}
+
+#fern-footer .footer-links a:hover {
+  color: var(--accent-contrast);
+  opacity: 0.8;
+}
+
+/* Bottom Container - Copyright only */
+#fern-footer .bottom-container {
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 5rem 3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+#fern-footer .copyright-section {
+  color: var(--grayscale-8);
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#fern-footer .built-with {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+#fern-footer .social-links a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--grayscale-8);
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+#fern-footer .social-links a:hover {
+  color: var(--grayscale-9);
+}
+
+#fern-footer .social-links svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  #fern-footer .top-container {
+    padding: 3rem 3rem 2rem;
+    gap: 2.5rem;
+  }
+  
+  #fern-footer .bottom-container {
+    padding: 1rem 3rem 3rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  #fern-footer .top-container {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem 1.5rem;
+    padding: 2rem 2rem 2rem 2rem;
+  }
+  
+  #fern-footer .logo-section {
+    grid-column: 1 / -1;
+  }
+  
+  #fern-footer .logo-section .social-links {
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+  
+  #fern-footer .company-description {
+    max-width: 100%;
+  }
+  
+  #fern-footer .bottom-container {
+    padding: 1.5rem 2rem 2rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #fern-footer .top-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.5rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  #fern-footer .logo-section {
+    grid-column: 1 / -1;
+  }
+  
+  #fern-footer .logo-and-text {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  #fern-footer .logo-section .social-links {
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+  
+  #fern-footer .footer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  #fern-footer .company-description {
+    max-width: 100%;
+  }
+  
+  #fern-footer .bottom-container {
+    padding: 1.5rem 1.5rem 2rem;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  #fern-footer .top-container {
+    grid-template-columns: 1fr;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+  
+  #fern-footer .logo-section {
+    grid-column: 1;
+  }
+  
+  #fern-footer .bottom-container {
+    padding: 1rem 1rem 1.5rem;
+  }
+  
+  #fern-footer .section-title {
+    margin-bottom: 1rem;
+  }
+  
+  #fern-footer .footer-links {
+    gap: 0.5rem;
+  }
+  
+  #fern-footer .social-links {
+    gap: 1.5rem;
+  }
+  
+  #fern-footer .social-links a {
+    width: 40px;
+    height: 40px;
+  }
+  
+  #fern-footer .social-links svg {
+    width: 20px;
+    height: 20px;
+  }
+}
