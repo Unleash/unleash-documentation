@@ -149,7 +149,7 @@ export const FernFooter: React.FC = () => {
           <div className="copyright-section">
             <span>Made in a cosy atmosphere in the Nordic countries.</span>
             <div className="built-with">
-              <span>Copyright © 2025 Unleash. Built with Docs</span>
+              <span>Copyright © 2025 Unleash</span>
             </div>
           </div>
         </div>
