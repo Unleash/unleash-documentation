@@ -1,15 +1,19 @@
 :root {
-  --footer-background-color: #1a1924;
+  --footer-background-color: #f5f5f7;
   --contact-support-hover-color: #232323;
-  --customer-support-text-color: #141414;
+  --text-color: #202021;
+  --link-color: #606770;
   --customer-support-background-color: #F5F5F5;
+  --border-color: #ebebee;
 
 }
 .dark {
-  --footer-background-color: #eaeaed;
+  --footer-background-color: #222130;
   --contact-support-hover-color: #f3f4f6;
-   --customer-support-text-color: #F5F5F5;
+   --text-color: #e3e3e3;
+   --link-color: #DADDE1;
    --customer-support-background-color: #141414;
+   --border-color: #1a1925;
 
 }
 
@@ -35,7 +39,10 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
   gap: 2rem;
-  padding: 3rem 5rem 2rem;
+  padding-top: 1.5rem;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 2rem;
   margin: 0 auto;
   max-width: 100%;
 }
@@ -46,60 +53,71 @@
   flex-direction: column;
 }
 
-/* Remove old ID.me specific positioning */
 
 /* Logo section styling */
 #fern-footer .logo-section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 13rem;
+}
+
+#fern-footer .logo-and-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 #fern-footer .logo-container {
-  margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 #fern-footer .unleash-logo {
-  margin-bottom: 1rem;
+  width: 48px;
+  height: 48px;
 }
 
-#fern-footer .unleash-logo svg {
-  width: 48px;
-  height: 32px;
+/* Social links under logo and text */
+#fern-footer .logo-section .social-links {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  margin-left: 4rem;
 }
 
 #fern-footer .unleash-logo-dark {
-  display: none;
+  display: block;
 }
 
 #fern-footer .unleash-logo-light {
-  display: block;
+  display: none;
 }
 
 /* Also support explicit dark mode class if Fern uses it */
 [data-theme="dark"] #fern-footer .unleash-logo-dark,
 .dark #fern-footer .unleash-logo-dark {
-  display: block;
+  display: none;
 }
 
 [data-theme="dark"] #fern-footer .unleash-logo-light,
 .dark #fern-footer .unleash-logo-light {
-  display: none;
+  display: block;
 }
 
 #fern-footer .company-description {
-  color: var(--accent-contrast);
-  font-size: 14px;
+  color: var(--text-color);
+  font-size: 12px;
   line-height: 1.5;
   margin: 0;
-  max-width: 280px;
+  flex: 1;
 }
 
 /* Section titles */
 #fern-footer .section-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
-  color: var(--grayscale-6);
+  color: var(--text-color);
   margin: 0 0 1.5rem 0;
 }
 
@@ -118,16 +136,17 @@
 }
 
 #fern-footer .footer-links li a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  /* text-decoration: underline; */
+  /* text-underline-offset: 3px; */
+  color: var(--link-color);
   font-weight: 500 !important;
-  font-size: 16px;
+  font-size: 12px !important;
 }
 
 #fern-footer .footer-links a {
   text-decoration: none;
-  color: var(--accent-contrast);
-  font-size: 14px;
+  color: var(--text-color);
+  font-size: 12px !important;
   transition: color 0.2s ease;
 }
 
@@ -136,14 +155,13 @@
   opacity: 0.8;
 }
 
-/* Removed old help section styles - not needed for Unleash footer */
-
-/* Bottom Container - Copyright and Social Links */
+/* Bottom Container - Copyright only */
 #fern-footer .bottom-container {
-  border-top: 1px solid var(--accent-contrast);
+  border-top: 1px solid var(--border-color);
   padding: 1rem 5rem 3rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: flex-start;
   max-width: 100%;
   margin: 0 auto;
@@ -151,10 +169,12 @@
 
 #fern-footer .copyright-section {
   color: var(--grayscale-8);
-  font-size: 14px;
+  font-size: 12px;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 #fern-footer .built-with {
@@ -162,14 +182,9 @@
   opacity: 0.8;
 }
 
-#fern-footer .social-links {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 #fern-footer .social-links a {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   width: 32px;
@@ -212,6 +227,11 @@
     grid-column: 1 / -1;
   }
   
+  #fern-footer .logo-section .social-links {
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+  
   #fern-footer .company-description {
     max-width: 100%;
   }
@@ -232,6 +252,17 @@
     grid-column: 1 / -1;
   }
   
+  #fern-footer .logo-and-text {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  #fern-footer .logo-section .social-links {
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+  
   #fern-footer .footer-section {
     display: flex;
     flex-direction: column;
@@ -244,14 +275,8 @@
   }
   
   #fern-footer .bottom-container {
-    flex-direction: column;
-    gap: 1.5rem;
     padding: 1.5rem 1.5rem 2rem;
     text-align: left;
-  }
-  
-  #fern-footer .social-links {
-    order: -1;
   }
 }
 

@@ -77,19 +77,17 @@ body:has(.landing-page) .fern-card:before {
     opacity: 0.8;
 }
 
-/* Adjust background visibility for light mode */
-@media (prefers-color-scheme: light) {
-    body:has(.landing-page) .fern-card:before {
-        opacity: 0.6;
-        filter: brightness(0.5) contrast(1.5);
-    }
+/* Light mode - use Fern's light theme class */
+[data-theme="light"] body:has(.landing-page) .fern-card:before,
+body:not([data-theme="dark"]):has(.landing-page) .fern-card:before {
+    opacity: 0.7 !important;
+    filter: brightness(0.4) contrast(1.8) !important;
 }
 
-/* Ensure background is visible in dark mode */
-@media (prefers-color-scheme: dark) {
-    body:has(.landing-page) .fern-card:before {
-        opacity: 0.6;
-    }
+/* Dark mode - use Fern's dark theme class */
+[data-theme="dark"] body:has(.landing-page) .fern-card:before {
+    opacity: 0.6 !important;
+    filter: none !important;
 }
 
 /* Ensure card content is positioned above background */
