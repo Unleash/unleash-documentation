@@ -39,9 +39,9 @@ body:has(.landing-page) .fern-page-actions {
     border-radius: 12px;
 }
 
-.fern-header-content .fern-button {
+/* .fern-header-content .fern-button {
     border-radius: 0px;
-}
+} */
 
 /* Card bottom stripe styles */
 body:has(.landing-page) .fern-card {
@@ -99,3 +99,7 @@ body:has(.landing-page) .fern-card > * {
 /* #fern-sidebar-scroll-area {
     background-color: blue;
   } */
+
+img {
+    border-radius: 12px !important;
+}
