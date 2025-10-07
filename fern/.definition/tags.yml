@@ -1,0 +1,364 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Create, update, and delete [tags and tag
+  types](https://docs.getunleash.io/reference/feature-toggles#tags).
+service:
+  auth: false
+  base-path: ''
+  display-name: Tags
+  endpoints:
+    addTagToFeatures:
+      display-name: Adds a tag to the specified features
+      docs: Add a tag to a list of features. Create tags if needed.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            projectId: projectId
+          request:
+            features:
+              - features
+            tags:
+              addedTags:
+                - type: simple
+                  value: tag-to-add
+              removedTags:
+                - type: simple
+                  value: tag-to-remove
+      method: PUT
+      path: /api/admin/projects/{projectId}/tags
+      path-parameters:
+        projectId: string
+      request:
+        body:
+          properties:
+            features:
+              docs: The list of features that will be affected by the tag changes.
+              type: list<string>
+            tags:
+              docs: The tag changes to be applied to the features.
+              type: root.UpdateTagsSchema
+        content-type: application/json
+        name: TagsBulkAddSchema
+      source:
+        openapi: openapi.json
+    createTag:
+      display-name: Create a new tag.
+      docs: Create a new tag with the specified data.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.ConflictError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            type: simple
+            value: a-tag-value
+          response:
+            body:
+              tag:
+                color: '#FFFFFF'
+                type: simple
+                value: a-tag-value
+              version: 1
+      method: POST
+      path: /api/admin/tags
+      request:
+        body:
+          properties:
+            color:
+              docs: The hexadecimal color code for the tag type.
+              type: optional<string>
+              validation:
+                pattern: ^#[0-9A-Fa-f]{6}$
+            type:
+              docs: >-
+                The
+                [type](https://docs.getunleash.io/reference/feature-toggles#tags)
+                of the tag
+              type: string
+              validation:
+                maxLength: 50
+                minLength: 2
+            value:
+              docs: >-
+                The value of the tag. The value must be between 2 and 50
+                characters long. Leading and trailing whitespace is ignored and
+                will be trimmed before saving the tag value.
+              type: string
+              validation:
+                pattern: ^\s*\S.{0,48}\S\s*$
+        content-type: application/json
+        name: CreateTagSchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.TagWithVersionSchema
+      source:
+        openapi: openapi.json
+    createTagType:
+      display-name: Create a tag type
+      docs: Create a new tag type.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.ConflictError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            name: color
+          response:
+            body:
+              color: '#FFFFFF'
+              description: A tag type for describing the color of a tag.
+              icon: not-really-used
+              name: color
+      method: POST
+      path: /api/admin/tag-types
+      request:
+        body: root.TagTypeSchema
+        content-type: application/json
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.TagTypeSchema
+      source:
+        openapi: openapi.json
+    deleteTag:
+      display-name: Delete a tag.
+      docs: >-
+        Delete a tag by type and value. When a tag is deleted all references to
+        the tag are removed.
+      examples:
+        - path-parameters:
+            type: type
+            value: value
+      method: DELETE
+      path: /api/admin/tags/{type}/{value}
+      path-parameters:
+        type: string
+        value: string
+      source:
+        openapi: openapi.json
+    deleteTagType:
+      display-name: Delete a tag type
+      docs: >-
+        Deletes a tag type. If any features have tags of this type, those tags
+        will be deleted.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            name: name
+      method: DELETE
+      path: /api/admin/tag-types/{name}
+      path-parameters:
+        name: string
+      source:
+        openapi: openapi.json
+    getTag:
+      display-name: Get a tag by type and value.
+      docs: >-
+        Get a tag by type and value. Can be used to check whether a given tag
+        already exists in Unleash or not.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            type: type
+            value: value
+          response:
+            body:
+              tag:
+                color: '#FFFFFF'
+                type: simple
+                value: a-tag-value
+              version: 1
+      method: GET
+      path: /api/admin/tags/{type}/{value}
+      path-parameters:
+        type: string
+        value: string
+      response:
+        docs: tagWithVersionSchema
+        status-code: 200
+        type: root.TagWithVersionSchema
+      source:
+        openapi: openapi.json
+    getTags:
+      display-name: List all tags.
+      docs: List all tags available in Unleash.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - response:
+            body:
+              tags:
+                - color: '#FFFFFF'
+                  type: simple
+                  value: a-tag-value
+              version: 1
+      method: GET
+      path: /api/admin/tags
+      response:
+        docs: tagsSchema
+        status-code: 200
+        type: root.TagsSchema
+      source:
+        openapi: openapi.json
+    getTagsByType:
+      display-name: List all tags of a given type.
+      docs: >-
+        List all tags of a given type. If the tag type does not exist it returns
+        an empty list.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            type: type
+          response:
+            body:
+              tags:
+                - color: '#FFFFFF'
+                  type: simple
+                  value: a-tag-value
+              version: 1
+      method: GET
+      path: /api/admin/tags/{type}
+      path-parameters:
+        type: string
+      response:
+        docs: tagsSchema
+        status-code: 200
+        type: root.TagsSchema
+      source:
+        openapi: openapi.json
+    getTagType:
+      display-name: Get a tag type
+      docs: Get a tag type by name.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              color: '#FFFFFF'
+              description: A tag type for describing the color of a tag.
+              icon: not-really-used
+              name: color
+      method: GET
+      path: /api/admin/tag-types/{name}
+      path-parameters:
+        name: string
+      response:
+        docs: tagTypeSchema
+        status-code: 200
+        type: root.TagTypeSchema
+      source:
+        openapi: openapi.json
+    getTagTypes:
+      display-name: Get all tag types
+      docs: Get a list of all available tag types.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - response:
+            body:
+              tagTypes:
+                - color: '#FFFFFF'
+                  description: A tag type for describing the color of a tag.
+                  icon: not-really-used
+                  name: color
+              version: 1
+      method: GET
+      path: /api/admin/tag-types
+      response:
+        docs: tagTypesSchema
+        status-code: 200
+        type: root.TagTypesSchema
+      source:
+        openapi: openapi.json
+    updateTagType:
+      display-name: Update a tag type
+      docs: Update the configuration for the specified tag type.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            name: name
+          request: {}
+      method: PUT
+      path: /api/admin/tag-types/{name}
+      path-parameters:
+        name: string
+      request:
+        body:
+          properties:
+            color:
+              docs: The hexadecimal color code for the tag type.
+              type: optional<string>
+              validation:
+                pattern: ^#[0-9A-Fa-f]{6}$
+            description:
+              docs: The description of the tag type.
+              type: optional<string>
+            icon:
+              docs: The icon of the tag type.
+              type: optional<string>
+        content-type: application/json
+        name: UpdateTagTypeSchema
+      source:
+        openapi: openapi.json
+    validateTagType:
+      display-name: Validate a tag type
+      docs: >-
+        Validates whether if the body of the request is a valid tag and whether
+        the a tag type with that name already exists or not. If a tag type with
+        the same name exists, this operation will return a 409 status code.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.ConflictError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            name: color
+          response:
+            body:
+              tagType:
+                color: '#FFFFFF'
+                description: A tag type for describing the color of a tag.
+                icon: not-really-used
+                name: color
+              valid: true
+      method: POST
+      path: /api/admin/tag-types/validate
+      request:
+        body: root.TagTypeSchema
+        content-type: application/json
+      response:
+        docs: validateTagTypeSchema
+        status-code: 200
+        type: root.ValidateTagTypeSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

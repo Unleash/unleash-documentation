@@ -2,4 +2,4 @@
 
 api:
   specs:
-    - openapi: openapi.yaml
+    - openapi: openapi.json

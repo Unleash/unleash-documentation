@@ -1,0 +1,235 @@
+imports:
+  root: __package__.yml
+types:
+  SearchFeaturesRequestSortOrder:
+    enum:
+      - asc
+      - desc
+    source:
+      openapi: openapi.json
+docs: Search for features.
+service:
+  auth: false
+  base-path: ''
+  display-name: Search
+  endpoints:
+    features:
+      display-name: Search and filter features
+      docs: Search and filter by selected fields.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - query-parameters:
+            archived: IS:true
+            createdAt: IS_ON_OR_AFTER:2023-01-28
+            createdBy: IS:1
+            favoritesFirst: 'true'
+            lastSeenAt: IS_ON_OR_AFTER:2023-01-28
+            lifecycle: IS:initial
+            limit: '50'
+            offset: '50'
+            project: IS:default
+            query: feature_a
+            segment: INCLUDE:pro-users
+            sortBy: type
+            sortOrder: asc
+            state: IS:active
+            tag: INCLUDE:simple:my_tag
+            type: IS:release
+          response:
+            body:
+              features:
+                - archivedAt: '2023-01-29T15:21:39Z'
+                  createdAt: '2023-01-28T15:21:39Z'
+                  createdBy:
+                    id: 123
+                    imageUrl: https://example.com/242x200.png
+                    name: User
+                  dependencyType: parent
+                  description: >-
+                    Controls disabling of the comments section in case of an
+                    incident
+                  environments:
+                    - enabled: true
+                      environment: development
+                      featureName: disable-comments
+                      milestoneName: Phase One
+                      milestoneOrder: 0
+                      name: my-dev-env
+                      'no': 50
+                      sortOrder: 3
+                      strategies:
+                        - constraints:
+                            - contextName: appName
+                              operator: NOT_IN
+                              value: my-app
+                          featureName: myAwesomeFeature
+                          id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                          name: flexibleRollout
+                          sortOrder: 9999
+                          variants:
+                            - name: blue_group
+                              payload:
+                                type: json
+                                value: '{"color": "red"}'
+                              stickiness: custom.context.field
+                              weight: 1
+                              weightType: variable
+                      totalMilestones: 0
+                      type: development
+                      variants:
+                        - name: blue_group
+                          overrides:
+                            - contextName: userId
+                              values:
+                                - red
+                                - blue
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1.1
+                      'yes': 974
+                  favorite: true
+                  impressionData: false
+                  lifecycle:
+                    enteredStageAt: '2023-01-28T15:21:39Z'
+                    stage: initial
+                  name: disable-comments
+                  project: dx-squad
+                  segments:
+                    - pro-users
+                    - main-segment
+                  stale: false
+                  tags:
+                    - type: simple
+                      value: a-tag-value
+                  type: kill-switch
+              total: 10
+      method: GET
+      path: /api/admin/search/features
+      request:
+        name: SearchFeaturesRequest
+        query-parameters:
+          archived:
+            docs: >-
+              Whether to get results for archived feature flags or active
+              feature flags. If `true`, Unleash will return only archived flags.
+              If `false`, it will return only active flags.
+            type: optional<string>
+          createdAt:
+            docs: >-
+              The date the feature was created. The date can be specified with
+              an operator. The supported operators are IS_BEFORE,
+              IS_ON_OR_AFTER.
+            type: optional<string>
+            validation:
+              pattern: ^(IS_BEFORE|IS_ON_OR_AFTER):\d{4}-\d{2}-\d{2}$
+          createdBy:
+            docs: >-
+              The feature flag creator to filter by. The creators can be
+              specified with an operator. The supported operators are IS,
+              IS_NOT, IS_ANY_OF, IS_NONE_OF.
+            type: optional<string>
+            validation:
+              pattern: ^(IS|IS_NOT|IS_ANY_OF|IS_NONE_OF):(.*?)(,([a-zA-Z0-9_]+))*$
+          favoritesFirst:
+            docs: >-
+              The flag to indicate if the favorite features should be returned
+              first. By default it is set to false.
+            type: optional<string>
+          lastSeenAt:
+            docs: >-
+              The date the feature was last seen from metrics. The date can be
+              specified with an operator. The supported operators are IS_BEFORE,
+              IS_ON_OR_AFTER.
+            type: optional<string>
+            validation:
+              pattern: ^(IS_BEFORE|IS_ON_OR_AFTER):\d{4}-\d{2}-\d{2}$
+          lifecycle:
+            docs: >-
+              The lifecycle stage of the feature. The stagee can be specified
+              with an operator. The supported operators are IS, IS_NOT,
+              IS_ANY_OF, IS_NONE_OF.
+            type: optional<string>
+            validation:
+              pattern: ^(IS|IS_NOT|IS_ANY_OF|IS_NONE_OF):(.*?)(,([a-zA-Z0-9_]+))*$
+          limit:
+            docs: >-
+              The number of feature environments to return in a page. By default
+              it is set to 50.
+            type: optional<string>
+          offset:
+            docs: >-
+              The number of features to skip when returning a page. By default
+              it is set to 0.
+            type: optional<string>
+          project:
+            docs: >-
+              Id of the project where search and filter is performed. The
+              project id can be specified with an operator. The supported
+              operators are IS, IS_NOT, IS_ANY_OF, IS_NONE_OF.
+            type: optional<string>
+            validation:
+              pattern: ^(IS|IS_NOT|IS_ANY_OF|IS_NONE_OF):(.*?)(,([a-zA-Z0-9_]+))*$
+          query:
+            docs: The search query for the feature name or tag
+            type: optional<string>
+          segment:
+            docs: >-
+              The list of segments with operators to filter by. The segment
+              valid operators are INCLUDE, DO_NOT_INCLUDE, INCLUDE_ALL_OF,
+              INCLUDE_ANY_OF, EXCLUDE_IF_ANY_OF, EXCLUDE_ALL.
+            type: optional<string>
+            validation:
+              pattern: >-
+                ^(INCLUDE|DO_NOT_INCLUDE|INCLUDE_ALL_OF|INCLUDE_ANY_OF|EXCLUDE_IF_ANY_OF|EXCLUDE_ALL):(.*?)(,([a-zA-Z0-9_]+))*$
+          sortBy:
+            docs: >-
+              The field to sort the results by. By default it is set to
+              "createdAt".
+            type: optional<string>
+          sortOrder:
+            docs: The sort order for the sortBy. By default it is det to "asc".
+            type: optional<SearchFeaturesRequestSortOrder>
+          state:
+            docs: >-
+              The state of the feature active/stale. The state can be specified
+              with an operator. The supported operators are IS, IS_NOT,
+              IS_ANY_OF, IS_NONE_OF.
+            type: optional<string>
+            validation:
+              pattern: ^(IS|IS_NOT|IS_ANY_OF|IS_NONE_OF):(.*?)(,([a-zA-Z0-9_]+))*$
+          status:
+            allow-multiple: true
+            docs: >-
+              The list of feature environment status to filter by. Feature
+              environment has to specify a name and a status joined with a
+              colon.
+            type: optional<string>
+          tag:
+            docs: >-
+              The list of feature tags to filter by. Feature tag has to specify
+              a type and a value joined with a colon.
+            type: optional<string>
+            validation:
+              pattern: >-
+                ^(INCLUDE|DO_NOT_INCLUDE|INCLUDE_ALL_OF|INCLUDE_ANY_OF|EXCLUDE_IF_ANY_OF|EXCLUDE_ALL):([^:,]+:.+?)(,\s*[^:,]+:.+?)*$
+          type:
+            docs: >-
+              The feature flag type to filter by. The type can be specified with
+              an operator. The supported operators are IS, IS_NOT, IS_ANY_OF,
+              IS_NONE_OF.
+            type: optional<string>
+            validation:
+              pattern: ^(IS|IS_NOT|IS_ANY_OF|IS_NONE_OF):(.*?)(,([a-zA-Z0-9_]+))*$
+      response:
+        docs: searchFeaturesSchema
+        status-code: 200
+        type: root.SearchFeaturesSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

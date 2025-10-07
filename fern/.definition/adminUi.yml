@@ -1,0 +1,324 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Configuration for the Unleash Admin UI. These endpoints should not be relied
+  upon and can change at any point without prior notice.
+service:
+  auth: false
+  base-path: ''
+  display-name: Admin UI
+  endpoints:
+    createFeedback:
+      display-name: Send Unleash feedback
+      docs: >-
+        Sends feedback gathered from the Unleash UI to the Unleash server. Must
+        be called with a token with an identifiable user (either from being sent
+        from the UI or from using a
+        [PAT](https://docs.getunleash.io/reference/api-tokens-and-client-keys#personal-access-tokens)).
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            feedbackId: pnps
+          response:
+            body:
+              feedbackId: pnps
+              given: '2023-07-06T08:29:21Z'
+              neverShow: false
+              userId: 2
+      method: POST
+      path: /api/admin/feedback
+      request:
+        body:
+          properties:
+            feedbackId:
+              docs: The name of the feedback session
+              type: string
+            neverShow:
+              docs: >-
+                `true` if the user has asked never to see this feedback
+                questionnaire again. Defaults to `false`.
+              type: optional<boolean>
+        content-type: application/json
+        name: FeedbackCreateSchema
+      response:
+        docs: feedbackResponseSchema
+        status-code: 200
+        type: root.FeedbackResponseSchema
+      source:
+        openapi: openapi.json
+    getLifecycleTrends:
+      display-name: Get lifecycle trends
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Gets lifecycle trends information showing feature flag progression
+        across development, production, and cleanup stages.
+      examples:
+        - query-parameters:
+            projects: project1,project2,project3
+          response:
+            body:
+              lifecycleTrends:
+                cleanup:
+                  categories:
+                    experimental:
+                      flagsOlderThanWeek: 0
+                      newFlagsThisWeek: 3
+                    permanent:
+                      flagsOlderThanWeek: 1
+                      newFlagsThisWeek: 0
+                    release:
+                      flagsOlderThanWeek: 0
+                      newFlagsThisWeek: 1
+                  medianDaysHistorically: 18
+                  medianDaysInCurrentStage: 16
+                  totalFlags: 5
+                develop:
+                  categories:
+                    experimental:
+                      flagsOlderThanWeek: 15
+                      newFlagsThisWeek: 13
+                    permanent:
+                      flagsOlderThanWeek: 7
+                      newFlagsThisWeek: 0
+                    release:
+                      flagsOlderThanWeek: 13
+                      newFlagsThisWeek: 0
+                  medianDaysHistorically: 25
+                  medianDaysInCurrentStage: 28
+                  totalFlags: 35
+                production:
+                  categories:
+                    experimental:
+                      flagsOlderThanWeek: 2
+                      newFlagsThisWeek: 5
+                    permanent:
+                      flagsOlderThanWeek: 3
+                      newFlagsThisWeek: 0
+                    release:
+                      flagsOlderThanWeek: 2
+                      newFlagsThisWeek: 1
+                  medianDaysHistorically: 12
+                  medianDaysInCurrentStage: 14
+                  totalFlags: 10
+      method: GET
+      path: /api/admin/insights/lifecycle
+      request:
+        name: GetLifecycleTrendsRequest
+        query-parameters:
+          projects:
+            docs: Comma-separated list of project IDs to filter lifecycle trends
+            type: optional<string>
+      response:
+        docs: lifecycleTrendsSchema
+        status-code: 200
+        type: root.LifecycleTrendsSchema
+      source:
+        openapi: openapi.json
+    getUiConfig:
+      display-name: Get UI configuration
+      docs: Retrieves the full configuration used to set up the Unleash Admin UI.
+      examples:
+        - response:
+            body:
+              authenticationType: open-source
+              baseUriPath: /enterprise
+              billing: subscription
+              disablePasswordAuth: false
+              emailEnabled: true
+              environment: Enterprise
+              feedbackUriPath: /feedback
+              flags:
+                featuresExportImport: true
+                messageBanner:
+                  enabled: false
+                  feature_enabled: true
+                  name: disabled
+                  payload:
+                    value: '{ "starter": "squirtle" }'
+              frontendApiOrigins:
+                - '*'
+              links:
+                - href: https://docs.getunleash.io/docs
+                  icon: library_books
+                  title: User documentation
+                  value: Documentation
+                - href: https://github.com/Unleash/unleash
+                  icon: c_github
+                  title: Source code on GitHub
+                  value: GitHub
+              maintenanceMode: false
+              maxSessionsCount: 10
+              name: Unleash enterprise
+              oidcConfiguredThroughEnv: false
+              prometheusAPIAvailable: true
+              resourceLimits:
+                actionSetActions: 10
+                actionSetFilters: 10
+                actionSetFilterValues: 10
+                actionSetsPerProject: 10
+                apiTokens: 2000
+                constraints: 30
+                constraintValues: 250
+                environments: 50
+                featureEnvironmentStrategies: 30
+                featureFlags: 5000
+                projects: 500
+                releaseTemplates: 5
+                segments: 300
+                segmentValues: 10
+                signalEndpoints: 10
+                signalTokensPerEndpoint: 10
+                strategySegments: 10
+              samlConfiguredThroughEnv: false
+              slogan: The enterprise-ready feature flag service.
+              unleashContext:
+                key: value
+              unleashUrl: https://unleash.mycompany.com/enterprise
+              version: 5.3.0-main
+              versionInfo:
+                buildDate: '2023-06-30T11:41:00Z'
+                current:
+                  enterprise: 5.3.0-main+2105.45ed03c9
+                  oss: 5.3.0-main
+                instanceId: 0d652a82-43db-4144-8e02-864b0b030710
+                isLatest: true
+                latest:
+                  enterprise: 5.1.5
+                  oss: 5.1.5
+      method: GET
+      path: /api/admin/ui-config
+      response:
+        docs: uiConfigSchema
+        status-code: 200
+        type: root.UiConfigSchema
+      source:
+        openapi: openapi.json
+    setCors:
+      display-name: Sets allowed CORS origins
+      docs: Sets Cross-Origin Resource Sharing headers for Frontend SDK API.
+      examples:
+        - request: {}
+      method: POST
+      path: /api/admin/ui-config/cors
+      request:
+        body:
+          properties:
+            frontendApiOrigins:
+              docs: >-
+                The list of origins that the front-end API should accept
+                requests from.
+              type: optional<list<string>>
+        content-type: application/json
+        name: SetCorsSchema
+      source:
+        openapi: openapi.json
+    uiObservability:
+      display-name: Accepts errors from the UI client
+      docs: >-
+        This endpoint accepts error reports from the UI client, so that we can
+        add observability on UI errors.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - request:
+            errorMessage: errorMessage
+      method: POST
+      path: /api/admin/record-ui-error
+      request:
+        body:
+          properties:
+            errorMessage:
+              docs: The error message
+              type: string
+            errorStack:
+              docs: The stack trace of the error
+              type: optional<string>
+        content-type: application/json
+        name: RecordUiErrorSchema
+      source:
+        openapi: openapi.json
+    updateFeedback:
+      display-name: Update Unleash feedback
+      docs: >-
+        Updates the feedback with the provided ID. Only provided fields are
+        updated. Fields left out are left untouched. Must be called with a token
+        with an identifiable user (either from being sent from the UI or from
+        using a
+        [PAT](https://docs.getunleash.io/reference/api-tokens-and-client-keys#personal-access-tokens)).
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              feedbackId: pnps
+              given: '2023-07-06T08:29:21Z'
+              neverShow: false
+              userId: 2
+      method: PUT
+      path: /api/admin/feedback/{id}
+      path-parameters:
+        id: string
+      request:
+        body:
+          properties:
+            given:
+              docs: When this feedback was given
+              type: optional<datetime>
+            neverShow:
+              docs: >-
+                `true` if the user has asked never to see this feedback
+                questionnaire again.
+              type: optional<boolean>
+            userId:
+              docs: The ID of the user that gave the feedback.
+              type: optional<integer>
+        content-type: application/json
+        name: FeedbackUpdateSchema
+      response:
+        docs: feedbackResponseSchema
+        status-code: 200
+        type: root.FeedbackResponseSchema
+      source:
+        openapi: openapi.json
+    updateSplashSettings:
+      display-name: Update splash settings
+      docs: >-
+        This operation updates splash settings for a user, indicating that they
+        have seen a particualar splash screen.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              seen: true
+              splashId: new-splash-screen
+              userId: 1
+      method: POST
+      path: /api/admin/splash/{id}
+      path-parameters:
+        id: string
+      response:
+        docs: splashResponseSchema
+        status-code: 200
+        type: root.SplashResponseSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

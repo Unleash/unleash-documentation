@@ -1,0 +1,230 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Create, update, and delete [context
+  fields](https://docs.getunleash.io/reference/unleash-context) that Unleash is
+  aware of.
+service:
+  auth: false
+  base-path: ''
+  display-name: Context
+  endpoints:
+    createContextField:
+      display-name: Create a context field
+      docs: >-
+        Endpoint that allows creation of [custom context
+        fields](https://docs.getunleash.io/reference/unleash-context#custom-context-fields)
+      examples:
+        - request:
+            name: subscriptionTier
+          response:
+            body:
+              createdAt: '2023-06-29T10:19:00Z'
+              description: Used to uniquely identify users
+              legalValues:
+                - description: Deep fuchsia
+                  value: '#c154c1'
+              name: userId
+              sortOrder: 900
+              stickiness: true
+              usedInFeatures: 3
+              usedInProjects: 2
+      method: POST
+      path: /api/admin/context
+      request:
+        body:
+          properties:
+            description:
+              docs: A description of the context field
+              type: optional<string>
+            legalValues:
+              docs: A list of allowed values for this context field
+              type: optional<list<root.LegalValueSchema>>
+            name:
+              docs: The name of the context field.
+              type: string
+            sortOrder:
+              docs: >-
+                How this context field should be sorted if no other sort order
+                is selected
+              type: optional<integer>
+            stickiness:
+              docs: >-
+                `true` if this field should be available for use with [custom
+                stickiness](https://docs.getunleash.io/reference/stickiness#custom-stickiness),
+                otherwise `false`
+              type: optional<boolean>
+        content-type: application/json
+        name: CreateContextFieldSchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.ContextFieldSchema
+      source:
+        openapi: openapi.json
+    deleteContextField:
+      display-name: Delete an existing context field
+      docs: >-
+        Endpoint that allows deletion of a custom context field. Does not
+        validate that context field is not in use, but since context field
+        configuration is stored in a json blob for the strategy, existing
+        strategies are safe.
+      examples:
+        - path-parameters:
+            contextField: contextField
+      method: DELETE
+      path: /api/admin/context/{contextField}
+      path-parameters:
+        contextField: string
+      source:
+        openapi: openapi.json
+    deleteContextFieldLegalValue:
+      display-name: Delete legal value for the context field
+      docs: >-
+        Removes the specified custom context field legal value. Does not
+        validate that the legal value is not in use and does not remove usage
+        from constraints that use it.
+      examples:
+        - path-parameters:
+            contextField: contextField
+            legalValue: legalValue
+      method: DELETE
+      path: /api/admin/context/{contextField}/legal-values/{legalValue}
+      path-parameters:
+        contextField: string
+        legalValue: string
+      source:
+        openapi: openapi.json
+    getContextField:
+      display-name: Gets context field
+      docs: >-
+        Returns specific [context
+        field](https://docs.getunleash.io/reference/unleash-context) identified
+        by the name in the path
+      examples:
+        - path-parameters:
+            contextField: contextField
+          response:
+            body:
+              createdAt: '2023-06-29T10:19:00Z'
+              description: Used to uniquely identify users
+              legalValues:
+                - description: Deep fuchsia
+                  value: '#c154c1'
+              name: userId
+              sortOrder: 900
+              stickiness: true
+              usedInFeatures: 3
+              usedInProjects: 2
+      method: GET
+      path: /api/admin/context/{contextField}
+      path-parameters:
+        contextField: string
+      response:
+        docs: contextFieldSchema
+        status-code: 200
+        type: root.ContextFieldSchema
+      source:
+        openapi: openapi.json
+    getContextFields:
+      display-name: Gets configured context fields
+      docs: >-
+        Returns all configured [Context
+        fields](https://docs.getunleash.io/reference/unleash-context) that have
+        been created.
+      examples:
+        - response:
+            body:
+              - createdAt: '2023-06-29T10:19:00Z'
+                description: Used to uniquely identify users
+                legalValues:
+                  - description: Deep fuchsia
+                    value: '#c154c1'
+                name: userId
+                sortOrder: 900
+                stickiness: true
+                usedInFeatures: 3
+                usedInProjects: 2
+      method: GET
+      path: /api/admin/context
+      response:
+        docs: contextFieldsSchema
+        status-code: 200
+        type: root.ContextFieldsSchema
+      source:
+        openapi: openapi.json
+    updateContextField:
+      display-name: Update an existing context field
+      docs: >-
+        Endpoint that allows updating a custom context field. Used to toggle
+        stickiness and add/remove legal values for this context field
+      examples:
+        - path-parameters:
+            contextField: contextField
+          request: {}
+      method: PUT
+      path: /api/admin/context/{contextField}
+      path-parameters:
+        contextField: string
+      request:
+        body:
+          properties:
+            description:
+              docs: A description of the context field
+              type: optional<string>
+            legalValues:
+              docs: A list of allowed values for this context field
+              type: optional<list<root.LegalValueSchema>>
+            sortOrder:
+              docs: >-
+                How this context field should be sorted if no other sort order
+                is selected
+              type: optional<integer>
+            stickiness:
+              docs: >-
+                `true` if this field should be available for use with [custom
+                stickiness](https://docs.getunleash.io/reference/stickiness#custom-stickiness),
+                otherwise `false`
+              type: optional<boolean>
+        content-type: application/json
+        name: UpdateContextFieldSchema
+      source:
+        openapi: openapi.json
+    updateContextFieldLegalValue:
+      display-name: Add or update legal value for the context field
+      docs: >-
+        Endpoint that allows adding or updating a single custom context field
+        legal value. If the legal value already exists, it will be updated with
+        the new description
+      examples:
+        - path-parameters:
+            contextField: contextField
+          request:
+            value: '#c154c1'
+      method: POST
+      path: /api/admin/context/{contextField}/legal-values
+      path-parameters:
+        contextField: string
+      request:
+        body: root.LegalValueSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+    validate:
+      display-name: Validate a context field
+      docs: >-
+        Check whether the provided data can be used to create a context field.
+        If the data is not valid, returns a 400 status code with the reason why
+        it is not valid.
+      examples:
+        - request:
+            name: betaUser
+      method: POST
+      path: /api/admin/context/validate
+      request:
+        body: root.NameSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

@@ -1,0 +1,358 @@
+imports:
+  root: __package__.yml
+docs: >-
+  [Import and
+  export](https://docs.getunleash.io/how-to/how-to-environment-import-export)
+  the state of your Unleash instance.
+service:
+  auth: false
+  base-path: ''
+  display-name: Import/Export
+  endpoints:
+    exportFeatures:
+      display-name: Export feature flags from an environment
+      docs: >-
+        Exports all features listed in the `features` property from the
+        environment specified in the request body. If set to `true`, the
+        `downloadFile` property will let you download a file with the exported
+        data. Otherwise, the export data is returned directly as JSON. Refer to
+        the documentation for more information about [Unleash's export
+        functionality](https://docs.getunleash.io/reference/deploy/environment-import-export#export).
+      errors:
+        - root.NotFoundError
+      examples:
+        - request:
+            environment: development
+            features:
+              - MyAwesomeFeature
+          response:
+            body:
+              contextFields:
+                - createdAt: '2023-06-29T10:19:00Z'
+                  description: Allows you to constrain on application name
+                  legalValues:
+                    - description: Deep fuchsia
+                      value: '#c154c1'
+                  name: appName
+                  sortOrder: 2
+                  stickiness: false
+                  usedInFeatures: 3
+                  usedInProjects: 2
+              dependencies:
+                - dependencies:
+                    - enabled: false
+                      feature: parent_feature
+                  feature: child_feature
+              featureEnvironments:
+                - changeRequestIds:
+                    - 1.1
+                  enabled: true
+                  environment: development
+                  featureName: my-feature
+                  hasEnabledStrategies: true
+                  hasStrategies: true
+                  lastSeenAt: '2023-01-28T16:21:39Z'
+                  milestoneName: Phase One
+                  milestoneOrder: 0
+                  name: variant-testing
+                  sortOrder: 3
+                  strategies:
+                    - constraints:
+                        - contextName: appName
+                          operator: NOT_IN
+                          value: my-app
+                      featureName: myAwesomeFeature
+                      id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                      name: flexibleRollout
+                      sortOrder: 9999
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+                  totalMilestones: 0
+                  type: development
+                  variantCount: 1.1
+                  variants:
+                    - name: a
+                      overrides:
+                        - contextName: userId
+                          values:
+                            - red
+                            - blue
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: random
+                      weight: 500
+                      weightType: variable
+                    - name: b
+                      overrides:
+                        - contextName: userId
+                          values:
+                            - red
+                            - blue
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: random
+                      weight: 500
+                      weightType: variable
+              features:
+                - archived: false
+                  archivedAt: '2023-01-29T15:21:39Z'
+                  children:
+                    - some-feature
+                  collaborators:
+                    users:
+                      - id: 123
+                        imageUrl: https://example.com/242x200.png
+                        name: User
+                  createdAt: '2023-01-28T15:21:39Z'
+                  createdBy:
+                    id: 123
+                    imageUrl: https://example.com/242x200.png
+                    name: User
+                  dependencies:
+                    - enabled: true
+                      feature: some-feature
+                      variants:
+                        - some-feature-blue-variant
+                  description: best feature ever
+                  enabled: true
+                  environments:
+                    - enabled: true
+                      environment: development
+                      featureName: disable-comments
+                      milestoneName: Phase One
+                      milestoneOrder: 0
+                      name: my-dev-env
+                      sortOrder: 3
+                      strategies:
+                        - constraints:
+                            - contextName: appName
+                              operator: NOT_IN
+                              value: my-app
+                          featureName: myAwesomeFeature
+                          id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                          name: flexibleRollout
+                          sortOrder: 9999
+                          variants:
+                            - name: blue_group
+                              payload:
+                                type: json
+                                value: '{"color": "red"}'
+                              stickiness: custom.context.field
+                              weight: 1
+                              weightType: variable
+                      totalMilestones: 0
+                      type: development
+                      variants:
+                        - name: blue_group
+                          overrides:
+                            - contextName: userId
+                              values:
+                                - red
+                                - blue
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1.1
+                  favorite: true
+                  impressionData: false
+                  lifecycle:
+                    enteredStageAt: '2023-01-28T15:21:39Z'
+                    stage: initial
+                  links:
+                    - id: 01JTJNCJ5XVP2KPJFA03YRBZCA
+                      url: https://github.com/search?q=cleanupReminder&type=code
+                  name: my-feature
+                  project: default
+                  stale: false
+                  tags:
+                    - type: simple
+                      value: a-tag-value
+                  type: release
+              featureStrategies:
+                - constraints:
+                    - contextName: appName
+                      operator: NOT_IN
+                      value: my-app
+                  disabled: false
+                  featureName: my-feature
+                  id: 924974d7-8003-43ee-87eb-c5f887c06fd1
+                  name: flexibleRollout
+                  parameters:
+                    groupId: default
+                    rollout: '50'
+                    stickiness: random
+                  segments:
+                    - 1
+                  sortOrder: 9999
+                  title: Rollout 50%
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+              featureTags:
+                - createdByUserId: 1
+                  featureName: my-feature
+                  tagType: simple
+                  tagValue: user-facing
+              links:
+                - feature: child_feature
+                  links:
+                    - url: https://github.com/search?q=cleanupReminder&type=code
+              segments:
+                - id: 1
+                  name: new-segment-name
+              tagTypes:
+                - color: '#FFFFFF'
+                  description: Used to simplify filtering of features
+                  icon: '#'
+                  name: simple
+      method: POST
+      path: /api/admin/features-batch/export
+      request:
+        body: root.ExportQuerySchema
+        content-type: application/json
+      response:
+        docs: exportResultSchema
+        status-code: 200
+        type: root.ExportResultSchema
+      source:
+        openapi: openapi.json
+    importToggles:
+      display-name: Import feature flags
+      docs: >-
+        [Import feature
+        flags](https://docs.getunleash.io/reference/deploy/environment-import-export#import)
+        into a specific project and environment.
+      errors:
+        - root.NotFoundError
+      examples:
+        - request:
+            data:
+              features:
+                - archived: false
+                  description: best feature ever
+                  impressionData: false
+                  name: my-feature
+                  project: default
+                  stale: false
+                  type: release
+              featureStrategies:
+                - constraints:
+                    - contextName: appName
+                      operator: NOT_IN
+                  disabled: false
+                  featureName: my-feature
+                  id: 924974d7-8003-43ee-87eb-c5f887c06fd1
+                  name: flexibleRollout
+                  parameters:
+                    groupId: default
+                    rollout: '50'
+                    stickiness: random
+                  segments:
+                    - 1
+                  title: Rollout 50%
+              tagTypes:
+                - description: Used to simplify filtering of features
+                  icon: '#'
+                  name: simple
+            environment: development
+            project: My awesome project
+      method: POST
+      path: /api/admin/features-batch/import
+      request:
+        body: root.ImportTogglesSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+    validateImport:
+      display-name: Validate feature import data
+      docs: >-
+        Validates a feature flag data set. Checks whether the data can be
+        imported into the specified project and environment. The returned value
+        is an object that contains errors, warnings, and permissions required to
+        perform the import, as described in the [import
+        documentation](https://docs.getunleash.io/reference/deploy/environment-import-export#import).
+      errors:
+        - root.NotFoundError
+      examples:
+        - request:
+            data:
+              features:
+                - archived: false
+                  description: best feature ever
+                  impressionData: false
+                  name: my-feature
+                  project: default
+                  stale: false
+                  type: release
+              featureStrategies:
+                - constraints:
+                    - contextName: appName
+                      operator: NOT_IN
+                  disabled: false
+                  featureName: my-feature
+                  id: 924974d7-8003-43ee-87eb-c5f887c06fd1
+                  name: flexibleRollout
+                  parameters:
+                    groupId: default
+                    rollout: '50'
+                    stickiness: random
+                  segments:
+                    - 1
+                  title: Rollout 50%
+              tagTypes:
+                - description: Used to simplify filtering of features
+                  icon: '#'
+                  name: simple
+            environment: development
+            project: My awesome project
+          response:
+            body:
+              errors:
+                - affectedItems:
+                    - my-feature (in project project-854)
+                  message: >-
+                    You cannot import a feature that already exist in other
+                    projects. You already have the following features defined
+                    outside of project default:
+              permissions:
+                - affectedItems:
+                    - some-feature-a
+                    - some-feature-b
+                  message: >-
+                    You cannot import a feature that already exist in other
+                    projects. You already have the following features defined
+                    outside of project default:
+              warnings:
+                - affectedItems:
+                    - custom-strategy-7
+                  message: >-
+                    The following strategy types will be used in import. Please
+                    make sure the strategy type parameters are configured as in
+                    source environment:
+      method: POST
+      path: /api/admin/features-batch/validate
+      request:
+        body: root.ImportTogglesSchema
+        content-type: application/json
+      response:
+        docs: importTogglesValidateSchema
+        status-code: 200
+        type: root.ImportTogglesValidateSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

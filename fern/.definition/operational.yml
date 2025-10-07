@@ -1,0 +1,95 @@
+imports:
+  root: __package__.yml
+docs: Endpoints related to the operational status of this Unleash instance.
+service:
+  auth: false
+  base-path: ''
+  display-name: Operational
+  endpoints:
+    getDetailedInvoices:
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        undefined
+      examples:
+        - response:
+            body:
+              invoices:
+                - dueDate: '2025-11-13T00:00:00Z'
+                  invoiceDate: '2025-11-01T00:00:00Z'
+                  invoicePDF: https://pay.stripe.com/invoice/acct_.../test_.../pdf?s=ap
+                  invoiceURL: https://invoice.stripe.com/i/acct_.../test_...?
+                  mainLines:
+                    - consumption: 0
+                      currency: usd
+                      description: 1 x Unleash PAYG Seat (at $75.00 / month)
+                      limit: 5
+                      lookupKey: auth_app_payg_seat
+                      quantity: 1
+                      totalAmount: 7500
+                  status: upcoming
+                  totalAmount: 8000
+                  usageLines:
+                    - consumption: 0
+                      currency: usd
+                      description: 1 x Unleash PAYG Seat (at $75.00 / month)
+                      limit: 5
+                      lookupKey: auth_app_payg_seat
+                      quantity: 1
+                      totalAmount: 7500
+      method: GET
+      path: /api/admin/invoices/list
+      response:
+        docs: '#/components/schemas/detailedInvoicesSchema'
+        status-code: 200
+        type: root.DetailedInvoicesSchema
+      source:
+        openapi: openapi.json
+    getHealth:
+      display-name: Get instance operational status
+      docs: >-
+        This operation returns information about whether this Unleash instance
+        is healthy and ready to serve requests or not. Typically used by your
+        deployment orchestrator (e.g. Kubernetes, Docker Swarm, Mesos, et al.).
+      errors:
+        - root.InternalServerError
+      examples:
+        - response:
+            body:
+              health: GOOD
+      method: GET
+      path: /health
+      response:
+        docs: healthCheckSchema
+        status-code: 200
+        type: root.HealthCheckSchema
+      source:
+        openapi: openapi.json
+    getInvoices:
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        undefined
+      examples:
+        - response:
+            body:
+              - amountFormatted: € 123.00
+                dueDate: '2018-11-13'
+                invoicePDF: https://invoice.url/pdf
+                invoiceURL: https://invoice.url
+                paid: true
+                status: pending
+      method: GET
+      path: /api/admin/invoices
+      response:
+        docs: invoicesSchema
+        status-code: 200
+        type: root.InvoicesSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

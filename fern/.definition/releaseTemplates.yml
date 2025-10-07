@@ -1,0 +1,772 @@
+imports:
+  root: __package__.yml
+docs: >-
+  API for managing [release
+  templates](https://docs.getunleash.io/reference/release-templates).
+service:
+  auth: false
+  base-path: ''
+  display-name: Release Templates
+  endpoints:
+    addMilestoneToReleaseTemplate:
+      display-name: Adds a milestone to a release template.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds release template identified by its id and adds a milestone
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            templateId: templateId
+          response:
+            body:
+              id: 01JB9GGTGQYEQ9D40R17T3YVW1
+              name: My milestone
+              releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+              sortOrder: 1
+              strategies:
+                - constraints:
+                    - caseInsensitive: false
+                      contextName: appName
+                      inverted: false
+                      operator: IN
+                      value: my-app
+                      values:
+                        - '1'
+                        - '2'
+                  id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                  milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  parameters:
+                    key: value
+                  segments:
+                    - 1
+                    - 2
+                  sortOrder: 9999
+                  strategyName: flexibleRollout
+                  title: Gradual Rollout 25-Prod
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+      method: POST
+      path: /api/admin/release-plan-templates/{templateId}/milestones
+      path-parameters:
+        templateId: string
+      response:
+        docs: '#/components/schemas/releasePlanMilestoneSchema'
+        status-code: 200
+        type: root.ReleasePlanMilestoneSchema
+      source:
+        openapi: openapi.json
+    addReleasePlan:
+      display-name: Add a release plan.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Adds a release plan to a specific feature flag and environment.
+      errors:
+        - root.UnauthorizedError
+        - root.ConflictError
+      examples:
+        - path-parameters:
+            environment: environment
+            featureName: featureName
+            project: project
+          request:
+            templateId: 01JB9GGTGQYEQ9D40R17T3YVW2
+          response:
+            body:
+              activeMilestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+              createdAt: '2022-01-01T00:00:00Z'
+              createdByUserId: 53
+              description: This is my release plan
+              discriminator: plan
+              environment: production
+              featureName: my-feature
+              id: 01JB9GGTGQYEQ9D40R17T3YVW2
+              milestones:
+                - id: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  name: My milestone
+                  releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+                  sortOrder: 1
+                  strategies:
+                    - constraints:
+                        - caseInsensitive: false
+                          contextName: appName
+                          inverted: false
+                          operator: IN
+                          value: my-app
+                          values:
+                            - '1'
+                            - '2'
+                      id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                      milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                      sortOrder: 9999
+                      strategyName: flexibleRollout
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+              name: My release plan
+              releasePlanTemplateId: 01JB9GGTGQYEQ9D40R17T3YVW2
+      method: POST
+      path: >-
+        /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+      path-parameters:
+        environment: string
+        featureName: string
+        project: string
+      request:
+        body: root.ReleasePlanTemplateIdSchema
+        content-type: application/json
+      response:
+        docs: '#/components/schemas/releasePlanSchema'
+        status-code: 200
+        type: root.ReleasePlanSchema
+      source:
+        openapi: openapi.json
+    addStrategyToMilestone:
+      display-name: Adds a strategy to a milestone.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds milestone identified by its id and adds a strategy.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            milestoneId: milestoneId
+            templateId: templateId
+          response:
+            body:
+              id: 01JB9GGTGQYEQ9D40R17T3YVW1
+              name: My milestone
+              releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+              sortOrder: 1
+              strategies:
+                - constraints:
+                    - caseInsensitive: false
+                      contextName: appName
+                      inverted: false
+                      operator: IN
+                      value: my-app
+                      values:
+                        - '1'
+                        - '2'
+                  id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                  milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  parameters:
+                    key: value
+                  segments:
+                    - 1
+                    - 2
+                  sortOrder: 9999
+                  strategyName: flexibleRollout
+                  title: Gradual Rollout 25-Prod
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+      method: POST
+      path: >-
+        /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies
+      path-parameters:
+        milestoneId: string
+        templateId: string
+      response:
+        docs: '#/components/schemas/releasePlanMilestoneSchema'
+        status-code: 200
+        type: root.ReleasePlanMilestoneSchema
+      source:
+        openapi: openapi.json
+    archiveReleaseTemplate:
+      display-name: Archives a release template by its id.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds and archives a release template by the provided id.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            templateId: templateId
+      method: POST
+      path: /api/admin/release-plan-templates/archive/{templateId}
+      path-parameters:
+        templateId: string
+      source:
+        openapi: openapi.json
+    createReleaseTemplate:
+      display-name: Create a release template.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Creates and returns a release template.
+      errors:
+        - root.UnauthorizedError
+        - root.ConflictError
+      examples:
+        - response:
+            body:
+              archivedAt: '2022-01-01T00:00:00Z'
+              createdAt: '2022-01-01T00:00:00Z'
+              createdByUserId: 53
+              description: This is my release plan
+              discriminator: template
+              id: 01JB9GGTGQYEQ9D40R17T3YVW2
+              milestones:
+                - id: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  name: My milestone
+                  releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+                  sortOrder: 1
+                  strategies:
+                    - constraints:
+                        - caseInsensitive: false
+                          contextName: appName
+                          inverted: false
+                          operator: IN
+                          value: my-app
+                          values:
+                            - '1'
+                            - '2'
+                      id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                      milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                      sortOrder: 9999
+                      strategyName: flexibleRollout
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+              name: My release plan
+      method: POST
+      path: /api/admin/release-plan-templates
+      response:
+        docs: '#/components/schemas/releasePlanTemplateSchema'
+        status-code: 200
+        type: root.ReleasePlanTemplateSchema
+      source:
+        openapi: openapi.json
+    deleteReleaseTemplate:
+      display-name: Deletes a release template by its id.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds and deletes a release template by the provided id.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            templateId: templateId
+      method: DELETE
+      path: /api/admin/release-plan-templates/{templateId}
+      path-parameters:
+        templateId: string
+      source:
+        openapi: openapi.json
+    getReleasePlans:
+      display-name: Get release plans.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Returns a list of all release plans for a specific feature flag and
+        environment.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            environment: environment
+            featureName: featureName
+            project: project
+          response:
+            body:
+              activeMilestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+              createdAt: '2022-01-01T00:00:00Z'
+              createdByUserId: 53
+              description: This is my release plan
+              discriminator: plan
+              environment: production
+              featureName: my-feature
+              id: 01JB9GGTGQYEQ9D40R17T3YVW2
+              milestones:
+                - id: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  name: My milestone
+                  releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+                  sortOrder: 1
+                  strategies:
+                    - constraints:
+                        - caseInsensitive: false
+                          contextName: appName
+                          inverted: false
+                          operator: IN
+                          value: my-app
+                          values:
+                            - '1'
+                            - '2'
+                      id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                      milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                      sortOrder: 9999
+                      strategyName: flexibleRollout
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+              name: My release plan
+              releasePlanTemplateId: 01JB9GGTGQYEQ9D40R17T3YVW2
+      method: GET
+      path: >-
+        /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+      path-parameters:
+        environment: string
+        featureName: string
+        project: string
+      response:
+        docs: '#/components/schemas/releasePlanSchema'
+        status-code: 200
+        type: root.ReleasePlanSchema
+      source:
+        openapi: openapi.json
+    getReleaseTemplate:
+      display-name: Get a release template by its id.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds and returns a release template by the provided id.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            templateId: templateId
+          response:
+            body:
+              archivedAt: '2022-01-01T00:00:00Z'
+              createdAt: '2022-01-01T00:00:00Z'
+              createdByUserId: 53
+              description: This is my release plan
+              discriminator: template
+              id: 01JB9GGTGQYEQ9D40R17T3YVW2
+              milestones:
+                - id: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  name: My milestone
+                  releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+                  sortOrder: 1
+                  strategies:
+                    - constraints:
+                        - caseInsensitive: false
+                          contextName: appName
+                          inverted: false
+                          operator: IN
+                          value: my-app
+                          values:
+                            - '1'
+                            - '2'
+                      id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                      milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                      sortOrder: 9999
+                      strategyName: flexibleRollout
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+              name: My release plan
+      method: GET
+      path: /api/admin/release-plan-templates/{templateId}
+      path-parameters:
+        templateId: string
+      response:
+        docs: '#/components/schemas/releasePlanTemplateSchema'
+        status-code: 200
+        type: root.ReleasePlanTemplateSchema
+      source:
+        openapi: openapi.json
+    getReleaseTemplates:
+      display-name: Get all release templates.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Returns a list of all release templates.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - response:
+            body:
+              archivedAt: '2022-01-01T00:00:00Z'
+              createdAt: '2022-01-01T00:00:00Z'
+              createdByUserId: 53
+              description: This is my release plan
+              discriminator: template
+              id: 01JB9GGTGQYEQ9D40R17T3YVW2
+              milestones:
+                - id: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  name: My milestone
+                  releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+                  sortOrder: 1
+                  strategies:
+                    - constraints:
+                        - caseInsensitive: false
+                          contextName: appName
+                          inverted: false
+                          operator: IN
+                          value: my-app
+                          values:
+                            - '1'
+                            - '2'
+                      id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                      milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                      sortOrder: 9999
+                      strategyName: flexibleRollout
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+              name: My release plan
+      method: GET
+      path: /api/admin/release-plan-templates
+      response:
+        docs: '#/components/schemas/releasePlanTemplateSchema'
+        status-code: 200
+        type: root.ReleasePlanTemplateSchema
+      source:
+        openapi: openapi.json
+    remoteMilestoneStrategy:
+      display-name: Removes a strategy attached to a milestone
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Deletes the milestone strategy
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            milestoneId: milestoneId
+            strategyId: strategyId
+            templateId: templateId
+      method: DELETE
+      path: >-
+        /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+      path-parameters:
+        milestoneId: string
+        strategyId: string
+        templateId: string
+      source:
+        openapi: openapi.json
+    removeReleasePlan:
+      display-name: Remove a release plan.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Removes a release plan from a specific feature flag and environment.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            environment: environment
+            featureName: featureName
+            planId: planId
+            project: project
+      method: DELETE
+      path: >-
+        /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}
+      path-parameters:
+        environment: string
+        featureName: string
+        planId: string
+        project: string
+      source:
+        openapi: openapi.json
+    removeReleaseTemplateMilestone:
+      display-name: Removes an existing milestone
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Deletes an existing milestone and all attached strategies beneath it
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            milestoneId: milestoneId
+            templateId: templateId
+      method: DELETE
+      path: /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+      path-parameters:
+        milestoneId: string
+        templateId: string
+      source:
+        openapi: openapi.json
+    startMilestone:
+      display-name: Start a release plan milestone.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Starts a release plan milestone for a specific feature flag and
+        environment.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            environment: environment
+            featureName: featureName
+            milestoneId: milestoneId
+            planId: planId
+            project: project
+          response:
+            body:
+              id: 01JB9GGTGQYEQ9D40R17T3YVW1
+              name: My milestone
+              releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+              sortOrder: 1
+              strategies:
+                - constraints:
+                    - caseInsensitive: false
+                      contextName: appName
+                      inverted: false
+                      operator: IN
+                      value: my-app
+                      values:
+                        - '1'
+                        - '2'
+                  id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                  milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  parameters:
+                    key: value
+                  segments:
+                    - 1
+                    - 2
+                  sortOrder: 9999
+                  strategyName: flexibleRollout
+                  title: Gradual Rollout 25-Prod
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+      method: POST
+      path: >-
+        /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}/milestones/{milestoneId}/start
+      path-parameters:
+        environment: string
+        featureName: string
+        milestoneId: string
+        planId: string
+        project: string
+      response:
+        docs: '#/components/schemas/releasePlanMilestoneSchema'
+        status-code: 200
+        type: root.ReleasePlanMilestoneSchema
+      source:
+        openapi: openapi.json
+    updateMilestoneStrategy:
+      display-name: Updates a strategy attached to a milestone
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Overwrites existing strategy configuration for the strategy referenced
+        by the id
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            milestoneId: milestoneId
+            strategyId: strategyId
+            templateId: templateId
+          response:
+            body:
+              constraints:
+                - caseInsensitive: false
+                  contextName: appName
+                  inverted: false
+                  operator: IN
+                  value: my-app
+                  values:
+                    - '1'
+                    - '2'
+              id: 01JB9GGTGQYEQ9D40R17T3YVW3
+              milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+              parameters:
+                key: value
+              segments:
+                - 1
+                - 2
+              sortOrder: 9999
+              strategyName: flexibleRollout
+              title: Gradual Rollout 25-Prod
+              variants:
+                - name: blue_group
+                  payload:
+                    type: json
+                    value: '{"color": "red"}'
+                  stickiness: custom.context.field
+                  weight: 1
+                  weightType: variable
+      method: PUT
+      path: >-
+        /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+      path-parameters:
+        milestoneId: string
+        strategyId: string
+        templateId: string
+      response:
+        docs: '#/components/schemas/releasePlanMilestoneStrategySchema'
+        status-code: 200
+        type: root.ReleasePlanMilestoneStrategySchema
+      source:
+        openapi: openapi.json
+    updateReleaseTemplate:
+      display-name: Updates a release template by its id.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds and updates a release template by the provided id. Will delete
+        existing milestones and create new ones from the body
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.ConflictError
+      examples:
+        - path-parameters:
+            templateId: templateId
+      method: PUT
+      path: /api/admin/release-plan-templates/{templateId}
+      path-parameters:
+        templateId: string
+      source:
+        openapi: openapi.json
+    updateReleaseTemplateMilestone:
+      display-name: Updates existing milestone
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Finds milestone by id, and updates to body included in request
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            milestoneId: milestoneId
+            templateId: templateId
+          response:
+            body:
+              id: 01JB9GGTGQYEQ9D40R17T3YVW1
+              name: My milestone
+              releasePlanDefinitionId: 01JB9GGTGQYEQ9D40R17T3YVW2
+              sortOrder: 1
+              strategies:
+                - constraints:
+                    - caseInsensitive: false
+                      contextName: appName
+                      inverted: false
+                      operator: IN
+                      value: my-app
+                      values:
+                        - '1'
+                        - '2'
+                  id: 01JB9GGTGQYEQ9D40R17T3YVW3
+                  milestoneId: 01JB9GGTGQYEQ9D40R17T3YVW1
+                  parameters:
+                    key: value
+                  segments:
+                    - 1
+                    - 2
+                  sortOrder: 9999
+                  strategyName: flexibleRollout
+                  title: Gradual Rollout 25-Prod
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+      method: PUT
+      path: /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+      path-parameters:
+        milestoneId: string
+        templateId: string
+      response:
+        docs: '#/components/schemas/releasePlanMilestoneSchema'
+        status-code: 200
+        type: root.ReleasePlanMilestoneSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

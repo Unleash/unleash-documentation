@@ -1,0 +1,200 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Create, update, and delete [Unleash API
+  tokens](https://docs.getunleash.io/reference/api-tokens-and-client-keys).
+service:
+  auth: false
+  base-path: ''
+  display-name: API tokens
+  endpoints:
+    createApiToken:
+      display-name: Create API token
+      docs: >-
+        Create an API token of a specific type: one of client, admin, frontend,
+        backend.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            tokenName: token-64522
+            type: frontend
+          response:
+            body:
+              alias: randomid-or-some-alias
+              createdAt: '2023-04-19T08:15:14Z'
+              environment: development
+              expiresAt: '2023-04-19T08:15:14Z'
+              project: developerexperience
+              projects:
+                - developerexperience
+                - enterprisegrowth
+              secret: project:environment.xyzrandomstring
+              seenAt: '2023-04-19T08:15:14Z'
+              tokenName: some-user
+              type: client
+      method: POST
+      path: /api/admin/api-tokens
+      request:
+        body:
+          properties:
+            environment:
+              docs: >-
+                The environment that the token should be valid for. Defaults to
+                "default"
+              type: optional<string>
+            expiresAt:
+              docs: The time when this token should expire.
+              type: optional<datetime>
+            project:
+              docs: >-
+                The project that the token should be valid for. Defaults to "*"
+                meaning every project. This property is mutually incompatible
+                with the `projects` property. If you specify one, you cannot
+                specify the other.
+              type: optional<string>
+            projects:
+              docs: >-
+                A list of projects that the token should be valid for. This
+                property is mutually incompatible with the `project` property.
+                If you specify one, you cannot specify the other.
+              type: optional<list<string>>
+            tokenName:
+              docs: The name of the token.
+              type: string
+            type:
+              docs: >-
+                A client or frontend token. Must be one of the strings "client"
+                (deprecated), "backend" (preferred over "client") or "frontend"
+                (not case sensitive).
+              type: string
+              validation:
+                pattern: >-
+                  ^([Cc][Ll][Ii][Ee][Nn][Tt]|[Bb][Aa][Cc][Kk][Ee][Nn][Dd]|[Ff][Rr][Oo][Nn][Tt][Ee][Nn][Dd])$
+        content-type: application/json
+        name: CreateApiTokenSchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.ApiTokenSchema
+      source:
+        openapi: openapi.json
+    deleteApiToken:
+      display-name: Delete API token
+      docs: >-
+        Deletes an existing API token. The `token` path parameter is the token's
+        `secret`. If the token does not exist, this endpoint returns a 200 OK,
+        but does nothing.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            token: token
+      method: DELETE
+      path: /api/admin/api-tokens/{token}
+      path-parameters:
+        token: string
+      source:
+        openapi: openapi.json
+    getAllApiTokens:
+      display-name: Get API tokens
+      docs: Retrieves all API tokens that exist in the Unleash instance.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - response:
+            body:
+              tokens:
+                - alias: randomid-or-some-alias
+                  createdAt: '2023-04-19T08:15:14Z'
+                  environment: development
+                  expiresAt: '2023-04-19T08:15:14Z'
+                  project: developerexperience
+                  projects:
+                    - developerexperience
+                    - enterprisegrowth
+                  secret: project:environment.xyzrandomstring
+                  seenAt: '2023-04-19T08:15:14Z'
+                  tokenName: some-user
+                  type: client
+      method: GET
+      path: /api/admin/api-tokens
+      response:
+        docs: apiTokensSchema
+        status-code: 200
+        type: root.ApiTokensSchema
+      source:
+        openapi: openapi.json
+    getApiTokensByName:
+      display-name: Get API tokens by name
+      docs: >-
+        Retrieves all API tokens that match a given token name. Because token
+        names are not unique, this endpoint will always return a list. If no
+        tokens with the provided name exist, the list will be empty. Otherwise,
+        it will contain all the tokens with the given name.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              tokens:
+                - alias: randomid-or-some-alias
+                  createdAt: '2023-04-19T08:15:14Z'
+                  environment: development
+                  expiresAt: '2023-04-19T08:15:14Z'
+                  project: developerexperience
+                  projects:
+                    - developerexperience
+                    - enterprisegrowth
+                  secret: project:environment.xyzrandomstring
+                  seenAt: '2023-04-19T08:15:14Z'
+                  tokenName: some-user
+                  type: client
+      method: GET
+      path: /api/admin/api-tokens/{name}
+      path-parameters:
+        name: string
+      response:
+        docs: apiTokensSchema
+        status-code: 200
+        type: root.ApiTokensSchema
+      source:
+        openapi: openapi.json
+    updateApiToken:
+      display-name: Update API token
+      docs: >-
+        Updates an existing API token with a new expiry date. The `token` path
+        parameter is the token's `secret`. If the token does not exist, this
+        endpoint returns a 200 OK, but does nothing.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            token: token
+          request:
+            expiresAt: '2023-09-04T09:26:24Z'
+      method: PUT
+      path: /api/admin/api-tokens/{token}
+      path-parameters:
+        token: string
+      request:
+        body:
+          properties:
+            expiresAt:
+              docs: The new time when this token should expire.
+              type: datetime
+        content-type: application/json
+        name: UpdateApiTokenSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

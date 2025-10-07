@@ -1,0 +1,371 @@
+imports:
+  root: __package__.yml
+types:
+  CreateStrategySchemaParametersItem:
+    inline: true
+    properties:
+      description:
+        docs: >-
+          A description of this strategy parameter. Use this to indicate to the
+          users what the parameter does.
+        type: optional<string>
+      name:
+        docs: The name of the parameter
+        type: string
+      required:
+        docs: >-
+          Whether this parameter must be configured when using the strategy.
+          Defaults to `false`
+        type: optional<boolean>
+      type:
+        docs: >-
+          The [type of the
+          parameter](https://docs.getunleash.io/reference/custom-activation-strategies#parameter-types)
+        type: CreateStrategySchemaParametersItemType
+    source:
+      openapi: openapi.json
+  CreateStrategySchemaParametersItemType:
+    docs: >-
+      The [type of the
+      parameter](https://docs.getunleash.io/reference/custom-activation-strategies#parameter-types)
+    enum:
+      - string
+      - percentage
+      - list
+      - number
+      - boolean
+    inline: true
+    source:
+      openapi: openapi.json
+  UpdateStrategySchemaParametersItem:
+    inline: true
+    properties:
+      description:
+        docs: >-
+          A description of this strategy parameter. Use this to indicate to the
+          users what the parameter does.
+        type: optional<string>
+      name:
+        docs: The name of the parameter
+        type: string
+      required:
+        docs: >-
+          Whether this parameter must be configured when using the strategy.
+          Defaults to `false`
+        type: optional<boolean>
+      type:
+        docs: >-
+          The [type of the
+          parameter](https://docs.getunleash.io/reference/custom-activation-strategies#parameter-types)
+        type: UpdateStrategySchemaParametersItemType
+    source:
+      openapi: openapi.json
+  UpdateStrategySchemaParametersItemType:
+    docs: >-
+      The [type of the
+      parameter](https://docs.getunleash.io/reference/custom-activation-strategies#parameter-types)
+    enum:
+      - string
+      - percentage
+      - list
+      - number
+      - boolean
+    inline: true
+    source:
+      openapi: openapi.json
+docs: >-
+  Create, update, delete, manage [custom
+  strategies](https://docs.getunleash.io/reference/custom-activation-strategies).
+service:
+  auth: false
+  base-path: ''
+  display-name: Strategies
+  endpoints:
+    createStrategy:
+      display-name: Create a strategy
+      docs: Creates a custom strategy type based on the supplied data.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.ConflictError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            name: my-custom-strategy
+            parameters:
+              - name: Rollout percentage
+                type: string
+          response:
+            body:
+              deprecated: true
+              description: Gradual rollout to logged in users
+              displayName: Gradual Rollout
+              editable: true
+              name: flexibleRollout
+              parameters:
+                - description: Gradual rollout to logged in users
+                  name: percentage
+                  required: true
+                  type: percentage
+              title: GradualRollout - Prod25
+      method: POST
+      path: /api/admin/strategies
+      request:
+        body:
+          properties:
+            deprecated:
+              docs: >-
+                Whether the strategy type is deprecated or not. Defaults to
+                `false`.
+              type: optional<boolean>
+            description:
+              docs: A description of the strategy type.
+              type: optional<string>
+            editable:
+              docs: >-
+                Whether the strategy type is editable or not. Defaults to
+                `true`.
+              type: optional<boolean>
+            name:
+              docs: The name of the strategy type. Must be unique.
+              type: string
+            parameters:
+              docs: >-
+                The parameter list lets you pass arguments to your custom
+                activation strategy. These will be made available to your custom
+                strategy implementation.
+              type: list<CreateStrategySchemaParametersItem>
+            title:
+              docs: The title of the strategy
+              type: optional<string>
+        content-type: application/json
+        name: CreateStrategySchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.StrategySchema
+      source:
+        openapi: openapi.json
+    deprecateStrategy:
+      display-name: Deprecate a strategy
+      docs: Marks the specified strategy as deprecated.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            strategyName: strategyName
+      method: POST
+      path: /api/admin/strategies/{strategyName}/deprecate
+      path-parameters:
+        strategyName: string
+      source:
+        openapi: openapi.json
+    getAllStrategies:
+      display-name: Get all strategies
+      docs: >-
+        Retrieves all strategy types
+        ([predefined](https://docs.getunleash.io/reference/activation-strategies
+        "predefined strategies") and [custom
+        strategies](https://docs.getunleash.io/reference/custom-activation-strategies))
+        that are defined on this Unleash instance.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - response:
+            body:
+              strategies:
+                - deprecated: true
+                  description: Gradual rollout to logged in users
+                  displayName: Gradual Rollout
+                  editable: true
+                  name: flexibleRollout
+                  parameters:
+                    - description: Gradual rollout to logged in users
+                      name: percentage
+                      required: true
+                      type: percentage
+                  title: GradualRollout - Prod25
+              version: 1
+      method: GET
+      path: /api/admin/strategies
+      response:
+        docs: strategiesSchema
+        status-code: 200
+        type: root.StrategiesSchema
+      source:
+        openapi: openapi.json
+    getStrategiesByContextField:
+      display-name: Get strategies that use a context field
+      docs: >-
+        Retrieves a list of all strategies that use the specified context field.
+        If the context field doesn't exist, returns an empty list of strategies
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            contextField: contextField
+          response:
+            body:
+              strategies:
+                - environment: environment
+                  featureName: best-feature
+                  id: 433ae8d9-dd69-4ad0-bc46-414aedbe9c55
+                  projectId: projectId
+                  strategyName: strategyName
+      method: GET
+      path: /api/admin/context/{contextField}/strategies
+      path-parameters:
+        contextField: string
+      response:
+        docs: contextFieldStrategiesSchema
+        status-code: 200
+        type: root.ContextFieldStrategiesSchema
+      source:
+        openapi: openapi.json
+    getStrategy:
+      display-name: Get a strategy definition
+      docs: Retrieves the definition of the strategy specified in the URL
+      errors:
+        - root.UnauthorizedError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              deprecated: true
+              description: Gradual rollout to logged in users
+              displayName: Gradual Rollout
+              editable: true
+              name: flexibleRollout
+              parameters:
+                - description: Gradual rollout to logged in users
+                  name: percentage
+                  required: true
+                  type: percentage
+              title: GradualRollout - Prod25
+      method: GET
+      path: /api/admin/strategies/{name}
+      path-parameters:
+        name: string
+      response:
+        docs: strategySchema
+        status-code: 200
+        type: root.StrategySchema
+      source:
+        openapi: openapi.json
+    reactivateStrategy:
+      display-name: Reactivate a strategy
+      docs: >-
+        Marks the specified strategy as not deprecated. If the strategy wasn't
+        already deprecated, nothing changes.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            strategyName: strategyName
+      method: POST
+      path: /api/admin/strategies/{strategyName}/reactivate
+      path-parameters:
+        strategyName: string
+      source:
+        openapi: openapi.json
+    removeStrategy:
+      display-name: Delete a strategy
+      docs: Deletes the specified strategy definition
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+      method: DELETE
+      path: /api/admin/strategies/{name}
+      path-parameters:
+        name: string
+      source:
+        openapi: openapi.json
+    updateFeatureStrategySegments:
+      display-name: Update strategy segments
+      docs: >-
+        Sets the segments of the strategy specified to be exactly the ones
+        passed in the payload. Any segments that were used by the strategy
+        before will be removed if they are not in the provided list of segments.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            environmentId: development
+            projectId: red-vista
+            segmentIds:
+              - 1
+              - 5
+              - 6
+            strategyId: 15d1e20b-6310-4e17-a0c2-9fb84de3053a
+          response:
+            body:
+              environmentId: development
+              projectId: red-vista
+              segmentIds:
+                - 1
+                - 5
+                - 6
+              strategyId: 15d1e20b-6310-4e17-a0c2-9fb84de3053a
+      method: POST
+      path: /api/admin/segments/strategies
+      request:
+        body: root.UpdateFeatureStrategySegmentsSchema
+        content-type: application/json
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.UpdateFeatureStrategySegmentsSchema
+      source:
+        openapi: openapi.json
+    updateStrategy:
+      display-name: Update a strategy type
+      docs: >-
+        Updates the specified strategy type. Any properties not specified in the
+        request body are left untouched.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            name: name
+          request:
+            parameters:
+              - name: Rollout percentage
+                type: string
+      method: PUT
+      path: /api/admin/strategies/{name}
+      path-parameters:
+        name: string
+      request:
+        body:
+          properties:
+            description:
+              docs: A description of the strategy type.
+              type: optional<string>
+            parameters:
+              docs: >-
+                The parameter list lets you pass arguments to your custom
+                activation strategy. These will be made available to your custom
+                strategy implementation.
+              type: list<UpdateStrategySchemaParametersItem>
+        content-type: application/json
+        name: UpdateStrategySchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

@@ -1,0 +1,1023 @@
+imports:
+  root: __package__.yml
+docs: >-
+  API for managing [change
+  requests](https://docs.getunleash.io/reference/change-requests).
+service:
+  auth: false
+  base-path: ''
+  display-name: Change Requests
+  endpoints:
+    addChangeRequestComment:
+      display-name: This endpoint will add a comment to a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will add a comment to a change request for the user making
+        the request.
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+          request:
+            text: This is a comment
+      method: POST
+      path: /api/admin/projects/{projectId}/change-requests/{id}/comments
+      path-parameters:
+        id: string
+        projectId: string
+      request:
+        body:
+          properties:
+            text:
+              docs: The content of the comment.
+              type: string
+        content-type: application/json
+        name: ChangeRequestAddCommentSchema
+      source:
+        openapi: openapi.json
+    addChangeRequestReviewers:
+      display-name: This endpoint will update the reviewers of a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Change requests can have requests for review from users. This endpoint
+        allows to add or remove reviewers from a change request. The maximum
+        number of reviewers is 10.
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+      method: PUT
+      path: /api/admin/projects/{projectId}/change-requests/{id}/approvers
+      path-parameters:
+        id: string
+        projectId: string
+      source:
+        openapi: openapi.json
+    changeRequest:
+      display-name: Create/Add change to a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Given a change request exists, this endpoint will attempt to add a
+        change to
+
+
+        an existing change request for the user. If a change request does not
+        exist,
+
+
+        it will attempt to create one.
+      errors:
+        - root.BadRequestError
+      examples:
+        - path-parameters:
+            environment: environment
+            projectId: projectId
+          request:
+            action: updateSegment
+            payload:
+              constraints:
+                - contextName: appName
+                  operator: NOT_IN
+              name: beta-users
+          response:
+            body:
+              approvals:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              comments:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy: {}
+                  id: 33
+                  text: This is a comment
+              createdAt: '2023-07-31T13:33:02Z'
+              createdBy:
+                imageUrl: imageUrl
+                username: Hunter
+              environment: development
+              features:
+                - changes:
+                    - action: updateStrategy
+                      conflict: Strategy has been deleted
+                      createdAt: '2023-07-31T11:22:03Z'
+                      id: 33
+                      payload: payload
+                  conflict: Feature has been archived
+                  defaultChange:
+                    action: addStrategy
+                    payload:
+                      constraints:
+                        - caseInsensitive: false
+                          contextName: userId
+                          inverted: false
+                          operator: STR_CONTAINS
+                          values:
+                            - ux
+                      disabled: false
+                      name: flexibleRollout
+                      parameters:
+                        groupId: my-feature
+                        rollout: '100'
+                        stickiness: default
+                      title: ''
+                  name: my-feature
+              id: 3
+              minApprovals: 2
+              project: unleash-project
+              rejections:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              segments:
+                - action: updateStrategy
+                  conflict: Strategy has been deleted
+                  createdAt: '2023-07-31T11:22:03Z'
+                  id: 33
+                  name: beta-users
+                  payload: payload
+                  scheduleConflicts:
+                    changeRequests:
+                      - id: 1.1
+              state: Draft
+              stateTimestamps:
+                Approved: '2023-08-02T09:01:00Z'
+                Draft: '2023-07-31T13:33:02Z'
+                In review: '2023-08-01T10:15:30Z'
+              title: Increasing gradual rollout
+      method: POST
+      path: >-
+        /api/admin/projects/{projectId}/environments/{environment}/change-requests
+      path-parameters:
+        environment: string
+        projectId: string
+      request:
+        body: root.ChangeRequestOneOrManyCreateSchema
+        content-type: application/json
+      response:
+        docs: changeRequestSchema
+        status-code: 200
+        type: root.ChangeRequestSchema
+      source:
+        openapi: openapi.json
+    deleteChange:
+      display-name: Discards a change from a change request by change id
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will discard one change from a change request if it
+        matches the provided id.
+      examples:
+        - path-parameters:
+            changeId: changeId
+            changeRequestId: changeRequestId
+            projectId: projectId
+      method: DELETE
+      path: >-
+        /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+      path-parameters:
+        changeId: string
+        changeRequestId: string
+        projectId: string
+      source:
+        openapi: openapi.json
+    deleteChangeRequest:
+      display-name: Deletes a change request by id
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will delete one change request if it matches the provided
+        id.
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+      method: DELETE
+      path: /api/admin/projects/{projectId}/change-requests/{id}
+      path-parameters:
+        id: string
+        projectId: string
+      source:
+        openapi: openapi.json
+    editChange:
+      display-name: Edits a single change in a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will edit one change from a change request if it matches
+        the provided id. The edit removes previous change and inserts a new one.
+        You
+
+
+        should not rely on the changeId for subsequent edits and always check
+        the most recent changeId.
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            changeId: changeId
+            changeRequestId: changeRequestId
+            projectId: projectId
+          request:
+            action: updateSegment
+            payload:
+              constraints:
+                - contextName: appName
+                  operator: NOT_IN
+              name: beta-users
+          response:
+            body:
+              approvals:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              comments:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy: {}
+                  id: 33
+                  text: This is a comment
+              createdAt: '2023-07-31T13:33:02Z'
+              createdBy:
+                imageUrl: imageUrl
+                username: Hunter
+              environment: development
+              features:
+                - changes:
+                    - action: updateStrategy
+                      conflict: Strategy has been deleted
+                      createdAt: '2023-07-31T11:22:03Z'
+                      id: 33
+                      payload: payload
+                  conflict: Feature has been archived
+                  defaultChange:
+                    action: addStrategy
+                    payload:
+                      constraints:
+                        - caseInsensitive: false
+                          contextName: userId
+                          inverted: false
+                          operator: STR_CONTAINS
+                          values:
+                            - ux
+                      disabled: false
+                      name: flexibleRollout
+                      parameters:
+                        groupId: my-feature
+                        rollout: '100'
+                        stickiness: default
+                      title: ''
+                  name: my-feature
+              id: 3
+              minApprovals: 2
+              project: unleash-project
+              rejections:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              segments:
+                - action: updateStrategy
+                  conflict: Strategy has been deleted
+                  createdAt: '2023-07-31T11:22:03Z'
+                  id: 33
+                  name: beta-users
+                  payload: payload
+                  scheduleConflicts:
+                    changeRequests:
+                      - id: 1.1
+              state: Draft
+              stateTimestamps:
+                Approved: '2023-08-02T09:01:00Z'
+                Draft: '2023-07-31T13:33:02Z'
+                In review: '2023-08-01T10:15:30Z'
+              title: Increasing gradual rollout
+      method: PUT
+      path: >-
+        /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+      path-parameters:
+        changeId: string
+        changeRequestId: string
+        projectId: string
+      request:
+        body: root.ChangeRequestCreateSchema
+        content-type: application/json
+      response:
+        docs: changeRequestSchema
+        status-code: 200
+        type: root.ChangeRequestSchema
+      source:
+        openapi: openapi.json
+    getAvailableChangeRequestReviewers:
+      display-name: >-
+        This endpoint will return users available to review/approve this change
+        request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will list users available to approve a change request in
+        this project.
+      examples:
+        - path-parameters:
+            environment: environment
+            projectId: projectId
+          response:
+            body:
+              reviewers:
+                - email: email@example.com
+                  id: 23
+                  imageUrl: imageUrl
+                  name: Reviewer Approver
+                  username: unleash-user
+      method: GET
+      path: >-
+        /api/admin/projects/{projectId}/change-requests/available-reviewers/{environment}
+      path-parameters:
+        environment: string
+        projectId: string
+      response:
+        docs: changeRequestAvailableReviewersSchema
+        status-code: 200
+        type: root.ChangeRequestAvailableReviewersSchema
+      source:
+        openapi: openapi.json
+    getChangeRequest:
+      display-name: Retrieves one change request by id
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve one change request if it matches the
+        provided id.
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+          response:
+            body:
+              approvals:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              comments:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy: {}
+                  id: 33
+                  text: This is a comment
+              createdAt: '2023-07-31T13:33:02Z'
+              createdBy:
+                imageUrl: imageUrl
+                username: Hunter
+              environment: development
+              features:
+                - changes:
+                    - action: updateStrategy
+                      conflict: Strategy has been deleted
+                      createdAt: '2023-07-31T11:22:03Z'
+                      id: 33
+                      payload: payload
+                  conflict: Feature has been archived
+                  defaultChange:
+                    action: addStrategy
+                    payload:
+                      constraints:
+                        - caseInsensitive: false
+                          contextName: userId
+                          inverted: false
+                          operator: STR_CONTAINS
+                          values:
+                            - ux
+                      disabled: false
+                      name: flexibleRollout
+                      parameters:
+                        groupId: my-feature
+                        rollout: '100'
+                        stickiness: default
+                      title: ''
+                  name: my-feature
+              id: 3
+              minApprovals: 2
+              project: unleash-project
+              rejections:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              segments:
+                - action: updateStrategy
+                  conflict: Strategy has been deleted
+                  createdAt: '2023-07-31T11:22:03Z'
+                  id: 33
+                  name: beta-users
+                  payload: payload
+                  scheduleConflicts:
+                    changeRequests:
+                      - id: 1.1
+              state: Draft
+              stateTimestamps:
+                Approved: '2023-08-02T09:01:00Z'
+                Draft: '2023-07-31T13:33:02Z'
+                In review: '2023-08-01T10:15:30Z'
+              title: Increasing gradual rollout
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/{id}
+      path-parameters:
+        id: string
+        projectId: string
+      response:
+        docs: changeRequestSchema
+        status-code: 200
+        type: root.ChangeRequestSchema
+      source:
+        openapi: openapi.json
+    getChangeRequestApprovers:
+      display-name: This endpoint fetches the requested approvers of a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Change requests can have requests for review from users. This endpoint
+        fetches the list of requested reviewers for a change request.
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+          response:
+            body:
+              reviewers:
+                - email: email@example.com
+                  id: 23
+                  imageUrl: imageUrl
+                  name: Reviewer Approver
+                  username: unleash-user
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/{id}/approvers
+      path-parameters:
+        id: string
+        projectId: string
+      response:
+        docs: changeRequestAvailableReviewersSchema
+        status-code: 200
+        type: root.ChangeRequestAvailableReviewersSchema
+      source:
+        openapi: openapi.json
+    getChangeRequestsCount:
+      display-name: Retrieves number of project change requests in each state
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve the number of project change requests that
+        are: approved, applied, rejected, scheduled or awaiting review
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              applied: 5
+              approved: 1
+              rejected: 2
+              reviewRequired: 2
+              scheduled: 1
+              total: 10
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/count
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestsCountSchema
+        status-code: 200
+        type: root.ChangeRequestsCountSchema
+      source:
+        openapi: openapi.json
+    getChangeRequestsForProject:
+      display-name: Retrieves all change requests for a project
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve all change requests regardless of status for
+        a given project. There's an upper limit of last 300 change requests
+        ordered by creation date.
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              - createdAt: '2023-07-31T13:33:02Z'
+                createdBy:
+                  imageUrl: imageUrl
+                  username: Hunter
+                environment: development
+                features:
+                  - changes:
+                      - action: updateStrategy
+                        conflict: Strategy has been deleted
+                        createdAt: '2023-07-31T11:22:03Z'
+                        id: 33
+                        payload: payload
+                    conflict: Feature has been archived
+                    defaultChange:
+                      action: addStrategy
+                      payload:
+                        constraints:
+                          - caseInsensitive: false
+                            contextName: userId
+                            inverted: false
+                            operator: STR_CONTAINS
+                            values:
+                              - ux
+                        disabled: false
+                        name: flexibleRollout
+                        parameters:
+                          groupId: my-feature
+                          rollout: '100'
+                          stickiness: default
+                        title: ''
+                    name: my-feature
+                id: 3
+                project: unleash-project
+                segments:
+                  - action: updateStrategy
+                    conflict: Strategy has been deleted
+                    createdAt: '2023-07-31T11:22:03Z'
+                    id: 33
+                    name: beta-users
+                    payload: payload
+                state: Draft
+                title: Increasing gradual rollout
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestsSchema
+        status-code: 200
+        type: root.ChangeRequestsSchema
+      source:
+        openapi: openapi.json
+    getOpenChangeRequestsForUser:
+      availability: deprecated
+      display-name: Retrieves pending change requests in configured environments
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve the pending change requests in the
+        configured environments for the project, for the current user performing
+        the request.
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              - createdAt: '2023-07-31T13:33:02Z'
+                createdBy:
+                  imageUrl: imageUrl
+                  username: Hunter
+                environment: development
+                features:
+                  - changes:
+                      - action: updateStrategy
+                        conflict: Strategy has been deleted
+                        createdAt: '2023-07-31T11:22:03Z'
+                        id: 33
+                        payload: payload
+                    conflict: Feature has been archived
+                    defaultChange:
+                      action: addStrategy
+                      payload:
+                        constraints:
+                          - caseInsensitive: false
+                            contextName: userId
+                            inverted: false
+                            operator: STR_CONTAINS
+                            values:
+                              - ux
+                        disabled: false
+                        name: flexibleRollout
+                        parameters:
+                          groupId: my-feature
+                          rollout: '100'
+                          stickiness: default
+                        title: ''
+                    name: my-feature
+                id: 3
+                project: unleash-project
+                segments:
+                  - action: updateStrategy
+                    conflict: Strategy has been deleted
+                    createdAt: '2023-07-31T11:22:03Z'
+                    id: 33
+                    name: beta-users
+                    payload: payload
+                state: Draft
+                title: Increasing gradual rollout
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/open
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestsSchema
+        status-code: 200
+        type: root.ChangeRequestsSchema
+      source:
+        openapi: openapi.json
+    getPendingChangeRequestsForFeature:
+      display-name: >-
+        Retrieves all pending change requests referencing a feature in the
+        project
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve all pending change requests (change requests
+        with a status of Draft | In review | Approved) referencing the given
+        feature flag name.
+      examples:
+        - path-parameters:
+            featureName: featureName
+            projectId: projectId
+          response:
+            body:
+              - createdAt: '2023-07-31T13:33:02Z'
+                createdBy:
+                  imageUrl: imageUrl
+                  username: Hunter
+                environment: development
+                features:
+                  - changes:
+                      - action: updateStrategy
+                        conflict: Strategy has been deleted
+                        createdAt: '2023-07-31T11:22:03Z'
+                        id: 33
+                        payload: payload
+                    conflict: Feature has been archived
+                    defaultChange:
+                      action: addStrategy
+                      payload:
+                        constraints:
+                          - caseInsensitive: false
+                            contextName: userId
+                            inverted: false
+                            operator: STR_CONTAINS
+                            values:
+                              - ux
+                        disabled: false
+                        name: flexibleRollout
+                        parameters:
+                          groupId: my-feature
+                          rollout: '100'
+                          stickiness: default
+                        title: ''
+                    name: my-feature
+                id: 3
+                project: unleash-project
+                segments:
+                  - action: updateStrategy
+                    conflict: Strategy has been deleted
+                    createdAt: '2023-07-31T11:22:03Z'
+                    id: 33
+                    name: beta-users
+                    payload: payload
+                state: Draft
+                title: Increasing gradual rollout
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/pending/{featureName}
+      path-parameters:
+        featureName: string
+        projectId: string
+      response:
+        docs: changeRequestsSchema
+        status-code: 200
+        type: root.ChangeRequestsSchema
+      source:
+        openapi: openapi.json
+    getPendingChangeRequestsForUser:
+      display-name: Retrieves pending change requests in configured environments
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will retrieve the pending change requests in the
+        configured environments for the project, for the current user performing
+        the request.
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              - createdAt: '2023-07-31T13:33:02Z'
+                createdBy:
+                  imageUrl: imageUrl
+                  username: Hunter
+                environment: development
+                features:
+                  - changes:
+                      - action: updateStrategy
+                        conflict: Strategy has been deleted
+                        createdAt: '2023-07-31T11:22:03Z'
+                        id: 33
+                        payload: payload
+                    conflict: Feature has been archived
+                    defaultChange:
+                      action: addStrategy
+                      payload:
+                        constraints:
+                          - caseInsensitive: false
+                            contextName: userId
+                            inverted: false
+                            operator: STR_CONTAINS
+                            values:
+                              - ux
+                        disabled: false
+                        name: flexibleRollout
+                        parameters:
+                          groupId: my-feature
+                          rollout: '100'
+                          stickiness: default
+                        title: ''
+                    name: my-feature
+                id: 3
+                project: unleash-project
+                segments:
+                  - action: updateStrategy
+                    conflict: Strategy has been deleted
+                    createdAt: '2023-07-31T11:22:03Z'
+                    id: 33
+                    name: beta-users
+                    payload: payload
+                state: Draft
+                title: Increasing gradual rollout
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/pending
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestsSchema
+        status-code: 200
+        type: root.ChangeRequestsSchema
+      source:
+        openapi: openapi.json
+    getProjectChangeRequestConfig:
+      display-name: Retrieves change request configuration for a project
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Given a projectId, this endpoint will retrieve change request
+        configuration for the project
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              - changeRequestEnabled: true
+                environment: my-dev-environment
+                requiredApprovals: 2
+                type: development
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/config
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestConfigSchema
+        status-code: 200
+        type: root.ChangeRequestConfigSchema
+      source:
+        openapi: openapi.json
+    getScheduledChangeRequests:
+      display-name: Get scheduled change requests matching a query.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint retrieves basic information about all scheduled change
+        requests that match the search criteria provided in the query
+        parameters. The endpoint will return any change request that matches one
+        or more of the provided parameters. If you use no query parameters,
+        you'll get an empty list.
+
+
+        For instance, to find all the scheduled change requests that either
+        touch feature `MyFeature` or strategy
+        `0D198067-7D55-460C-9EC7-DB86E3AE261A`, you would use the query string
+        `feature=MyFeature&strategyId=0D198067-7D55-460C-9EC7-DB86E3AE261A`.
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              - environment: production
+                id: 1
+                title: My awesome change
+      method: GET
+      path: /api/admin/projects/{projectId}/change-requests/scheduled
+      path-parameters:
+        projectId: string
+      response:
+        docs: changeRequestScheduledResultSchema
+        status-code: 200
+        type: root.ChangeRequestScheduledResultSchema
+      source:
+        openapi: openapi.json
+    updateChangeRequestState:
+      display-name: This endpoint will update the state of a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will update the state of a change request if the business
+        rules allow it. The state can be one of the following: Draft, In review,
+        Approved, Cancelled, Applied. In order to be approved, the change
+        request must have at least one change and the number of approvals must
+        be greater than or equal to the number of approvals required for the
+        environment.
+
+
+        Once a change request has been approved, it can be applied. Once a
+        change request has been applied, it cannot be changed. Once a change
+        request has been cancelled, it cannot be changed. Any change to a change
+        request in the state of Approved will result in the state being set to
+        In Review and the number of approvals will be reset.
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+          response:
+            body:
+              approvals:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              comments:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy: {}
+                  id: 33
+                  text: This is a comment
+              createdAt: '2023-07-31T13:33:02Z'
+              createdBy:
+                imageUrl: imageUrl
+                username: Hunter
+              environment: development
+              features:
+                - changes:
+                    - action: updateStrategy
+                      conflict: Strategy has been deleted
+                      createdAt: '2023-07-31T11:22:03Z'
+                      id: 33
+                      payload: payload
+                  conflict: Feature has been archived
+                  defaultChange:
+                    action: addStrategy
+                    payload:
+                      constraints:
+                        - caseInsensitive: false
+                          contextName: userId
+                          inverted: false
+                          operator: STR_CONTAINS
+                          values:
+                            - ux
+                      disabled: false
+                      name: flexibleRollout
+                      parameters:
+                        groupId: my-feature
+                        rollout: '100'
+                        stickiness: default
+                      title: ''
+                  name: my-feature
+              id: 3
+              minApprovals: 2
+              project: unleash-project
+              rejections:
+                - createdAt: '2022-12-12T12:13:24Z'
+                  createdBy:
+                    id: 33
+                    username: unleash-user
+              segments:
+                - action: updateStrategy
+                  conflict: Strategy has been deleted
+                  createdAt: '2023-07-31T11:22:03Z'
+                  id: 33
+                  name: beta-users
+                  payload: payload
+                  scheduleConflicts:
+                    changeRequests:
+                      - id: 1.1
+              state: Draft
+              stateTimestamps:
+                Approved: '2023-08-02T09:01:00Z'
+                Draft: '2023-07-31T13:33:02Z'
+                In review: '2023-08-01T10:15:30Z'
+              title: Increasing gradual rollout
+      method: PUT
+      path: /api/admin/projects/{projectId}/change-requests/{id}/state
+      path-parameters:
+        id: string
+        projectId: string
+      response:
+        docs: changeRequestSchema
+        status-code: 200
+        type: root.ChangeRequestSchema
+      source:
+        openapi: openapi.json
+    updateChangeRequestTitle:
+      display-name: This endpoint will update the custom title of a change request
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Change requests get a default title e.g. Change Request #1. This
+        endpoint allows to make the title
+
+
+        more meaningful and describe the intent behind the Change Request
+      examples:
+        - path-parameters:
+            id: id
+            projectId: projectId
+      method: PUT
+      path: /api/admin/projects/{projectId}/change-requests/{id}/title
+      path-parameters:
+        id: string
+        projectId: string
+      source:
+        openapi: openapi.json
+    updateProjectChangeRequestConfig:
+      display-name: Updates change request configuration for an environment in the project
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        This endpoint will change the change request configuration for a given
+        environment, set it to either on/off and optionally configure the number
+        of approvals needed. The minimum number of approvals is 1 and the
+        maximum number is 10. If you provide a number higher than 10 or lower
+        than 1, Unleash will clamp it to the allowed range.
+      examples:
+        - path-parameters:
+            environment: environment
+            projectId: projectId
+          request:
+            changeRequestsEnabled: true
+      method: PUT
+      path: >-
+        /api/admin/projects/{projectId}/environments/{environment}/change-requests/config
+      path-parameters:
+        environment: string
+        projectId: string
+      request:
+        body:
+          properties:
+            changeRequestsEnabled:
+              docs: '`true` if change requests should be enabled, otherwise `false`.'
+              type: boolean
+            requiredApprovals:
+              docs: >-
+                The number of approvals required before a change request can be
+                applied in this environment.
+              type: optional<integer>
+              validation:
+                min: 0
+        content-type: application/json
+        name: UpdateChangeRequestEnvironmentConfigSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

@@ -1,0 +1,15 @@
+auth: apiKey
+auth-schemes:
+  apiKey:
+    header: Authorization
+    name: apiKey
+    type: string
+  BearerAuthScheme:
+    scheme: bearer
+default-environment: Default
+display-name: Unleash API
+environments:
+  Default: https://us.app.unleash-hosted.com/ushosted
+error-discrimination:
+  strategy: status-code
+name: api

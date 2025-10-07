@@ -1,0 +1,467 @@
+imports:
+  root: __package__.yml
+types:
+  GetTrafficDataUsageForPeriodRequestGrouping:
+    enum:
+      - daily
+      - monthly
+    source:
+      openapi: openapi.json
+docs: Register, read, or delete metrics recorded by Unleash.
+service:
+  auth: false
+  base-path: ''
+  display-name: Metrics
+  endpoints:
+    createApplication:
+      display-name: Create an application to connect reported metrics
+      docs: Is used to report usage as well which sdk the application uses
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            appName: appName
+          request: {}
+      method: POST
+      path: /api/admin/metrics/applications/{appName}
+      path-parameters:
+        appName: string
+      request:
+        body:
+          properties:
+            color:
+              docs: >-
+                Css color to be used to color the application's entry in the
+                application list
+              type: optional<string>
+            icon:
+              docs: >-
+                An URL to an icon file to be used for the applications's entry
+                in the application list
+              type: optional<string>
+            strategies:
+              docs: >-
+                Which
+                [strategies](https://docs.getunleash.io/topics/the-anatomy-of-unleash#activation-strategies)
+                the application has loaded. Useful when trying to figure out if
+                your [custom
+                strategy](https://docs.getunleash.io/reference/custom-activation-strategies)
+                has been loaded in the SDK
+              type: optional<list<string>>
+            url:
+              docs: >-
+                A link to reference the application reporting the metrics. Could
+                for instance be a GitHub link to the repository of the
+                application
+              type: optional<string>
+        content-type: application/json
+        name: CreateApplicationSchema
+      source:
+        openapi: openapi.json
+    deleteApplication:
+      display-name: Delete an application
+      docs: >-
+        Delete the application specified in the request URL. Returns 200 OK if
+        the application was successfully deleted or if it didn't exist
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            appName: appName
+      method: DELETE
+      path: /api/admin/metrics/applications/{appName}
+      path-parameters:
+        appName: string
+      source:
+        openapi: openapi.json
+    getApplication:
+      display-name: Get application data
+      docs: >-
+        Returns data about the specified application (`appName`). The data
+        contains information on the name of the application, sdkVersion (which
+        sdk reported these metrics, typically `unleash-client-node:3.4.1` or
+        `unleash-client-java:7.1.0`), as well as data about how to display this
+        application in a list.
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            appName: appName
+          response:
+            body:
+              appName: accounting
+              color: red
+              description: Application for reporting page visits
+              icon: https://github.com/favicon.ico
+              sdkVersion: unleash-client-java:8.0.0
+              strategies:
+                - standard
+                - gradualRollout
+                - mySpecialCustomStrategy
+              url: https://github.com/Unleash/unleash-proxy-client-js
+              usage:
+                - environments:
+                    - development
+                    - production
+                  project: main-project
+      method: GET
+      path: /api/admin/metrics/applications/{appName}
+      path-parameters:
+        appName: string
+      response:
+        docs: applicationSchema
+        status-code: 200
+        type: root.ApplicationSchema
+      source:
+        openapi: openapi.json
+    getApplicationEnvironmentInstances:
+      display-name: Get application environment instances (Last 24h)
+      docs: >-
+        Returns an overview of the instances for the given `appName` and
+        `environment` that have received traffic in the last 24 hours.
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            appName: appName
+            environment: environment
+          response:
+            body:
+              instances:
+                - clientIp: 192.168.0.1
+                  instanceId: b77f3d13-5f48-4a7b-a3f4-a449b97ce43a
+                  lastSeen: '2023-04-19T08:15:14Z'
+                  sdkVersion: unleash-client-java:7.0.0
+      method: GET
+      path: /api/admin/metrics/instances/{appName}/environment/{environment}
+      path-parameters:
+        appName: string
+        environment: string
+      response:
+        docs: applicationEnvironmentInstancesSchema
+        status-code: 200
+        type: root.ApplicationEnvironmentInstancesSchema
+      source:
+        openapi: openapi.json
+    getApplicationOverview:
+      display-name: Get application overview
+      docs: Returns an overview of the specified application (`appName`).
+      errors:
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            appName: appName
+          response:
+            body:
+              environments:
+                - backendSdks:
+                    - unleash-client-node:5.4.0
+                  frontendSdks:
+                    - unleash-client-js:3.7.5
+                  instanceCount: 5
+                  issues:
+                    missingFeatures:
+                      - feature1
+                      - feature2
+                    outdatedSdks:
+                      - unleash-client-node:5.4.0
+                      - unleash-client-node:5.3.0
+                  lastSeen: '2023-04-19T08:15:14Z'
+                  name: production
+                  sdks:
+                    - unleash-client-node:5.4.0
+                    - unleash-client-node:5.3.0
+              featureCount: 5
+              issues:
+                missingStrategies:
+                  - feature1
+                  - feature2
+              projects:
+                - default
+                - payment
+      method: GET
+      path: /api/admin/metrics/applications/{appName}/overview
+      path-parameters:
+        appName: string
+      response:
+        docs: applicationOverviewSchema
+        status-code: 200
+        type: root.ApplicationOverviewSchema
+      source:
+        openapi: openapi.json
+    getApplications:
+      display-name: Get all applications
+      docs: >-
+        Returns all applications registered with Unleash. Applications can be
+        created via metrics reporting or manual creation
+      examples:
+        - query-parameters:
+            limit: '50'
+            offset: '50'
+            query: first_app
+            sortBy: type
+            sortOrder: desc
+          response:
+            body:
+              applications:
+                - appName: accounting
+                  color: red
+                  description: Application for reporting page visits
+                  icon: https://github.com/favicon.ico
+                  sdkVersion: unleash-client-java:8.0.0
+                  strategies:
+                    - standard
+                    - gradualRollout
+                    - mySpecialCustomStrategy
+                  url: https://github.com/Unleash/unleash-proxy-client-js
+                  usage:
+                    - environments:
+                        - development
+                        - production
+                      project: main-project
+              total: 50
+      method: GET
+      path: /api/admin/metrics/applications
+      request:
+        name: GetApplicationsRequest
+        query-parameters:
+          limit:
+            docs: >-
+              The number of applications to return in a page. By default it is
+              set to 1000.
+            type: optional<string>
+          offset:
+            docs: >-
+              The number of applications to skip when returning a page. By
+              default it is set to 0.
+            type: optional<string>
+          query:
+            docs: The search query for the application name
+            type: optional<string>
+          sortBy:
+            docs: >-
+              The field to sort the results by. By default it is set to
+              "appName".
+            type: optional<string>
+          sortOrder:
+            docs: The sort order for the sortBy. By default it is det to "asc".
+            type: optional<string>
+      response:
+        docs: applicationsSchema
+        status-code: 200
+        type: root.ApplicationsSchema
+      source:
+        openapi: openapi.json
+    getCustomMetrics:
+      display-name: Get stored custom metrics
+      docs: Retrieves the stored custom metrics data.
+      examples:
+        - {}
+      method: GET
+      path: /api/admin/custom-metrics
+      source:
+        openapi: openapi.json
+    getFeatureUsageSummary:
+      display-name: >-
+        Last hour of usage and a list of applications that have reported seeing
+        this feature flag
+      docs: >-
+        Separate counts for yes (enabled), no (disabled), as well as how many
+        times each variant was selected during the last hour
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              featureName: my.special.feature
+              lastHourUsage:
+                - appName: accounting
+                  environment: development
+                  featureName: my.special.feature
+                  'no': 50
+                  timestamp: '2023-07-27T11:23:44Z'
+                  variants:
+                    variantA: 15
+                    variantB: 25
+                    variantC: 5
+                  'yes': 974
+              maturity: stable
+              seenApplications:
+                - accounting
+                - billing
+                - booking
+              version: 1
+      method: GET
+      path: /api/admin/client-metrics/features/{name}
+      path-parameters:
+        name: string
+      response:
+        docs: featureUsageSchema
+        status-code: 200
+        type: root.FeatureUsageSchema
+      source:
+        openapi: openapi.json
+    getOutdatedSdks:
+      display-name: Get outdated SDKs
+      docs: Returns a list of the outdated SDKS with the applications using them.
+      errors:
+        - root.NotFoundError
+      examples:
+        - response:
+            body:
+              sdks:
+                - applications:
+                    - accounting
+                  sdkVersion: unleash-client-java:7.0.0
+      method: GET
+      path: /api/admin/metrics/sdks/outdated
+      response:
+        docs: outdatedSdksSchema
+        status-code: 200
+        type: root.OutdatedSdksSchema
+      source:
+        openapi: openapi.json
+    getPrometheusMetrics:
+      display-name: Get metrics in Prometheus format
+      docs: Exposes all custom metrics in Prometheus text format for scraping.
+      method: GET
+      path: /api/admin/custom-metrics/prometheus
+      response:
+        docs: Prometheus formatted metrics
+        status-code: 200
+        type: text
+      source:
+        openapi: openapi.json
+    getRawFeatureMetrics:
+      display-name: Get feature metrics
+      docs: >-
+        Get usage metrics for a specific feature for the last 48 hours, grouped
+        by hour
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              data:
+                - appName: accounting
+                  environment: development
+                  featureName: my.special.feature
+                  'no': 50
+                  timestamp: '2023-07-27T11:23:44Z'
+                  variants:
+                    variantA: 15
+                    variantB: 25
+                    variantC: 5
+                  'yes': 974
+              maturity: stable
+              version: 1
+      method: GET
+      path: /api/admin/client-metrics/features/{name}/raw
+      path-parameters:
+        name: string
+      response:
+        docs: featureMetricsSchema
+        status-code: 200
+        type: root.FeatureMetricsSchema
+      source:
+        openapi: openapi.json
+    getRequestsPerSecond:
+      display-name: Gets usage data
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Gets usage data per app/endpoint from a prometheus compatible metrics
+        endpoint
+      examples:
+        - response:
+            body:
+              adminMetrics:
+                data:
+                  result:
+                    - {}
+                  resultType: matrix
+                status: success
+              clientMetrics:
+                data:
+                  result:
+                    - {}
+                  resultType: matrix
+                status: success
+      method: GET
+      path: /api/admin/metrics/rps
+      response:
+        docs: requestsPerSecondSegmentedSchema
+        status-code: 200
+        type: root.RequestsPerSecondSegmentedSchema
+      source:
+        openapi: openapi.json
+    getTrafficDataUsageForPeriod:
+      display-name: Get aggregated traffic data for a given time period.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Gets traffic usage data for the selected period, either aggregated by
+        day or by month.
+      examples:
+        - query-parameters:
+            from: '2024-01-01'
+            grouping: daily
+            to: '2024-01-31'
+          response:
+            body:
+              apiData:
+                - apiPath: /api/client
+                  dataPoints:
+                    - period: '2023-04-01'
+                      trafficTypes:
+                        - count: 42
+                          group: successful-requests
+              dateRange:
+                from: '2023-04-01'
+                to: '2023-04-30'
+              grouping: monthly
+      method: GET
+      path: /api/admin/metrics/traffic
+      request:
+        name: GetTrafficDataUsageForPeriodRequest
+        query-parameters:
+          from:
+            docs: >-
+              The starting date of the traffic data usage search in
+              IS:yyyy-MM-dd format
+            type: string
+            validation:
+              format: date
+          grouping:
+            docs: Whether to aggregate the data by month or by day
+            type: GetTrafficDataUsageForPeriodRequestGrouping
+          to:
+            docs: >-
+              The starting date of the traffic data usage search in
+              IS:yyyy-MM-dd format
+            type: string
+            validation:
+              format: date
+      response:
+        docs: trafficUsageDataSegmentedCombinedSchema
+        status-code: 200
+        type: root.TrafficUsageDataSegmentedCombinedSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

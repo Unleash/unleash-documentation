@@ -1,0 +1,35 @@
+imports:
+  root: __package__.yml
+docs: Endpoints related to unknown flags.
+service:
+  auth: false
+  base-path: ''
+  display-name: Unknown Flags
+  endpoints:
+    getUnknownFlags:
+      display-name: Get unknown flags
+      docs: >-
+        Returns a list of unknown flag reports from the last 24 hours, if any.
+        Maximum of 1000.
+      examples:
+        - response:
+            body:
+              unknownFlags:
+                - lastEventAt: '2023-10-01T12:00:00Z'
+                  lastSeenAt: '2023-10-01T12:00:00Z'
+                  name: my-unknown-flag
+                  reports:
+                    - appName: my-app
+                      environments:
+                        - environment: production
+                          seenAt: '2023-10-01T12:00:00Z'
+      method: GET
+      path: /api/admin/metrics/unknown-flags
+      response:
+        docs: unknownFlagsResponseSchema
+        status-code: 200
+        type: root.UnknownFlagsResponseSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

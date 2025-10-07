@@ -1,0 +1,436 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Create, update, delete, enable or disable
+  [environments](https://docs.getunleash.io/reference/environments) for this
+  Unleash instance.
+service:
+  auth: false
+  base-path: ''
+  display-name: Environments
+  endpoints:
+    cloneEnvironment:
+      display-name: Clones an environment
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Given an existing environment name and a set of options, this will
+        create a copy of that environment
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            name: name
+          request:
+            name: development
+            type: development
+          response:
+            body:
+              apiTokenCount: 6
+              enabled: true
+              enabledToggleCount: 10
+              name: my-dev-env
+              projectCount: 10
+              protected: true
+              requiredApprovals: 3
+              sortOrder: 3
+              type: development
+      method: POST
+      path: /api/admin/environments/{name}/clone
+      path-parameters:
+        name: string
+      request:
+        body:
+          properties:
+            clonePermissions:
+              docs: >-
+                Copies the RBAC permissions from the source environment if true.
+                Defaults to true
+              type: optional<boolean>
+            name:
+              docs: >-
+                The name of the new cloned environment, this cannot be changed
+                later
+              name: cloneEnvironmentSchemaName
+              type: string
+            projects:
+              docs: >-
+                A list of projects that should be included in the cloned
+                environment.
+              type: optional<list<string>>
+            type:
+              docs: >-
+                Updates the type of environment (i.e. development or
+                production).
+              type: string
+        content-type: application/json
+        name: CloneEnvironmentSchema
+      response:
+        docs: environmentSchema
+        status-code: 200
+        type: root.EnvironmentSchema
+      source:
+        openapi: openapi.json
+    createEnvironment:
+      display-name: Creates a new environment
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Uses the details provided in the payload to create a new environment
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+      examples:
+        - request:
+            name: name
+            type: type
+          response:
+            body:
+              apiTokenCount: 6
+              enabled: true
+              enabledToggleCount: 10
+              name: my-dev-env
+              projectCount: 10
+              protected: true
+              requiredApprovals: 3
+              sortOrder: 3
+              type: development
+      method: POST
+      path: /api/admin/environments
+      request:
+        body:
+          properties:
+            enabled:
+              docs: >-
+                Newly created environments are enabled by default. Set this
+                property to `false` to create the environment in a disabled
+                state.
+              type: optional<boolean>
+            name:
+              docs: >-
+                The name of the environment. Must be a URL-friendly string
+                according to [RFC 3968, section
+                2.3](https://www.rfc-editor.org/rfc/rfc3986#section-2.3)
+              type: string
+              validation:
+                pattern: ^[a-zA-Z0-9~_.-]+$
+            requiredApprovals:
+              docs: >-
+                Experimental field. The number of approvals required before a
+                change request can be applied in this environment.
+              type: optional<integer>
+              validation:
+                min: 1
+            sortOrder:
+              docs: >-
+                Defines where in the list of environments to place this
+                environment. The list uses an ascending sort, so lower numbers
+                are shown first. You can change this value later.
+              type: optional<integer>
+            type:
+              docs: >-
+                The [type of
+                environment](https://docs.getunleash.io/reference/environments#environment-types)
+                you would like to create. Unleash officially recognizes the
+                following values:
+
+                - `development`
+
+                - `test`
+
+                - `preproduction`
+
+                - `production`
+
+
+                If you pass a string that is not one of the recognized values,
+                Unleash will accept it, but it will carry no special semantics.
+              type: string
+              validation:
+                minLength: 1
+        content-type: application/json
+        name: CreateEnvironmentSchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.EnvironmentSchema
+      source:
+        openapi: openapi.json
+    getAllEnvironments:
+      display-name: Get all environments
+      docs: Retrieves all environments that exist in this Unleash instance.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - response:
+            body:
+              environments:
+                - apiTokenCount: 6
+                  enabled: true
+                  enabledToggleCount: 10
+                  name: my-dev-env
+                  projectCount: 10
+                  protected: true
+                  requiredApprovals: 3
+                  sortOrder: 3
+                  type: development
+              version: 1
+      method: GET
+      path: /api/admin/environments
+      response:
+        docs: environmentsSchema
+        status-code: 200
+        type: root.EnvironmentsSchema
+      source:
+        openapi: openapi.json
+    getEnvironment:
+      display-name: Get the environment with `name`
+      docs: >-
+        Retrieves the environment with `name` if it exists in this Unleash
+        instance
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+          response:
+            body:
+              apiTokenCount: 6
+              enabled: true
+              enabledToggleCount: 10
+              name: my-dev-env
+              projectCount: 10
+              protected: true
+              requiredApprovals: 3
+              sortOrder: 3
+              type: development
+      method: GET
+      path: /api/admin/environments/{name}
+      path-parameters:
+        name: string
+      response:
+        docs: environmentSchema
+        status-code: 200
+        type: root.EnvironmentSchema
+      source:
+        openapi: openapi.json
+    getProjectEnvironments:
+      display-name: Get the environments available to a project
+      docs: >-
+        Gets the environments that are available for this project. An
+        environment is available for a project if enabled in the [project
+        configuration](https://docs.getunleash.io/reference/environments#enable-an-environment)
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            projectId: projectId
+          response:
+            body:
+              environments:
+                - defaultStrategy:
+                    constraints:
+                      - contextName: appName
+                        operator: NOT_IN
+                        value: my-app
+                    featureName: myAwesomeFeature
+                    id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                    name: flexibleRollout
+                    sortOrder: 9999
+                    variants:
+                      - name: blue_group
+                        payload:
+                          type: json
+                          value: '{"color": "red"}'
+                        stickiness: custom.context.field
+                        weight: 1
+                        weightType: variable
+                  enabled: true
+                  name: development
+                  projectApiTokenCount: 5
+                  projectEnabledToggleCount: 7
+                  protected: false
+                  requiredApprovals: 3
+                  sortOrder: 1
+                  type: production
+                  visible: true
+              version: 1
+      method: GET
+      path: /api/admin/environments/project/{projectId}
+      path-parameters:
+        projectId: string
+      response:
+        docs: environmentsProjectSchema
+        status-code: 200
+        type: root.EnvironmentsProjectSchema
+      source:
+        openapi: openapi.json
+    removeEnvironment:
+      display-name: Deletes an environment by name
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Given an existing environment by name, this endpoint will attempt to
+        delete it
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            name: name
+      method: DELETE
+      path: /api/admin/environments/{name}
+      path-parameters:
+        name: string
+      source:
+        openapi: openapi.json
+    toggleEnvironmentOff:
+      display-name: Toggle the environment with `name` off
+      docs: >-
+        Removes this environment from the list of available environments for
+        projects to use
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+      method: POST
+      path: /api/admin/environments/{name}/off
+      path-parameters:
+        name: string
+      source:
+        openapi: openapi.json
+    toggleEnvironmentOn:
+      display-name: Toggle the environment with `name` on
+      docs: >-
+        Makes it possible to enable this environment for a project. An
+        environment must first be globally enabled using this endpoint before it
+        can be enabled for a project
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            name: name
+      method: POST
+      path: /api/admin/environments/{name}/on
+      path-parameters:
+        name: string
+      source:
+        openapi: openapi.json
+    updateEnvironment:
+      display-name: Updates an environment by name
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Given an environment by name updates the environment with the given
+        payload. Note that `name`, `enabled` and `protected` cannot be changed
+        by this API
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+      examples:
+        - path-parameters:
+            name: name
+          request: {}
+          response:
+            body:
+              apiTokenCount: 6
+              enabled: true
+              enabledToggleCount: 10
+              name: my-dev-env
+              projectCount: 10
+              protected: true
+              requiredApprovals: 3
+              sortOrder: 3
+              type: development
+      method: PUT
+      path: /api/admin/environments/update/{name}
+      path-parameters:
+        name: string
+      request:
+        body:
+          properties:
+            requiredApprovals:
+              docs: >-
+                Experimental field. The number of approvals required before a
+                change request can be applied in this environment.
+              type: optional<integer>
+              validation:
+                min: 1
+            sortOrder:
+              docs: Changes the sort order of this environment.
+              type: optional<integer>
+            type:
+              docs: >-
+                Updates the type of environment (i.e. development or
+                production).
+              type: optional<string>
+        content-type: application/json
+        name: UpdateEnvironmentSchema
+      response:
+        docs: environmentSchema
+        status-code: 200
+        type: root.EnvironmentSchema
+      source:
+        openapi: openapi.json
+    updateSortOrder:
+      display-name: Update environment sort orders
+      docs: >-
+        Updates sort orders for the named environments. Environments not
+        specified are unaffected.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - request:
+            key: 6
+      method: PUT
+      path: /api/admin/environments/sort-order
+      request:
+        body: root.SortOrderSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+    validateEnvironmentName:
+      display-name: Validates if an environment name exists
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Uses the name provided in the body of the request to validate if the
+        given name exists or not
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+      examples:
+        - request:
+            name: betaUser
+      method: POST
+      path: /api/admin/environments/validate
+      request:
+        body: root.NameSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

@@ -1,0 +1,119 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Manage [feature flag
+  types](https://docs.getunleash.io/reference/feature-toggles#feature-flag-types).
+service:
+  auth: false
+  base-path: ''
+  display-name: Feature Types
+  endpoints:
+    getAllFeatureTypes:
+      display-name: Get all feature types
+      docs: >-
+        Retrieves all feature types that exist in this Unleash instance, along
+        with their descriptions and lifetimes.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - response:
+            body:
+              types:
+                - description: Release feature flags are used to release new features.
+                  id: release
+                  lifetimeDays: 40
+                  name: Release
+                - description: >-
+                    Experiment feature flags are used to test and verify
+                    multiple different versions of a feature.
+                  id: experiment
+                  lifetimeDays: 40
+                  name: Experiment
+                - description: >-
+                    Operational feature flags are used to control aspects of a
+                    rollout.
+                  id: operational
+                  lifetimeDays: 7
+                  name: Operational
+                - description: >-
+                    Kill switch feature flags are used to quickly turn on or off
+                    critical functionality in your system.
+                  id: kill-switch
+                  lifetimeDays: 40
+                  name: Kill switch
+                - description: >-
+                    Permission feature flags are used to control permissions in
+                    your system.
+                  id: permission
+                  lifetimeDays: 40
+                  name: Permission
+              version: 1
+      method: GET
+      path: /api/admin/feature-types
+      response:
+        docs: featureTypesSchema
+        status-code: 200
+        type: root.FeatureTypesSchema
+      source:
+        openapi: openapi.json
+    updateFeatureTypeLifetime:
+      display-name: Update feature type lifetime
+      docs: >-
+        Updates the lifetime configuration for the specified [feature flag
+        type](https://docs.getunleash.io/reference/feature-toggles#feature-flag-types).
+        The expected lifetime is an integer representing the number of days
+        before Unleash marks a feature flag of that type as potentially stale.
+        If set to `null` or `0`, then feature flags of that particular type will
+        never be marked as potentially stale.
+
+
+        When a feature flag type's expected lifetime is changed, this will also
+        cause any feature flags of this type to be reevaluated for potential
+        staleness.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+        - root.ConflictError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              description: >-
+                Kill switch feature flags are used to quickly turn on or off
+                critical functionality in your system.
+              id: kill-switch
+              lifetimeDays: 40
+              name: Kill switch
+      method: PUT
+      path: /api/admin/feature-types/{id}/lifetime
+      path-parameters:
+        id: string
+      request:
+        body:
+          properties:
+            lifetimeDays:
+              docs: >-
+                The new lifetime (in days) that you want to assign to the
+                feature flag type. If the value is `null` or `0`, then the
+                feature flags of that type will never be marked as potentially
+                stale. Otherwise, they will be considered potentially stale
+                after the number of days indicated by this property.
+              type: optional<integer>
+              validation:
+                max: 2147483647
+                min: 0
+        content-type: application/json
+        name: UpdateFeatureTypeLifetimeSchema
+      response:
+        docs: featureTypeSchema
+        status-code: 200
+        type: root.FeatureTypeSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

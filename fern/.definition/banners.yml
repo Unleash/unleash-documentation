@@ -1,0 +1,276 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Create, update, flag, and delete
+  [banners](https://docs.getunleash.io/reference/banners).
+service:
+  auth: false
+  base-path: ''
+  display-name: Banners
+  endpoints:
+    createBanner:
+      display-name: Create a banner.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Creates a new banner.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            message: >-
+              **Reminder to everyone**: Maintenance is scheduled for
+              *2337-12-27*.
+          response:
+            body:
+              createdAt: '2023-12-27T12:37:00Z'
+              dialog: |-
+                # Information
+
+                Maintenance is **scheduled**.
+
+                ## More details
+
+                This is an example dialog that supports Markdown.
+              dialogTitle: Learn more about it here
+              enabled: true
+              icon: build
+              id: 7
+              link: dialog
+              linkText: Learn more
+              message: >-
+                **Reminder to everyone**: Maintenance is scheduled for
+                *2337-12-27*.
+              sticky: true
+              variant: info
+      method: POST
+      path: /api/admin/banners
+      request:
+        body: root.CreateBannerSchema
+        content-type: application/json
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.BannerSchema
+      source:
+        openapi: openapi.json
+    deleteBanner:
+      display-name: Delete a banner.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Deletes an existing banner identified by its id.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            id: id
+      method: DELETE
+      path: /api/admin/banners/{id}
+      path-parameters:
+        id: string
+      source:
+        openapi: openapi.json
+    disableBanner:
+      display-name: Disables a banner.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Disables an existing banner, identified by its id.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              createdAt: '2023-12-27T12:37:00Z'
+              dialog: |-
+                # Information
+
+                Maintenance is **scheduled**.
+
+                ## More details
+
+                This is an example dialog that supports Markdown.
+              dialogTitle: Learn more about it here
+              enabled: true
+              icon: build
+              id: 7
+              link: dialog
+              linkText: Learn more
+              message: >-
+                **Reminder to everyone**: Maintenance is scheduled for
+                *2337-12-27*.
+              sticky: true
+              variant: info
+      method: POST
+      path: /api/admin/banners/{id}/off
+      path-parameters:
+        id: string
+      response:
+        docs: bannerSchema
+        status-code: 200
+        type: root.BannerSchema
+      source:
+        openapi: openapi.json
+    enableBanner:
+      display-name: Enables a banner.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Enables an existing banner, identified by its id.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              createdAt: '2023-12-27T12:37:00Z'
+              dialog: |-
+                # Information
+
+                Maintenance is **scheduled**.
+
+                ## More details
+
+                This is an example dialog that supports Markdown.
+              dialogTitle: Learn more about it here
+              enabled: true
+              icon: build
+              id: 7
+              link: dialog
+              linkText: Learn more
+              message: >-
+                **Reminder to everyone**: Maintenance is scheduled for
+                *2337-12-27*.
+              sticky: true
+              variant: info
+      method: POST
+      path: /api/admin/banners/{id}/on
+      path-parameters:
+        id: string
+      response:
+        docs: bannerSchema
+        status-code: 200
+        type: root.BannerSchema
+      source:
+        openapi: openapi.json
+    getBanners:
+      display-name: Get all banners.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Returns a list of all configured banners.
+      errors:
+        - root.UnauthorizedError
+      examples:
+        - response:
+            body:
+              banners:
+                - createdAt: '2023-12-27T12:37:00Z'
+                  dialog: |-
+                    # Information
+
+                    Maintenance is **scheduled**.
+
+                    ## More details
+
+                    This is an example dialog that supports Markdown.
+                  dialogTitle: Learn more about it here
+                  enabled: true
+                  icon: build
+                  id: 7
+                  link: dialog
+                  linkText: Learn more
+                  message: >-
+                    **Reminder to everyone**: Maintenance is scheduled for
+                    *2337-12-27*.
+                  sticky: true
+                  variant: info
+      method: GET
+      path: /api/admin/banners
+      response:
+        docs: bannersSchema
+        status-code: 200
+        type: root.BannersSchema
+      source:
+        openapi: openapi.json
+    updateBanner:
+      display-name: Update a banner.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Updates an existing banner identified by its id.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.NotFoundError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            message: >-
+              **Reminder to everyone**: Maintenance is scheduled for
+              *2337-12-27*.
+          response:
+            body:
+              createdAt: '2023-12-27T12:37:00Z'
+              dialog: |-
+                # Information
+
+                Maintenance is **scheduled**.
+
+                ## More details
+
+                This is an example dialog that supports Markdown.
+              dialogTitle: Learn more about it here
+              enabled: true
+              icon: build
+              id: 7
+              link: dialog
+              linkText: Learn more
+              message: >-
+                **Reminder to everyone**: Maintenance is scheduled for
+                *2337-12-27*.
+              sticky: true
+              variant: info
+      method: PUT
+      path: /api/admin/banners/{id}
+      path-parameters:
+        id: string
+      request:
+        body: root.CreateBannerSchema
+        content-type: application/json
+      response:
+        docs: bannerSchema
+        status-code: 200
+        type: root.BannerSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

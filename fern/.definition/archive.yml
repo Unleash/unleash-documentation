@@ -1,0 +1,91 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Revive or permanently delete [archived feature
+  flags](https://docs.getunleash.io/advanced/archived_toggles).
+service:
+  auth: false
+  base-path: ''
+  display-name: Archive
+  endpoints:
+    deleteFeature:
+      display-name: Archives a feature
+      docs: This endpoint archives the specified feature.
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            featureName: featureName
+      method: DELETE
+      path: /api/admin/archive/{featureName}
+      path-parameters:
+        featureName: string
+      source:
+        openapi: openapi.json
+    deleteFeatures:
+      display-name: Deletes a list of features
+      docs: This endpoint deletes the specified features, that are in archive.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            projectId: projectId
+          request:
+            features:
+              - my-feature-4
+              - my-feature-5
+              - my-feature-6
+      method: POST
+      path: /api/admin/projects/{projectId}/delete
+      path-parameters:
+        projectId: string
+      request:
+        body: root.BatchFeaturesSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+    reviveFeature:
+      display-name: Revives a feature
+      docs: This endpoint revives the specified feature from archive.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            featureName: featureName
+      method: POST
+      path: /api/admin/archive/revive/{featureName}
+      path-parameters:
+        featureName: string
+      source:
+        openapi: openapi.json
+    reviveFeatures:
+      display-name: Revives a list of features
+      docs: This endpoint revives the specified features.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - path-parameters:
+            projectId: projectId
+          request:
+            features:
+              - my-feature-4
+              - my-feature-5
+              - my-feature-6
+      method: POST
+      path: /api/admin/projects/{projectId}/revive
+      path-parameters:
+        projectId: string
+      request:
+        body: root.BatchFeaturesSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

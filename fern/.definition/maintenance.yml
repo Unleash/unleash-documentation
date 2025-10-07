@@ -1,0 +1,55 @@
+imports:
+  root: __package__.yml
+docs: Enable/disable the maintenance mode of Unleash.
+service:
+  auth: false
+  base-path: ''
+  display-name: Maintenance
+  endpoints:
+    getMaintenance:
+      display-name: Get maintenance mode status
+      docs: Tells you whether maintenance mode is enabled or disabled
+      errors:
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - response:
+            body:
+              enabled: true
+      method: GET
+      path: /api/admin/maintenance
+      response:
+        docs: maintenanceSchema
+        status-code: 200
+        type: root.MaintenanceSchema
+      source:
+        openapi: openapi.json
+    toggleMaintenance:
+      display-name: Enabled/disabled maintenance mode
+      docs: >-
+        Lets administrators put Unleash into a mostly read-only mode. While
+        Unleash is in maintenance mode, users can not change any configuration
+        settings
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+      examples:
+        - request:
+            enabled: true
+      method: POST
+      path: /api/admin/maintenance
+      request:
+        body:
+          properties:
+            enabled:
+              docs: >-
+                `true` if you want to activate maintenance mode, `false` if you
+                want to deactivate it.
+              type: boolean
+        content-type: application/json
+        name: ToggleMaintenanceSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

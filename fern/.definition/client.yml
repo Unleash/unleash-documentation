@@ -1,0 +1,302 @@
+imports:
+  root: __package__.yml
+types:
+  ClientApplicationSchemaStarted:
+    discriminated: false
+    docs: Either an RFC-3339 timestamp or a unix timestamp in seconds
+    inline: true
+    source:
+      openapi: openapi.json
+    union:
+      - datetime
+      - double
+docs: >-
+  Endpoints for [Unleash backend
+  clients](https://docs.getunleash.io/reference/sdks).
+service:
+  auth: false
+  base-path: ''
+  display-name: Client
+  endpoints:
+    customMetrics:
+      display-name: Send custom metrics
+      docs: >-
+        This operation accepts custom metrics from clients. These metrics will
+        be exposed via Prometheus in Unleash.
+      errors:
+        - root.BadRequestError
+      examples:
+        - request:
+            metrics:
+              - name: http_responses_total
+                value: 1
+      method: POST
+      path: /api/client/metrics/custom
+      request:
+        body:
+          properties:
+            metrics:
+              docs: Array of custom metrics
+              type: list<root.CustomMetricSchema>
+        content-type: application/json
+        name: CustomMetricsSchema
+      source:
+        openapi: openapi.json
+    getAllClientFeatures:
+      display-name: Get all flags (SDK)
+      docs: >-
+        Returns the SDK configuration for all feature flags that are available
+        to the provided API key. Used by SDKs to configure local evaluation
+      examples:
+        - response:
+            body:
+              features:
+                - dependencies:
+                    - enabled: false
+                      feature: parent_feature
+                  description: No variants here
+                  enabled: true
+                  impressionData: false
+                  name: new.payment.flow.stripe
+                  project: new.payment.flow
+                  stale: false
+                  strategies:
+                    - constraints:
+                        - contextName: appName
+                          operator: NOT_IN
+                          value: my-app
+                      featureName: myAwesomeFeature
+                      id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                      name: flexibleRollout
+                      sortOrder: 9999
+                      variants:
+                        - name: blue_group
+                          payload:
+                            type: json
+                            value: '{"color": "red"}'
+                          stickiness: custom.context.field
+                          weight: 1
+                          weightType: variable
+                  type: release
+                  variants:
+                    - name: blue_group
+                      overrides:
+                        - contextName: userId
+                          values:
+                            - red
+                            - blue
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1.1
+              query:
+                inlineSegmentConstraints: true
+                namePrefix: payment
+                tag:
+                  - - simple:payment
+                    - simple:stripejourney
+              segments:
+                - constraints:
+                    - contextName: appName
+                      operator: NOT_IN
+                      value: my-app
+                  id: 1.1
+                  name: segment A
+              version: 2
+      method: GET
+      path: /api/client/features
+      response:
+        docs: clientFeaturesSchema
+        status-code: 200
+        type: root.ClientFeaturesSchema
+      source:
+        openapi: openapi.json
+    getClientFeature:
+      display-name: Get a single feature flag
+      docs: >-
+        Gets all the client data for a single flag. Contains the exact same
+        information about a flag as the `/api/client/features` endpoint does,
+        but only contains data about the specified flag. All SDKs should use
+        `/api/client/features`
+      examples:
+        - path-parameters:
+            featureName: featureName
+          response:
+            body:
+              dependencies:
+                - enabled: false
+                  feature: parent_feature
+                  variants:
+                    - variantA
+                    - variantB
+              description: No variants here
+              enabled: true
+              impressionData: false
+              name: new.payment.flow.stripe
+              project: new.payment.flow
+              stale: false
+              strategies:
+                - constraints:
+                    - contextName: appName
+                      operator: NOT_IN
+                      value: my-app
+                  disabled: false
+                  featureName: myAwesomeFeature
+                  id: 6b5157cb-343a-41e7-bfa3-7b4ec3044840
+                  name: flexibleRollout
+                  parameters:
+                    key: value
+                  segments:
+                    - 1
+                    - 2
+                  sortOrder: 9999
+                  title: Gradual Rollout 25-Prod
+                  variants:
+                    - name: blue_group
+                      payload:
+                        type: json
+                        value: '{"color": "red"}'
+                      stickiness: custom.context.field
+                      weight: 1
+                      weightType: variable
+              type: release
+              variants:
+                - name: blue_group
+                  overrides:
+                    - contextName: userId
+                      values:
+                        - red
+                        - blue
+                  payload:
+                    type: json
+                    value: '{"color": "red"}'
+                  stickiness: custom.context.field
+                  weight: 1.1
+                  weightType: variable
+      method: GET
+      path: /api/client/features/{featureName}
+      path-parameters:
+        featureName: string
+      response:
+        docs: clientFeatureSchema
+        status-code: 200
+        type: root.ClientFeatureSchema
+      source:
+        openapi: openapi.json
+    registerClientApplication:
+      display-name: Register a client SDK
+      docs: >-
+        Register a client SDK with Unleash. SDKs call this endpoint on startup
+        to tell Unleash about their existence. Used to track custom strategies
+        in use as well as SDK versions.
+      examples:
+        - request:
+            appName: example-app
+            interval: 10
+            started: '2024-01-15T09:30:00Z'
+            strategies:
+              - default
+              - gradualRollout
+              - remoteAddress
+      method: POST
+      path: /api/client/register
+      request:
+        body:
+          properties:
+            appName:
+              docs: >-
+                An identifier for the app that uses the sdk, should be static
+                across SDK restarts
+              type: string
+            environment:
+              availability: deprecated
+              docs: >-
+                The SDK's configured 'environment' property. This property was
+                deprecated in v5. This property  does **not** control which
+                Unleash environment the SDK gets toggles for. To control Unleash
+                environments, use the SDKs API key.
+              type: optional<string>
+            instanceId:
+              docs: >-
+                A unique identifier identifying the instance of the application
+                running the SDK. Often changes based on execution environment.
+                For instance: two pods in Kubernetes will have two different
+                instanceIds
+              type: optional<string>
+            interval:
+              docs: How often (in seconds) does the client refresh its toggles
+              type: double
+              validation:
+                min: 0
+            platformName:
+              docs: >-
+                The platform the application is running on. For languages that
+                compile to binaries, this can be omitted
+              type: optional<string>
+            platformVersion:
+              docs: >-
+                The version of the platform the application is running on.
+                Languages that compile to binaries, this is expected to be the
+                compiler version used to assemble the binary.
+              type: optional<string>
+            sdkVersion:
+              docs: >-
+                An SDK version identifier. Usually formatted as
+                "unleash-client-<language>:<version>"
+              type: optional<string>
+            specVersion:
+              docs: >-
+                The version of the Unleash client specification the client
+                supports
+              type: optional<string>
+            started:
+              docs: Either an RFC-3339 timestamp or a unix timestamp in seconds
+              type: ClientApplicationSchemaStarted
+            strategies:
+              docs: Which strategies the SDKs runtime knows about
+              type: list<string>
+            yggdrasilVersion:
+              docs: >-
+                The semantic version of the Yggdrasil engine used by the client.
+                If the client is using a native engine this can be omitted.
+              type: optional<string>
+        content-type: application/json
+        name: ClientApplicationSchema
+      source:
+        openapi: openapi.json
+    registerClientMetrics:
+      display-name: Register client usage metrics
+      docs: >-
+        Registers usage metrics. Stores information about how many times each
+        flag was evaluated to enabled and disabled within a time frame. If
+        provided, this operation will also store data on how many times each
+        feature flag's variants were displayed to the end user.
+      errors:
+        - root.BadRequestError
+      examples:
+        - request:
+            appName: insurance-selector
+            bucket:
+              start: '2023-07-27T11:23:44Z'
+              stop: '2023-07-27T11:23:44Z'
+              toggles:
+                myCoolToggle:
+                  'no': 42
+                  variants:
+                    blue: 6
+                    green: 15
+                    red: 46
+                  'yes': 25
+                myOtherToggle:
+                  'no': 100
+                  'yes': 0
+      method: POST
+      path: /api/client/metrics
+      request:
+        body: root.ClientMetricsSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

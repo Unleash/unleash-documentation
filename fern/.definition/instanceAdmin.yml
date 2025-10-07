@@ -1,0 +1,214 @@
+imports:
+  root: __package__.yml
+docs: Instance admin endpoints used to manage the Unleash instance itself.
+service:
+  auth: false
+  base-path: ''
+  display-name: Instance Admin
+  endpoints:
+    checkLicense:
+      display-name: Validates the Unleash license.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Validates the Unleash license.
+      examples:
+        - response:
+            body:
+              isValid: true
+              message: Your license expired 3 days ago
+              messageType: info
+      method: GET
+      path: /api/admin/license/check
+      response:
+        docs: licenseCheckSchema
+        status-code: 200
+        type: root.LicenseCheckSchema
+      source:
+        openapi: openapi.json
+    getInstanceAdminStats:
+      display-name: Instance usage statistics
+      docs: >-
+        Provides statistics about various features of Unleash to allow for
+        reporting of usage for self-hosted customers. The response contains data
+        such as the number of users, groups, features, strategies, versions,
+        etc.
+      examples:
+        - response:
+            body:
+              activeUsers:
+                last30: 10
+                last60: 12
+                last7: 5
+                last90: 15
+              apiTokens:
+                admin: 5
+                client: 5
+                frontend: 5
+              clientApps:
+                - count: 1
+                  range: allTime
+              contextFields: 7
+              environments: 3
+              featureExports: 0
+              featureImports: 0
+              featureToggles: 47
+              groups: 12
+              instanceId: ed3861ae-78f9-4e8c-8e57-b57efc15f82b
+              licensedUsers: 10
+              maxConstraints: 4
+              maxConstraintValues: 17
+              maxEnvironmentStrategies: 3
+              OIDCenabled: true
+              previousDayMetricsBucketsCount:
+                enabledCount: 10
+                variantCount: 10
+              productionChanges:
+                last30: 10
+                last60: 12
+                last90: 15
+              projects: 3
+              releasePlans: 1
+              releaseTemplates: 2
+              roles: 5
+              SAMLenabled: false
+              segments: 19
+              strategies: 8
+              sum: b023323477abb1eb145bebf3cdb30a1c2063e3edc1f7ae474ed8ed6c80de9a3b
+              timestamp: '2023-06-12T12:25:06Z'
+              users: 8
+              versionEnterprise: 5.1.7
+              versionOSS: 5.1.7
+      method: GET
+      path: /api/admin/instance-admin/statistics
+      response:
+        docs: instanceAdminStatsSchema
+        status-code: 200
+        type: root.InstanceAdminStatsSchema
+      source:
+        openapi: openapi.json
+    getInstanceAdminStatsCsv:
+      display-name: Instance usage statistics
+      docs: >-
+        Provides statistics about various features of Unleash to allow for
+        reporting of usage for self-hosted customers. The response contains data
+        such as the number of users, groups, features, strategies, versions,
+        etc.
+      examples:
+        - {}
+      method: GET
+      path: /api/admin/instance-admin/statistics/csv
+      source:
+        openapi: openapi.json
+    getLoginHistory:
+      display-name: Get all login events.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Returns **all** login events in the Unleash system. You can optionally
+        get them in CSV format by specifying the `Accept` header as `text/csv`.
+      errors:
+        - root.UnauthorizedError
+        - root.NotFoundError
+      examples:
+        - response:
+            body:
+              events:
+                - auth_type: simple
+                  created_at: '2023-03-01T12:04:26Z'
+                  failure_reason: No user found
+                  id: 13
+                  ip: '::ffff:127.0.0.1'
+                  successful: true
+                  username: admin
+      method: GET
+      path: /api/admin/logins
+      response:
+        docs: loginHistorySchema
+        status-code: 200
+        type: root.LoginHistorySchema
+      source:
+        openapi: openapi.json
+    readLicense:
+      display-name: Reads the Unleash license.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Reads the Unleash license. Only available for self-hosted Enterprise
+        customers.
+      examples:
+        - response:
+            body:
+              customer: customer
+              expireAt: '2023-07-31T13:33:02Z'
+              instanceId: instanceId
+              instanceName: instanceName
+              issuedAt: '2023-07-31T13:33:02Z'
+              isValid: true
+              plan: plan
+              releaseTemplates: 1.1
+              seats: 1.1
+              token: token
+              type: type
+      method: GET
+      path: /api/admin/license
+      response:
+        docs: licenseReadSchema
+        status-code: 200
+        type: root.LicenseReadSchema
+      source:
+        openapi: openapi.json
+    updateLicense:
+      display-name: Set a new Unleash license.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Set a new Unleash license. Only available for self-hosted Enterprise
+        customers.
+      errors:
+        - root.BadRequestError
+        - root.UnauthorizedError
+        - root.ForbiddenError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            token: token
+          response:
+            body:
+              customer: customer
+              expireAt: '2023-07-31T13:33:02Z'
+              instanceId: instanceId
+              instanceName: instanceName
+              issuedAt: '2023-07-31T13:33:02Z'
+              isValid: true
+              plan: plan
+              releaseTemplates: 1.1
+              seats: 1.1
+              token: token
+              type: type
+      method: POST
+      path: /api/admin/license
+      request:
+        body:
+          properties:
+            token:
+              docs: The actual license token.
+              type: string
+        content-type: application/json
+        name: LicenseUpdateSchema
+      response:
+        docs: The resource was successfully created.
+        status-code: 201
+        type: root.LicenseReadSchema
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json

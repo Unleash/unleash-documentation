@@ -1,0 +1,154 @@
+imports:
+  root: __package__.yml
+docs: >-
+  Endpoints related to [Unleash
+  Edge](https://docs.getunleash.io/reference/unleash-edge).
+service:
+  auth: false
+  base-path: ''
+  display-name: Unleash Edge
+  endpoints:
+    clientBulkMetrics:
+      display-name: Send metrics in bulk
+      docs: >-
+        This operation accepts batched metrics from any client. Metrics will be
+        inserted into Unleash's metrics storage
+      errors:
+        - root.BadRequestError
+        - root.ContentTooLargeError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            applications:
+              - appName: Ingress load balancer
+                environment: development
+                instanceId: application-name-dacb1234
+            metrics:
+              - appName: accounting
+                environment: development
+                featureName: my.special.feature
+      method: POST
+      path: /api/client/metrics/bulk
+      request:
+        body:
+          properties:
+            applications:
+              docs: A list of applications registered by an Unleash SDK
+              type: list<root.BulkRegistrationSchema>
+            impactMetrics:
+              docs: >-
+                a list of custom impact metrics registered by downstream
+                providers. (Typically Unleash Edge)
+              type: optional<list<root.ImpactMetricsSchema>>
+            metrics:
+              docs: >-
+                a list of client usage metrics registered by downstream
+                providers. (Typically Unleash Edge)
+              type: list<root.ClientMetricsEnvSchema>
+        content-type: application/json
+        name: BulkMetricsSchema
+      source:
+        openapi: openapi.json
+    getValidTokens:
+      auth:
+        - {}
+      display-name: Check which tokens are valid
+      docs: >-
+        This operation accepts a list of tokens to validate. Unleash will
+        validate each token you provide. For each valid token you provide,
+        Unleash will return the token along with its type and which projects it
+        has access to.
+      errors:
+        - root.BadRequestError
+        - root.ContentTooLargeError
+        - root.UnsupportedMediaTypeError
+      examples:
+        - request:
+            tokens:
+              - aproject:development.randomstring
+              - '[]:production.randomstring'
+          response:
+            body:
+              tokens:
+                - projects:
+                    - developerexperience
+                    - enterprisegrowth
+                  token: >-
+                    *:development.5c806b5320c88cf27e81f3e9b97dab298a77d5879316e3c2d806206b
+                  type: client
+      method: POST
+      path: /edge/validate
+      request:
+        body:
+          properties:
+            tokens:
+              docs: Tokens that we want to get access information about
+              type: list<string>
+        content-type: application/json
+        name: TokenStringListSchema
+      response:
+        docs: validatedEdgeTokensSchema
+        status-code: 200
+        type: root.ValidatedEdgeTokensSchema
+      source:
+        openapi: openapi.json
+    registerEdgeObservabilityMetrics:
+      display-name: Register Edge observability metrics.
+      docs: >-
+        ![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg)
+        **Enterprise feature**
+
+
+        Registers Edge observability metrics from downstream Edge instances to
+        aggregate a comprehensive status view of connected Edges.
+      examples:
+        - request:
+            appName: unleash-edge-us-east-1
+            connectedEdges: []
+            connectedStreamingClients: 1.1
+            edgeVersion: 19.6.3
+            identifier: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+            latencyUpstream:
+              edge:
+                avg: 1.1
+                count: 1.1
+                p99: 34.5
+              features:
+                avg: 1.1
+                count: 1.1
+                p99: 34.5
+              metrics:
+                avg: 1.1
+                count: 1.1
+                p99: 34.5
+            started: '2024-01-15T09:30:00Z'
+            traffic:
+              accessDenied:
+                key:
+                  avg: 1.1
+                  count: 1.1
+                  p99: 34.5
+              cachedResponses:
+                key:
+                  avg: 1.1
+                  count: 1.1
+                  p99: 34.5
+              get:
+                key:
+                  avg: 1.1
+                  count: 1.1
+                  p99: 34.5
+              post:
+                key:
+                  avg: 1.1
+                  count: 1.1
+                  p99: 34.5
+      method: POST
+      path: /api/client/metrics/edge
+      request:
+        body: root.EdgeInstanceDataSchema
+        content-type: application/json
+      source:
+        openapi: openapi.json
+  source:
+    openapi: openapi.json
