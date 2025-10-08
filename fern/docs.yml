@@ -12,41 +12,41 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
-roles:
- - everyone
- - unleash-admin
+# roles:
+#  - everyone
+#  - unleash-admin
 
 tabs:
   home:
     display-name: Home
     icon: home
-    viewers:
-      - everyone
+    # viewers:
+    #   - everyone
   guides:
     display-name: Guides
     icon: book
-    viewers:
-      - unleash-admin
+    # viewers:
+    #   - unleash-admin
   api:
     display-name: API Reference
     icon: puzzle
-    viewers:
-      - unleash-admin
+    # viewers:
+    #   - unleash-admin
   edge:
     display-name: Unleash Edge
     icon: fa-solid fa-bolt
-    viewers:
-      - unleash-admin
+    # viewers:
+    #   - unleash-admin
   deploy:
     display-name: Deploy & Integrate
     icon: fa-solid fa-rocket
-    viewers:
-      - unleash-admin
+    # viewers:
+    #   - unleash-admin
   support:
     display-name: Support
     icon: fa-solid fa-life-ring
-    viewers:
-      - unleash-admin
+    # viewers:
+    #   - unleash-admin
 
 navigation:
   - tab: home
@@ -86,8 +86,8 @@ navigation:
   - tab: guides
     layout:
       - section: Tutorials and guides
-        viewers:
-          - unleash-admin
+        # viewers:
+        #   - unleash-admin
         contents:
           - page: Feature flag best practices
             path: topics/feature-flags/feature-flag-best-practices.mdx
