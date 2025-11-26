@@ -1,3 +1,41 @@
+:root {
+    --ifm-background-color: #fff;
+    --ifm-font-color-base: #202021;
+    --color-night-blue: #1a4049;
+    --color-night-blue-100: var(--color-night-blue);
+    --color-night-blue-90: #39535b;
+    --color-night-blue-80: #4f666d;
+    --color-night-blue-70: #657a80;
+    --color-night-blue-60: #7c8e93;
+    --color-night-blue-50: #92a1a5;
+    --color-night-blue-40: #a9b5b8;
+    --color-night-blue-30: #c0c9cc;
+    --color-night-blue-20: #d7dcde;
+    --color-night-blue-10: #edf0f1;
+    --color-night-blue-dark: #122d33;
+    --color-night-blue-darker: #0a1a1d;
+    --color-day-blue: var(--color-night-blue-10);
+}
+
+#fern-docs {
+    background-color: var(--color-day-blue);
+}
+
+#fern-header {
+    background-color: var(--color-day-blue);
+}
+
+.fern-layout-guide, .fern-layout-reference {
+    background-color: var(--ifm-background-color);
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
+                0 0px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.fern-layout-reference {
+    padding: 0;
+}
 
 .landing-page { 
     margin-left: 4rem !important;
