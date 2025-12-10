@@ -17,6 +17,11 @@
     --color-day-blue: var(--color-night-blue-10);
 }
 
+/* Override Fern color variables for header tabs only */
+[data-theme=default] #fern-header {
+    --grayscale-a11: #244049;
+}
+
 #fern-docs {
     background-color: var(--color-day-blue);
 }
@@ -148,4 +153,65 @@ body:has(.landing-page) .fern-card > * {
 
 img {
     border-radius: 12px !important;
+}
+
+/* GitHub button styling - match free trial button size */
+#fern-header a[href*="github.com"] {
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    height: auto !important;
+}
+
+/* Separator after GitHub button */
+#fern-header a[href*="github.com"]::after {
+    content: '';
+    position: absolute;
+    right: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    width: 1px;
+    background-color: #d0d0d0;
+}
+
+/* Navbar links styling - no borders */
+#fern-header a[href="https://www.getunleash.io/product"],
+#fern-header a[href="https://www.getunleash.io/plans"],
+#fern-header a[href="https://www.getunleash.io/signin"] {
+    font-weight: 600 !important;
+    color: #244049 !important;
+    border: none !important;
+}
+
+/* Purple color on hover for navbar links */
+#fern-header a[href="https://www.getunleash.io/product"]:hover,
+#fern-header a[href="https://www.getunleash.io/plans"]:hover,
+#fern-header a[href="https://www.getunleash.io/signin"]:hover {
+    color: #817afe !important;
+}
+
+/* Header tabs - base color */
+.fern-header-tabs__tab {
+    color: #244049 !important;
+}
+
+/* Header tabs - active state stays purple - more specific selector */
+.fern-header-tabs__tab[aria-selected="true"] {
+    color: #817afe !important;
+}
+
+.fern-header-tabs__tab[data-state="active"] {
+    color: #817afe !important;
+}
+
+/* Navbar button styling */
+#fern-header a[href*="enterprise-payg"].fern-button {
+    background-color: #244049 !important;
+    color: white !important;
+}
+
+#fern-header a[href*="enterprise-payg"].fern-button:hover {
+    background-color: #817afe !important;
 }

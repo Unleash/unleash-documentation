@@ -17,43 +17,27 @@ layout:
 #  - unleash-admin
 
 tabs:
-  home:
-    display-name: Home
-    icon: home
-    # viewers:
-    #   - everyone
+  product-docs:
+    display-name: Docs
+  api-docs:
+    display-name: APIs
+  sdks:
+    display-name: SDKs
+  enterprise-edge:
+    display-name: Enterprise Edge
   guides:
-    display-name: Guides
-    icon: book
-    # viewers:
-    #   - unleash-admin
-  api:
-    display-name: API Reference
-    icon: puzzle
-    # viewers:
-    #   - unleash-admin
-  edge:
-    display-name: Unleash Edge
-    icon: fa-solid fa-bolt
-    # viewers:
-    #   - unleash-admin
-  deploy:
-    display-name: Deploy & Integrate
-    icon: fa-solid fa-rocket
-    # viewers:
-    #   - unleash-admin
-  support:
-    display-name: Support
-    icon: fa-solid fa-life-ring
-    # viewers:
-    #   - unleash-admin
+    display-name: Guides    
+  academy:
+    display-name: Academy
+  release-notes:
+    display-name: Release notes
 
 navigation:
-  - tab: home
+  - tab: product-docs
     layout:
-      - page: Welcome
+      - page: Home
         path: docs/pages/welcome.mdx
-        # skip-slug: true
+
       - section: Get started
         contents:
           - page: Quickstart
@@ -62,8 +46,7 @@ navigation:
             path: what-is-a-feature-flag.mdx
           - page: Unleash overview
             path: understanding-unleash/unleash-overview.mdx
-            
-      
+
       - section: Core concepts
         contents:
           - page: The anatomy of Unleash
@@ -83,29 +66,36 @@ navigation:
           - page: Login history
             path: reference/login-history.mdx
 
-  - tab: guides
-    layout:
-      - section: Tutorials and guides
-        # viewers:
-        #   - unleash-admin
+      - section: Integrate and deploy
         contents:
-          - page: Feature flag best practices
-            path: topics/feature-flags/feature-flag-best-practices.mdx
-          - page: How to create a feature flag
-            path: how-to-create-feature-flag.mdx
-          - page: User management, access controls, and auditing
-            path: feature-flag-tutorials/use-cases/user-management-access-controls-auditing.mdx
-          - page: A/B testing
-            path: feature-flag-tutorials/use-cases/a-b-testing.mdx
-          - page: React tutorial
-            path: feature-flag-tutorials/react.mdx
-      
-      - section: SDKs
+          - page: Hosting options
+            path: understanding-unleash/hosting-options.mdx
+          - page: Getting started
+            path: using-unleash/deploy/getting-started.mdx
+          - page: How to add SSO (OpenID Connect)
+            path: how-to/how-to-add-sso-open-id-connect.mdx
+          - page: How to setup provisioning with Okta
+            path: how-to/how-to-setup-provisioning-with-okta.mdx
+          - page: Integrations
+            path: reference/integrations.mdx
+
+      - section: Data privacy and compliance
         contents:
-          - page: SDKs overview
-            path: reference/sdks.mdx
-  
-  - tab: api
+          - page: Data collection
+            path: understanding-unleash/data-collection.mdx
+          - page: Compliance overview
+            path: using-unleash/compliance/compliance-overview.mdx
+
+      - section: Support and community
+        contents:
+          - page: Troubleshooting
+            path: troubleshooting.mdx
+          - page: Availability
+            path: availability.mdx
+          - page: Developer guide
+            path: contributing/developer-guide.mdx
+
+  - tab: api-docs
     layout:
       - api: API Reference
         skip-slug: true
@@ -305,9 +295,14 @@ navigation:
               - users
             contents: []
 
-  - tab: edge
+  - tab: sdks
     layout:
-      - section: Unleash Edge
+      - page: SDKs overview
+        path: reference/sdks.mdx
+
+  - tab: enterprise-edge
+    layout:
+      - section: Enterprise Edge
         contents:
           - page: Overview
             path: reference/unleash-edge.mdx
@@ -323,51 +318,49 @@ navigation:
             path: reference/unleash-edge/development-guide.mdx
           - page: Migration guide
             path: reference/unleash-edge/migration-guide.mdx
-
-  - tab: deploy
+            
+  - tab: guides
     layout:
-      - section: Integrate and deploy
+      - section: Developer tutorials
         contents:
-          - page: Hosting options
-            path: understanding-unleash/hosting-options.mdx
-          - page: Getting started
-            path: using-unleash/deploy/getting-started.mdx
-          - page: How to add SSO (OpenID Connect)
-            path: how-to/how-to-add-sso-open-id-connect.mdx
-          - page: How to setup provisioning with Okta
-            path: how-to/how-to-setup-provisioning-with-okta.mdx
-          - page: Integrations
-            path: reference/integrations.mdx
-      
-      - section: Data privacy and compliance
-        contents:
-          - page: Data collection
-            path: understanding-unleash/data-collection.mdx
-          - page: Compliance overview
-            path: using-unleash/compliance/compliance-overview.mdx
+          - page: Feature flag best practices
+            path: topics/feature-flags/feature-flag-best-practices.mdx
+          - page: How to create a feature flag
+            path: how-to-create-feature-flag.mdx
+          - page: User management, access controls, and auditing
+            path: feature-flag-tutorials/use-cases/user-management-access-controls-auditing.mdx
+          - page: A/B testing
+            path: feature-flag-tutorials/use-cases/a-b-testing.mdx
+          - page: React tutorial
+            path: feature-flag-tutorials/react.mdx
 
-  - tab: support
+  - tab: academy
     layout:
-      - section: Support and community
-        contents:
-          - page: Troubleshooting
-            path: troubleshooting.mdx
-          - page: Availability
-            path: availability.mdx
-          - page: Developer guide
-            path: contributing/developer-guide.mdx
-      
       - section: Unleash Academy
         contents:
           - page: Introduction
             path: unleash-academy/introduction.mdx
 
+  - tab: release-notes
+    layout:
+      - page: Release notes
+        path: docs/pages/release-notes.mdx
+
 navbar-links:
-  - type: filled
-    text: Start Free Trial
-    url: https://www.getunleash.io/plans/enterprise-payg
   - type: github
     value: https://github.com/Unleash/unleash
+  - type: minimal
+    text: Product
+    url: https://www.getunleash.io/product
+  - type: minimal
+    text: Plans
+    url: https://www.getunleash.io/plans
+  - type: minimal
+    text: Sign in
+    url: https://www.getunleash.io/signin
+  - type: filled
+    text: Start free trial
+    url: https://www.getunleash.io/plans/enterprise-payg
       
 colors:
   accent-primary:
