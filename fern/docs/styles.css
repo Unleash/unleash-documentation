@@ -1,3 +1,4 @@
+/* Light theme variables */
 :root {
     --ifm-background-color: #fff;
     --ifm-font-color-base: #202021;
@@ -15,6 +16,28 @@
     --color-night-blue-dark: #122d33;
     --color-night-blue-darker: #0a1a1d;
     --color-day-blue: var(--color-night-blue-10);
+    --unleash-purple: #817afe;
+}
+
+/* Dark theme overrides */
+.dark {
+    --ifm-background-color: #232130;
+    --ifm-font-color-base: #fff;
+    --color-night-blue: #BBB9FF;
+    --color-night-blue-100: var(--color-night-blue);
+    --color-night-blue-90: #BBB9FF;
+    --color-night-blue-80: #BBB9FF;
+    --color-night-blue-70: #BBB9FF;
+    --color-night-blue-60: #BBB9FF;
+    --color-night-blue-50: #BBB9FF;
+    --color-night-blue-40: #BBB9FF;
+    --color-night-blue-30: #BBB9FF;
+    --color-night-blue-20: #BBB9FF;
+    --color-night-blue-10: #2D2C3B;
+    --color-night-blue-dark: #BBB9FF;
+    --color-night-blue-darker: #BBB9FF;
+    --color-day-blue: #232130;
+    --unleash-purple: #BBB9FF;
 }
 
 
@@ -126,14 +149,13 @@ body:has(.landing-page) .fern-card:before {
 }
 
 /* Light mode - use Fern's light theme class */
-[data-theme="light"] body:has(.landing-page) .fern-card:before,
-body:not([data-theme="dark"]):has(.landing-page) .fern-card:before {
+.light body:has(.landing-page) .fern-card:before {
     opacity: 0.7 !important;
     filter: brightness(0.4) contrast(1.8) !important;
 }
 
 /* Dark mode - use Fern's dark theme class */
-[data-theme="dark"] body:has(.landing-page) .fern-card:before {
+.dark body:has(.landing-page) .fern-card:before {
     opacity: 0.6 !important;
     filter: none !important;
 }
@@ -157,7 +179,7 @@ img {
 #fern-header a[href="https://www.getunleash.io/plans"],
 #fern-header a[href="https://www.getunleash.io/signin"] {
     font-weight: 600 !important;
-    color: #244049 !important;
+    color: var(--color-night-blue) !important;
     border: none !important;
 }
 
@@ -165,14 +187,14 @@ img {
 #fern-header a[href="https://www.getunleash.io/product"]:hover,
 #fern-header a[href="https://www.getunleash.io/plans"]:hover,
 #fern-header a[href="https://www.getunleash.io/signin"]:hover {
-    color: #817afe !important;
+    color: var(--unleash-purple) !important;
 }
 
 /* Header tabs - base color - very specific selector */
 button.fern-header-tabs__tab[role="tab"],
 button.fern-header-tabs__tab[role="tab"] span,
 button.fern-header-tabs__tab[role="tab"] .truncate {
-    color: #244049 !important;
+    color: var(--color-night-blue) !important;
 }
 
 /* Header tabs - active state stays purple */
@@ -182,26 +204,50 @@ button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
 button.fern-header-tabs__tab[role="tab"][data-state="active"],
 button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
 button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate {
-    color: #817afe !important;
+    color: var(--unleash-purple) !important;
 }
 
 /* Header tabs - base color */
 .fern-header-tabs a {
-    color: #244049
+    color: var(--color-night-blue);
 }
 
 /* Header tabs - active state stays purple - more specific selector */
 .fern-header-tabs a[aria-selected="true"],
 .fern-header-tabs a[data-state="active"] {
-    color: #817afe;
+    color: var(--unleash-purple);
 }
 
-/* Navbar button styling */
+/* Navbar button styling - Light mode (default) */
 #fern-header a[href*="enterprise-payg"].fern-button {
     background-color: #244049 !important;
-    color: white !important;
+    font-weight: 600 !important;
+}
+
+#fern-header a[href*="enterprise-payg"].fern-button,
+#fern-header a[href*="enterprise-payg"].fern-button span,
+#fern-header a[href*="enterprise-payg"].fern-button .fern-button-text,
+#fern-header a[href*="enterprise-payg"].fern-button * {
+    color: #E3E3E3 !important;
+    font-weight: 600 !important;
 }
 
 #fern-header a[href*="enterprise-payg"].fern-button:hover {
-    background-color: #817afe !important;
+    background-color: #837BFF !important;
+}
+
+/* Navbar button styling - Dark mode override */
+.dark #fern-header a[href*="enterprise-payg"].fern-button {
+    background-color: #E3E3E3 !important;
+}
+
+.dark #fern-header a[href*="enterprise-payg"].fern-button,
+.dark #fern-header a[href*="enterprise-payg"].fern-button span,
+.dark #fern-header a[href*="enterprise-payg"].fern-button .fern-button-text,
+.dark #fern-header a[href*="enterprise-payg"].fern-button * {
+    color: #1A1924 !important;
+}
+
+.dark #fern-header a[href*="enterprise-payg"].fern-button:hover {
+    background-color: #BBB9FF !important;
 }
