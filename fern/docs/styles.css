@@ -17,10 +17,6 @@
     --color-day-blue: var(--color-night-blue-10);
 }
 
-/* Override Fern color variables for header tabs only */
-[data-theme=default] #fern-header {
-    --grayscale-a11: #244049;
-}
 
 #fern-docs {
     background-color: var(--color-day-blue);
@@ -40,6 +36,7 @@
 
 .fern-layout-reference {
     padding: 0;
+    margin-bottom: calc(var(--spacing) * 12);
 }
 
 .landing-page { 
@@ -155,27 +152,6 @@ img {
     border-radius: 12px !important;
 }
 
-/* GitHub button styling - match free trial button size */
-#fern-header a[href*="github.com"] {
-    border: 1px solid #d0d0d0 !important;
-    border-radius: 6px !important;
-    padding: 8px 16px !important;
-    font-size: 14px !important;
-    height: auto !important;
-}
-
-/* Separator after GitHub button */
-#fern-header a[href*="github.com"]::after {
-    content: '';
-    position: absolute;
-    right: -16px;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 24px;
-    width: 1px;
-    background-color: #d0d0d0;
-}
-
 /* Navbar links styling - no borders */
 #fern-header a[href="https://www.getunleash.io/product"],
 #fern-header a[href="https://www.getunleash.io/plans"],
@@ -192,18 +168,32 @@ img {
     color: #817afe !important;
 }
 
-/* Header tabs - base color */
-.fern-header-tabs__tab {
+/* Header tabs - base color - very specific selector */
+button.fern-header-tabs__tab[role="tab"],
+button.fern-header-tabs__tab[role="tab"] span,
+button.fern-header-tabs__tab[role="tab"] .truncate {
     color: #244049 !important;
 }
 
-/* Header tabs - active state stays purple - more specific selector */
-.fern-header-tabs__tab[aria-selected="true"] {
+/* Header tabs - active state stays purple */
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"],
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"] span,
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
+button.fern-header-tabs__tab[role="tab"][data-state="active"],
+button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
+button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate {
     color: #817afe !important;
 }
 
-.fern-header-tabs__tab[data-state="active"] {
-    color: #817afe !important;
+/* Header tabs - base color */
+.fern-header-tabs a {
+    color: #244049
+}
+
+/* Header tabs - active state stays purple - more specific selector */
+.fern-header-tabs a[aria-selected="true"],
+.fern-header-tabs a[data-state="active"] {
+    color: #817afe;
 }
 
 /* Navbar button styling */
