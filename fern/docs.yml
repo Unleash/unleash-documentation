@@ -41,7 +41,11 @@ navigation:
       - section: Get started
         contents:
           - page: Quickstart
-            path: pages/concepts.mdx
+            path: pages/get-started/quickstart.mdx
+          - page: What is a feature flag
+            path: pages/get-started/what-is-a-feature-flag.mdx
+          - page: Unleash overview
+            path: pages/get-started/unleash-overview.mdx
 
       - section: Core concepts
         contents:

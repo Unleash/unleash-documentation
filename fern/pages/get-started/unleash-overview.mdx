@@ -1,10 +1,11 @@
 ---
 title: Unleash architecture overview
+description: Learn how Unleash's architecture provides fast, secure, and reliable feature flag evaluations with SDKs, APIs, and Edge components.
+keywords: unleash architecture, feature flags, sdks, unleash edge, api, system design, evaluation
+og:site_name: Unleash Documentation
+og:title: Unleash Architecture Overview - Fast and Secure Feature Flags
+max-toc-depth: 3
 ---
-
-import SearchPriority from '@site/src/components/SearchPriority';
-
-<SearchPriority level="high" />
 
 Unleash is designed for privacy, speed, and resilience, enabling feature flag evaluations to occur locally within your applications. The architecture provides:
 - **Fast feature flag evaluations**: Feature flags are evaluated within the [SDKs](#unleash-sdks) or [Unleash Edge](#unleash-edge), making evaluations incredibly fast (nanoseconds).
@@ -15,7 +16,9 @@ Unleash is designed for privacy, speed, and resilience, enabling feature flag ev
 
 The Unleash system consists of several key components.
 
-![A visual overview of an Unleash system as described in the following paragraph.](/img/unleash-architecture.png)
+<Frame background="subtle">
+  ![A visual overview of an Unleash system as described in the following paragraph.](/assets/unleash-architecture.png)
+</Frame>
 
 ### The Unleash API server
 
@@ -25,7 +28,9 @@ The Unleash API server is the core service for managing feature flags, configura
 
 A web interface for managing feature flags, defining activation strategies, viewing analytics, configuring access roles, generating API tokens, and more.
 
-![A visual overview of an Unleash system as described in the following paragraph.](/img/unleash-admin-ui.png)
+<Frame background="subtle">
+  ![A visual overview of an Unleash system as described in the following paragraph.](/assets/unleash-admin-ui.png)
+</Frame>
 
 ### Unleash SDKs
 
@@ -41,7 +46,7 @@ Supported languages include: [Node.js](/sdks/node), [Go](/sdks/go), [Java](/sdks
 
 #### Frontend SDKs
 
-Frontend SDKs are used in frontend and mobile applications. They communicate with Unleash or [Unleash Edge](#unleash-edge) through the [Frontend API](#frontend-api). 
+Frontend SDKs are used in frontend and mobile applications. They communicate with Unleash or [Unleash Edge](#unleash-edge) through the [Frontend API](#frontend-api).
 
 Unlike backend SDKs, frontend SDKs do not perform the flag evaluation locally. Instead, they fetch all enabled feature flags for a given [Unleash Context](/concepts/unleash-context). The flag evaluation happens inside [Unleash Edge](#unleash-edge), or within the Unleash server. Frontend SDKs cache evaluated feature flags in memory using a single evaluation call to the server, making flag evaluation secure, fast, and efficient.
 
@@ -66,7 +71,7 @@ For frontend SDKs, you can use Unleash Edge for flag evaluation to ensure that u
 
 Unleash Edge is a lightweight caching layer designed to improve scalability, performance, and resilience. It sits between your SDKs and the Unleash API and handles thousands of connected SDKs without increasing the number of requests you make to your Unleash instance.
 
-Beyond scalability, Unleash Edge also offers privacy and security benefits for frontend SDKs by performing flag evaluations without exposing sensitive data to end-users or to Unleash. 
+Beyond scalability, Unleash Edge also offers privacy and security benefits for frontend SDKs by performing flag evaluations without exposing sensitive data to end-users or to Unleash.
 
 ### Unleash APIs
 
@@ -97,4 +102,4 @@ To integrate Unleash, you first need an [Unleash server](#the-unleash-api-server
   - [Helm Chart](https://github.com/unleash/helm-charts/)
   - [GitLab](https://docs.gitlab.com/ee/operations/feature_flags.html#choose-a-client-library)
 
-For a deeper dive into Unleash’s architecture, check out this [blog post](https://www.getunleash.io/blog/our-unique-architecture).
+For a deeper dive into Unleash's architecture, check out this [blog post](https://www.getunleash.io/blog/our-unique-architecture).

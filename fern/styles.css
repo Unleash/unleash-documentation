@@ -186,3 +186,15 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 #fern-header a[href*="enterprise-payg"].fern-button:hover {
     background-color: var(--button-hover-bg-color) !important;
 }
+
+/* CTA button styling (for inline buttons matching header style) */
+.cta-button {
+    background-color: var(--button-bg-color) !important;
+    color: var(--button-text-color) !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+.cta-button:hover {
+    background-color: var(--button-hover-bg-color) !important;
+}
