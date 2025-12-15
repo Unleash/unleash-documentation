@@ -1,40 +1,40 @@
 /* Light theme variables */
 :root {
-    --container-background-color: #fff;
+    --container-bg-color: #fff;
     --nav-text-color: #1a4049;
-    --page-background-light-color: #EAEAED;
-    --background-sidebar-nav-color: var(--page-background-light-color);
+    --page-bg-light-color: #EAEAED;
+    --sidebar-nav-bg-color: var(--page-bg-light-color);
     --accent-color: #817afe;
     --button-bg-color: #244049;
-    --button-text-color: #E3E3E3;
-    --button-hover-color: #635DC5;
+    --button-text-color: #FFF;
+    --button-hover-bg-color: #635DC5;
     --card-hover-bg-color: #f5f6fa80;
     --card-stripe-color: #6c64e5;
 }
 
 /* Dark theme overrides */
 .dark {
-    --container-background-color: #232130;
+    --container-bg-color: #232130;
     --nav-text-color: #E3E3E3;
-    --background-sidebar-nav-color: #1A1924;
+    --sidebar-nav-bg-color: #1A1924;
     --accent-color: #BBB9FF;
     --button-bg-color: #E3E3E3;
-    --button-text-color: var(--background-sidebar-nav-color);
-    --button-hover-color: #BBB9FF;
+    --button-text-color: var(--sidebar-nav-bg-color);
+    --button-hover-bg-color: #BBB9FF;
     --card-hover-bg-color: #23233a80;
 }
 
 
 #fern-docs {
-    background-color: var(--background-sidebar-nav-color);
+    background-color: var(--sidebar-nav-bg-color);
 }
 
 #fern-header {
-    background-color: var(--background-sidebar-nav-color);
+    background-color: var(--sidebar-nav-bg-color);
 }
 
 .fern-layout-guide, .fern-layout-reference {
-    background-color: var(--container-background-color);
+    background-color: var(--container-bg-color);
     border-radius: 0.75rem;
     margin-top: 2rem;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
@@ -46,16 +46,10 @@
     margin-bottom: calc(var(--spacing) * 12);
 }
 
-.landing-page { 
+.landing-page {
     margin-left: 4rem !important;
     margin-right: 4rem !important;
 }
-
-.hero {
-  margin-top: 2rem;
-  padding-bottom: 2.5rem;
-}
-
 
 body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
     display: none !important;
@@ -70,7 +64,9 @@ body:has(.landing-page) .fern-page-actions {
     display: flex;
     align-items: flex-start;
     gap: 2rem;
+    margin-top: 2rem;
     margin-bottom: 2rem;
+    padding-bottom: 2.5rem;
 }
 
 .hero-content {
@@ -86,10 +82,6 @@ body:has(.landing-page) .fern-page-actions {
     border-radius: 12px;
 }
 
-/* .fern-header-content .fern-button {
-    border-radius: 0px;
-} */
-
 /* Card bottom stripe styles */
 body:has(.landing-page) .fern-card {
     position: relative;
@@ -99,10 +91,6 @@ body:has(.landing-page) .fern-card {
 }
 
 body:has(.landing-page) .fern-card:hover {
-    background-color: var(--card-hover-bg-color) !important;
-}
-
-.dark body:has(.landing-page) .fern-card:hover {
     background-color: var(--card-hover-bg-color) !important;
 }
 
@@ -150,15 +138,11 @@ body:has(.landing-page) .fern-card > * {
     z-index: 1;
 }
 
-/* #fern-sidebar-scroll-area {
-    background-color: blue;
-  } */
-
 img {
     border-radius: 12px !important;
 }
 
-/* Navbar links styling - no borders - Light mode */
+/* Navbar links styling */
 #fern-header a[href="https://www.getunleash.io/product"],
 #fern-header a[href="https://www.getunleash.io/plans"],
 #fern-header a[href="https://www.getunleash.io/signin"] {
@@ -167,109 +151,38 @@ img {
     border: none !important;
 }
 
-/* Purple color on hover for navbar links - Light mode */
 #fern-header a[href="https://www.getunleash.io/product"]:hover,
 #fern-header a[href="https://www.getunleash.io/plans"]:hover,
 #fern-header a[href="https://www.getunleash.io/signin"]:hover {
     color: var(--accent-color) !important;
 }
 
-/* Navbar links styling - Dark mode overrides */
-.dark #fern-header a[href="https://www.getunleash.io/product"],
-.dark #fern-header a[href="https://www.getunleash.io/plans"],
-.dark #fern-header a[href="https://www.getunleash.io/signin"] {
-    color: var(--nav-text-color) !important;
-}
-
-.dark #fern-header a[href="https://www.getunleash.io/product"]:hover,
-.dark #fern-header a[href="https://www.getunleash.io/plans"]:hover,
-.dark #fern-header a[href="https://www.getunleash.io/signin"]:hover {
-    color: var(--accent-color) !important;
-}
-
-/* Header tabs - base color - very specific selector - Light mode */
+/* Header tabs */
 button.fern-header-tabs__tab[role="tab"],
 button.fern-header-tabs__tab[role="tab"] span,
-button.fern-header-tabs__tab[role="tab"] .truncate {
+button.fern-header-tabs__tab[role="tab"] .truncate,
+.fern-header-tabs a {
     color: var(--nav-text-color) !important;
 }
 
-/* Header tabs - active state stays purple - Light mode */
 button.fern-header-tabs__tab[role="tab"][aria-selected="true"],
 button.fern-header-tabs__tab[role="tab"][aria-selected="true"] span,
 button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
 button.fern-header-tabs__tab[role="tab"][data-state="active"],
 button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
-button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate {
-    color: var(--accent-color) !important;
-}
-
-/* Header tabs - base color - Light mode */
-.fern-header-tabs a {
-    color: var(--nav-text-color);
-}
-
-/* Header tabs - active state stays purple - Light mode */
+button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 .fern-header-tabs a[aria-selected="true"],
 .fern-header-tabs a[data-state="active"] {
-    color: var(--accent-color);
-}
-
-/* Header tabs - Dark mode overrides */
-.dark button.fern-header-tabs__tab[role="tab"],
-.dark button.fern-header-tabs__tab[role="tab"] span,
-.dark button.fern-header-tabs__tab[role="tab"] .truncate {
-    color: var(--nav-text-color) !important;
-}
-
-.dark button.fern-header-tabs__tab[role="tab"][aria-selected="true"],
-.dark button.fern-header-tabs__tab[role="tab"][aria-selected="true"] span,
-.dark button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
-.dark button.fern-header-tabs__tab[role="tab"][data-state="active"],
-.dark button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
-.dark button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate {
     color: var(--accent-color) !important;
 }
 
-.dark .fern-header-tabs a {
-    color: var(--nav-text-color);
-}
-
-.dark .fern-header-tabs a[aria-selected="true"],
-.dark .fern-header-tabs a[data-state="active"] {
-    color: var(--accent-color);
-}
-
-/* Navbar button styling - Light mode (default) */
+/* Navbar button styling */
 #fern-header a[href*="enterprise-payg"].fern-button {
     background-color: var(--button-bg-color) !important;
-    font-weight: 600 !important;
-}
-
-#fern-header a[href*="enterprise-payg"].fern-button,
-#fern-header a[href*="enterprise-payg"].fern-button span,
-#fern-header a[href*="enterprise-payg"].fern-button .fern-button-text,
-#fern-header a[href*="enterprise-payg"].fern-button * {
     color: var(--button-text-color) !important;
     font-weight: 600 !important;
 }
 
 #fern-header a[href*="enterprise-payg"].fern-button:hover {
-    background-color: var(--button-hover-color) !important;
-}
-
-/* Navbar button styling - Dark mode override */
-.dark #fern-header a[href*="enterprise-payg"].fern-button {
-    background-color: var(--button-bg-color) !important;
-}
-
-.dark #fern-header a[href*="enterprise-payg"].fern-button,
-.dark #fern-header a[href*="enterprise-payg"].fern-button span,
-.dark #fern-header a[href*="enterprise-payg"].fern-button .fern-button-text,
-.dark #fern-header a[href*="enterprise-payg"].fern-button * {
-    color: var(--button-text-color) !important;
-}
-
-.dark #fern-header a[href*="enterprise-payg"].fern-button:hover {
-    background-color: var(--button-hover-color) !important;
+    background-color: var(--button-hover-bg-color) !important;
 }
