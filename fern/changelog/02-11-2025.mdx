@@ -1,0 +1,27 @@
+---
+tags: ["Improvement", "Announcement"]
+---
+
+# v6.5.0
+
+## Renamed feature flag lifecycle stages
+
+We've updated the names of the [feature flag lifecycle](/concepts/feature-toggles#feature-flag-lifecycle) stages to better mirror a typical software development process and help you improve your release efficiency and workflows.
+
+The changes include updates to the names, icons, and colors for the different stages.
+
+## Updated license policy for self-hosted Enterprise
+
+Since Unleash v6.0, we've had soft limits in place warning self-hosted Enterprise instances operating without a [valid license](/deploy/license-keys) or exceeding their seat count.
+With Unleash v6.7, we have introduced the following restrictions:
+
+### Mandatory license for enterprise self-hosted plan
+
+If you don't have a valid license, your Unleash instance enters read-only mode, and the only available action is to install a valid license.
+
+### License expiration
+When your license expires, your Unleash instance enters read-only mode. The only available action is to install a new, valid license. Connected applications continue to operate and receive current feature flags, but users cannot make any changes to Unleash.
+
+### Seat count
+If you reach the maximum number of seats in your license, you cannot add new users until you remove existing users to stay within your limit.
+The Unleash Admin UI displays warning banners for customers approaching or exceeding the terms of their license.

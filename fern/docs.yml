@@ -30,6 +30,7 @@ tabs:
     display-name: Academy
   release-notes:
     display-name: Release notes
+    changelog: ./changelog
 
 navigation:
   - tab: product-docs
@@ -176,6 +177,7 @@ navigation:
 
           - page: Import and export
             path: pages/concepts/import-export.mdx
+            slug: import-export
 
       - section: Integrate and deploy
         slug: deploy
@@ -183,6 +185,7 @@ navigation:
         contents:
           - page: Unleash hosting options
             path: pages/deploy/hosting-options.mdx
+            slug: hosting-options
 
           - section: Self-hosting Unleash
             skip-slug: true
@@ -585,9 +588,6 @@ navigation:
             path: pages/concepts.mdx
 
   - tab: release-notes
-    layout:
-      - page: Release notes
-        path: pages/release-notes.mdx
 
 navbar-links:
   - type: github
