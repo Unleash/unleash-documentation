@@ -107,8 +107,10 @@ navigation:
                 path: pages/concepts/front-end-api.mdx
               - page: Role-based access control
                 path: pages/concepts/rbac.mdx
+                slug: rbac
               - page: Single sign-on
                 path: pages/concepts/sso.mdx
+                slug: sso
               - page: Provisioning
                 path: pages/concepts/scim.mdx
               - page: Change requests
@@ -137,6 +139,7 @@ navigation:
                 path: pages/concepts/playground.mdx
               - page: Network
                 path: pages/concepts/network-view.mdx
+                slug: network
               - page: Enterprise Edge observability
                 path: pages/concepts/enterprise-edge-observability.mdx
 
@@ -264,12 +267,13 @@ navigation:
                 path: pages/privacy-and-compliance/compliance-overview.mdx
               - page: FedRAMP
                 path: pages/privacy-and-compliance/fedramp.mdx
+                slug: fedramp
               - page: SOC2 type II
                 path: pages/privacy-and-compliance/soc2.mdx
-                slug: privacy-and-compliance/soc2
+                slug: soc2
               - page: ISO27001
                 path: pages/privacy-and-compliance/iso27001.mdx
-                slug: privacy-and-compliance/iso27001
+                slug: iso27001
 
       - section: Support and community
         skip-slug: true
@@ -293,11 +297,11 @@ navigation:
               - page: Client specification
                 path: pages/contributing/client-specification.mdx
               - page: Frontend
-                slug: frontend-overview
+                slug: frontend/overview
                 path: pages/contributing/frontend/overview.mdx
               - page: Backend
                 path: pages/contributing/backend/overview.mdx
-                slug: backend-overview
+                slug: backend/overview
 
   - tab: api-docs
     layout:
@@ -309,116 +313,7 @@ navigation:
             summary: pages/concepts.mdx
             contents: 
               - page: Authentication
-                path: pages/reference/api/unleash/unleash-api.mdx
-                hidden: true
-          - section: "Addons"
-            summary: pages/reference/api/unleash/addons.mdx
-            referenced-packages: [addons]
-          - section: "Admin UI"
-            summary: pages/reference/api/unleash/admin-ui.mdx
-            referenced-packages: [adminUi]
-          - section: "API Tokens"
-            summary: pages/reference/api/unleash/api-tokens.mdx
-            referenced-packages: [apiTokens]
-          - section: "Archive"
-            summary: pages/reference/api/unleash/archive.mdx
-            referenced-packages: [archive]
-          - section: "Auth"
-            summary: pages/reference/api/unleash/auth.mdx
-            referenced-packages: [auth]
-          - section: "Banners"
-            summary: pages/reference/api/unleash/banners.mdx
-            referenced-packages: [banners]
-          - section: "Change Requests"
-            summary: pages/reference/api/unleash/change-requests.mdx
-            referenced-packages: [changeRequests]
-          - section: "Client"
-            summary: pages/reference/api/unleash/client.mdx
-            referenced-packages: [client]
-          - section: "Context"
-            summary: pages/reference/api/unleash/context.mdx
-            referenced-packages: [context]
-          - section: "Dependencies"
-            summary: pages/reference/api/unleash/dependencies.mdx
-            referenced-packages: [dependencies]
-          - section: "Environments"
-            summary: pages/reference/api/unleash/environments.mdx
-            referenced-packages: [environments]
-          - section: "Events"
-            summary: pages/reference/api/unleash/events.mdx
-            referenced-packages: [events]
-          - section: "Feature Types"
-            summary: pages/reference/api/unleash/feature-types.mdx
-            referenced-packages: [featureTypes]
-          - section: "Features"
-            summary: pages/reference/api/unleash/features.mdx
-            referenced-packages: [features]
-          - section: "Frontend API"
-            summary: pages/reference/api/unleash/frontend-api.mdx
-            referenced-packages: [frontendApi]
-          - section: "Import/Export"
-            summary: pages/reference/api/unleash/import-export.mdx
-            referenced-packages: [importExport]
-          - section: "Instance Admin"
-            summary: pages/reference/api/unleash/instance-admin.mdx
-            referenced-packages: [instanceAdmin]
-          - section: "Maintenance"
-            summary: pages/reference/api/unleash/maintenance.mdx
-            referenced-packages: [maintenance]
-          - section: "Metrics"
-            summary: pages/reference/api/unleash/metrics.mdx
-            referenced-packages: [metrics]
-          - section: "Notifications"
-            summary: pages/reference/api/unleash/notifications.mdx
-            referenced-packages: [notifications]
-          - section: "Operational"
-            summary: pages/reference/api/unleash/operational.mdx
-            referenced-packages: [operational]
-          - section: "Personal Access Tokens"
-            summary: pages/reference/api/unleash/personal-access-tokens.mdx
-            referenced-packages: [personalAccessTokens]
-          - section: "Playground"
-            summary: pages/reference/api/unleash/playground.mdx
-            referenced-packages: [playground]
-          - section: "Projects"
-            summary: pages/reference/api/unleash/projects.mdx
-            referenced-packages: [projects]
-          - section: "Public Signup Tokens"
-            summary: pages/reference/api/unleash/public-signup-tokens.mdx
-            referenced-packages: [publicSignupTokens]
-          - section: "Release Templates"
-            summary: pages/reference/api/unleash/release-templates.mdx
-            referenced-packages: [releaseTemplates]
-          - section: "Search"
-            summary: pages/reference/api/unleash/search.mdx
-            referenced-packages: [search]
-          - section: "Segments"
-            summary: pages/reference/api/unleash/segments.mdx
-            referenced-packages: [segments]
-          - section: "Service Accounts"
-            summary: pages/reference/api/unleash/service-accounts.mdx
-            referenced-packages: [serviceAccounts]
-          - section: "Strategies"
-            summary: pages/reference/api/unleash/strategies.mdx
-            referenced-packages: [strategies]
-          - section: "Tags"
-            summary: pages/reference/api/unleash/tags.mdx
-            referenced-packages: [tags]
-          - section: "Telemetry"
-            summary: pages/reference/api/unleash/telemetry.mdx
-            referenced-packages: [telemetry]
-          - section: "Unknown Flags"
-            summary: pages/reference/api/unleash/unknown-flags.mdx
-            referenced-packages: [unknownFlags]
-          - section: "Unleash Edge"
-            summary: pages/reference/api/unleash/unleash-edge.mdx
-            referenced-packages: [unleashEdge]
-          - section: "Unstable"
-            summary: pages/reference/api/unleash/unstable.mdx
-            referenced-packages: [unstable]
-          - section: "Users"
-            summary: pages/reference/api/unleash/users.mdx
-            referenced-packages: [users]
+                path: pages/support/oss-comparison.mdx
 
   - tab: sdks
     layout:
@@ -430,12 +325,14 @@ navigation:
         contents:
           - page: Node.js
             path: pages/sdks/backend/node.mdx
+            slug: node
           - page: Java
             path: pages/sdks/backend/java.mdx
           - page: Python
             path: pages/sdks/backend/python.mdx
           - page: .NET
             path: pages/sdks/backend/dotnet.mdx
+            slug: dotnet
           - page: Go
             path: pages/sdks/backend/go.mdx
           - page: PHP
@@ -452,6 +349,7 @@ navigation:
             path: pages/sdks/frontend/react.mdx
           - page: JavaScript
             path: pages/sdks/frontend/javascript-browser.mdx
+            slug: javascript-browser
           - page: Next.js
             path: pages/sdks/frontend/next-js.mdx
           - page: Android
@@ -463,6 +361,7 @@ navigation:
             path: pages/sdks/frontend/flutter.mdx
           - page: iOS
             path: pages/sdks/frontend/ios.mdx
+            slug: ios
           - page: Svelte
             path: pages/sdks/frontend/svelte.mdx
           - page: Vue
@@ -566,6 +465,7 @@ navigation:
             slug: user-management-access-controls
           - page: Security and compliance
             path: pages/guides/security-compliance.mdx
+            slug: security-compliance
           - page: Scaling Unleash
             path: pages/guides/scaling-unleash.mdx
           - page: Managing feature flags in code
