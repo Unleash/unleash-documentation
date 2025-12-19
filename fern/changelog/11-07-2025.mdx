@@ -6,23 +6,23 @@ tags: ["Improvement", "New feature"]
 
 ## Improved experience for adding strategies to flags
 
-We redesigned how you add [activation strategies](https://docs.getunleash.io/reference/activation-strategies) to flags. The new flow makes it easier to access standard strategies and reusable [release templates](https://docs.getunleash.io/reference/release-templates).
+We redesigned how you add [activation strategies](/concepts/activation-strategies) to flags. The new flow makes it easier to access standard strategies and reusable [release templates](/concepts/release-templates).
 When you configure a flag in an environment, click Add strategy and choose one of the following options:
-- The [project's default strategy](https://docs.getunleash.io/reference/activation-strategies#default-strategy)
-- A [standard strategy](https://docs.getunleash.io/reference/activation-strategies#standard-strategies), such as gradual rollout or on/off
-- An [advanced strategy](https://docs.getunleash.io/reference/activation-strategies#advanced-strategies), such as IP or host targeting
-- A[ release template](https://docs.getunleash.io/reference/release-templates)
-- A [custom activation strategy](https://docs.getunleash.io/reference/custom-activation-strategies) defined in your instance
+- The [project's default strategy](/concepts/activation-strategies#default-strategy)
+- A [standard strategy](/concepts/activation-strategies#standard-strategies), such as gradual rollout or on/off
+- An [advanced strategy](/concepts/activation-strategies#advanced-strategies), such as IP or host targeting
+- A [release template](/concepts/release-templates)
+- A [custom activation strategy](/concepts/custom-activation-strategies) defined in your instance
 
 You'll also see a suggested strategy in any environment without an active configuration, so you can preview, edit, or apply your default strategy in a single click.
 
 ### New lifecycle analytics
-We've added two new widgets to the [Analytics](https://docs.getunleash.io/reference/insights) dashboard: **New flags in production** and **Flags archived vs flags created**.
+We've added two new widgets to the [Analytics](/concepts/insights) dashboard: **New flags in production** and **Flags archived vs flags created**.
 
-**New flags in production** shows how many flags reached production each week for your selected time period. It gives you a quick view of your team’s delivery pace and how feature output changes over time.
+**New flags in production** shows how many flags reached production each week for your selected time period. It gives you a quick view of your team's delivery pace and how feature output changes over time.
 
-**Flags archived vs. created track**s how many flags you archive each week compared to how many you create, alongside your average cleanup ratio. If you consistently create more flags than you archive, that’s a sign that technical debt may be increasing. Over time, aim for a 1:1 ratio (or 100%) of archived to created flags to keep your codebase healthy.
+**Flags archived vs. created track**s how many flags you archive each week compared to how many you create, alongside your average cleanup ratio. If you consistently create more flags than you archive, that's a sign that technical debt may be increasing. Over time, aim for a 1:1 ratio (or 100%) of archived to created flags to keep your codebase healthy.
 
 ### Aligned quick filters in Project Overview
 
-We aligned quick filters in **Project Overview** to provide a more consistent experience with feature flags lists. You can now use the same filters available on **Flags Overview** to narrow down flags by [lifecycle stage](https://docs.getunleash.io/reference/feature-toggles#lifecycle-stages), such as _Develop_, _Production_, or _Clean-up_.
+We aligned quick filters in **Project Overview** to provide a more consistent experience with feature flags lists. You can now use the same filters available on **Flags Overview** to narrow down flags by [lifecycle stage](/concepts/feature-toggles#lifecycle-stages), such as _Develop_, _Production_, or _Clean-up_.

@@ -12,8 +12,6 @@ When a feature flag reaches its intended cleanup date and we no longer detect me
 
 On the flag's page, you will see a reminder to remove the flag from your codebase and archive it in Unleash.
 
----
-
 ## External links on feature flags
 
 You can now add external links to your feature flags, allowing you to connect directly to related resources like key metrics, analytics, or issue trackers. Add a link on the **Overview** page of any feature flag.
@@ -22,13 +20,9 @@ In addition, you can define link templates at the project level in **Settings > 
 
 These templates automatically populate links for all new feature flags within that project. For example, you can create templates to find all usages of a feature flag in your repository or automatically link to a Jira issue when a flag is created from Jira
 
----
-
 ## Colors on tags
 
-To help you visually differentiate and organize your feature flags, you can now add colors to [tags](https://docs.getunleash.io/reference/feature-toggles#tags). When you create or edit a tag in **Configure > Tag types**, you can assign a specific color. This makes it easier to quickly identify and manage flags, especially in projects with many tags.
-
----
+To help you visually differentiate and organize your feature flags, you can now add colors to [tags](/concepts/feature-toggles#tags). When you create or edit a tag in **Configure > Tag types**, you can assign a specific color. This makes it easier to quickly identify and manage flags, especially in projects with many tags.
 
 ## Improved flag search and Admin UI menu
 
@@ -38,14 +32,10 @@ With **Flags overview**, you can get a clear picture of where each flag is in it
 
 We've also redesigned the **Configure** menu and removed redundant items such as **Recent projects** and **Recent flags**, which are now accessible from the main **Dashboard**.
 
----
-
 ## Simplified activation strategies and constraints
 
-We simplified the process of adding or editing [activation strategies](https://docs.getunleash.io/reference/activation-strategies) and constraints. Use **Add strategy** to add the default activation strategy to a flag; use **More strategies** to select a different strategy type or get an overview of all available release templates.
-
----
+We simplified the process of adding or editing [activation strategies](/concepts/activation-strategies) and constraints. Use **Add strategy** to add the default activation strategy to a flag; use **More strategies** to select a different strategy type or get an overview of all available release templates.
 
 ## Removed deprecated endpoints and schema properties
 
-As part of our commitment to maintaining a clean and robust codebase, several deprecated API endpoints and schema properties have been removed in Unleash v7. Refer to our [Migration guide](https://docs.getunleash.io/using-unleash/deploy/upgrading-unleash) for a detailed list of API changes and additional help with upgrading to Unleash 7.
+As part of our commitment to maintaining a clean and robust codebase, several deprecated API endpoints and schema properties have been removed in Unleash v7. Refer to our [Migration guide](/deploy/upgrading-unleash) for a detailed list of API changes and additional help with upgrading to Unleash 7.

@@ -6,17 +6,17 @@ tags: ["Improvement"]
 
 ## Improved user roles and permissions overview
 
-We’ve added a new **Access overview** page for each user, making it easier for administrators to see exactly what a user can do in Unleash and which roles grant those permissions. You can explore permissions at the root level or for specific environments and projects.  
-To view a user’s permissions, go to **Admin settings > Users**. Select a user and click **Access overview**.
+We've added a new **Access overview** page for each user, making it easier for administrators to see exactly what a user can do in Unleash and which roles grant those permissions. You can explore permissions at the root level or for specific environments and projects.
+To view a user's permissions, go to **Admin settings > Users**. Select a user and click **Access overview**.
 
 ## IP addresses in Event Log
 
-The [Event Log](https://docs.getunleash.io/reference/events#event-log) now records the IP address of the user who performed each action. This feature requires an Unleash Enterprise plan.
+The [Event Log](/concepts/events#event-log) now records the IP address of the user who performed each action. This feature requires an Unleash Enterprise plan.
 
 ## Projects no longer require an Owner
 
-We removed the requirement for projects to have an [Owner](https://docs.getunleash.io/reference/rbac#predefined-roles). This gives you full flexibility when it comes to customizing the project-level roles. Projects without an Owner are shown as owned by System.
+We removed the requirement for projects to have an [Owner](/concepts/rbac#predefined-roles). This gives you full flexibility when it comes to customizing the project-level roles. Projects without an Owner are shown as owned by System.
 
 ## New root-level permissions for authentication and instance maintenance
 
-We’ve introduced five new [root-level permissions](https://docs.getunleash.io/reference/rbac#root-permissions) to give more granular control over features that were previously restricted to the Admin role. These permissions cover authentication settings such as single sign-on, instance maintenance tasks like updating banners and toggling maintenance mode, managing CORS settings, and viewing access logs and login history.
+We've introduced five new [root-level permissions](/concepts/rbac#root-permissions) to give more granular control over features that were previously restricted to the Admin role. These permissions cover authentication settings such as single sign-on, instance maintenance tasks like updating banners and toggling maintenance mode, managing CORS settings, and viewing access logs and login history.
