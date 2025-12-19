@@ -1,0 +1,33 @@
+---
+tags: ["New feature", "Improvement"]
+---
+
+# v7.2.0
+
+## Release Management
+
+We’ve launched **Release Management** to help you standardize how you roll out new features. You can now define reusable [release templates](https://docs.getunleash.io/reference/release-templates) with milestones so you don’t have to manually configure the same rollout strategies across multiple flags. This reduces repetitive work, ensures consistent rollouts, and lowers release risk. Create new templates under **Configure \> Release templates**.  
+   
+## Change request improvements
+
+You now receive an email notification when you’re added as a reviewer to a [change request](https://docs.getunleash.io/reference/change-requests). This helps you maintain momentum by speeding up the approval process.
+
+Change requests also display a cleaner, formatted JSON diff that highlights only the changed values while still letting you expand for the full object. In the new **View diff** tab, you can review the changes in detail, and easily copy them without relying on tooltips.
+
+In addition, to give you a clear timeline of progress, every state update to a change request now includes a timestamp.
+
+## Flag performance and lifecycle updates  
+
+We’ve added [lifecycle metrics](https://docs.getunleash.io/reference/insights) to the **Analytics** dashboard so you can see a snapshot of how many flags are currently in each major lifecycle stage: Develop, Production, and Cleanup. Each stage shows how many flags are new this week, how many have been there for more than a week, and the median time flags spend in that stage. You can also compare this to the historical median to spot outliers.
+
+This gives you a clear picture of where flags may be stuck, helps you reduce technical debt, and connects engineering work to business outcomes.
+
+To help reduce technical debt, Unleash now also suggests flags that are [safe to archive](https://docs.getunleash.io/reference/feature-toggles#archive-a-feature-flag). By analyzing usage, the platform highlights flags in the cleanup stage that haven’t been used for seven days so you can confidently archive them in bulk.
+
+## Project list improvements  
+
+The **Project list** view has been redesigned to make it easier to scan, even with a large number of projects. You can now switch between card and list views depending on which format you prefer, making navigation more flexible.
+
+## Unknown flag checker  
+
+Unleash now highlights any flags your SDKs try to evaluate that Unleash doesn’t recognize. You’ll see these in the **Flags overview** under **Unknown flags**, where you can review the full list to spot typos, fix misconfigurations, or remove stale references in your code. This helps keep your setup clean and in sync.

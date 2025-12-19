@@ -1,0 +1,29 @@
+---
+tags: ["Improvement"]
+---
+
+# v7.1.0
+
+## Feature flag lifecycle improvements
+
+You can now mark any flag as **Ready for cleanup**, even if it never reached production. This helps you clean up flags at any stage in the lifecycle, for example, a kill switch you never enabled in production, and reduce technical debt.
+
+We also renamed Health to **Technical debt** to align with common engineering terminology. In **Project > Project status**, you can see a [technical debt rating](https://docs.getunleash.io/reference/technical-debt) for the project. In **Analytics > Technical debt**, you can explore the same data at the instance and project levels.
+
+### Renamed SDKs and token types
+
+We’ve introduced a more consistent naming pattern for our [SDKs](https://docs.getunleash.io/reference/sdks) and [API tokens](https://docs.getunleash.io/reference/api-tokens-and-client-keys). Server-side SDKs are now **backend SDK**s, and **client-side SDKs** are frontend SDKs. Backend SDKs use **backend tokens** and frontend SDKs use **frontend tokens**.
+
+You’ll find the new naming across our documentation and in the Admin UI, such as when creating API tokens or working with permissions. We also standardized SDK repository and registration names to follow the `unleash-{language/framework}-sdk` pattern. For example, `unleash-client-python` has been renamed to `unleash-python-sdk`. Note that SDK artifact names remain unchanged to avoid requiring changes to your codebase.
+
+### Grouped events in Event Log
+
+[Event Log](https://docs.getunleash.io/reference/events#event-log) now marks related events using a Group ID when a single action produces multiple changes. This makes the full sequence of changes easier to trace and audit.
+
+For example, when a [change request](https://docs.getunleash.io/reference/change-requests) is approved and applied, all resulting events, such as strategy or flag config changes, appear under the same Group ID. Similarly, if enabling a flag in an environment automatically adds the default strategy, both events share the same Group ID to reflect that they came from the same action.
+
+In addition, we’ve made the date filter optional and added filtering by ID on the [Events API](https://docs.getunleash.io/reference/api/unleash/get-events). 
+
+### View connected frontend applications
+
+To help debug [frontend application connections](https://docs.getunleash.io/reference/applications), you can now view connected frontend applications inside **Configure > Applications** and in each project’s **Applications** tab. If an application uses both backend and frontend SDKs, both are shown on the application’s overview page.

@@ -1,0 +1,51 @@
+---
+tags: ["New feature", "Improvement", "Deprecation"]
+---
+
+# v7.0.0
+
+## Flag cleanup reminders and automation
+
+To help you stay on top of technical debt, we've introduced automated reminders for flag cleanup.
+
+When a feature flag reaches its intended cleanup date and we no longer detect metrics, we’ll remind you to change its lifecycle status to **Cleanup**. This highlights the flag in the UI, making it clear which flags are ready to be removed.
+
+On the flag's page, you will see a reminder to remove the flag from your codebase and archive it in Unleash.
+
+---
+
+## External links on feature flags
+
+You can now add external links to your feature flags, allowing you to connect directly to related resources like key metrics, analytics, or issue trackers. Add a link on the **Overview** page of any feature flag.
+
+In addition, you can define link templates at the project level in **Settings > Project settings > Enterprise settings > Project link templates**.
+
+These templates automatically populate links for all new feature flags within that project. For example, you can create templates to find all usages of a feature flag in your repository or automatically link to a Jira issue when a flag is created from Jira
+
+---
+
+## Colors on tags
+
+To help you visually differentiate and organize your feature flags, you can now add colors to [tags](https://docs.getunleash.io/reference/feature-toggles#tags). When you create or edit a tag in **Configure > Tag types**, you can assign a specific color. This makes it easier to quickly identify and manage flags, especially in projects with many tags.
+
+---
+
+## Improved flag search and Admin UI menu
+
+We've renamed **Search** to **Flags overview**, to create a centralized place to monitor the status and lifecycle of all your feature flags and releases. This is particularly useful for coordinating flags across multiple teams.
+
+With **Flags overview**, you can get a clear picture of where each flag is in its lifecycle and its current status—replacing the need for manual tracking or spreadsheets.
+
+We've also redesigned the **Configure** menu and removed redundant items such as **Recent projects** and **Recent flags**, which are now accessible from the main **Dashboard**.
+
+---
+
+## Simplified activation strategies and constraints
+
+We simplified the process of adding or editing [activation strategies](https://docs.getunleash.io/reference/activation-strategies) and constraints. Use **Add strategy** to add the default activation strategy to a flag; use **More strategies** to select a different strategy type or get an overview of all available release templates.
+
+---
+
+## Removed deprecated endpoints and schema properties
+
+As part of our commitment to maintaining a clean and robust codebase, several deprecated API endpoints and schema properties have been removed in Unleash v7. Refer to our [Migration guide](https://docs.getunleash.io/using-unleash/deploy/upgrading-unleash) for a detailed list of API changes and additional help with upgrading to Unleash 7.
