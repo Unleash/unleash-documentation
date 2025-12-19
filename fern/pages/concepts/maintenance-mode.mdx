@@ -1,0 +1,47 @@
+---
+title: Maintenance mode
+og:site_name: Unleash Documentation
+og:title: Maintenance mode - Put Unleash into read-only mode
+description: Unleash maintenance mode is a feature that lets administrators put Unleash into a mostly read-only mode, preventing any configuration changes.
+keywords: maintenance mode, read-only, configuration, scheduled jobs
+max-toc-depth: 3
+---
+
+<Button small outlined className="version-button" href="https://docs.getunleash.io/support/availability">v4.22</Button>
+
+Unleash maintenance mode is a feature that lets administrators put Unleash into a mostly read-only mode. While Unleash is in maintenance mode:
+- Unleash users **can not change any configuration settings**
+- Unleash's APIs will not allow you to persist any changes
+
+However, any metrics sent to Unleash from client SDKs are still processed, so this mode does not have any effect on client SDKs.
+
+Maintenance mode is particularly useful during important events when any accidental or deliberate changes the feature/strategy configurations could lead to issues.
+
+## Maintenance mode configuration
+
+Maintenance mode is controlled from the "maintenance" section of the Unleash admin configuration page.
+
+<Frame background="subtle">
+![Maintenance mode being toggled on](/assets/maintenance-config.png)
+</Frame>
+
+When maintenance mode is enabled, a warning banner appears at the top of the Unleash dashboard, indicating that any changes made during this period will not be saved and may result in errors.
+
+<Frame background="subtle">
+![Maintenance mode banner when maintenance mod is toggled on](/assets/maintenance-banner.png)
+</Frame>
+
+## Maintenance mode and scheduled jobs
+
+When maintenance mode is enabled all internal jobs performed by Unleash such as updating metrics and statistics are paused. When maintenance mode is toggled back to disabled later, all scheduled
+jobs are resumed.
+
+## Maintenance mode and read-only DB user
+
+When maintenance mode is enabled most DB operations are suspended so you can use even read-only DB user. There's one exception though.
+Unleash DB user role needs a DELETE and UPDATE permission on the unleash_session table.
+
+```
+GRANT DELETE ON unleash_session TO my_db_role;
+GRANT UPDATE ON unleash_session TO my_db_role;
+```

@@ -1,0 +1,85 @@
+---
+title: Jira Cloud Integration - Usage
+og:site_name: Unleash Documentation
+og:title: Jira Cloud Integration - Usage
+max-toc-depth: 2
+slug: integrate/jira-cloud-plugin-usage
+---
+
+With the Unleash Jira Cloud Plugin you can create, view and manage Unleash feature flags directly from a Jira issue.
+
+The plugin also shows you current status of connected flags.
+
+## Using the plugin
+
+To use the plugin, you'll need to create an issue or use an existing one. Once the issue is saved and you open up the issue panel, you'll be greeted with a button to activate the Unleash plugin for that issue.
+
+<Frame>
+![Activating the Unleash plugin](/assets/jira-cloud-activate-unleash-panel-button.png)
+</Frame>
+
+### Connecting a flag to an issue
+
+<Frame>
+![Connecting a feature flag using the Unleash plugin](/assets/jira-cloud-issue-button.png)
+</Frame>
+
+
+Use the issue's "connect toggle" button to open a dialog.
+
+There are a few steps to connect a flag:
+
+1. Select the Unleash project that contains the flag:
+
+
+<Frame>
+![Jira Cloud: connect feature flag form. The project selection dropdown contains all Unleash projects](/assets/jira-cloud-select-project-expanded.png)
+</Frame>
+
+2. Use the "create new toggle" option to choose whether you want to add an existing flag or create a new one.
+
+<Frame>
+![Adding an existing flag using the Unleash plugin](/assets/jira-cloud-add-existing-toggle.png)
+</Frame>
+
+<Frame>
+![Creating a new flag using the Unleash plugin](/assets/jira-cloud-add-new-toggle.png)
+</Frame>
+
+### Flag status as part of Issue view
+
+Once you've connected at least one flag to an issue, the Unleash plugin will list the current status of each environment for
+that flag. If the current user is allowed to edit the issue, they can also enable or disable environments directly
+from Jira.
+
+<Frame>
+![Example of a Jira Cloud issue with a connected flag](/assets/jira-cloud-toggle-status.png)
+</Frame>
+
+### Change Requests
+
+The plugin respects Unleash's [change requests](/concepts/change-requests). If change requests are turned on in the connected project and the selected environment, the plugin will ask whether you want to create a change request or not.
+
+If you already have an active change request for that project and that environment, the changes will be added to your existing change request.
+
+
+If you confirm that you would like to open a change request, then the plugin will create one for you and present a confirmation dialog.
+
+<Frame>
+![Creating a change request using the Unleash plugin](/assets/jira-cloud-change-request-confirmation.png)
+</Frame>
+
+When the Change Request has been reviewed and applied in Unleash, the flag will show the requested state after the next refresh
+of the issue and flag status page.
+
+
+### Disconnecting flag from Issue
+
+If a flag is no longer relevant for your Jira Issue, you can disconnect it using the "disconnect toggle" button. This button is only available if your user has edit permissions for the Jira issue.
+
+<Frame>
+![Jira Cloud: issue with a connected flag. The 'disconnect flag' button (highlighted) is displayed next to the flag's name.](/assets/jira-cloud-disconnect-toggle.png)
+</Frame>
+
+The flag will be disconnected immediately. However, the plugin will not delete the flag from Unleash,
+so you can still reconnect your Jira issue to the same flag using the "Connect to existing flag" functionality

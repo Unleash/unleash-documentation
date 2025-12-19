@@ -198,3 +198,7 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 .cta-button:hover {
     background-color: var(--button-hover-bg-color) !important;
 }
+
+.version-button {
+    font-weight: 600 !important;
+}
