@@ -105,6 +105,7 @@ navigation:
                 path: pages/concepts/api-tokens-and-client-keys.mdx
               - page: Frontend API
                 path: pages/concepts/front-end-api.mdx
+                slug: front-end-api
               - page: Role-based access control
                 path: pages/concepts/rbac.mdx
                 slug: rbac
@@ -117,6 +118,7 @@ navigation:
                 path: pages/concepts/change-requests.mdx
               - page: Public invite links
                 path: pages/concepts/public-signup.mdx
+                slug: public-invite-links
 
           - section: Instance health and configuration
             skip-slug: true
@@ -139,7 +141,7 @@ navigation:
                 path: pages/concepts/playground.mdx
               - page: Network
                 path: pages/concepts/network-view.mdx
-                slug: network
+                slug: network-view
               - page: Enterprise Edge observability
                 path: pages/concepts/enterprise-edge-observability.mdx
 
@@ -168,6 +170,7 @@ navigation:
                 path: pages/concepts/command-menu.mdx
               - page: Search
                 path: pages/concepts/search-operators.mdx
+                slug: search-operators
               - page: Maintenance mode
                 path: pages/concepts/maintenance-mode.mdx
 
@@ -196,6 +199,7 @@ navigation:
                 path: pages/deploy/https.mdx
               - page: Synchronize Unleash instances
                 path: pages/guides/how-to-synchronize-unleash-instances.mdx
+                slug: how-to-synchronize-unleash-instances
 
           - section: Single sign-on
             contents:
@@ -230,15 +234,7 @@ navigation:
               - page: Datadog
                 path: pages/integrate/datadog.mdx
 
-              - section: Jira server
-                skip-slug: true
-                contents:
-                  - page: Jira Server plugin installation
-                    path: pages/integrate/jira-server-plugin-installation.mdx
-                  - page: Jira Server plugin usage
-                    path: pages/integrate/jira-server-plugin-usage.mdx
-
-              - section: Jira cloud
+              - section: Jira Cloud
                 skip-slug: true
                 contents:
                   - page: Jira Cloud plugin installation
@@ -259,6 +255,7 @@ navigation:
         contents:
           - page: Data collection and privacy
             path: pages/privacy-and-compliance/data-privacy.mdx
+            slug: data-privacy
 
           - section: Compliance
             skip-slug: true
