@@ -2,7 +2,7 @@
 
 instances:
   - url: unleash.docs.buildwithfern.com
-    custom-domain: unleash.ferndocs.com # specify your custom domain when you are ready to go live
+    custom-domain: unleash.ferndocs.com
 
 title: Unleash Documentation
 
@@ -12,19 +12,18 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
-# roles:
-#  - everyone
-#  - unleash-admin
-
 tabs:
   product-docs:
     display-name: Docs
+    skip-slug: true
   api-docs:
     display-name: APIs
   sdks:
     display-name: SDKs
+    slug: sdks
   enterprise-edge:
     display-name: Enterprise Edge
+    slug: unleash-edge
   guides:
     display-name: Guides    
   academy:
@@ -36,64 +35,270 @@ navigation:
   - tab: product-docs
     layout:
       - page: Home
-        path: docs/pages/welcome.mdx
+        path: pages/welcome.mdx
 
       - section: Get started
         contents:
           - page: Quickstart
-            path: quickstart.mdx
-          - page: What is a feature flag
-            path: what-is-a-feature-flag.mdx
-          - page: Unleash overview
-            path: understanding-unleash/unleash-overview.mdx
+            path: pages/get-started/quickstart.mdx
+          - page: Introduction to feature flags
+            path: pages/get-started/what-is-a-feature-flag.mdx
+            slug: what-is-a-feature-flag
+          - page: Unleash architecture overview
+            path: pages/get-started/unleash-overview.mdx
+            slug: unleash-overview
 
       - section: Core concepts
+        slug: concepts
         contents:
-          - page: The anatomy of Unleash
-            path: understanding-unleash/the-anatomy-of-unleash.mdx
-          - page: Projects
-            path: reference/projects.mdx
-          - page: Feature toggles
-            path: reference/feature-toggles.mdx
-          - page: API tokens and client keys
-            path: reference/api-tokens-and-client-keys.mdx
-          - page: Technical debt
-            path: reference/technical-debt.mdx
-          - page: Impression data
-            path: reference/impression-data.mdx
-          - page: Applications
-            path: reference/applications.mdx
-          - page: Login history
-            path: reference/login-history.mdx
+          - page: Overview
+            path: pages/concepts/concepts-overview.mdx
+
+          - section: Projects and environments
+            skip-slug: true
+            contents:
+              - page: Projects
+                path: pages/concepts/projects.mdx
+              - page: Project collaboration mode
+                path: pages/concepts/project-collaboration-mode.mdx
+              - page: Environments
+                path: pages/concepts/environments.mdx
+
+          - section: Feature flags and activation strategies
+            skip-slug: true
+            contents:
+              - page: Feature flags
+                path: pages/concepts/feature-flags.mdx
+              - page: Activation strategies
+                path: pages/concepts/activation-strategies.mdx
+              - page: Predefined strategy types
+                hidden: true
+                path: pages/concepts/predefined-strategy-types.mdx
+              - page: Custom activation strategies
+                hidden: true
+                path: pages/concepts/custom-activation-strategies.mdx
+              - page: Strategy variants
+                path: pages/concepts/strategy-variants.mdx
+              - page: Feature flag variants
+                hidden: true
+                path: pages/concepts/feature-flag-variants.mdx
+              - page: Segments
+                path: pages/concepts/segments.mdx
+              - page: Unleash context
+                path: pages/concepts/unleash-context.mdx
+              - page: Stickiness
+                path: pages/concepts/stickiness.mdx
+
+          - section: Release management
+            skip-slug: true
+            contents:
+              - page: Release templates
+                path: pages/concepts/release-templates.mdx
+              - page: Impact metrics
+                availability: beta
+                path: pages/concepts/impact-metrics.mdx
+
+          - section: Identity and access
+            skip-slug: true
+            contents:
+              - page: API tokens and client keys
+                path: pages/concepts/api-tokens-and-client-keys.mdx
+              - page: Frontend API
+                path: pages/concepts/front-end-api.mdx
+                slug: front-end-api
+              - page: Role-based access control
+                path: pages/concepts/rbac.mdx
+                slug: rbac
+              - page: Single sign-on
+                path: pages/concepts/sso.mdx
+                slug: sso
+              - page: Provisioning
+                path: pages/concepts/scim.mdx
+              - page: Change requests
+                path: pages/concepts/change-requests.mdx
+              - page: Public invite links
+                path: pages/concepts/public-signup.mdx
+                slug: public-invite-links
+
+          - section: Instance health and configuration
+            skip-slug: true
+            contents:
+              - page: Technical debt
+                path: pages/concepts/technical-debt.mdx
+              - page: Insights
+                path: pages/concepts/insights.mdx
+              - page: Resource limits
+                path: pages/concepts/resource-limits.mdx
+
+          - section: Testing and monitoring
+            skip-slug: true
+            contents:
+              - page: Impression data
+                path: pages/concepts/impression-data.mdx
+              - page: Events
+                path: pages/concepts/events.mdx
+              - page: Playground
+                path: pages/concepts/playground.mdx
+              - page: Network
+                path: pages/concepts/network-view.mdx
+                slug: network-view
+              - page: Enterprise Edge observability
+                path: pages/concepts/enterprise-edge-observability.mdx
+
+          - section: Automation and integrations
+            skip-slug: true
+            contents:
+              - page: Applications
+                path: pages/concepts/applications.mdx
+              - page: Service accounts
+                path: pages/concepts/service-accounts.mdx
+              - page: Signals
+                availability: beta
+                path: pages/concepts/signals.mdx
+              - page: Actions
+                availability: beta
+                path: pages/concepts/actions.mdx
+
+          - section: Admin UI
+            skip-slug: true
+            contents:
+              - page: Login history
+                path: pages/concepts/login-history.mdx
+              - page: Banners
+                path: pages/concepts/banners.mdx
+              - page: Command menu
+                path: pages/concepts/command-menu.mdx
+              - page: Search
+                path: pages/concepts/search-operators.mdx
+                slug: search-operators
+              - page: Maintenance mode
+                path: pages/concepts/maintenance-mode.mdx
+
+          - page: Import and export
+            path: pages/concepts/import-export.mdx
 
       - section: Integrate and deploy
+        slug: deploy
+        collapsed: true
         contents:
-          - page: Hosting options
-            path: understanding-unleash/hosting-options.mdx
-          - page: Getting started
-            path: using-unleash/deploy/getting-started.mdx
-          - page: How to add SSO (OpenID Connect)
-            path: how-to/how-to-add-sso-open-id-connect.mdx
-          - page: How to setup provisioning with Okta
-            path: how-to/how-to-setup-provisioning-with-okta.mdx
-          - page: Integrations
-            path: reference/integrations.mdx
+          - page: Unleash hosting options
+            path: pages/deploy/hosting-options.mdx
+
+          - section: Self-hosting Unleash
+            skip-slug: true
+            contents:
+              - page: Getting started
+                path: pages/deploy/getting-started.mdx
+              - page: Configuring Unleash
+                path: pages/deploy/configuring-unleash.mdx
+              - page: Upgrading Unleash
+                path: pages/deploy/upgrading-unleash.mdx
+              - page: License keys
+                path: pages/deploy/license-keys.mdx
+              - page: HTTPS
+                path: pages/deploy/https.mdx
+              - page: Synchronize Unleash instances
+                path: pages/guides/how-to-synchronize-unleash-instances.mdx
+                slug: how-to-synchronize-unleash-instances
+
+          - section: Single sign-on
+            contents:
+              - page: How to add SSO with OpenID Connect
+                path: pages/single-sign-on/how-to-add-sso-open-id-connect.mdx
+              - page: How to add SSO with SAML 2.0
+                path: pages/single-sign-on/how-to-add-sso-saml.mdx
+              - page: How to add SSO with SAML Keycloak
+                path: pages/single-sign-on/how-to-add-sso-saml-keycloak.mdx
+              - page: How to add SSO with Azure SAML
+                path: pages/single-sign-on/how-to-add-sso-azure-saml.mdx
+              - page: How to add SSO with Google
+                path: pages/single-sign-on/how-to-add-sso-google.mdx
+              - page: How to set up Keycloak group syncing
+                path: pages/single-sign-on/how-to-setup-sso-keycloak-group-sync.mdx
+              - page: How to set up group SSO sync
+                path: pages/single-sign-on/how-to-set-up-group-sso-sync.mdx
+
+          - section: Automatic provisioning
+            slug: provisioning
+            contents:
+              - page: How to set up provisioning with Okta
+                path: pages/provisioning/how-to-setup-provisioning-with-okta.mdx
+              - page: How to set up provisioning with Entra
+                path: pages/provisioning/how-to-setup-provisioning-with-entra.mdx
+
+          - section: Integrations
+            slug: integrate
+            contents:
+              - page: Integrations overview
+                path: pages/integrate/integrations.mdx
+              - page: Datadog
+                path: pages/integrate/datadog.mdx
+
+              - section: Jira Cloud
+                skip-slug: true
+                contents:
+                  - page: Jira Cloud plugin installation
+                    path: pages/integrate/jira-cloud-plugin-installation.mdx
+                  - page: Jira Cloud plugin usage
+                    path: pages/integrate/jira-cloud-plugin-usage.mdx
+
+              - page: App for Slack
+                path: pages/integrate/slack-app.mdx
+              - page: Microsoft Teams
+                path: pages/integrate/teams.mdx
+              - page: Webhook
+                path: pages/integrate/webhook.mdx  
 
       - section: Data privacy and compliance
+        slug: privacy-and-compliance
+        collapsed: true
         contents:
-          - page: Data collection
-            path: understanding-unleash/data-collection.mdx
-          - page: Compliance overview
-            path: using-unleash/compliance/compliance-overview.mdx
+          - page: Data collection and privacy
+            path: pages/privacy-and-compliance/data-privacy.mdx
+            slug: data-privacy
+
+          - section: Compliance
+            skip-slug: true
+            contents:
+              - page: Compliance overview
+                path: pages/privacy-and-compliance/compliance-overview.mdx
+              - page: FedRAMP
+                path: pages/privacy-and-compliance/fedramp.mdx
+                slug: fedramp
+              - page: SOC2 type II
+                path: pages/privacy-and-compliance/soc2.mdx
+                slug: soc2
+              - page: ISO27001
+                path: pages/privacy-and-compliance/iso27001.mdx
+                slug: iso27001
 
       - section: Support and community
+        skip-slug: true
         contents:
           - page: Troubleshooting
-            path: troubleshooting.mdx
-          - page: Availability
-            path: availability.mdx
-          - page: Developer guide
-            path: contributing/developer-guide.mdx
+            path: pages/support/troubleshooting.mdx
+            slug: support/troubleshooting
+          - page: Feature availability and versioning
+            slug: support/availability
+            path: pages/support/availability.mdx
+          - page: Compare Unleash OSS and Unleash Enterprise
+            slug: support/oss-comparison
+            path: pages/support/oss-comparison.mdx
+
+          - section: Contribute to Unleash
+            slug: contributing
+            collapsed: true
+            contents:
+              - page: Developer guide
+                path: pages/contributing/developer-guide.mdx
+              - page: Client specification
+                path: pages/contributing/client-specification.mdx
+              - page: Frontend
+                slug: frontend/overview
+                path: pages/contributing/frontend/overview.mdx
+              - page: Backend
+                path: pages/contributing/backend/overview.mdx
+                slug: backend/overview
 
   - tab: api-docs
     layout:
@@ -102,249 +307,287 @@ navigation:
         layout:
           - section: API Overview
             skip-slug: true
-            summary: api-overview.mdx
+            summary: pages/concepts.mdx
             contents: 
               - page: Authentication
-                path: reference/api/unleash/unleash-api.mdx
-                hidden: true
-          - section: Authentication
-            skip-slug: true
-            summary: reference/api/unleash/unleash-api.mdx
-            contents: 
-              - page: Authentication
-                path: reference/api/unleash/unleash-api.mdx             
-                hidden: true
-          - section: "Addons"
-            summary: reference/api/unleash/addons.mdx
-            referenced-packages:
-              - addons
-            contents: []
-          - section: "Admin UI"
-            summary: reference/api/unleash/admin-ui.mdx
-            referenced-packages:
-              - adminUi
-            contents: []
-          - section: "API Tokens"
-            summary: reference/api/unleash/api-tokens.mdx
-            referenced-packages:
-              - apiTokens
-            contents: []
-          - section: "Archive"
-            summary: reference/api/unleash/archive.mdx
-            referenced-packages:
-              - archive
-            contents: []
-          - section: "Auth"
-            summary: reference/api/unleash/auth.mdx
-            referenced-packages:
-              - auth
-            contents: []
-          - section: "Banners"
-            summary: reference/api/unleash/banners.mdx
-            referenced-packages:
-              - banners
-            contents: []
-          - section: "Change Requests"
-            summary: reference/api/unleash/change-requests.mdx
-            referenced-packages:
-              - changeRequests
-            contents: []
-          - section: "Client"
-            summary: reference/api/unleash/client.mdx
-            referenced-packages:
-              - client
-            contents: []
-          - section: "Context"
-            summary: reference/api/unleash/context.mdx
-            referenced-packages:
-              - context
-            contents: []
-          - section: "Dependencies"
-            summary: reference/api/unleash/dependencies.mdx
-            referenced-packages:
-              - dependencies
-            contents: []
-          - section: "Environments"
-            summary: reference/api/unleash/environments.mdx
-            referenced-packages:
-              - environments
-            contents: []
-          - section: "Events"
-            summary: reference/api/unleash/events.mdx
-            referenced-packages:
-              - events
-            contents: []
-          - section: "Feature Types"
-            summary: reference/api/unleash/feature-types.mdx
-            referenced-packages:
-              - featureTypes
-            contents: []
-          - section: "Features"
-            summary: reference/api/unleash/features.mdx
-            referenced-packages:
-              - features
-            contents: []
-          - section: "Frontend API"
-            summary: reference/api/unleash/frontend-api.mdx
-            referenced-packages:
-              - frontendApi
-            contents: []
-          - section: "Import/Export"
-            summary: reference/api/unleash/import-export.mdx
-            referenced-packages:
-              - importExport
-            contents: []
-          - section: "Instance Admin"
-            summary: reference/api/unleash/instance-admin.mdx
-            referenced-packages:
-              - instanceAdmin
-            contents: []
-          - section: "Maintenance"
-            summary: reference/api/unleash/maintenance.mdx
-            referenced-packages:
-              - maintenance
-            contents: []
-          - section: "Metrics"
-            summary: reference/api/unleash/metrics.mdx
-            referenced-packages:
-              - metrics
-            contents: []
-          - section: "Notifications"
-            summary: reference/api/unleash/notifications.mdx
-            referenced-packages:
-              - notifications
-            contents: []
-          - section: "Operational"
-            summary: reference/api/unleash/operational.mdx
-            referenced-packages:
-              - operational
-            contents: []
-          - section: "Personal Access Tokens"
-            summary: reference/api/unleash/personal-access-tokens.mdx
-            referenced-packages:
-              - personalAccessTokens
-            contents: []
-          - section: "Playground"
-            summary: reference/api/unleash/playground.mdx
-            referenced-packages:
-              - playground
-            contents: []
-          - section: "Projects"
-            summary: reference/api/unleash/projects.mdx
-            referenced-packages:
-              - projects
-            contents: []
-          - section: "Public Signup Tokens"
-            summary: reference/api/unleash/public-signup-tokens.mdx
-            referenced-packages:
-              - publicSignupTokens
-            contents: []
-          - section: "Release Templates"
-            summary: reference/api/unleash/release-templates.mdx
-            referenced-packages:
-              - releaseTemplates
-            contents: []
-          - section: "Search"
-            summary: reference/api/unleash/search.mdx
-            referenced-packages:
-              - search
-            contents: []
-          - section: "Segments"
-            summary: reference/api/unleash/segments.mdx
-            referenced-packages:
-              - segments
-            contents: []
-          - section: "Service Accounts"
-            summary: reference/api/unleash/service-accounts.mdx
-            referenced-packages:
-              - serviceAccounts
-            contents: []
-          - section: "Strategies"
-            summary: reference/api/unleash/strategies.mdx
-            referenced-packages:
-              - strategies
-            contents: []
-          - section: "Tags"
-            summary: reference/api/unleash/tags.mdx
-            referenced-packages:
-              - tags
-            contents: []
-          - section: "Telemetry"
-            summary: reference/api/unleash/telemetry.mdx
-            referenced-packages:
-              - telemetry
-            contents: []
-          - section: "Unknown Flags"
-            summary: reference/api/unleash/unknown-flags.mdx
-            referenced-packages:
-              - unknownFlags
-            contents: []
-          - section: "Unleash Edge"
-            summary: reference/api/unleash/unleash-edge.mdx
-            referenced-packages:
-              - unleashEdge
-            contents: []
-          - section: "Unstable"
-            summary: reference/api/unleash/unstable.mdx
-            referenced-packages:
-              - unstable
-            contents: []
-          - section: "Users"
-            summary: reference/api/unleash/users.mdx
-            referenced-packages:
-              - users
-            contents: []
+                path: pages/support/oss-comparison.mdx
 
   - tab: sdks
     layout:
       - page: SDKs overview
-        path: reference/sdks.mdx
+        path: pages/sdks/overview.mdx
+
+      - section: Backend SDKs
+        skip-slug: true
+        contents:
+          - page: Node.js
+            path: pages/sdks/backend/node.mdx
+            slug: node
+          - page: Java
+            path: pages/sdks/backend/java.mdx
+          - page: Python
+            path: pages/sdks/backend/python.mdx
+          - page: .NET
+            path: pages/sdks/backend/dotnet.mdx
+            slug: dotnet
+          - page: Go
+            path: pages/sdks/backend/go.mdx
+          - page: PHP
+            path: pages/sdks/backend/php.mdx
+          - page: Ruby
+            path: pages/sdks/backend/ruby.mdx
+          - page: Rust
+            path: pages/sdks/backend/rust.mdx
+
+      - section: Frontend SDKs
+        skip-slug: true
+        contents:
+          - page: React
+            path: pages/sdks/frontend/react.mdx
+          - page: JavaScript
+            path: pages/sdks/frontend/javascript-browser.mdx
+            slug: javascript-browser
+          - page: Next.js
+            path: pages/sdks/frontend/next-js.mdx
+          - page: Android
+            path: pages/sdks/frontend/android.mdx
+          - page: Android (Legacy)
+            path: pages/sdks/frontend/android-proxy-legacy.mdx
+            hidden: true
+          - page: Flutter
+            path: pages/sdks/frontend/flutter.mdx
+          - page: iOS
+            path: pages/sdks/frontend/ios.mdx
+            slug: ios
+          - page: Svelte
+            path: pages/sdks/frontend/svelte.mdx
+          - page: Vue
+            path: pages/sdks/frontend/vue.mdx
+
+      - section: Community SDKs
+        collapsed: true
+        contents:
+          - link: Angular (Karelics)
+            href: https://github.com/Karelics/angular-unleash-proxy-client
+          - link: Angular (ngx)
+            href: https://github.com/snowfrogdev/snowfrogdev/tree/main/packages/ngx-unleash-proxy-client
+          - link: Clojure
+            href: https://github.com/AppsFlyer/unleash-client-clojure
+          - link: C++
+            href: https://github.com/aruizs/unleash-client-cpp
+          - link: ColdBox (CFML)
+            href: https://github.com/coldbox-modules/unleashsdk
+          - link: Dart
+            href: https://pub.dev/packages/unleash
+          - link: Elixir
+            href: https://gitlab.com/afontaine/unleash_ex
+          - link: Haskell
+            href: https://github.com/finn-no/unleash-client-haskell
+          - link: Kotlin
+            href: https://github.com/silvercar/unleash-client-kotlin
+          - link: NestJS
+            href: https://github.com/pmb0/nestjs-unleash
+          - link: PHP (Minds)
+            href: https://gitlab.com/minds/unleash-client-php
+          - link: PHP Symfony
+            href: https://github.com/Stogon/unleash-bundle
+          - link: React Native / Expo
+            href: https://github.com/nunogois/unleash-react-native
+          - link: Solid
+            href: https://github.com/nunogois/proxy-client-solid
 
   - tab: enterprise-edge
     layout:
-      - section: Enterprise Edge
+      - page: Enterprise Edge overview
+        path: pages/enterprise-edge/overview.mdx
+
+      - section: Self-hosted Enterprise Edge
+        slug: deploy
+        skip-slug: true
         contents:
-          - page: Overview
-            path: reference/unleash-edge.mdx
-          - page: Concepts
-            path: reference/unleash-edge/concepts.mdx
-          - page: Deploying
-            path: reference/unleash-edge/deploying.mdx
-          - page: Benchmarking
-            path: reference/unleash-edge/benchmarking.mdx
-          - page: CLI
-            path: reference/unleash-edge/cli.mdx
-          - page: Development guide
-            path: reference/unleash-edge/development-guide.mdx
-          - page: Migration guide
-            path: reference/unleash-edge/migration-guide.mdx
+          - page: Deploy Enterprise Edge
+            path: pages/enterprise-edge/deploy.mdx
+            slug: deploy
+          - page: Configure Enterprise Edge
+            path: pages/enterprise-edge/configure.mdx
+            slug: configure
+          - page: Migrate from Unleash Proxy
+            path: pages/enterprise-edge/migrate-from-proxy.mdx
+            slug: migrate-from-proxy
             
   - tab: guides
     layout:
-      - section: Developer tutorials
+      - page: Overview
+        path: pages/guides/guides-overview.mdx
+
+      - section: Feature management best practices
+        skip-slug: true
         contents:
-          - page: Feature flag best practices
-            path: topics/feature-flags/feature-flag-best-practices.mdx
-          - page: How to create a feature flag
-            path: how-to-create-feature-flag.mdx
+          - page: Building and scaling feature flag systems
+            path: pages/guides/feature-flag-best-practices.mdx
+            slug: feature-flag-best-practices
+          - page: Using feature flags at scale
+            path: pages/guides/best-practices-using-feature-flags-at-scale.mdx
+            slug: best-practices-using-feature-flags-at-scale
+          - page: Migrating from homegrown feature management solutions
+            path: pages/guides/feature-flag-migration-best-practices.mdx
+            slug: feature-flag-migration-best-practices
+          - page: Managing large constraints
+            path: pages/guides/managing-constraints.mdx
+            slug: managing-constraints
+
+      - section: Development and release workflows
+        skip-slug: true
+        collapsed: true
+        contents:
+          - page: Create and configure a feature flag
+            path: pages/guides/how-to-create-feature-flags.mdx
+            slug: how-to-create-feature-flags
+          - page: Schedule a feature release
+            path: pages/guides/how-to-schedule-feature-releases.mdx
+            slug: how-to-schedule-feature-releases
+          - page: Trunk-based development
+            path: pages/guides/trunk-based-development.mdx
+          - page: Gradual rollout
+            path: pages/guides/gradual-rollout.mdx
+          - page: Unleash Edge quickstart
+            path: pages/guides/unleash-edge-quickstart.mdx
+
+      - section: Enterprise-grade security and scale
+        skip-slug: true
+        collapsed: true
+        contents:
           - page: User management, access controls, and auditing
-            path: feature-flag-tutorials/use-cases/user-management-access-controls-auditing.mdx
+            path: pages/guides/user-management-access-controls.mdx
+            slug: user-management-access-controls
+          - page: Security and compliance
+            path: pages/guides/security-compliance.mdx
+            slug: security-compliance
+          - page: Scaling Unleash
+            path: pages/guides/scaling-unleash.mdx
+          - page: Managing feature flags in code
+            path: pages/guides/manage-feature-flags-in-code.mdx
+            slug: manage-feature-flags-in-code
+          - page: Organizing feature flags using projects and environments
+            path: pages/guides/organize-feature-flags.mdx
+            slug: organize-feature-flags
+
+      - section: Experimentation and analytics
+        skip-slug: true
+        collapsed: true
+        contents:
           - page: A/B testing
-            path: feature-flag-tutorials/use-cases/a-b-testing.mdx
-          - page: React tutorial
-            path: feature-flag-tutorials/react.mdx
+            path: pages/guides/a-b-testing.mdx
+          - page: Feature flags for AI
+            path: pages/guides/manage-ai-models-with-feature-flags.mdx
+            slug: manage-ai-models-with-feature-flags
+          - page: Use impression data for analytics
+            path: pages/guides/how-to-capture-impression-data.mdx
+            slug: how-to-capture-impression-data
+
+      - section: Language and framework examples
+        skip-slug: true
+        contents:
+          - section: React
+            skip-slug: true
+            contents:
+              - page: React
+                path: pages/guides/language-specific-tutorials/react/implementing-feature-flags.mdx
+              - page: Advanced React examples
+                path: pages/guides/language-specific-tutorials/react/examples.mdx
+
+          - section: Java
+            skip-slug: true
+            contents:
+              - page: Java
+                path: pages/guides/language-specific-tutorials/java/implementing-feature-flags.mdx
+              - page: Spring Boot
+                path: pages/guides/language-specific-tutorials/java/spring-boot-implementing-feature-flags.mdx
+              - page: Advanced Spring Boot examples
+                path: pages/guides/language-specific-tutorials/java/spring-boot-examples.mdx
+
+          - section: Python
+            skip-slug: true
+            contents:
+              - page: Python
+                path: pages/guides/language-specific-tutorials/python/implementing-feature-flags.mdx
+              - page: Advanced Python examples
+                path: pages/guides/language-specific-tutorials/python/examples.mdx
+              - page: Django
+                path: pages/guides/language-specific-tutorials/django/implementing-feature-flags-django.mdx
+              - page: Advanced Django examples
+                path: pages/guides/language-specific-tutorials/django/django-examples.mdx
+
+          - page: Next.js
+            path: pages/guides/language-specific-tutorials/nextjs/implementing-feature-flags-nextjs.mdx
+
+          - section: Go
+            skip-slug: true
+            contents:
+              - page: Go
+                path: pages/guides/language-specific-tutorials/golang/implementing-feature-flags-golang.mdx
+              - page: Advanced Go examples
+                path: pages/guides/language-specific-tutorials/golang/golang-examples.mdx
+
+          - page: JavaScript
+            path: pages/guides/language-specific-tutorials/javascript/implementing-feature-flags-js.mdx
+
+          - section: .NET
+            skip-slug: true
+            contents:
+              - page: .NET
+                path: pages/guides/language-specific-tutorials/dotnet/implementing-feature-flags-dotnet.mdx
+              - page: Advanced .NET examples
+                path: pages/guides/language-specific-tutorials/dotnet/dotnet-examples.mdx
+
+          - section: iOS
+            skip-slug: true
+            contents:
+              - page: iOS
+                path: pages/guides/language-specific-tutorials/ios/implementing-feature-flags-ios.mdx
+              - page: Advanced iOS examples
+                path: pages/guides/language-specific-tutorials/ios/examples.mdx
+
+          - page: Serverless
+            path: pages/guides/language-specific-tutorials/serverless/implementing-feature-flags-in-aws-lambda.mdx
+
+          - section: Rust
+            skip-slug: true
+            contents:
+              - page: Rust
+                path: pages/guides/language-specific-tutorials/rust/implementing-feature-flags-rust.mdx
+              - page: Advanced Rust examples
+                path: pages/guides/language-specific-tutorials/rust/rust-examples.mdx
+
+          - page: Flutter
+            path: pages/guides/language-specific-tutorials/flutter/a-b-testing.mdx
+
+          - page: SvelteKit
+            path: pages/guides/language-specific-tutorials/sveltekit/implementing-feature-flags-sveltekit.mdx
+
+          - section: Ruby
+            skip-slug: true
+            contents:
+              - page: Ruby
+                path: pages/guides/language-specific-tutorials/ruby/implementing-feature-flags-ruby.mdx
+              - page: Advanced Ruby examples
+                path: pages/guides/language-specific-tutorials/ruby/ruby-examples.mdx
+              - page: Ruby on Rails
+                path: pages/guides/language-specific-tutorials/rails/implementing-feature-flags-rails.mdx
+              - page: Advanced Ruby on Rails examples
+                path: pages/guides/language-specific-tutorials/rails/rails-examples.mdx
 
   - tab: academy
     layout:
       - section: Unleash Academy
         contents:
           - page: Introduction
-            path: unleash-academy/introduction.mdx
+            path: pages/concepts.mdx
 
   - tab: release-notes
     layout:
       - page: Release notes
-        path: docs/pages/release-notes.mdx
+        path: pages/release-notes.mdx
 
 navbar-links:
   - type: github
@@ -371,18 +614,20 @@ colors:
     light: "#ffffff"
 
 logo:
-  dark: docs/assets/logo-dark.svg
-  light: docs/assets/logo-light.svg
+  dark: assets/logo-dark.svg
+  light: assets/logo-light.svg
   height: 35
   href: /welcome
 
-favicon: docs/assets/favicon.svg
+favicon: assets/favicon.svg
 
 css: 
-  - docs/styles.css
+  - styles.css
   - ./footer-dist/output.css
 
 js:
   - path: ./footer-dist/output.js
     strategy: afterInteractive
-  # - path: ./docs/rbac-demo.js
+
+settings:
+  hide-404-page: true

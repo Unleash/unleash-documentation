@@ -1,0 +1,247 @@
+---
+title: Flutter SDK
+description: Integrate feature flags in your Flutter applications using the Unleash Flutter SDK
+og:site_name: Unleash
+og:title: Flutter SDK
+keywords: Flutter SDK, Dart SDK, feature flags, mobile development, cross-platform
+max-toc-depth: 3
+---
+
+# Unleash SDK for Flutter (Dart)
+
+Unleash is a private, secure, and scalable [feature management platform](https://www.getunleash.io/) built to reduce the risk of releasing new features and accelerate software development. This Flutter SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
+
+You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=flutter) or [Unleash Open Source](https://github.com/Unleash/unleash).
+
+This is a lightweight Unleash Frontend SDK you can use together with [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api#using-the-unleash-front-end-api) or [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge).
+This makes it super simple to use Unleash from any Flutter app.
+
+## How to Use the Client as a Module
+
+### Step 1: Installation
+
+```
+flutter pub add unleash_proxy_client_flutter
+```
+
+### Step 2: Initialize the SDK
+
+<Tip>As a Frontend SDK, this SDK requires you to connect to either Unleash Edge or to Unleash Frontend API. Refer to the [connection options section](#connection-options) for more information.</Tip>
+
+Configure the client according to your needs. The following example provides only the required options. Refer to [the section on available options](#available-options) for the full list.
+
+
+```dart
+import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
+
+final unleash = UnleashClient(
+    url: Uri.parse('https://<your-unleash-instance>/api/frontend'),
+    clientKey: '<your-client-side-token>',
+    appName: 'my-app');
+unleash.start();
+```
+
+#### Connection Options
+
+To connect this SDK to your Unleash instance's [front-end API](https://docs.getunleash.io/reference/front-end-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance. Refer to the [_how to create API tokens_](https://docs.getunleash.io/how-to/how-to-create-api-tokens) guide for the necessary steps.
+
+To connect this SDK to the [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge), use the URL of Unleash Edge with a Frontend token from an upstream Unleash instance or use a [pretrusted token](https://docs.getunleash.io/reference/unleash-edge#pretrusted-tokens) from Unleash Edge.
+
+
+### Step 3: Let the Client Synchronize
+
+You should wait for the client's `ready` or `initialized` events before you start working with it. Before it's ready, the client might not report the correct state for your features.
+
+
+```dart
+unleash.on('ready', (_) {
+    if (unleash.isEnabled('flutter.demo')) {
+      print('flutter.demo is enabled');
+    } else {
+      print('flutter.demo is disabled');
+    }
+});
+```
+
+The difference between the events is [explained below](#available-events).
+
+### Step 4: Check Feature Toggle States
+
+Once the client is ready, you can start checking features in your application. Use the `isEnabled` method to check the state of any feature you want:
+
+```dart
+unleash.isEnabled('flutter.demo');
+```
+
+You can use the `getVariant` method to get the variant of an **enabled feature that has variants**. If the feature is disabled or if it has no variants, then you will get back the [**disabled variant**](https://docs.getunleash.io/reference/feature-toggle-variants#the-disabled-variant)
+
+```dart
+final variant = unleash.getVariant('flutter.demo');
+
+if (variant.name == 'blue') {
+ // something with variant blue...
+}
+```
+
+You can also access the payload associated with the variant:
+
+```dart
+final variant = unleash.getVariant('flutter.demo');
+final payload = variant.payload;
+
+if (payload != null) {
+  // do something with the payload
+  // print(payload "${payload.type} ${payload.value}");
+}
+```
+
+#### Updating the Unleash Context
+
+The [Unleash context](https://docs.getunleash.io/reference/unleash-context) is used to evaluate features against attributes of a the current user. To update and configure the Unleash context in this SDK, use the `updateContext`, `setContextField` and `setContextFields` methods.
+
+The context you set in your app will be passed along to Unleash Edge or the Frontend API as query parameters for feature evaluation.
+
+The `updateContext` method will replace the entire
+(mutable part) of the Unleash context with the data that you pass in.
+
+The `setContextField` method only acts on the property that you choose. It does not affect any other properties of the Unleash context.
+
+The `setContextFields` method only acts on the properties that you choose. It does not affect any other properties of the Unleash context.
+
+```dart
+// Used to set the context fields, shared with the Unleash Edge. This
+// method will replace the entire (mutable part) of the Unleash Context.
+unleash.updateContext(UnleashContext(userId: '1233'));
+
+// Used to update a single field on the Unleash Context.
+unleash.setContextField('userId', '4141');
+
+// Used to update multiple context fields on the Unleash Context.
+unleash.setContextFields({'userId': '4141'});
+```
+
+### Available Options
+
+The Unleash SDK takes the following options:
+
+| option            | required | default                            | description                                                                                                                                                                                                                                                       |
+|-------------------|----------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| url               | yes | n/a                                | The Unleash Frontend API URL to connect to. E.g.: `https://eu.app.unleash-hosted.com/demo/api/frontend`                                                                                                                                                                                           |
+| clientKey         | yes | n/a                                | The Frontend Token to be used                                                                                                                                                                                                                               |
+| appName           | yes | n/a                                | The name of the application using this SDK. Will be used as part of the metrics sent to Unleash Edge/Frontend API. Will also be part of the Unleash Context.                                                                                                      |
+| refreshInterval   | no | 30                                 | How often, in seconds, the SDK should check for updated toggle configuration. If set to 0 will disable checking for updates                                                                                                                                       |
+| disableRefresh    | no | false                              | If set to true, the client will not check for updated toggle configuration                                                                                                                                                                                        |
+| metricsInterval   | no | 30                                 | How often, in seconds, the SDK should send usage metrics back to Unleash                                                                                                                                                                                    |
+| disableMetrics    | no | false                              | Set this option to `true` if you want to disable usage metrics                                                                                                                                                                                                    |
+| storageProvider   | no | `SharedPreferencesStorageProvider` | Allows you to inject a custom storeProvider                                                                                                                                                                                                                       |
+| bootstrap         | no | `null`                             | Allows you to bootstrap the cached feature toggle configuration.                                                                                                                                                                                                  |
+| bootstrapOverride | no| `true`                             | Should the bootstrap automatically override cached data in the local-storage. Will only be used if bootstrap is not an empty array.                                                                                                                               |
+| headerName        | no| `Authorization`                    | Provides possibility to specify custom header that is passed to Unleash / Unleash Edge with the `clientKey`                                                                                                                                                       |
+| customHeaders     | no| `{}`                               | Additional headers to use when making HTTP requests to the Unleash. In case of name collisions with the default headers, the `customHeaders` value will be used.                                                                                            |
+| impressionDataAll | no| `false`                            | Allows you to trigger "impression" events for **all** `getToggle` and `getVariant` invocations. This is particularly useful for "disabled" feature toggles that are not visible to frontend SDKs.                                                                 |
+| fetcher           | no | `http.get`                         | Allows you to define your own **fetcher**. Can be used to add certificate pinning or additional http behavior.                                                                                                                                                    |
+| poster            | no | `http.post`                        | Allows you to define your own **poster**. Can be used to add certificate pinning or additional http behavior.                                                                                                                                                     |
+| experimental      | no | `null`                             | Enabling optional experimentation. `togglesStorageTTL` : How long (Time To Live), in seconds, the toggles in storage are considered valid and should not be fetched on start. If set to 0 will disable expiration checking and will be considered always expired. |
+
+### Listen for Updates via the Events_emitter
+
+The client is also an event emitter. This means that your code can subscribe to updates from the client.
+This is a neat way to update your app when toggle state updates.
+
+```dart
+unleash.on('update', (_) {
+    final myToggle = unleash.isEnabled('flutter.demo');
+    //do something useful
+});
+```
+
+#### Available Events:
+
+- **error** - emitted when an error occurs on init, or when fetch function fails, or when fetch receives a non-ok response object. The error object is sent as payload.
+- **initialized** - emitted after the SDK has read local cached data in the storageProvider.
+- **ready** - emitted after the SDK has successfully started and performed the initial fetch towards Unleash.
+- **update** - emitted every time the Unleash returns a new feature toggle configuration. The SDK will emit this event as part of the initial fetch from the SDK.
+
+<Note>Please remember that you should always register your event listeners before your call `unleash.start()`. If you register them after you have started the SDK you risk losing important events.</Note>
+
+### SessionId - Important Note
+
+You may provide a custom session id via the "context". If you do not provide a sessionId this SDK will create a random session id, which will also be stored in the provided storage. By always having a consistent sessionId available ensures that even "anonymous" users will get a consistent experience when feature toggles is evaluated, in combination with a gradual (percentage based) rollout.
+
+### Stop the SDK
+You can stop the Unleash client by calling the `stop` method. Once the client has been stopped, it will no longer check for updates or send metrics to the server.
+
+A stopped client _can_ be restarted.
+
+```dart
+unleash.stop();
+```
+
+## Bootstrap
+Now it is possible to bootstrap the SDK with your own feature toggle configuration when you don't want to make an API call.
+
+This is also useful if you require the toggles to be in a certain state immediately after initializing the SDK.
+
+### How to Use It?
+Add a `bootstrap` attribute when create a new `UnleashClient`.
+There's also a `bootstrapOverride` attribute which by default is `true`.
+
+```dart
+final unleash = UnleashClient(
+    url: Uri.parse('https://app.unleash-hosted.com/demo/api/flutter'),
+    clientKey: 'token-123',
+    appName: 'my-app',
+    bootstrapOverride: false,
+    bootstrap: {
+    'demoApp.step4': ToggleConfig(
+        enabled: true,
+        impressionData: false,
+        variant: Variant(enabled: true, name: 'blue'))
+});
+```
+
+<Warning>
+* If `bootstrapOverride` is `true` (by default), any local cached data will be overridden with the bootstrap specified.
+* If `bootstrapOverride` is `false` any local cached data will not be overridden unless the local cache is empty.
+</Warning>
+
+## Manage Your Own Refresh Mechanism
+
+You can opt out of the Unleash feature flag auto-refresh mechanism and metrics update by settings the `refreshInterval` and/or `metricsInterval` options to `0`.
+In this case, it becomes your responsibility to call `updateToggles` and/or `sendMetrics` methods.
+
+## Experimental: Skip Fetching Toggles on Start
+
+If you start multiple clients sharing the same storage provider (e.g. a default `SharedPreferencesStorageProvider`) you might want to skip fetching toggles on start for all but one of the clients.
+This can be achieved by setting the `togglesStorageTTL` to a non-zero value.
+E.g in the example below, the toggles will be considered valid for 60 seconds and will not be fetched on start if they already exist in storage.
+We recommend to set `togglesStorageTTL` to a value greater than the `refreshInterval`.
+
+```dart
+    final anotherUnleash = UnleashClient(
+        // ...
+        experimental: const ExperimentalConfig(togglesStorageTTL: 60)
+    );
+```
+
+## Release Guide
+
+You can release manually or use the automated GitHub Action:
+
+### Automated Release (Recommended)
+
+1. Go to the **Actions** tab in GitHub and select the **Release SDK** workflow.
+2. Click **Run workflow** and enter the desired version (e.g. `1.9.7`).
+3. The workflow will bump the version, update the SDK metadata, prepend the changelog, push a `release/<version>` branch, fast-forward merge it to `main`, and create/push the `v<version>` tag.
+4. Publishing to pub.dev happens automatically on tag push via the separate **Publish to pub.dev** workflow (OIDC). Monitor that workflow for publish status.
+
+### Manual Release
+
+* Run tests: `flutter test`
+* Format code: `dart format lib test`
+* Analyse code: `flutter analyze lib test`
+* (optional) run example app (from inside the `example` dir): `flutter run`
+* Bump up the version in `pubspec.yaml`
+* Update `CHANGELOG.md` and the SDK version string in `lib/unleash_proxy_client_flutter.dart`
+* Create a PR in a new branch, merge it to `main`
+* Create an annotated tag on `main` (e.g. `v1.9.7`) and push it: this triggers the **Publish to pub.dev** workflow

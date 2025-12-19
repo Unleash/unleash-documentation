@@ -1,0 +1,204 @@
+/* Light theme variables */
+:root {
+    --container-bg-color: #fff;
+    --nav-text-color: #1a4049;
+    --page-bg-light-color: #EAEAED;
+    --sidebar-nav-bg-color: var(--page-bg-light-color);
+    --accent-color: #817afe;
+    --button-bg-color: #244049;
+    --button-text-color: #FFF;
+    --button-hover-bg-color: #635DC5;
+    --card-hover-bg-color: #f5f6fa80;
+    --card-stripe-color: #6c64e5;
+}
+
+/* Dark theme overrides */
+.dark {
+    --container-bg-color: #232130;
+    --nav-text-color: #E3E3E3;
+    --sidebar-nav-bg-color: #1A1924;
+    --accent-color: #BBB9FF;
+    --button-bg-color: #E3E3E3;
+    --button-text-color: var(--sidebar-nav-bg-color);
+    --button-hover-bg-color: #BBB9FF;
+    --card-hover-bg-color: #23233a80;
+}
+
+
+#fern-docs {
+    background-color: var(--sidebar-nav-bg-color);
+}
+
+#fern-header {
+    background-color: var(--sidebar-nav-bg-color);
+}
+
+.fern-layout-guide, .fern-layout-reference {
+    background-color: var(--container-bg-color);
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
+                0 0px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.fern-layout-reference {
+    padding: 0;
+    margin-bottom: calc(var(--spacing) * 12);
+}
+
+.landing-page {
+    margin-left: 4rem !important;
+    margin-right: 4rem !important;
+}
+
+body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
+    display: none !important;
+}
+
+body:has(.landing-page) .fern-page-actions {
+    display: none !important;
+}
+
+/* Hero section styles */
+.hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2.5rem;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-video {
+    flex: 0 0 500px;
+    margin-top: 5rem;
+}
+
+.hero-video iframe {
+    border-radius: 12px;
+}
+
+/* Card bottom stripe styles */
+body:has(.landing-page) .fern-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+body:has(.landing-page) .fern-card:hover {
+    background-color: var(--card-hover-bg-color) !important;
+}
+
+body:has(.landing-page) .fern-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--card-stripe-color);
+    border-radius: 0 0 8px 8px;
+}
+
+/* Card background */
+body:has(.landing-page) .fern-card:before {
+    content: "";
+    z-index: -1;
+    background-image: url(https://unleash-images.s3.us-east-1.amazonaws.com/card-background.png);
+    background-size: cover;
+    border-top-right-radius: 12px;
+    width: 60%;
+    height: 85%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.8;
+}
+
+/* Light mode - use Fern's light theme class */
+.light body:has(.landing-page) .fern-card:before {
+    opacity: 0.7 !important;
+    filter: brightness(0.4) contrast(1.8) !important;
+}
+
+/* Dark mode - use Fern's dark theme class */
+.dark body:has(.landing-page) .fern-card:before {
+    opacity: 0.6 !important;
+    filter: none !important;
+}
+
+/* Ensure card content is positioned above background */
+body:has(.landing-page) .fern-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+img {
+    border-radius: 12px !important;
+}
+
+/* Navbar links styling */
+#fern-header a[href="https://www.getunleash.io/product"],
+#fern-header a[href="https://www.getunleash.io/plans"],
+#fern-header a[href="https://www.getunleash.io/signin"] {
+    font-weight: 600 !important;
+    color: var(--nav-text-color) !important;
+    border: none !important;
+}
+
+#fern-header a[href="https://www.getunleash.io/product"]:hover,
+#fern-header a[href="https://www.getunleash.io/plans"]:hover,
+#fern-header a[href="https://www.getunleash.io/signin"]:hover {
+    color: var(--accent-color) !important;
+}
+
+/* Header tabs */
+button.fern-header-tabs__tab[role="tab"],
+button.fern-header-tabs__tab[role="tab"] span,
+button.fern-header-tabs__tab[role="tab"] .truncate,
+.fern-header-tabs a {
+    color: var(--nav-text-color) !important;
+}
+
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"],
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"] span,
+button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
+button.fern-header-tabs__tab[role="tab"][data-state="active"],
+button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
+button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
+.fern-header-tabs a[aria-selected="true"],
+.fern-header-tabs a[data-state="active"] {
+    color: var(--accent-color) !important;
+}
+
+/* Navbar button styling */
+#fern-header a[href*="enterprise-payg"].fern-button {
+    background-color: var(--button-bg-color) !important;
+    color: var(--button-text-color) !important;
+    font-weight: 600 !important;
+}
+
+#fern-header a[href*="enterprise-payg"].fern-button:hover {
+    background-color: var(--button-hover-bg-color) !important;
+}
+
+/* CTA button styling (for inline buttons matching header style) */
+.cta-button {
+    background-color: var(--button-bg-color) !important;
+    color: var(--button-text-color) !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+.cta-button:hover {
+    background-color: var(--button-hover-bg-color) !important;
+}
+
+.version-button {
+    font-weight: 600 !important;
+}

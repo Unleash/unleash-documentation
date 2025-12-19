@@ -1,0 +1,79 @@
+---
+title: Analytics
+og:site_name: Unleash Documentation
+og:title: Analytics - Visibility into how flags are created, used, and cleaned up
+description: Analytics gives you visibility into how flags are created, used, and cleaned up in your Unleash instance. These dashboards connect engineering activity to business outcomes.
+keywords: analytics, insights, lifecycle, technical debt, metrics, dashboards
+max-toc-depth: 3
+---
+
+<Button small outlined className="version-button" href="https://docs.getunleash.io/support/availability">v6.0</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+Analytics gives you visibility into how flags are created, used, and cleaned up in your Unleash instance. These dashboards connect engineering activity to business outcomes by showing how quickly features move to production, how well teams manage technical debt, and how your user base evolves over time.
+You can view analytics across all projects or by selecting single or multiple projects using the filter.
+
+The dashboard shows:
+- Feature flag lifecycle data
+- Total users and flags
+- Technical debt
+- Median time to production
+- Flag evaluation metrics
+- Updates per environment type
+
+### Flags lifecycle
+
+<Button small outlined className="version-button" href="https://docs.getunleash.io/support/availability">v7.2</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+Shows how many flags are currently in each major lifecycle stage: Develop, Production, and Cleanup. Each stage shows how many flags are new this week, how many have been there for more than a week, and the median time flags spend in that stage. You can also compare this to the historical median to spot outliers.
+
+<Frame background="subtle">
+![Total users chart](/assets/flag-lifecycle-analytics.png)
+</Frame>
+
+### Total users
+
+The Total users chart provides information about the total number of current users in your Unleash instance. This chart helps you understand how the user base is growing or changing over time. Additionally, it shows the number of users in selected projects and how the user distribution varies among them.
+
+<Frame background="subtle">
+![Total users chart](/assets/insights-total-users.png)
+</Frame>
+
+### Flags
+
+The flags chart displays the total number of active (not archived) feature flags across all projects. It provides insights into how the number of flags has changed over time, helping you track the growth and usage of feature flags. You can also view the data for specific projects.
+
+<Frame background="subtle">
+![Flags chart](/assets/insights-total-flags.png)
+</Frame>
+
+### Technical debt
+
+The technical debt rating shows the percentage of healthy flags in a project compared to stale or potentially stale flags. This helps you ensure all flags are actively maintained and relevant. You can also view these changes over time to identify potential issues early and take corrective actions.
+
+<Frame background="subtle">
+![Technical debt chart](/assets/insights-technical-debt.png)
+</Frame>
+
+### Median time to production
+
+The median time to production chart measures the average time from when a feature flag is created until it is enabled in a "production" type environment. This metric is calculated only for feature flags of the type "release" and is the median across the selected projects. Understanding this metric helps in assessing the efficiency of your development and deployment processes. It also highlights areas where you can improve to reduce time to market for new features.
+
+<Frame background="subtle">
+![Time to production chart](/assets/insights-production.png)
+</Frame>
+
+### Flag evaluation metrics
+
+The flag evaluation metrics chart provides a summary of all flag evaluations reported by SDKs across all projects. This chart helps you understand how often feature flags are being evaluated and used within your applications. It can indicate the performance impact and the effectiveness of your feature flag implementations. By analyzing these metrics per project, you can gain deeper insights into the usage patterns and optimize accordingly.
+
+<Frame background="subtle">
+![Flag evaluation metrics chart](/assets/insights-evaluation.png)
+</Frame>
+
+### Updates per environment type
+
+The updates per environment type chart summarizes all feature configuration updates per environment type. This chart is crucial for understanding how configuration changes propagate across different environments, such as development, testing, and production. It helps in tracking the frequency and impact of updates, ensuring that changes are consistently and safely deployed. Monitoring updates per environment type can also help identify potential bottlenecks or issues in the deployment pipeline.
+
+<Frame background="subtle">
+![Updates per environment type chart](/assets/insights-updates.png)
+</Frame>
