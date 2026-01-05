@@ -42,7 +42,7 @@
 }
 
 .fern-layout-reference {
-    padding: 0;
+    padding: 0 2rem;
     margin-bottom: calc(var(--spacing) * 12);
 }
 

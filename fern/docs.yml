@@ -18,6 +18,7 @@ tabs:
     skip-slug: true
   api-docs:
     display-name: APIs
+    slug: api
   sdks:
     display-name: SDKs
     slug: sdks
@@ -307,13 +308,6 @@ navigation:
     layout:
       - api: API Reference
         skip-slug: true
-        layout:
-          - section: API Overview
-            skip-slug: true
-            summary: pages/concepts.mdx
-            contents: 
-              - page: Authentication
-                path: pages/support/oss-comparison.mdx
 
   - tab: sdks
     layout:
