@@ -306,57 +306,24 @@ navigation:
 
   - tab: api-docs
     layout:
-      - api: API Reference
+      - page: API overview
+        path: pages/apis/concepts.mdx
+
+      - api: Client API
+        api-name: client-api
+        skip-slug: true
+        
+      - api: Admin API
+        api-name: admin-api
         skip-slug: true
         display-errors: true
+        alphabetized: true
         layout:
-          - section: Admin API
-            skip-slug: true
-            contents:
+          - section: "Integrations"
+            referenced-packages:
               - Addons
-              - Admin UI
-              - API tokens
-              - Archive
-              - Auth
-              - Banners
-              - Change Requests
-              - Context
-              - Dependencies
-              - Environments
-              - Events
-              - Feature Types
-              - Features
-              - Import/Export
-              - Instance Admin
-              - Maintenance
-              - Metrics
-              - Notifications
-              - Operational
-              - Personal access tokens
-              - Playground
-              - Projects
-              - Public signup tokens
-              - Release Templates
-              - Search
-              - Segments
-              - Service Accounts
-              - Strategies
-              - Tags
-              - Telemetry
-              - Unleash Edge
-              - Unknown Flags
-              - Unstable
-              - Users
-          - section: Client API
-            skip-slug: true
-            referenced-packages:
-              - client
             contents: []
-          - section: Frontend API
             skip-slug: true
-            referenced-packages:
-              - frontendApi
-            contents: []
 
   - tab: sdks
     layout:
