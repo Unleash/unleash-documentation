@@ -308,6 +308,55 @@ navigation:
     layout:
       - api: API Reference
         skip-slug: true
+        display-errors: true
+        layout:
+          - section: Admin API
+            skip-slug: true
+            contents:
+              - Addons
+              - Admin UI
+              - API tokens
+              - Archive
+              - Auth
+              - Banners
+              - Change Requests
+              - Context
+              - Dependencies
+              - Environments
+              - Events
+              - Feature Types
+              - Features
+              - Import/Export
+              - Instance Admin
+              - Maintenance
+              - Metrics
+              - Notifications
+              - Operational
+              - Personal access tokens
+              - Playground
+              - Projects
+              - Public signup tokens
+              - Release Templates
+              - Search
+              - Segments
+              - Service Accounts
+              - Strategies
+              - Tags
+              - Telemetry
+              - Unleash Edge
+              - Unknown Flags
+              - Unstable
+              - Users
+          - section: Client API
+            skip-slug: true
+            referenced-packages:
+              - client
+            contents: []
+          - section: Frontend API
+            skip-slug: true
+            referenced-packages:
+              - frontendApi
+            contents: []
 
   - tab: sdks
     layout:
