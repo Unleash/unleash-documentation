@@ -4,7 +4,8 @@ Work in progress. This repository contains the Unleash documentation built with 
 
 ## Prerequisites
 
-Install the Fern CLI globally:
+- Node.js 20+
+- Fern CLI (installed globally):
 
 ```bash
 npm install -g fern-api
@@ -12,16 +13,30 @@ npm install -g fern-api
 
 ## Local development
 
-Start the local development server:
+Start the local development server (automatically fetches latest API spec):
 
 ```bash
-fern docs dev
+npm run dev
 ```
 
-The dev server runs on `http://localhost:3000` by default. Use `--port` to specify a different port:
+This will:
+1. Fetch the latest OpenAPI spec from the hosted Unleash instance
+2. Save it to `fern/openapi.json`
+3. Start the dev server at `http://localhost:3000`
+
+### Manual commands
+
+If you need to run commands separately:
 
 ```bash
-fern docs dev --port 8080
+# Fetch OpenAPI spec only
+npm run fetch
+
+# Start dev server without fetching
+fern docs dev
+
+# Build docs (with automatic fetch)
+npm run build
 ```
 
 ## Validation

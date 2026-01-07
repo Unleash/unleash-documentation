@@ -11,9 +11,22 @@ if (!response.ok) {
 
 const data = await response.json();
 
+// Replace server URL with user-agnostic example
+data.servers = [
+    {
+        url: 'https://app.unleash-instance.example.com',
+        description: 'Your Unleash instance (replace with your actual URL)',
+    },
+];
+
+// Remove image markdown from descriptions (images don't work in Fern)
+const jsonString = JSON.stringify(data, null, 2)
+    .replace(/!\[Unleash Enterprise\]\([^)]+\)\s*/g, '')
+    .replace(/!\[Beta\]\([^)]+\)\s*/g, '');
+
 await fs.writeFile(
     './fern/openapi.json',
-    JSON.stringify(data, null, 2),
+    jsonString,
     'utf8',
 );
 

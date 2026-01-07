@@ -2,7 +2,8 @@
   "openapi": "3.0.3",
   "servers": [
     {
-      "url": "https://us.app.unleash-hosted.com/ushosted"
+      "url": "https://app.unleash-instance.example.com",
+      "description": "Your Unleash instance (replace with your actual URL)"
     }
   ],
   "info": {
@@ -22356,7 +22357,7 @@
         ],
         "operationId": "createProject",
         "summary": "Create project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreate a new [Unleash project](https://docs.getunleash.io/concepts/projects).",
+        "description": "**Enterprise feature**\n\nCreate a new [Unleash project](https://docs.getunleash.io/concepts/projects).",
         "requestBody": {
           "description": "createProjectSchema",
           "required": true,
@@ -22506,7 +22507,7 @@
         ],
         "operationId": "validateProject",
         "summary": "Validate project ID",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nValidate a project ID against Unleash's rules",
+        "description": "**Enterprise feature**\n\nValidate a project ID against Unleash's rules",
         "requestBody": {
           "description": "validateProjectSchema",
           "required": true,
@@ -22640,7 +22641,7 @@
         ],
         "operationId": "updateProject",
         "summary": "Update project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdate a project with new configuration. Any fields not provided are ignored.",
+        "description": "**Enterprise feature**\n\nUpdate a project with new configuration. Any fields not provided are ignored.",
         "requestBody": {
           "description": "updateProjectSchema",
           "required": true,
@@ -22808,7 +22809,7 @@
           "Projects"
         ],
         "summary": "Delete project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nPermanently delete the provided project. All feature flags in the project must be archived before you can delete it. This permanently deletes the project and its archived flags. It can not be undone.",
+        "description": "**Enterprise feature**\n\nPermanently delete the provided project. All feature flags in the project must be archived before you can delete it. This permanently deletes the project and its archived flags. It can not be undone.",
         "operationId": "deleteProject",
         "responses": {
           "200": {
@@ -22915,7 +22916,7 @@
         ],
         "operationId": "updateProjectEnterpriseSettings",
         "summary": "Update project enterprise settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdate project enterprise settings with new values. Any fields not provided are ignored.",
+        "description": "**Enterprise feature**\n\nUpdate project enterprise settings with new values. Any fields not provided are ignored.",
         "requestBody": {
           "description": "updateProjectEnterpriseSettingsSchema",
           "required": true,
@@ -23085,7 +23086,7 @@
           "Unstable"
         ],
         "summary": "Archive project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nArchive the provided project. All feature flags in the project must be archived before you can archive the project.",
+        "description": "**Enterprise feature**\n\nArchive the provided project. All feature flags in the project must be archived before you can archive the project.",
         "operationId": "archiveProject",
         "responses": {
           "200": {
@@ -23191,7 +23192,7 @@
           "Unstable"
         ],
         "summary": "Revive project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRevive the specified project from the archive.",
+        "description": "**Enterprise feature**\n\nRevive the specified project from the archive.",
         "operationId": "reviveProject",
         "responses": {
           "200": {
@@ -23297,7 +23298,7 @@
           "Projects"
         ],
         "summary": "Get users and groups in project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet all groups, users and their roles, and available roles for the given project.",
+        "description": "**Enterprise feature**\n\nGet all groups, users and their roles, and available roles for the given project.",
         "operationId": "getProjectAccess",
         "responses": {
           "200": {
@@ -23381,7 +23382,7 @@
           "Projects"
         ],
         "summary": "Set users and groups to roles in the current project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSets all groups, users and their roles for the given project, overriding any existing configuration.",
+        "description": "**Enterprise feature**\n\nSets all groups, users and their roles for the given project, overriding any existing configuration.",
         "operationId": "setProjectAccess",
         "requestBody": {
           "description": "projectAccessConfigurationSchema",
@@ -23469,7 +23470,7 @@
           "Projects"
         ],
         "summary": "Configure project access",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nConfigure project access for groups and single users. The provided users and groups will be given the roles specified in the payload.",
+        "description": "**Enterprise feature**\n\nConfigure project access for groups and single users. The provided users and groups will be given the roles specified in the payload.",
         "operationId": "addAccessToProject",
         "requestBody": {
           "description": "projectAddAccessSchema",
@@ -23640,7 +23641,7 @@
           "Projects"
         ],
         "summary": "Get project-role mappings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFor the provided role, retrieves a list of projects that use this role. For each project it also contains information about how the role used in that project, such as how many users, groups, or service accounts that use the role.",
+        "description": "**Enterprise feature**\n\nFor the provided role, retrieves a list of projects that use this role. For each project it also contains information about how the role used in that project, such as how many users, groups, or service accounts that use the role.",
         "operationId": "getRoleProjectAccess",
         "responses": {
           "200": {
@@ -23726,7 +23727,7 @@
           "Projects"
         ],
         "summary": "Sets roles for user",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSets the roles a user has in the project.",
+        "description": "**Enterprise feature**\n\nSets the roles a user has in the project.",
         "operationId": "setRolesForUser",
         "responses": {
           "200": {
@@ -23838,7 +23839,7 @@
           "Projects"
         ],
         "summary": "Remove project access for a user",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRemoves project access for a user by removing all of its roles for the project.",
+        "description": "**Enterprise feature**\n\nRemoves project access for a user by removing all of its roles for the project.",
         "operationId": "removeUserAccess",
         "responses": {
           "200": {
@@ -23952,7 +23953,7 @@
           "Projects"
         ],
         "summary": "Sets roles for group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSets the roles a group has in the project.",
+        "description": "**Enterprise feature**\n\nSets the roles a group has in the project.",
         "operationId": "setRolesForGroup",
         "responses": {
           "200": {
@@ -24064,7 +24065,7 @@
           "Projects"
         ],
         "summary": "Remove project access for a group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRemoves project access for a group by removing all of its roles for the project.",
+        "description": "**Enterprise feature**\n\nRemoves project access for a group by removing all of its roles for the project.",
         "operationId": "removeGroupAccess",
         "responses": {
           "200": {
@@ -24179,7 +24180,7 @@
         ],
         "operationId": "changeProject",
         "summary": "Move feature to project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nMoves the specified feature to the new project in the request schema. Requires you to have permissions to move the feature flag in both projects. Features that are included in any active change requests can not be moved.",
+        "description": "**Enterprise feature**\n\nMoves the specified feature to the new project in the request schema. Requires you to have permissions to move the feature flag in both projects. Features that are included in any active change requests can not be moved.",
         "requestBody": {
           "description": "changeProjectSchema",
           "required": true,
@@ -24358,7 +24359,7 @@
         ],
         "operationId": "getPermissions",
         "summary": "Gets available permissions",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns a list of available permissions",
+        "description": "**Enterprise feature**\n\nReturns a list of available permissions",
         "responses": {
           "200": {
             "description": "adminPermissionsSchema",
@@ -24380,7 +24381,7 @@
         ],
         "operationId": "getRequestsPerSecond",
         "summary": "Gets usage data",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets usage data per app/endpoint from a prometheus compatible metrics endpoint",
+        "description": "**Enterprise feature**\n\nGets usage data per app/endpoint from a prometheus compatible metrics endpoint",
         "responses": {
           "200": {
             "description": "requestsPerSecondSegmentedSchema",
@@ -24402,7 +24403,7 @@
         ],
         "operationId": "getTrafficDataUsageForPeriod",
         "summary": "Get aggregated traffic data for a given time period.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets traffic usage data for the selected period, either aggregated by day or by month.",
+        "description": "**Enterprise feature**\n\nGets traffic usage data for the selected period, either aggregated by day or by month.",
         "parameters": [
           {
             "name": "grouping",
@@ -24462,7 +24463,7 @@
         ],
         "operationId": "getConnectionsForPeriod",
         "summary": "Get aggregated metered connections for a given time period.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets metered connections count for the selected period, either aggregated by day or by month.",
+        "description": "**Enterprise feature**\n\nGets metered connections count for the selected period, either aggregated by day or by month.",
         "parameters": [
           {
             "name": "grouping",
@@ -24522,7 +24523,7 @@
         ],
         "operationId": "getRequestsForPeriod",
         "summary": "Get aggregated metered requests for a given time period.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets metered requests count for the selected period, either aggregated by day or by month.",
+        "description": "**Enterprise feature**\n\nGets metered requests count for the selected period, either aggregated by day or by month.",
         "parameters": [
           {
             "name": "grouping",
@@ -24578,7 +24579,7 @@
     "/api/admin/notifications": {
       "get": {
         "summary": "Retrieves a list of notifications",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nA user may get relevant notifications from the projects they are a member of",
+        "description": "**Enterprise feature**\n\nA user may get relevant notifications from the projects they are a member of",
         "tags": [
           "Notifications"
         ],
@@ -24600,7 +24601,7 @@
     "/api/admin/notifications/read": {
       "post": {
         "summary": "Mark notifications as read",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nAllow to select which notifications were read and saving a read date",
+        "description": "**Enterprise feature**\n\nAllow to select which notifications were read and saving a read date",
         "tags": [
           "Notifications"
         ],
@@ -24654,7 +24655,7 @@
           }
         ],
         "summary": "Get lifecycle trends",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets lifecycle trends information showing feature flag progression across development, production, and cleanup stages."
+        "description": "**Enterprise feature**\n\nGets lifecycle trends information showing feature flag progression across development, production, and cleanup stages."
       }
     },
     "/api/admin/insights": {
@@ -24696,7 +24697,7 @@
           }
         ],
         "summary": "Get instance information",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets high level information about the usage of this Unleash instance, including user, project, and flag information."
+        "description": "**Enterprise feature**\n\nGets high level information about the usage of this Unleash instance, including user, project, and flag information."
       }
     },
     "/api/admin/email-subscription/{subscription}": {
@@ -24765,7 +24766,7 @@
           }
         },
         "summary": "Subscribe to email subscription",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSubscribe to email subscription e.g. monthly productivity report. By default everyone is subscribed. This API is mostly used by hosted Unleash.",
+        "description": "**Enterprise feature**\n\nSubscribe to email subscription e.g. monthly productivity report. By default everyone is subscribed. This API is mostly used by hosted Unleash.",
         "parameters": [
           {
             "name": "subscription",
@@ -24842,7 +24843,7 @@
           }
         },
         "summary": "Unsubscribe from email subscription",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUnsubscribe from email subscription e.g. monthly productivity report. This API is mostly used by hosted Unleash.",
+        "description": "**Enterprise feature**\n\nUnsubscribe from email subscription e.g. monthly productivity report. This API is mostly used by hosted Unleash.",
         "parameters": [
           {
             "name": "subscription",
@@ -24862,7 +24863,7 @@
         ],
         "operationId": "getAllLicensedUsers",
         "summary": "Retrieves all licensed users data.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFetches an array of licensed users with date and count.",
+        "description": "**Enterprise feature**\n\nFetches an array of licensed users with date and count.",
         "responses": {
           "200": {
             "description": "licensedUsersSchema",
@@ -24880,7 +24881,7 @@
     "/api/client/metrics/edge": {
       "post": {
         "summary": "Register Edge observability metrics.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRegisters Edge observability metrics from downstream Edge instances to aggregate a comprehensive status view of connected Edges.",
+        "description": "**Enterprise feature**\n\nRegisters Edge observability metrics from downstream Edge instances to aggregate a comprehensive status view of connected Edges.",
         "tags": [
           "Unleash Edge"
         ],
@@ -24906,7 +24907,7 @@
     "/api/client/edge-licensing/heartbeat": {
       "post": {
         "summary": "Heartbeat for Enterprise Edge instances.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReports that an Enterprise Edge instance is alive and in use. This is related to billing and usage tracking.",
+        "description": "**Enterprise feature**\n\nReports that an Enterprise Edge instance is alive and in use. This is related to billing and usage tracking.",
         "tags": [
           "Unstable"
         ],
@@ -25018,7 +25019,7 @@
           "Auth"
         ],
         "summary": "Get SAML auth settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the current settings for SAML authentication",
+        "description": "**Enterprise feature**\n\nReturns the current settings for SAML authentication",
         "operationId": "getSamlSettings",
         "responses": {
           "200": {
@@ -25120,7 +25121,7 @@
         ],
         "operationId": "setSamlSettings",
         "summary": "Update SAML auth settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdates the settings for SAML Authentication",
+        "description": "**Enterprise feature**\n\nUpdates the settings for SAML Authentication",
         "requestBody": {
           "description": "samlSettingsSchema",
           "required": true,
@@ -25260,7 +25261,7 @@
           "Auth"
         ],
         "summary": "Get OIDC auth settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the current settings for OIDC Authentication",
+        "description": "**Enterprise feature**\n\nReturns the current settings for OIDC Authentication",
         "operationId": "getOidcSettings",
         "responses": {
           "200": {
@@ -25362,7 +25363,7 @@
         ],
         "operationId": "setOidcSettings",
         "summary": "Set OIDC settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nConfigure OpenID Connect as a login provider for Unleash.",
+        "description": "**Enterprise feature**\n\nConfigure OpenID Connect as a login provider for Unleash.",
         "requestBody": {
           "description": "oidcSettingsSchema",
           "required": true,
@@ -25503,7 +25504,7 @@
         ],
         "operationId": "getSimpleSettings",
         "summary": "Get Simple auth settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nIs simple authentication (username/password) enabled for this server",
+        "description": "**Enterprise feature**\n\nIs simple authentication (username/password) enabled for this server",
         "responses": {
           "200": {
             "description": "passwordAuthSchema",
@@ -25577,7 +25578,7 @@
         ],
         "operationId": "setSimpleSettings",
         "summary": "Update Simple auth settings",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nEnable or disable simple authentication (username/password)",
+        "description": "**Enterprise feature**\n\nEnable or disable simple authentication (username/password)",
         "requestBody": {
           "description": "passwordAuthSchema",
           "required": true,
@@ -25718,7 +25719,7 @@
         ],
         "operationId": "getGroups",
         "summary": "Get a list of groups",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet a list of user groups for Role-Based Access Control",
+        "description": "**Enterprise feature**\n\nGet a list of user groups for Role-Based Access Control",
         "responses": {
           "200": {
             "description": "groupsSchema",
@@ -25792,7 +25793,7 @@
         ],
         "operationId": "createGroup",
         "summary": "Create a new group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreate a new user group for Role-Based Access Control",
+        "description": "**Enterprise feature**\n\nCreate a new user group for Role-Based Access Control",
         "requestBody": {
           "description": "createGroupSchema",
           "required": true,
@@ -25942,7 +25943,7 @@
         ],
         "operationId": "getGroup",
         "summary": "Get a single group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet a single user group by group id",
+        "description": "**Enterprise feature**\n\nGet a single user group by group id",
         "responses": {
           "200": {
             "description": "groupSchema",
@@ -26080,7 +26081,7 @@
         ],
         "operationId": "updateGroup",
         "summary": "Update a group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdate existing user group by group id. It overrides previous group details.",
+        "description": "**Enterprise feature**\n\nUpdate existing user group by group id. It overrides previous group details.",
         "requestBody": {
           "description": "createGroupSchema",
           "required": true,
@@ -26256,7 +26257,7 @@
         ],
         "operationId": "deleteGroup",
         "summary": "Delete a single group",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDelete a single user group by group id",
+        "description": "**Enterprise feature**\n\nDelete a single user group by group id",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -26362,7 +26363,7 @@
         ],
         "operationId": "deleteScimGroups",
         "summary": "Delete all SCIM groups",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes all groups managed by SCIM",
+        "description": "**Enterprise feature**\n\nDeletes all groups managed by SCIM",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -26431,7 +26432,7 @@
         ],
         "operationId": "getRoles",
         "summary": "Get a list of roles",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet a list of project, root and custom roles for Role-Based Access Control",
+        "description": "**Enterprise feature**\n\nGet a list of project, root and custom roles for Role-Based Access Control",
         "responses": {
           "200": {
             "description": "rolesWithVersionSchema",
@@ -26505,7 +26506,7 @@
         ],
         "operationId": "createRole",
         "summary": "Create a new role",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreate a new custom role for Role-Based Access Control",
+        "description": "**Enterprise feature**\n\nCreate a new custom role for Role-Based Access Control",
         "requestBody": {
           "description": "createRoleWithPermissionsSchema",
           "required": true,
@@ -26646,7 +26647,7 @@
         ],
         "operationId": "getRoleById",
         "summary": "Get a single role",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet a single role by role id",
+        "description": "**Enterprise feature**\n\nGet a single role by role id",
         "responses": {
           "200": {
             "description": "roleWithPermissionsSchema",
@@ -26757,7 +26758,7 @@
         ],
         "operationId": "updateRole",
         "summary": "Update a role",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdate a custom role by role id",
+        "description": "**Enterprise feature**\n\nUpdate a custom role by role id",
         "requestBody": {
           "description": "createRoleWithPermissionsSchema",
           "required": true,
@@ -26933,7 +26934,7 @@
         ],
         "operationId": "deleteRole",
         "summary": "Delete a custom role",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDelete a custom role by id. You cannot delete built-in roles or roles that are in use.",
+        "description": "**Enterprise feature**\n\nDelete a custom role by id. You cannot delete built-in roles or roles that are in use.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -27066,7 +27067,7 @@
         ],
         "operationId": "validateRole",
         "summary": "Validate a role",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCheck if the role matches schema and has a unique name",
+        "description": "**Enterprise feature**\n\nCheck if the role matches schema and has a unique name",
         "requestBody": {
           "description": "createRoleWithPermissionsSchema",
           "required": true,
@@ -27142,7 +27143,7 @@
     "/api/admin/environments": {
       "post": {
         "summary": "Creates a new environment",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUses the details provided in the payload to create a new environment",
+        "description": "**Enterprise feature**\n\nUses the details provided in the payload to create a new environment",
         "tags": [
           "Environments"
         ],
@@ -27312,7 +27313,7 @@
     "/api/admin/environments/validate": {
       "post": {
         "summary": "Validates if an environment name exists",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUses the name provided in the body of the request to validate if the given name exists or not",
+        "description": "**Enterprise feature**\n\nUses the name provided in the body of the request to validate if the given name exists or not",
         "tags": [
           "Environments"
         ],
@@ -27392,7 +27393,7 @@
     "/api/admin/environments/update/{name}": {
       "put": {
         "summary": "Updates an environment by name",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGiven an environment by name updates the environment with the given payload. Note that `name`, `enabled` and `protected` cannot be changed by this API",
+        "description": "**Enterprise feature**\n\nGiven an environment by name updates the environment with the given payload. Note that `name`, `enabled` and `protected` cannot be changed by this API",
         "tags": [
           "Environments"
         ],
@@ -27489,7 +27490,7 @@
     "/api/admin/environments/{name}": {
       "delete": {
         "summary": "Deletes an environment by name",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGiven an existing environment by name, this endpoint will attempt to delete it",
+        "description": "**Enterprise feature**\n\nGiven an existing environment by name, this endpoint will attempt to delete it",
         "tags": [
           "Environments"
         ],
@@ -27679,7 +27680,7 @@
     "/api/admin/environments/{name}/clone": {
       "post": {
         "summary": "Clones an environment",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGiven an existing environment name and a set of options, this will create a copy of that environment",
+        "description": "**Enterprise feature**\n\nGiven an existing environment name and a set of options, this will create a copy of that environment",
         "tags": [
           "Environments"
         ],
@@ -27776,7 +27777,7 @@
     "/api/admin/projects/{projectId}/change-requests/config": {
       "get": {
         "summary": "Retrieves change request configuration for a project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGiven a projectId, this endpoint will retrieve change request configuration for the project",
+        "description": "**Enterprise feature**\n\nGiven a projectId, this endpoint will retrieve change request configuration for the project",
         "tags": [
           "Change Requests"
         ],
@@ -27808,7 +27809,7 @@
     "/api/admin/projects/{projectId}/environments/{environment}/change-requests/config": {
       "put": {
         "summary": "Updates change request configuration for an environment in the project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will change the change request configuration for a given environment, set it to either on/off and optionally configure the number of approvals needed. The minimum number of approvals is 1 and the maximum number is 10. If you provide a number higher than 10 or lower than 1, Unleash will clamp it to the allowed range.",
+        "description": "**Enterprise feature**\n\nThis endpoint will change the change request configuration for a given environment, set it to either on/off and optionally configure the number of approvals needed. The minimum number of approvals is 1 and the maximum number is 10. If you provide a number higher than 10 or lower than 1, Unleash will clamp it to the allowed range.",
         "tags": [
           "Change Requests"
         ],
@@ -27852,7 +27853,7 @@
     "/api/admin/projects/{projectId}/change-requests/scheduled": {
       "get": {
         "summary": "Get scheduled change requests matching a query.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint retrieves basic information about all scheduled change requests that match the search criteria provided in the query parameters. The endpoint will return any change request that matches one or more of the provided parameters. If you use no query parameters, you'll get an empty list.\n\nFor instance, to find all the scheduled change requests that either touch feature `MyFeature` or strategy `0D198067-7D55-460C-9EC7-DB86E3AE261A`, you would use the query string `feature=MyFeature&strategyId=0D198067-7D55-460C-9EC7-DB86E3AE261A`.",
+        "description": "**Enterprise feature**\n\nThis endpoint retrieves basic information about all scheduled change requests that match the search criteria provided in the query parameters. The endpoint will return any change request that matches one or more of the provided parameters. If you use no query parameters, you'll get an empty list.\n\nFor instance, to find all the scheduled change requests that either touch feature `MyFeature` or strategy `0D198067-7D55-460C-9EC7-DB86E3AE261A`, you would use the query string `feature=MyFeature&strategyId=0D198067-7D55-460C-9EC7-DB86E3AE261A`.",
         "tags": [
           "Change Requests"
         ],
@@ -27911,7 +27912,7 @@
     "/api/admin/projects/{projectId}/environments/{environment}/change-requests": {
       "post": {
         "summary": "Create/Add change to a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGiven a change request exists, this endpoint will attempt to add a change to\n\nan existing change request for the user. If a change request does not exist,\n\nit will attempt to create one.",
+        "description": "**Enterprise feature**\n\nGiven a change request exists, this endpoint will attempt to add a change to\n\nan existing change request for the user. If a change request does not exist,\n\nit will attempt to create one.",
         "tags": [
           "Change Requests"
         ],
@@ -27989,7 +27990,7 @@
     "/api/admin/projects/{projectId}/change-requests/count": {
       "get": {
         "summary": "Retrieves number of project change requests in each state",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve the number of project change requests that are: approved, applied, rejected, scheduled or awaiting review",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve the number of project change requests that are: approved, applied, rejected, scheduled or awaiting review",
         "tags": [
           "Change Requests"
         ],
@@ -28021,7 +28022,7 @@
     "/api/admin/projects/{projectId}/change-requests/open": {
       "get": {
         "summary": "Retrieves pending change requests in configured environments",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve the pending change requests in the configured environments for the project, for the current user performing the request.",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve the pending change requests in the configured environments for the project, for the current user performing the request.",
         "tags": [
           "Change Requests"
         ],
@@ -28054,7 +28055,7 @@
     "/api/admin/projects/{projectId}/change-requests/pending": {
       "get": {
         "summary": "Retrieves pending change requests in configured environments",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve the pending change requests in the configured environments for the project, for the current user performing the request.",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve the pending change requests in the configured environments for the project, for the current user performing the request.",
         "tags": [
           "Change Requests"
         ],
@@ -28086,7 +28087,7 @@
     "/api/admin/projects/{projectId}/change-requests/actionable": {
       "get": {
         "summary": "Get the number of change requests you can do something with",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the number of change requests in this project that your user can move into the next stage by approving or applying them.",
+        "description": "**Enterprise feature**\n\nReturns the number of change requests in this project that your user can move into the next stage by approving or applying them.",
         "tags": [
           "Unstable"
         ],
@@ -28118,7 +28119,7 @@
     "/api/admin/projects/{projectId}/change-requests": {
       "get": {
         "summary": "Retrieves all change requests for a project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve all change requests regardless of status for a given project. There's an upper limit of last 300 change requests ordered by creation date.",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve all change requests regardless of status for a given project. There's an upper limit of last 300 change requests ordered by creation date.",
         "tags": [
           "Change Requests"
         ],
@@ -28150,7 +28151,7 @@
     "/api/admin/projects/{projectId}/change-requests/pending/{featureName}": {
       "get": {
         "summary": "Retrieves all pending change requests referencing a feature in the project",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve all pending change requests (change requests with a status of Draft | In review | Approved) referencing the given feature flag name.",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve all pending change requests (change requests with a status of Draft | In review | Approved) referencing the given feature flag name.",
         "tags": [
           "Change Requests"
         ],
@@ -28190,7 +28191,7 @@
     "/api/admin/projects/{projectId}/change-requests/{id}": {
       "get": {
         "summary": "Retrieves one change request by id",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will retrieve one change request if it matches the provided id.",
+        "description": "**Enterprise feature**\n\nThis endpoint will retrieve one change request if it matches the provided id.",
         "tags": [
           "Change Requests"
         ],
@@ -28255,7 +28256,7 @@
       },
       "delete": {
         "summary": "Deletes a change request by id",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will delete one change request if it matches the provided id.",
+        "description": "**Enterprise feature**\n\nThis endpoint will delete one change request if it matches the provided id.",
         "tags": [
           "Change Requests"
         ],
@@ -28288,7 +28289,7 @@
     "/api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}": {
       "delete": {
         "summary": "Discards a change from a change request by change id",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will discard one change from a change request if it matches the provided id.",
+        "description": "**Enterprise feature**\n\nThis endpoint will discard one change from a change request if it matches the provided id.",
         "tags": [
           "Change Requests"
         ],
@@ -28327,7 +28328,7 @@
       },
       "put": {
         "summary": "Edits a single change in a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will edit one change from a change request if it matches the provided id. The edit removes previous change and inserts a new one. You\n\nshould not rely on the changeId for subsequent edits and always check the most recent changeId.",
+        "description": "**Enterprise feature**\n\nThis endpoint will edit one change from a change request if it matches the provided id. The edit removes previous change and inserts a new one. You\n\nshould not rely on the changeId for subsequent edits and always check the most recent changeId.",
         "tags": [
           "Change Requests"
         ],
@@ -28413,7 +28414,7 @@
     "/api/admin/projects/{projectId}/change-requests/{id}/state": {
       "put": {
         "summary": "This endpoint will update the state of a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will update the state of a change request if the business rules allow it. The state can be one of the following: Draft, In review, Approved, Cancelled, Applied. In order to be approved, the change request must have at least one change and the number of approvals must be greater than or equal to the number of approvals required for the environment.\n\nOnce a change request has been approved, it can be applied. Once a change request has been applied, it cannot be changed. Once a change request has been cancelled, it cannot be changed. Any change to a change request in the state of Approved will result in the state being set to In Review and the number of approvals will be reset.",
+        "description": "**Enterprise feature**\n\nThis endpoint will update the state of a change request if the business rules allow it. The state can be one of the following: Draft, In review, Approved, Cancelled, Applied. In order to be approved, the change request must have at least one change and the number of approvals must be greater than or equal to the number of approvals required for the environment.\n\nOnce a change request has been approved, it can be applied. Once a change request has been applied, it cannot be changed. Once a change request has been cancelled, it cannot be changed. Any change to a change request in the state of Approved will result in the state being set to In Review and the number of approvals will be reset.",
         "tags": [
           "Change Requests"
         ],
@@ -28453,7 +28454,7 @@
     "/api/admin/projects/{projectId}/change-requests/{id}/title": {
       "put": {
         "summary": "This endpoint will update the custom title of a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nChange requests get a default title e.g. Change Request #1. This endpoint allows to make the title\n\nmore meaningful and describe the intent behind the Change Request",
+        "description": "**Enterprise feature**\n\nChange requests get a default title e.g. Change Request #1. This endpoint allows to make the title\n\nmore meaningful and describe the intent behind the Change Request",
         "tags": [
           "Change Requests"
         ],
@@ -28486,7 +28487,7 @@
     "/api/admin/projects/{projectId}/change-requests/{id}/approvers": {
       "put": {
         "summary": "This endpoint will update the reviewers of a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nChange requests can have requests for review from users. This endpoint allows to add or remove reviewers from a change request. The maximum number of reviewers is 10.",
+        "description": "**Enterprise feature**\n\nChange requests can have requests for review from users. This endpoint allows to add or remove reviewers from a change request. The maximum number of reviewers is 10.",
         "tags": [
           "Change Requests"
         ],
@@ -28517,7 +28518,7 @@
       },
       "get": {
         "summary": "This endpoint fetches the requested approvers of a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nChange requests can have requests for review from users. This endpoint fetches the list of requested reviewers for a change request.",
+        "description": "**Enterprise feature**\n\nChange requests can have requests for review from users. This endpoint fetches the list of requested reviewers for a change request.",
         "tags": [
           "Change Requests"
         ],
@@ -28557,7 +28558,7 @@
     "/api/admin/projects/{projectId}/change-requests/{id}/comments": {
       "post": {
         "summary": "This endpoint will add a comment to a change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will add a comment to a change request for the user making the request.",
+        "description": "**Enterprise feature**\n\nThis endpoint will add a comment to a change request for the user making the request.",
         "tags": [
           "Change Requests"
         ],
@@ -28601,7 +28602,7 @@
     "/api/admin/projects/{projectId}/change-requests/available-reviewers/{environment}": {
       "get": {
         "summary": "This endpoint will return users available to review/approve this change request",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nThis endpoint will list users available to approve a change request in this project.",
+        "description": "**Enterprise feature**\n\nThis endpoint will list users available to approve a change request in this project.",
         "tags": [
           "Change Requests"
         ],
@@ -28644,7 +28645,7 @@
           "Change Requests"
         ],
         "summary": "Search change requests",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSearch and filter change requests by creator and approver.",
+        "description": "**Enterprise feature**\n\nSearch and filter change requests by creator and approver.",
         "operationId": "searchChangeRequests",
         "parameters": [
           {
@@ -28907,7 +28908,7 @@
             }
           }
         },
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUse the provided `context` to evaluate toggles on this Unleash instance with a change request applied in preview mode. You can use comma-separated values to provide multiple values to each context field. Returns a combinatorial list of all toggles that match the parameters and what they evaluate to.",
+        "description": "**Enterprise feature**\n\nUse the provided `context` to evaluate toggles on this Unleash instance with a change request applied in preview mode. You can use comma-separated values to provide multiple values to each context field. Returns a combinatorial list of all toggles that match the parameters and what they evaluate to.",
         "summary": "Evaluate an Unleash context against a change request preview.",
         "parameters": [
           {
@@ -28928,7 +28929,7 @@
         ],
         "operationId": "getServiceAccounts",
         "summary": "List service accounts.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the list of all service accounts.",
+        "description": "**Enterprise feature**\n\nReturns the list of all service accounts.",
         "responses": {
           "200": {
             "description": "#/components/schemas/serviceAccountsSchema",
@@ -29002,7 +29003,7 @@
         ],
         "operationId": "createServiceAccount",
         "summary": "Create a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreates a new service account.",
+        "description": "**Enterprise feature**\n\nCreates a new service account.",
         "requestBody": {
           "description": "#/components/schemas/createServiceAccountSchema",
           "required": true,
@@ -29179,7 +29180,7 @@
         ],
         "operationId": "updateServiceAccount",
         "summary": "Update a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdates an existing service account identified by its id.",
+        "description": "**Enterprise feature**\n\nUpdates an existing service account identified by its id.",
         "requestBody": {
           "description": "#/components/schemas/updateServiceAccountSchema",
           "required": true,
@@ -29355,7 +29356,7 @@
         ],
         "operationId": "deleteServiceAccount",
         "summary": "Delete a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes an existing service account identified by its id.",
+        "description": "**Enterprise feature**\n\nDeletes an existing service account identified by its id.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -29461,7 +29462,7 @@
         ],
         "operationId": "getServiceAccountTokens",
         "summary": "List all tokens for a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the list of all tokens for a service account identified by the id.",
+        "description": "**Enterprise feature**\n\nReturns the list of all tokens for a service account identified by the id.",
         "responses": {
           "200": {
             "description": "#/components/schemas/patsSchema",
@@ -29572,7 +29573,7 @@
         ],
         "operationId": "createServiceAccountToken",
         "summary": "Create a token for a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreates a new token for the service account identified by the id.",
+        "description": "**Enterprise feature**\n\nCreates a new token for the service account identified by the id.",
         "requestBody": {
           "description": "#/components/schemas/createPatSchema",
           "required": true,
@@ -29759,7 +29760,7 @@
         ],
         "operationId": "deleteServiceAccountToken",
         "summary": "Delete a token for a service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes a token for the service account identified both by the service account's id and the token's id.",
+        "description": "**Enterprise feature**\n\nDeletes a token for the service account identified both by the service account's id and the token's id.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -29873,7 +29874,7 @@
         ],
         "operationId": "getServiceAccountPermissions",
         "summary": "Returns the list of permissions for the service account.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets a list of permissions for a service account. Project and environment can be specified.",
+        "description": "**Enterprise feature**\n\nGets a list of permissions for a service account. Project and environment can be specified.",
         "parameters": [
           {
             "name": "id",
@@ -30006,7 +30007,7 @@
             }
           }
         },
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGet all feedback events.",
+        "description": "**Enterprise feature**\n\nGet all feedback events.",
         "summary": "Get all feedback events. Limited to 2000 items."
       },
       "post": {
@@ -30125,7 +30126,7 @@
     "/feedback": {
       "post": {
         "summary": "Submit user feedback",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nAllows users to submit feedback.",
+        "description": "**Enterprise feature**\n\nAllows users to submit feedback.",
         "tags": [
           "Unstable"
         ],
@@ -30408,14 +30409,14 @@
             }
           }
         },
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns **all** login events in the Unleash system. You can optionally get them in CSV format by specifying the `Accept` header as `text/csv`.",
+        "description": "**Enterprise feature**\n\nReturns **all** login events in the Unleash system. You can optionally get them in CSV format by specifying the `Accept` header as `text/csv`.",
         "summary": "Get all login events."
       }
     },
     "/api/admin/cdn/tokens": {
       "post": {
         "summary": "Create a CDN token.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreates a new CDN token for the specified Edge instance.",
+        "description": "**Enterprise feature**\n\nCreates a new CDN token for the specified Edge instance.",
         "tags": [
           "Unstable"
         ],
@@ -30439,7 +30440,7 @@
       },
       "get": {
         "summary": "Get a CDN tokens.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRetrieves all CDN tokens for the specified Edge instance.",
+        "description": "**Enterprise feature**\n\nRetrieves all CDN tokens for the specified Edge instance.",
         "tags": [
           "Unstable"
         ],
@@ -30465,7 +30466,7 @@
         ],
         "operationId": "getAccessOverview",
         "summary": "Gets access overview",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets an overview of what access all users have to all projects and groups",
+        "description": "**Enterprise feature**\n\nGets an overview of what access all users have to all projects and groups",
         "responses": {
           "200": {
             "description": "accessOverviewSchema",
@@ -30573,7 +30574,7 @@
         ],
         "operationId": "getBanners",
         "summary": "Get all banners.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns a list of all configured banners.",
+        "description": "**Enterprise feature**\n\nReturns a list of all configured banners.",
         "responses": {
           "200": {
             "description": "bannersSchema",
@@ -30620,7 +30621,7 @@
         ],
         "operationId": "createBanner",
         "summary": "Create a banner.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreates a new banner.",
+        "description": "**Enterprise feature**\n\nCreates a new banner.",
         "requestBody": {
           "description": "createBannerSchema",
           "required": true,
@@ -30770,7 +30771,7 @@
         ],
         "operationId": "updateBanner",
         "summary": "Update a banner.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nUpdates an existing banner identified by its id.",
+        "description": "**Enterprise feature**\n\nUpdates an existing banner identified by its id.",
         "requestBody": {
           "description": "createBannerSchema",
           "required": true,
@@ -30946,7 +30947,7 @@
         ],
         "operationId": "deleteBanner",
         "summary": "Delete a banner.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes an existing banner identified by its id.",
+        "description": "**Enterprise feature**\n\nDeletes an existing banner identified by its id.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -31052,7 +31053,7 @@
         ],
         "operationId": "enableBanner",
         "summary": "Enables a banner.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nEnables an existing banner, identified by its id.",
+        "description": "**Enterprise feature**\n\nEnables an existing banner, identified by its id.",
         "responses": {
           "200": {
             "description": "bannerSchema",
@@ -31165,7 +31166,7 @@
         ],
         "operationId": "disableBanner",
         "summary": "Disables a banner.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDisables an existing banner, identified by its id.",
+        "description": "**Enterprise feature**\n\nDisables an existing banner, identified by its id.",
         "responses": {
           "200": {
             "description": "bannerSchema",
@@ -31278,7 +31279,7 @@
         ],
         "operationId": "checkLicense",
         "summary": "Validates the Unleash license.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nValidates the Unleash license.",
+        "description": "**Enterprise feature**\n\nValidates the Unleash license.",
         "responses": {
           "200": {
             "description": "licenseCheckSchema",
@@ -31299,7 +31300,7 @@
           "Instance Admin"
         ],
         "summary": "Reads the Unleash license.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReads the Unleash license. Only available for self-hosted Enterprise customers.",
+        "description": "**Enterprise feature**\n\nReads the Unleash license. Only available for self-hosted Enterprise customers.",
         "operationId": "readLicense",
         "responses": {
           "200": {
@@ -31320,7 +31321,7 @@
         ],
         "operationId": "updateLicense",
         "summary": "Set a new Unleash license.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSet a new Unleash license. Only available for self-hosted Enterprise customers.",
+        "description": "**Enterprise feature**\n\nSet a new Unleash license. Only available for self-hosted Enterprise customers.",
         "requestBody": {
           "description": "licenseUpdateSchema",
           "required": true,
@@ -31470,7 +31471,7 @@
         ],
         "operationId": "getScimSettings",
         "summary": "Get SCIM settings.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns the current settings for SCIM provisioning.",
+        "description": "**Enterprise feature**\n\nReturns the current settings for SCIM provisioning.",
         "responses": {
           "200": {
             "description": "#/components/schemas/scimSettingsSchema",
@@ -31517,7 +31518,7 @@
         ],
         "operationId": "setScimSettings",
         "summary": "Set SCIM settings.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSets new settings for SCIM provisioning.",
+        "description": "**Enterprise feature**\n\nSets new settings for SCIM provisioning.",
         "requestBody": {
           "description": "#/components/schemas/setScimSettingsSchema",
           "required": true,
@@ -31651,7 +31652,7 @@
         ],
         "operationId": "generateNewToken",
         "summary": "Generates a new SCIM API token.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGenerates a new SCIM API token. Previously generated tokens will be invalidated.",
+        "description": "**Enterprise feature**\n\nGenerates a new SCIM API token. Previously generated tokens will be invalidated.",
         "responses": {
           "200": {
             "description": "#/components/schemas/scimTokenSchema",
@@ -31754,7 +31755,7 @@
         ],
         "operationId": "getReleaseTemplates",
         "summary": "Get all release templates.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns a list of all release templates.",
+        "description": "**Enterprise feature**\n\nReturns a list of all release templates.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanTemplateSchema",
@@ -31801,7 +31802,7 @@
         ],
         "operationId": "createReleaseTemplate",
         "summary": "Create a release template.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nCreates and returns a release template.",
+        "description": "**Enterprise feature**\n\nCreates and returns a release template.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanTemplateSchema",
@@ -31877,7 +31878,7 @@
         ],
         "operationId": "getReleaseTemplate",
         "summary": "Get a release template by its id.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds and returns a release template by the provided id.",
+        "description": "**Enterprise feature**\n\nFinds and returns a release template by the provided id.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanTemplateSchema",
@@ -31934,7 +31935,7 @@
         ],
         "operationId": "deleteReleaseTemplate",
         "summary": "Deletes a release template by its id.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds and deletes a release template by the provided id.",
+        "description": "**Enterprise feature**\n\nFinds and deletes a release template by the provided id.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -32011,7 +32012,7 @@
         ],
         "operationId": "updateReleaseTemplate",
         "summary": "Updates a release template by its id.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds and updates a release template by the provided id. Will delete existing milestones and create new ones from the body",
+        "description": "**Enterprise feature**\n\nFinds and updates a release template by the provided id. Will delete existing milestones and create new ones from the body",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -32117,7 +32118,7 @@
         ],
         "operationId": "archiveReleaseTemplate",
         "summary": "Archives a release template by its id.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds and archives a release template by the provided id.",
+        "description": "**Enterprise feature**\n\nFinds and archives a release template by the provided id.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -32196,7 +32197,7 @@
         ],
         "operationId": "addMilestoneToReleaseTemplate",
         "summary": "Adds a milestone to a release template.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds release template identified by its id and adds a milestone",
+        "description": "**Enterprise feature**\n\nFinds release template identified by its id and adds a milestone",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneSchema",
@@ -32309,7 +32310,7 @@
         ],
         "operationId": "updateReleaseTemplateMilestone",
         "summary": "Updates existing milestone",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds milestone by id, and updates to body included in request",
+        "description": "**Enterprise feature**\n\nFinds milestone by id, and updates to body included in request",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneSchema",
@@ -32428,7 +32429,7 @@
         ],
         "operationId": "removeReleaseTemplateMilestone",
         "summary": "Removes an existing milestone",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes an existing milestone and all attached strategies beneath it",
+        "description": "**Enterprise feature**\n\nDeletes an existing milestone and all attached strategies beneath it",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -32542,7 +32543,7 @@
         ],
         "operationId": "addStrategyToMilestone",
         "summary": "Adds a strategy to a milestone.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFinds milestone identified by its id and adds a strategy.",
+        "description": "**Enterprise feature**\n\nFinds milestone identified by its id and adds a strategy.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneSchema",
@@ -32663,7 +32664,7 @@
         ],
         "operationId": "updateMilestoneStrategy",
         "summary": "Updates a strategy attached to a milestone",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nOverwrites existing strategy configuration for the strategy referenced by the id",
+        "description": "**Enterprise feature**\n\nOverwrites existing strategy configuration for the strategy referenced by the id",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneStrategySchema",
@@ -32790,7 +32791,7 @@
         ],
         "operationId": "remoteMilestoneStrategy",
         "summary": "Removes a strategy attached to a milestone",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes the milestone strategy",
+        "description": "**Enterprise feature**\n\nDeletes the milestone strategy",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -32913,7 +32914,7 @@
         "deprecated": true,
         "operationId": "oldGetReleasePlans",
         "summary": "Get release plans.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns a list of all release plans for a specific feature flag and environment. Deprecated, please use /release-plans instead.",
+        "description": "**Enterprise feature**\n\nReturns a list of all release plans for a specific feature flag and environment. Deprecated, please use /release-plans instead.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanSchema",
@@ -32998,7 +32999,7 @@
           }
         },
         "summary": "Add a release plan.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nAdds a release plan to a specific feature flag and environment. Deprecated, please use /release-plans instead.",
+        "description": "**Enterprise feature**\n\nAdds a release plan to a specific feature flag and environment. Deprecated, please use /release-plans instead.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanSchema",
@@ -33100,7 +33101,7 @@
         ],
         "operationId": "getReleasePlans",
         "summary": "Get release plans.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nReturns a list of all release plans for a specific feature flag and environment.",
+        "description": "**Enterprise feature**\n\nReturns a list of all release plans for a specific feature flag and environment.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanSchema",
@@ -33184,7 +33185,7 @@
           }
         },
         "summary": "Add a release plan.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nAdds a release plan to a specific feature flag and environment.",
+        "description": "**Enterprise feature**\n\nAdds a release plan to a specific feature flag and environment.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanSchema",
@@ -33287,7 +33288,7 @@
         "deprecated": true,
         "operationId": "oldRemoveReleasePlan",
         "summary": "Remove a release plan.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRemoves a release plan from a specific feature flag and environment. Deprecated, please use /release-plans/:planId instead.",
+        "description": "**Enterprise feature**\n\nRemoves a release plan from a specific feature flag and environment. Deprecated, please use /release-plans/:planId instead.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -33390,7 +33391,7 @@
         ],
         "operationId": "removeReleasePlan",
         "summary": "Remove a release plan.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nRemoves a release plan from a specific feature flag and environment.",
+        "description": "**Enterprise feature**\n\nRemoves a release plan from a specific feature flag and environment.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -33494,7 +33495,7 @@
         "deprecated": true,
         "operationId": "oldStartMilestone",
         "summary": "Start a release plan milestone.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nStarts a release plan milestone for a specific feature flag and environment. Deprecated, please use /release-plans/:planId/milestones/:milestoneId/start instead.",
+        "description": "**Enterprise feature**\n\nStarts a release plan milestone for a specific feature flag and environment. Deprecated, please use /release-plans/:planId/milestones/:milestoneId/start instead.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneSchema",
@@ -33639,7 +33640,7 @@
         ],
         "operationId": "startMilestone",
         "summary": "Start a release plan milestone.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nStarts a release plan milestone for a specific feature flag and environment.",
+        "description": "**Enterprise feature**\n\nStarts a release plan milestone for a specific feature flag and environment.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanMilestoneSchema",
@@ -33784,7 +33785,7 @@
         ],
         "operationId": "connect",
         "summary": "Connect to the streaming API.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nConnects to the client features SSE streaming API.",
+        "description": "**Enterprise feature**\n\nConnects to the client features SSE streaming API.",
         "responses": {
           "200": {
             "description": "Connected to the streaming API."
@@ -33849,7 +33850,7 @@
     "/api/client/delta": {
       "get": {
         "summary": "Get partial updates (SDK)",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nInitially returns the full set of feature flags available to the provided API key. When called again with the returned etag, only returns the flags that have changed",
+        "description": "**Enterprise feature**\n\nInitially returns the full set of feature flags available to the provided API key. When called again with the returned etag, only returns the flags that have changed",
         "operationId": "getDelta",
         "tags": [
           "Unstable"
@@ -33875,7 +33876,7 @@
         ],
         "operationId": "disconnectAll",
         "summary": "Disconnect all clients.",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDisconnects all streaming clients.",
+        "description": "**Enterprise feature**\n\nDisconnects all streaming clients.",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -33940,7 +33941,7 @@
     "/api/admin/impact-metrics/plausible": {
       "get": {
         "summary": "Get Plausible analytics data",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nFetches analytics data from Plausible API for favorite events over the last 7 days.",
+        "description": "**Enterprise feature**\n\nFetches analytics data from Plausible API for favorite events over the last 7 days.",
         "tags": [
           "Unstable"
         ],
@@ -34043,7 +34044,7 @@
     "/api/admin/projects/{projectId}/features/{featureName}/impact-metrics/config": {
       "post": {
         "summary": "Save flag level impact metrics configuration",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSaves a configuration for an impact metric chart associated with a feature flag.",
+        "description": "**Enterprise feature**\n\nSaves a configuration for an impact metric chart associated with a feature flag.",
         "tags": [
           "Unstable"
         ],
@@ -34173,7 +34174,7 @@
       },
       "get": {
         "summary": "Get impact metrics configurations for a single feature",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets all impact metrics configurations associated with a specific feature flag.",
+        "description": "**Enterprise feature**\n\nGets all impact metrics configurations associated with a specific feature flag.",
         "tags": [
           "Unstable"
         ],
@@ -34240,7 +34241,7 @@
     "/api/admin/impact-metrics/config": {
       "post": {
         "summary": "Save instance level impact metrics configuration",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nSaves a configuration for an instance level impact metric chart without a feature flag",
+        "description": "**Enterprise feature**\n\nSaves a configuration for an instance level impact metric chart without a feature flag",
         "tags": [
           "Unstable"
         ],
@@ -34271,7 +34272,7 @@
       },
       "get": {
         "summary": "Get impact metrics configuration for the instance",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nGets all impact metrics configurations now associated with any feature flag.",
+        "description": "**Enterprise feature**\n\nGets all impact metrics configurations now associated with any feature flag.",
         "tags": [
           "Unstable"
         ],
@@ -34293,7 +34294,7 @@
     "/api/admin/projects/{projectId}/features/{featureName}/impact-metrics/config/{id}": {
       "delete": {
         "summary": "Delete flag level impact metric configuration",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
+        "description": "**Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
         "tags": [
           "Unstable"
         ],
@@ -34388,7 +34389,7 @@
     "/api/admin/impact-metrics/config/{id}": {
       "delete": {
         "summary": "Delete instance level impact metric configuration",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
+        "description": "**Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
         "tags": [
           "Unstable"
         ],
@@ -34482,7 +34483,7 @@
           }
         },
         "summary": "Create or update a milestone progression",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\n![Beta](/ushosted/openapi-static/Beta.svg) This is a beta endpoint and it may change or be removed in the future.\n\nCreates or updates a milestone progression by source milestone ID. If a progression with the given source milestone exists, it will be updated; otherwise, a new one will be created.",
+        "description": "**Enterprise feature**\n\nThis is a beta endpoint and it may change or be removed in the future.\n\nCreates or updates a milestone progression by source milestone ID. If a progression with the given source milestone exists, it will be updated; otherwise, a new one will be created.",
         "responses": {
           "200": {
             "description": "#/components/schemas/milestoneProgressionSchema",
@@ -34590,7 +34591,7 @@
         ],
         "operationId": "deleteMilestoneProgression",
         "summary": "Delete a milestone progression",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\n![Beta](/ushosted/openapi-static/Beta.svg) This is a beta endpoint and it may change or be removed in the future.\n\nDeletes an existing milestone progression by source milestone ID.",
+        "description": "**Enterprise feature**\n\nThis is a beta endpoint and it may change or be removed in the future.\n\nDeletes an existing milestone progression by source milestone ID.",
         "responses": {
           "204": {
             "description": "This response has no body."
@@ -34720,7 +34721,7 @@
         ],
         "operationId": "resumeMilestoneProgressions",
         "summary": "Resume paused milestone progressions",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\n![Beta](/ushosted/openapi-static/Beta.svg) This is a beta endpoint and it may change or be removed in the future.\n\nResumes all paused milestone progressions for a release plan",
+        "description": "**Enterprise feature**\n\nThis is a beta endpoint and it may change or be removed in the future.\n\nResumes all paused milestone progressions for a release plan",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -34850,7 +34851,7 @@
         ],
         "operationId": "changeSafeguard",
         "summary": "Change a safeguard",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\n![Beta](/ushosted/openapi-static/Beta.svg) This is a beta endpoint and it may change or be removed in the future.\n\nCreates or updates a safeguard for a specific feature, environment, and release plan.",
+        "description": "**Enterprise feature**\n\nThis is a beta endpoint and it may change or be removed in the future.\n\nCreates or updates a safeguard for a specific feature, environment, and release plan.",
         "requestBody": {
           "description": "createSafeguardSchema",
           "required": true,
@@ -34964,7 +34965,7 @@
         ],
         "operationId": "deleteSafeguard",
         "summary": "Delete a safeguard",
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\n![Beta](/ushosted/openapi-static/Beta.svg) This is a beta endpoint and it may change or be removed in the future.\n\nDeletes a safeguard by its ID for a specific feature, environment, and release plan.",
+        "description": "**Enterprise feature**\n\nThis is a beta endpoint and it may change or be removed in the future.\n\nDeletes a safeguard by its ID for a specific feature, environment, and release plan.",
         "responses": {
           "204": {
             "description": "This response has no body."
@@ -35113,7 +35114,7 @@
             }
           }
         },
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nundefined"
+        "description": "**Enterprise feature**\n\nundefined"
       }
     },
     "/api/admin/invoices/list": {
@@ -35134,7 +35135,7 @@
             }
           }
         },
-        "description": "![Unleash Enterprise](/ushosted/openapi-static/Enterprise.svg) **Enterprise feature**\n\nundefined"
+        "description": "**Enterprise feature**\n\nundefined"
       }
     },
     "/ready": {
