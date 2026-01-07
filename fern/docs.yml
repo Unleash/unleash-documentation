@@ -317,11 +317,175 @@ navigation:
         api-name: admin-api
         skip-slug: true
         display-errors: true
-        alphabetized: true
         layout:
-          - section: "Integrations"
+          - section: "Addons"
             referenced-packages:
               - Addons
+            contents: []
+            skip-slug: true
+          - section: "Admin UI"
+            referenced-packages:
+              - Admin UI
+            contents: []
+            skip-slug: true
+          - section: "API tokens"
+            referenced-packages:
+              - API tokens
+            contents: []
+            skip-slug: true
+          - section: "Archive"
+            referenced-packages:
+              - Archive
+            contents: []
+            skip-slug: true
+          - section: "Auth"
+            referenced-packages:
+              - Auth
+            contents: []
+            skip-slug: true
+          - section: "Banners"
+            referenced-packages:
+              - Banners
+            contents: []
+            skip-slug: true
+          - section: "Change requests"
+            referenced-packages:
+              - Change Requests
+            contents: []
+            skip-slug: true
+          - section: "Context"
+            referenced-packages:
+              - Context
+            contents: []
+            skip-slug: true
+          - section: "Dependencies"
+            referenced-packages:
+              - Dependencies
+            contents: []
+            skip-slug: true
+          - section: "Environments"
+            referenced-packages:
+              - Environments
+            contents: []
+            skip-slug: true
+          - section: "Events"
+            referenced-packages:
+              - Events
+            contents: []
+            skip-slug: true
+          - section: "Feature flag types"
+            referenced-packages:
+              - Feature Types
+            contents: []
+            skip-slug: true
+          - section: "Feature flags"
+            referenced-packages:
+              - Features
+            contents: []
+            skip-slug: true
+          - section: "Import and export"
+            referenced-packages:
+              - Import/Export
+            contents: []
+            skip-slug: true
+          - section: "Instance admin"
+            referenced-packages:
+              - Instance Admin
+            contents: []
+            skip-slug: true
+          - section: "Maintenance"
+            referenced-packages:
+              - Maintenance
+            contents: []
+            skip-slug: true
+          - section: "Metrics"
+            referenced-packages:
+              - Metrics
+            contents: []
+            skip-slug: true
+          - section: "Notifications"
+            referenced-packages:
+              - Notifications
+            contents: []
+            skip-slug: true
+          - section: "Operational"
+            referenced-packages:
+              - Operational
+            contents: []
+            skip-slug: true
+          - section: "Personal access tokens"
+            referenced-packages:
+              - Personal access tokens
+            contents: []
+            skip-slug: true
+          - section: "Playground"
+            referenced-packages:
+              - Playground
+            contents: []
+            skip-slug: true
+          - section: "Projects"
+            referenced-packages:
+              - Projects
+            contents: []
+            skip-slug: true
+          - section: "Public signup tokens"
+            referenced-packages:
+              - Public signup tokens
+            contents: []
+            skip-slug: true
+          - section: "Release templates"
+            referenced-packages:
+              - Release Templates
+            contents: []
+            skip-slug: true
+          - section: "Search"
+            referenced-packages:
+              - Search
+            contents: []
+            skip-slug: true
+          - section: "Segments"
+            referenced-packages:
+              - Segments
+            contents: []
+            skip-slug: true
+          - section: "Service accounts"
+            referenced-packages:
+              - Service Accounts
+            contents: []
+            skip-slug: true
+          - section: "Strategies"
+            referenced-packages:
+              - Strategies
+            contents: []
+            skip-slug: true
+          - section: "Tags"
+            referenced-packages:
+              - Tags
+            contents: []
+            skip-slug: true
+          - section: "Telemetry"
+            referenced-packages:
+              - Telemetry
+            contents: []
+            skip-slug: true
+          - section: "Unleash Edge"
+            referenced-packages:
+              - Unleash Edge
+            contents: []
+            skip-slug: true
+          - section: "Unknown flags"
+            referenced-packages:
+              - Unknown Flags
+            contents: []
+            skip-slug: true
+          - section: "Unstable"
+            referenced-packages:
+              - Unstable
+            contents: []
+            skip-slug: true
+          - section: "Users"
+            referenced-packages:
+              - Users
             contents: []
             skip-slug: true
 
