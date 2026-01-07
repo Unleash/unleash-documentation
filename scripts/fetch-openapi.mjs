@@ -89,6 +89,21 @@ console.log(`📦 Version: ${clientApiData.info.version}`);
 console.log(`🔗 Endpoints: ${Object.keys(clientApiData.paths || {}).length}`);
 console.log(`✅ Kept only tag: Client`);
 
+// Frontend API: Keep ONLY "Frontend API" tag
+const frontendApiData = filterOpenApiSpec(data, ['Frontend API']);
+const frontendApiJsonString = cleanJsonString(frontendApiData);
+
+await fs.writeFile(
+    './fern/apis/frontend-api/openapi.json',
+    frontendApiJsonString,
+    'utf8',
+);
+
+console.log(`✅ Saved to fern/apis/frontend-api/openapi.json`);
+console.log(`📦 Version: ${frontendApiData.info.version}`);
+console.log(`🔗 Endpoints: ${Object.keys(frontendApiData.paths || {}).length}`);
+console.log(`✅ Kept only tag: Frontend API`);
+
 // Admin API: Filter out "Client" and "Frontend API" tags
 const adminApiData = filterOpenApiSpec(data, null, ['Client', 'Frontend API']);
 const adminApiJsonString = cleanJsonString(adminApiData);

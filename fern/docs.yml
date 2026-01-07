@@ -307,7 +307,7 @@ navigation:
   - tab: api-docs
     layout:
       - page: API overview
-        path: pages/apis/concepts.mdx
+        path: pages/apis/overview.mdx
 
       - api: Client API
         api-name: client-api
@@ -327,7 +327,25 @@ navigation:
             skip-slug: true
             contents:
               - endpoint: POST /api/client/register
-        
+
+      - api: Frontend API
+        api-name: frontend-api
+        skip-slug: true
+        layout:
+          - section: "Feature flags"
+            skip-slug: true
+            contents:
+              - endpoint: GET /api/frontend
+              - endpoint: POST /api/frontend
+          - section: "Metrics"
+            skip-slug: true
+            contents:
+              - endpoint: POST /api/frontend/client/metrics
+          - section: "Register SDK"
+            skip-slug: true
+            contents:
+              - endpoint: POST /api/frontend/client/register
+
       - api: Admin API
         api-name: admin-api
         skip-slug: true
