@@ -312,6 +312,21 @@ navigation:
       - api: Client API
         api-name: client-api
         skip-slug: true
+        layout:
+          - section: "Feature flags"
+            skip-slug: true
+            contents:
+              - endpoint: GET /api/client/features
+              - endpoint: GET /api/client/features/{featureName}
+          - section: "Metrics"
+            skip-slug: true
+            contents:
+              - endpoint: POST /api/client/metrics
+              - endpoint: POST /api/client/metrics/custom
+          - section: "Register SDK"
+            skip-slug: true
+            contents:
+              - endpoint: POST /api/client/register
         
       - api: Admin API
         api-name: admin-api
