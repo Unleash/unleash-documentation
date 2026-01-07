@@ -38,6 +38,7 @@ navigation:
     layout:
       - page: Home
         path: pages/welcome.mdx
+        slug: ""
 
       - section: Get started
         contents:
@@ -246,12 +247,17 @@ navigation:
                   - page: Jira Cloud plugin usage
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
 
+              - page: MCP
+                availability: beta
+                path: pages/integrate/mcp.mdx
               - page: App for Slack
                 path: pages/integrate/slack-app.mdx
               - page: Microsoft Teams
                 path: pages/integrate/teams.mdx
+              - page: Terraform
+                path: pages/concepts/terraform.mdx
               - page: Webhook
-                path: pages/integrate/webhook.mdx  
+                path: pages/integrate/webhook.mdx
 
       - section: Data privacy and compliance
         slug: privacy-and-compliance
@@ -278,6 +284,7 @@ navigation:
 
       - section: Support and community
         skip-slug: true
+        collapsed: true
         contents:
           - page: Troubleshooting
             path: pages/support/troubleshooting.mdx
@@ -824,7 +831,7 @@ logo:
   dark: assets/logo-dark.svg
   light: assets/logo-light.svg
   height: 35
-  href: /welcome
+  href: /
 
 favicon: assets/favicon.svg
 

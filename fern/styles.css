@@ -33,7 +33,7 @@
     background-color: var(--sidebar-nav-bg-color);
 }
 
-.fern-layout-guide, .fern-layout-reference {
+.fern-layout-guide, .fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
     margin-top: 2rem;
