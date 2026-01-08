@@ -1,0 +1,10 @@
+{
+  "name": "unleash-documentation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "fetch": "node scripts/fetch-openapi.mjs",
+    "dev": "npm run fetch && fern docs dev",
+    "build": "npm run fetch && fern generate --docs"
+  }
+}
