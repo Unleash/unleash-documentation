@@ -29,6 +29,7 @@ tabs:
     display-name: Guides    
   academy:
     display-name: Academy
+    slug: unleash-academy
   release-notes:
     display-name: Release notes
     changelog: ./changelog
@@ -796,10 +797,15 @@ navigation:
 
   - tab: academy
     layout:
-      - section: Unleash Academy
-        contents:
-          - page: Introduction
-            path: pages/concepts.mdx
+      - page: Unleash Academy
+        path: pages/academy/academy.mdx
+        slug: introduction
+      - page: Foundational
+        path: pages/academy/foundational.mdx
+      - page: Advanced for Developers
+        path: pages/academy/advanced-for-devs.mdx
+      - page: Managing Unleash for DevOps/Admins
+        path: pages/academy/managing-unleash-for-devops.mdx
 
   - tab: release-notes
 
