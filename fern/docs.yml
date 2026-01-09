@@ -799,6 +799,7 @@ navigation:
     layout:
       - page: Unleash Academy
         path: pages/academy/academy.mdx
+        slug: introduction
       - page: Foundational
         path: pages/academy/foundational.mdx
       - page: Advanced for Developers
