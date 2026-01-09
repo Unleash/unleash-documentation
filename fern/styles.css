@@ -247,7 +247,7 @@ html.dark .unleash-academy-banner {
     margin-block-end: 15px !important;
     position: relative;
     border: var(--ifm-global-border-width) solid var(--ifm-color-emphasis-200);
-    padding: 45px !important; /* Matches computed value from screenshot */
+    padding: 45px !important; 
     border-radius: var(--ifm-global-radius);
     background-color: #f1f0fc;
     background-image: url("https://cdn.getunleash.io/docs-assets/banner-bg-pixels.svg");
@@ -462,11 +462,11 @@ html.dark .unleash-academy-level-badge {
 }
 
 
-/* 6. Buttons Styling */
+/* 6. Buttons Styling (The Simple Fix) */
 .unleash-academy-buttons {
     display: flex;
     flex-direction: column;
-    gap: 7.5px !important; /* Space BETWEEN buttons */
+    gap: 7.5px !important;
     padding-bottom: 0 !important;
 }
 
@@ -474,51 +474,49 @@ html.dark .unleash-academy-level-badge {
     display: none !important;
 }
 
-/* FIX: Ensure paragraph text inside button has NO spacing of its own */
-.unleash-academy-buttons a p {
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1.2 !important; /* Tight line height for the text itself */
-}
-
-/* Button Container (The Anchor Tag) */
+/* 1. RESET THE LINK CONTAINER */
+/* Remove padding from the anchor so it is just a wrapper */
 .unleash-academy-buttons a.unleash-action-button,
 .unleash-academy-buttons a.get-certified {
     display: block !important;
-    border-radius: var(--ifm-global-radius);
     width: 100%;
     text-align: center;
+    text-decoration: none !important;
+    border-radius: var(--ifm-global-radius);
     
-    /* FIX: The 7.5px spacing lives here, creating the breathing room */
-    padding: 7.5px 16px !important; 
-    
-    line-height: 1.2 !important;
+    padding: 0 !important;
+    margin: 0 !important;
     min-height: 0 !important;
-    margin: 0 !important; /* No outer margin */
+}
+
+/* 2. APPLY PADDING TO THE TEXT */
+/* Apply the breathing room (padding) directly to the <p> tag */
+.unleash-academy-buttons a p {
+    padding: 7.5px 16px !important;
+    margin: 0 !important; /* Kill the default margin */
+    line-height: 1.2 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
 }
 
 /* Primary Button Colors */
 .unleash-academy-buttons a.unleash-action-button {
-    --button-color: #6c65e5;
-    --button-hover-color: #615bc2;
-    background: var(--button-color);
-    color: white;
+    background: #6c5ce7;
+    color: white !important;
+    border: 1px solid #6c5ce7;
 }
 .unleash-academy-buttons a.unleash-action-button:hover {
-    background: var(--button-hover-color);
-    color: white;
-    text-decoration: none;
+    background: #5b4dc4;
 }
 
 /* Secondary Button Colors */
 .unleash-academy-buttons a.get-certified {
-    background: var(--ifm-color-emphasis-100);
-    color: var(--unleash-logo-purple);
-    border: 2px solid var(--unleash-logo-purple);
+    background: #f5f6f7;
+    color: #6c5ce7 !important;
+    border: 2px solid #6c5ce7;
 }
 .unleash-academy-buttons a.get-certified:hover {
-    background: var(--ifm-color-emphasis-200);
-    text-decoration: none;
+    background: #ebedf0;
 }
 
 

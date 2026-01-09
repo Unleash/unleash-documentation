@@ -29,6 +29,7 @@ tabs:
     display-name: Guides    
   academy:
     display-name: Academy
+    slug: unleash-academy
   release-notes:
     display-name: Release notes
     changelog: ./changelog
