@@ -1,0 +1,25 @@
+name: code-snippets-check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Node.js test suite dependencies
+        run: cd fern/pages/sdks/examples/node && npm ci
+
+      - name: Run test suite for Node.js SDK
+        run: cd fern/pages/sdks/examples/node && npm test
