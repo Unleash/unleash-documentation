@@ -1,0 +1,18 @@
+{
+  "name": "unleash-nodejs-examples",
+  "version": "1.0.0",
+  "description": "Node.js code snippets",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "unleash-client": "^6.9.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  }
+}
