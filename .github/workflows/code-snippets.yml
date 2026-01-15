@@ -23,3 +23,6 @@ jobs:
 
       - name: Run test suite for Node.js SDK
         run: cd fern/pages/sdks/examples/node && npm test
+        env:
+          UNLEASH_URL: ${{ secrets.UNLEASH_URL }}
+          UNLEASH_TOKEN: ${{ secrets.UNLEASH_TOKEN }}
