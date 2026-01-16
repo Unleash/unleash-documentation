@@ -54,7 +54,9 @@ curl --location --request PUT 'http://localhost:4242/api/admin/projects/default/
 
 ```
 
-Learn more about [gradual rollouts in our docs](/concepts/activation-strategies). Also, learn more about our [API for creating a new strategy](/api/update-feature-strategy) for your flag.
+Learn more about [gradual rollouts in our docs](/concepts/activation-strategies).
+<EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/strategies" />
+Also, learn more about our API for creating a new strategy for your flag.
 
 ## Canary Deployments in iOS
 
@@ -278,7 +280,8 @@ Our metrics are great for understanding user traffic. You can get a better sense
 
 Another use case for reviewing metrics is verifying that the right users are being exposed to your feature based on how you’ve configured your strategies and/or variants.
 
-Take a look at our [Metrics API documentation](/api/metrics) to understand how it works from a code perspective.
+<EndpointRequestSnippet endpoint="GET /api/admin/metrics/feature-usage" />
+Take a look at our Metrics API documentation to understand how it works from a code perspective.
 
 ## Feature Flag Audit Logs in iOS
 
@@ -307,7 +310,8 @@ curl -L -X GET '<your-unleash-url>/api/admin/events/:featureName' \
 -H 'Authorization: <API_KEY_VALUE>'
 ```
 
-Read our documentation on [Event Log](/concepts/events#event-log) and [APIs](/api/events) to learn more.
+Read our documentation on [Event Log](/concepts/events#event-log) and
+<EndpointRequestSnippet endpoint="GET /api/admin/events" /> to learn more.
 
 ## Change Management & Feature Flag Approvals in iOS
 
@@ -345,7 +349,8 @@ You can write your own integration to your own ticketing tool if you don't use J
     -H 'Authorization: <API_KEY_VALUE>'
     ```
 
-    Review our [API docs on flag enablement](/api/toggle-feature-environment-on).
+  <EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/on" />
+  Review our API docs on flag enablement.
 
 2. Update a flag.
 
@@ -363,7 +368,8 @@ You can write your own integration to your own ticketing tool if you don't use J
     }'
     ```
 
-    Review our [API docs on updating feature flags](/api/update-feature).
+  <EndpointRequestSnippet endpoint="PUT /api/admin/projects/{projectId}/features/{featureName}" />
+  Review our API docs on updating feature flags.
 
 3. Archive a flag.
 
@@ -372,4 +378,5 @@ You can write your own integration to your own ticketing tool if you don't use J
     -H 'Authorization: <API_KEY_VALUE>'
     ```
 
-    Review [API docs on archiving flags](/api/archive-feature).
+  <EndpointRequestSnippet endpoint="DELETE /api/admin/projects/{projectId}/features/{featureName}" />
+  Review API docs on archiving flags.

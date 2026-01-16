@@ -47,7 +47,9 @@ Request request = new Request.Builder()
 Response response = client.newCall(request).execute();
 ```
 
-Learn more about [gradual rollouts in our docs](/concepts/activation-strategies). Also, learn more about our [API for creating a new strategy](/api/update-feature-strategy) for your flag.
+Learn more about [gradual rollouts in our docs](/concepts/activation-strategies).
+<EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/strategies" />
+Also, learn more about our API for creating a new strategy for your flag.
 
 ## Canary Deployments in Java
 
@@ -138,7 +140,8 @@ Response response = client.newCall(request).execute();
 > If you already have a gradual rollout strategy for your flag, use a PUT request to update it.
 > If you’re creating a new strategy, use a POST request.
 
-Check out our [API docs on updating flag strategies](/api/update-feature-strategy) to learn more.
+<EndpointRequestSnippet endpoint="PUT /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/strategies/{strategyId}" />
+Check out our API docs on updating flag strategies to learn more.
 
 Read our documentation for more context on [strategy constraint configurations](/concepts/activation-strategies#constraints) and use cases.
 
@@ -223,7 +226,8 @@ Our metrics are great for understanding user traffic. You can get a better sense
 
 Another use case for reviewing metrics is verifying that the right users are being exposed to your feature based on how you’ve configured your strategies and/or variants.
 
-Take a look at our [Metrics API documentation](/api/metrics) to understand how it works from a code perspective.
+<EndpointRequestSnippet endpoint="GET /api/admin/metrics/feature-usage" />
+Take a look at our Metrics API documentation to understand how it works from a code perspective.
 
 ## Feature Flag Audit Logs in Java
 
@@ -244,7 +248,8 @@ For our Spring Boot app, we can view events in [Event Log](/concepts/events#even
   ![Event Log in Unleash tracks every single change made to flags, similar to Git commit history.](/assets/spring-boot-events-log.png)
 </Frame>
 
-You can also retrieve events by using an API command. Read our documentation on [Event Log](/concepts/events#event-log) and [APIs](/api/get-events-for-toggle) to learn more.
+You can also retrieve events by using an API command. Read our documentation on [Event Log](/concepts/events#event-log) and
+<EndpointRequestSnippet endpoint="GET /api/admin/events" /> to learn more.
 
 ## Flag Automation & Workflow Integration for Java Apps
 
@@ -272,7 +277,8 @@ Request request = new Request.Builder()
 Response response = client.newCall(request).execute();
 ```
 
-Review our [API docs on flag enablement](/api/toggle-feature-environment-on).
+<EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/on" />
+Review our API docs on flag enablement.
 
 2. Update a flag
 
@@ -291,7 +297,8 @@ Request request = new Request.Builder()
 Response response = client.newCall(request).execute();
 ```
 
-Review our [API docs on updating feature flags](/api/update-feature).
+<EndpointRequestSnippet endpoint="PUT /api/admin/projects/{projectId}/features/{featureName}" />
+Review our API docs on updating feature flags.
 
 3. Archive a flag
 
@@ -308,6 +315,7 @@ Request request = new Request.Builder()
 Response response = client.newCall(request).execute();
 ```
 
-Review [API docs on archiving flags](/api/archive-feature).
+<EndpointRequestSnippet endpoint="DELETE /api/admin/projects/{projectId}/features/{featureName}" />
+Review API docs on archiving flags.
 
 Learn more about different use cases in our [Spring Boot Starter Kit](https://github.com/Unleash/unleash-spring-boot-starter) and [Java SDK](/sdks/java).

@@ -266,7 +266,6 @@ navigation:
                 slug: integrate/teams
               - page: Terraform
                 path: pages/integrate/terraform.mdx
-                slug: integrate/terraform
               - page: Webhook
                 path: pages/integrate/webhook.mdx
                 slug: integrate/webhook
@@ -393,10 +392,47 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Change requests"
-            referenced-packages:
-              - Change Requests
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/config
+                title: Get change request configuration
+              - endpoint: PUT /api/admin/projects/{projectId}/environments/{environment}/change-requests/config
+                title: Update change request configuration
+              - endpoint: POST /api/admin/projects/{projectId}/environments/{environment}/change-requests
+                title: Create or add change to request
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests
+                title: Get all change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/count
+                title: Get change request count
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/scheduled
+                title: Get scheduled change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/pending
+                title: Get pending change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/pending/{featureName}
+                title: Get pending requests for a feature
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/{id}
+                title: Get a change request
+              - endpoint: DELETE /api/admin/projects/{projectId}/change-requests/{id}
+                title: Delete a change request
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/state
+                title: Update change request state
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/title
+                title: Update change request title
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+                title: Edit a change
+              - endpoint: DELETE /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+                title: Discard a change
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/{id}/approvers
+                title: Get change request approvers
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/approvers
+                title: Add change request reviewers
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/available-reviewers/{environment}
+                title: Get available reviewers
+              - endpoint: POST /api/admin/projects/{projectId}/change-requests/{id}/comments
+                title: Add a comment
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/open
+                title: Get open change requests (deprecated)
+                hidden: true
           - section: "Context"
             referenced-packages:
               - Context
@@ -478,15 +514,60 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Release templates"
-            referenced-packages:
-              - Release Templates
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/release-plan-templates
+                title: Get all release templates
+              - endpoint: POST /api/admin/release-plan-templates
+                title: Create a release template
+              - endpoint: GET /api/admin/release-plan-templates/{templateId}
+                title: Get a release template
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}
+                title: Update a release template
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}
+                title: Delete a release template
+              - endpoint: POST /api/admin/release-plan-templates/archive/{templateId}
+                title: Archive a release template
+              - endpoint: POST /api/admin/release-plan-templates/{templateId}/milestones
+                title: Add a milestone
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+                title: Update a milestone
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+                title: Remove a milestone
+              - endpoint: POST /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies
+                title: Add a strategy to milestone
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+                title: Update milestone strategy
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+                title: Remove milestone strategy
+              - endpoint: GET /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans
+                title: Get release plans
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans
+                title: Add a release plan
+              - endpoint: DELETE /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans/{planId}
+                title: Remove a release plan
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans/{planId}/milestones/{milestoneId}/start
+                title: Start a milestone
+              - endpoint: GET /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+                title: Get release plans (deprecated)
+                hidden: true
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+                title: Add a release plan (deprecated)
+                hidden: true
+              - endpoint: DELETE /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}
+                title: Remove a release plan (deprecated)
+                hidden: true
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}/milestones/{milestoneId}/start
+                title: Start a milestone (deprecated)
+                hidden: true
           - section: "Search"
-            referenced-packages:
-              - Search
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/search/features
+                title: Search features
+                slug: /search-features
+              - endpoint: GET /api/admin/search/change-requests
+                title: Search change requests
           - section: "Segments"
             referenced-packages:
               - Segments
