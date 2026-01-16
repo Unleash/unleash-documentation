@@ -122,8 +122,8 @@ export const FernFooter: React.FC = () => {
           <div className="footer-section">
             <h3 className="section-title">Product</h3>
             <ul className="footer-links">
-              <li><a href="/quickstart" target="_blank" rel="noopener noreferrer">Quickstart</a></li>
-              <li><a href="/understanding-unleash" target="_blank" rel="noopener noreferrer">Unleash architecture</a></li>
+              <li><a href="/get-started/quickstart" target="_blank" rel="noopener noreferrer">Quickstart</a></li>
+              <li><a href="/get-started/unleash-overview" target="_blank" rel="noopener noreferrer">Unleash architecture</a></li>
               <li><a href="/pricing" target="_blank" rel="noopener noreferrer">Pricing</a></li>
               <li><a href="/product-vision" target="_blank" rel="noopener noreferrer">Product vision</a></li>
               <li><a href="/demo" target="_blank" rel="noopener noreferrer">Open live demo</a></li>

@@ -239,28 +239,37 @@ navigation:
             contents:
               - page: Integrations overview
                 path: pages/integrate/integrations.mdx
+                slug: integrate
               - page: Datadog
                 path: pages/integrate/datadog.mdx
+                slug: integrate/data
 
               - section: Jira Cloud
                 skip-slug: true
                 contents:
                   - page: Jira Cloud plugin installation
                     path: pages/integrate/jira-cloud-plugin-installation.mdx
+                    slug: integrate/jira-cloud-plugin-installation
                   - page: Jira Cloud plugin usage
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
+                    slug: integrate/jira-cloud-plugin-usage
 
               - page: MCP
                 availability: beta
                 path: pages/integrate/mcp.mdx
-              - page: App for Slack
-                path: pages/integrate/slack-app.mdx
+                slug: integrate/mcp
+              - page: Slack
+                path: pages/integrate/slack-app.mdx 
+                slug: integrate/slack
               - page: Microsoft Teams
                 path: pages/integrate/teams.mdx
+                slug: integrate/teams
               - page: Terraform
-                path: pages/concepts/terraform.mdx
+                path: pages/integrate/terraform.mdx
+                slug: integrate/terraform
               - page: Webhook
                 path: pages/integrate/webhook.mdx
+                slug: integrate/webhook
 
       - section: Data privacy and compliance
         slug: privacy-and-compliance
@@ -299,20 +308,9 @@ navigation:
             slug: support/oss-comparison
             path: pages/support/oss-comparison.mdx
 
-          - section: Contribute to Unleash
+          - page: Contribute to Unleash
             slug: contributing
-            collapsed: true
-            contents:
-              - page: Developer guide
-                path: pages/contributing/developer-guide.mdx
-              - page: Client specification
-                path: pages/contributing/client-specification.mdx
-              - page: Frontend
-                slug: frontend/overview
-                path: pages/contributing/frontend/overview.mdx
-              - page: Backend
-                path: pages/contributing/backend/overview.mdx
-                slug: backend/overview
+            path: pages/contribute.mdx
 
   - tab: api-docs
     layout:
@@ -322,6 +320,7 @@ navigation:
       - api: Client API
         api-name: client-api
         skip-slug: true
+        summary: pages/apis/client-api-overview.mdx
         layout:
           - section: "Feature flags"
             skip-slug: true
@@ -341,6 +340,7 @@ navigation:
       - api: Frontend API
         api-name: frontend-api
         skip-slug: true
+        summary: pages/apis/frontend-api-overview.mdx
         layout:
           - section: "Feature flags"
             skip-slug: true
@@ -360,6 +360,7 @@ navigation:
         api-name: admin-api
         skip-slug: true
         display-errors: true
+        summary: pages/apis/admin-api-overview.mdx
         layout:
           - section: "Addons"
             referenced-packages:
@@ -809,8 +810,10 @@ navigation:
         path: pages/academy/foundational.mdx
       - page: Advanced for Developers
         path: pages/academy/advanced-for-devs.mdx
+        slug: advanced-for-devs
       - page: Managing Unleash for DevOps/Admins
         path: pages/academy/managing-unleash-for-devops.mdx
+        slug: managing-unleash-for-devops
 
   - tab: release-notes
 
@@ -854,5 +857,12 @@ js:
   - path: ./footer-dist/output.js
     strategy: afterInteractive
 
+redirects:
+  - source: /contributing/:slug
+    destination: /contribute
+    permanent: true
+  - source: /contributing/ADRs/:slug*
+    destination: /contribute
+    permanent: true
 settings:
   hide-404-page: true
