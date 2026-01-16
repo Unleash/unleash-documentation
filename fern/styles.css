@@ -24,7 +24,6 @@
     --card-hover-bg-color: #23233a80;
 }
 
-
 #fern-docs {
     background-color: var(--sidebar-nav-bg-color);
 }
@@ -203,34 +202,27 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
     font-weight: 600 !important;
 }
 
-/* =========================================
-   ACADEMY SECTION - COMPLETE FINAL CSS
-   ========================================= */
+/* =====================================
+   ACADEMY SECTION
+   ===================================== */
 
-/* 1. Variables & Container Setup */
+/* Variables & Container Setup */
 .unleash-academy-links-container,
 .unleash-academy-banner {
-    /* Infima Variables */
     --ifm-spacing-vertical: 1rem;
     --ifm-spacing-horizontal: 1rem;
     --ifm-global-radius: 0.5rem;
     --ifm-global-border-width: 1px;
-    
-    /* Colors */
     --ifm-color-emphasis-100: #f5f6f7;
     --ifm-color-emphasis-200: #ebedf0;
     --ifm-link-color: #6c5ce7;
     --unleash-logo-purple: #6c5ce7;
     --unleash-font-size-smaller: 0.9rem;
-    --color-purple: #6c5ce7;
-
-    /* Center & Width */
     margin-left: auto !important;
     margin-right: auto !important;
     max-width: 1140px;
 }
 
-/* Dark Mode */
 html[data-theme="dark"] .unleash-academy-links-container,
 html[data-theme="dark"] .unleash-academy-banner,
 html.dark .unleash-academy-links-container,
@@ -240,14 +232,12 @@ html.dark .unleash-academy-banner {
     --ifm-link-color: #a29bfe;
 }
 
-
-/* 2. Banner Styling */
+/* Banner */
 .unleash-academy-banner {
-    margin-block-start: 15px !important;
-    margin-block-end: 15px !important;
+    margin-block: 15px !important;
     position: relative;
     border: var(--ifm-global-border-width) solid var(--ifm-color-emphasis-200);
-    padding: 45px !important; 
+    padding: 45px !important;
     border-radius: var(--ifm-global-radius);
     background-color: #f1f0fc;
     background-image: url("https://cdn.getunleash.io/docs-assets/banner-bg-pixels.svg");
@@ -255,25 +245,20 @@ html.dark .unleash-academy-banner {
     background-repeat: no-repeat;
     overflow: hidden;
     color: #000;
-    height: auto !important;
-    min-height: 0 !important;
 }
 
-.academy-banner-main-text,
 .academy-banner-main-text h1,
 .academy-banner-main-text h2,
 .academy-banner-main-text h3,
 .academy-banner-main-text p {
     font-weight: normal;
     font-size: 21px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0.5rem !important;
+    margin: 0 0 0.5rem !important;
     line-height: 1.4 !important;
     padding-top: 0 !important;
 }
 
-
-/* 3. Banner Bullets (Checkmarks) */
+/* Banner Bullets */
 .unleash-academy-banner-list {
     grid-area: bullets;
     display: flex;
@@ -284,7 +269,6 @@ html.dark .unleash-academy-banner {
     margin: 0 !important;
 }
 
-/* Desktop Horizontal Layout */
 @media (min-width: 700px) {
     .unleash-academy-banner-list {
         flex-direction: row !important;
@@ -299,24 +283,17 @@ html.dark .unleash-academy-banner {
     list-style: none !important;
     background-image: url("https://cdn.getunleash.io/docs-assets/bullet-check.svg");
     background-repeat: no-repeat;
-    background-position: left center !important;
+    background-position: left center;
     padding-left: 28px !important;
     line-height: 1.5 !important;
     margin: 0 !important;
 }
 
-.unleash-academy-banner-list > li::marker,
-.unleash-academy-banner-list > li::before {
-    display: none !important;
-    content: none !important;
-}
-
-
-/* 4. Banner Logos & Grid Layout */
+/* Banner Grid Layout */
 .academy-general-banner-content {
     display: grid;
     grid-template-areas: "header logo" "bullets bullets" "button button";
-    grid-template-columns: 1fr 85px; 
+    grid-template-columns: 1fr 85px;
     gap: var(--ifm-spacing-horizontal);
 }
 
@@ -324,25 +301,23 @@ html.dark .unleash-academy-banner {
 .unleash-academy-banner-list { grid-area: bullets; }
 .academy-general-banner-content .unleash-action-button { grid-area: button; }
 
-/* Mobile Small Logo */
 .academy-general-banner .small-logo {
     grid-area: logo;
     background-image: url("https://cdn.getunleash.io/docs-assets/academy-logo.svg");
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
     width: 100%;
     aspect-ratio: 1;
-    background-size: contain;
-    display: block;
 }
+
 .academy-general-banner .big-logo { display: none; }
 
-/* Desktop Grid Layout */
 @media (min-width: 711px) {
     .academy-general-banner-content {
         grid-template-areas: "header" "bullets" "button";
         grid-template-columns: 1fr;
-        padding-right: 240px; 
+        padding-right: 240px;
     }
 
     .academy-general-banner-content .unleash-action-button {
@@ -351,24 +326,22 @@ html.dark .unleash-academy-banner {
 
     .academy-general-banner .small-logo { display: none; }
 
-    /* Desktop Big Logo */
     .academy-general-banner .big-logo {
         display: block;
         position: absolute;
         background-image: url("https://cdn.getunleash.io/docs-assets/academy-logo.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
         bottom: -20px;
         right: 20px;
         width: 200px;
         height: 200px;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
         z-index: 1;
     }
 }
 
-
-/* 5. Course Cards */
+/* Course Cards */
 .unleash-academy-links {
     list-style: none !important;
     margin: 0 !important;
@@ -386,12 +359,6 @@ html.dark .unleash-academy-banner {
     margin: 0 !important;
     padding: 0 !important;
     list-style: none !important;
-}
-
-.unleash-academy-links > li::marker,
-.unleash-academy-links > li::before {
-    display: none !important;
-    content: none !important;
 }
 
 @media (min-width: 711px) {
@@ -424,6 +391,14 @@ html.dark .unleash-academy-banner {
     line-height: 1.3 !important;
 }
 
+.unleash-academy-links-container article p {
+    font-size: var(--unleash-font-size-smaller);
+    flex-grow: 1;
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+    line-height: 1.4;
+}
+
 .unleash-academy-level-badge {
     border: 2px solid;
     border-radius: 60px;
@@ -446,23 +421,15 @@ html.dark .unleash-academy-level-badge {
     color: var(--ifm-link-color);
 }
 
-.unleash-academy-links-container article p {
-    font-size: var(--unleash-font-size-smaller);
-    flex-grow: 1; 
-    margin-top: 0 !important;
-    margin-bottom: 1rem !important;
-    line-height: 1.4;
-}
-
 .unleash-academy-level-container.advanced {
     background-image: url("https://cdn.getunleash.io/docs-assets/advanced-pixels.svg");
 }
+
 .unleash-academy-level-container.beginners {
     background-image: url("https://cdn.getunleash.io/docs-assets/beginner-pixels.svg");
 }
 
-
-/* 6. Buttons Styling (The Simple Fix) */
+/* Buttons */
 .unleash-academy-buttons {
     display: flex;
     flex-direction: column;
@@ -474,8 +441,6 @@ html.dark .unleash-academy-level-badge {
     display: none !important;
 }
 
-/* 1. RESET THE LINK CONTAINER */
-/* Remove padding from the anchor so it is just a wrapper */
 .unleash-academy-buttons a.unleash-action-button,
 .unleash-academy-buttons a.get-certified {
     display: block !important;
@@ -483,52 +448,49 @@ html.dark .unleash-academy-level-badge {
     text-align: center;
     text-decoration: none !important;
     border-radius: var(--ifm-global-radius);
-    
     padding: 0 !important;
     margin: 0 !important;
     min-height: 0 !important;
 }
 
-/* 2. APPLY PADDING TO THE TEXT */
-/* Apply the breathing room (padding) directly to the <p> tag */
 .unleash-academy-buttons a p {
     padding: 7.5px 16px !important;
-    margin: 0 !important; /* Kill the default margin */
+    margin: 0 !important;
     line-height: 1.2 !important;
     font-size: 15px !important;
     font-weight: 600 !important;
 }
 
-/* Primary Button Colors */
 .unleash-academy-buttons a.unleash-action-button {
     background: #6c5ce7;
     color: white !important;
     border: 1px solid #6c5ce7;
 }
+
 .unleash-academy-buttons a.unleash-action-button:hover {
     background: #5b4dc4;
 }
 
-/* Secondary Button Colors */
 .unleash-academy-buttons a.get-certified {
     background: #f5f6f7;
     color: #6c5ce7 !important;
     border: 2px solid #6c5ce7;
 }
+
 .unleash-academy-buttons a.get-certified:hover {
     background: #ebedf0;
 }
 
-
-/* 7. Cleanup (Icons & Defaults) */
+/* Remove unwanted decorations */
 .unleash-action-button::after,
 .unleash-action-button svg,
 .unleash-academy-buttons a::after,
 .unleash-academy-buttons a svg,
-.unleash-academy-banner-list > li::after {
+.unleash-academy-banner-list > li::after,
+.unleash-academy-banner-list > li::marker,
+.unleash-academy-banner-list > li::before,
+.unleash-academy-links > li::marker,
+.unleash-academy-links > li::before {
     display: none !important;
-}
-
-.unleash-academy-buttons a {
-    text-decoration: none !important;
+    content: none !important;
 }
