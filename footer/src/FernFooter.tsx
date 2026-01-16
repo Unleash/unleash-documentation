@@ -76,15 +76,15 @@ export const FernFooter: React.FC = () => {
           <div className="footer-section">
             <h3 className="section-title">Server SDKs</h3>
             <ul className="footer-links">
-              <li><a href="/reference/sdks/node" target="_blank" rel="noopener noreferrer">Node.js</a></li>
-              <li><a href="/reference/sdks/java" target="_blank" rel="noopener noreferrer">Java</a></li>
-              <li><a href="/reference/sdks/go" target="_blank" rel="noopener noreferrer">Go</a></li>
-              <li><a href="/reference/sdks/rust" target="_blank" rel="noopener noreferrer">Rust</a></li>
-              <li><a href="/reference/sdks/ruby" target="_blank" rel="noopener noreferrer">Ruby</a></li>
-              <li><a href="/reference/sdks/python" target="_blank" rel="noopener noreferrer">Python</a></li>
-              <li><a href="/reference/sdks/dotnet" target="_blank" rel="noopener noreferrer">.NET</a></li>
-              <li><a href="/reference/sdks/php" target="_blank" rel="noopener noreferrer">PHP</a></li>
-              <li><a href="/reference/sdks" target="_blank" rel="noopener noreferrer">All SDKs</a></li>
+              <li><a href="/sdks/node" target="_blank" rel="noopener noreferrer">Node.js</a></li>
+              <li><a href="/sdks/java" target="_blank" rel="noopener noreferrer">Java</a></li>
+              <li><a href="/sdks/go" target="_blank" rel="noopener noreferrer">Go</a></li>
+              <li><a href="/sdks/rust" target="_blank" rel="noopener noreferrer">Rust</a></li>
+              <li><a href="/sdks/ruby" target="_blank" rel="noopener noreferrer">Ruby</a></li>
+              <li><a href="/sdks/python" target="_blank" rel="noopener noreferrer">Python</a></li>
+              <li><a href="/sdks/dotnet" target="_blank" rel="noopener noreferrer">.NET</a></li>
+              <li><a href="/sdks/php" target="_blank" rel="noopener noreferrer">PHP</a></li>
+              <li><a href="/sdks" target="_blank" rel="noopener noreferrer">All SDKs</a></li>
             </ul>
           </div>
 
@@ -92,13 +92,13 @@ export const FernFooter: React.FC = () => {
           <div className="footer-section">
             <h3 className="section-title">Frontend SDKs</h3>
             <ul className="footer-links">
-              <li><a href="/reference/sdks/javascript" target="_blank" rel="noopener noreferrer">JavaScript</a></li>
-              <li><a href="/reference/sdks/react" target="_blank" rel="noopener noreferrer">React</a></li>
-              <li><a href="/reference/sdks/nextjs" target="_blank" rel="noopener noreferrer">Next.js</a></li>
-              <li><a href="/reference/sdks/vue" target="_blank" rel="noopener noreferrer">Vue</a></li>
-              <li><a href="/reference/sdks/ios" target="_blank" rel="noopener noreferrer">iOS</a></li>
-              <li><a href="/reference/sdks/android" target="_blank" rel="noopener noreferrer">Android</a></li>
-              <li><a href="/reference/sdks/flutter" target="_blank" rel="noopener noreferrer">Flutter</a></li>
+              <li><a href="/sdks/javascript-browser" target="_blank" rel="noopener noreferrer">JavaScript</a></li>
+              <li><a href="/sdks/react" target="_blank" rel="noopener noreferrer">React</a></li>
+              <li><a href="/sdks/next-js" target="_blank" rel="noopener noreferrer">Next.js</a></li>
+              <li><a href="/sdks/vue" target="_blank" rel="noopener noreferrer">Vue</a></li>
+              <li><a href="/sdks/ios" target="_blank" rel="noopener noreferrer">iOS</a></li>
+              <li><a href="/sdks/android" target="_blank" rel="noopener noreferrer">Android</a></li>
+              <li><a href="/sdks/flutter" target="_blank" rel="noopener noreferrer">Flutter</a></li>
             </ul>
           </div>
 
@@ -106,15 +106,15 @@ export const FernFooter: React.FC = () => {
           <div className="footer-section">
             <h3 className="section-title">Feature Flag use cases</h3>
             <ul className="footer-links">
-              <li><a href="/topics/feature-flags" target="_blank" rel="noopener noreferrer">Secure, scalable feature flags</a></li>
-              <li><a href="/feature-flag-tutorials/use-cases" target="_blank" rel="noopener noreferrer">Rollbacks</a></li>
-              <li><a href="/topics/compliance" target="_blank" rel="noopener noreferrer">FedRAMP, SOC2, ISO2700 compliance</a></li>
-              <li><a href="/topics/gradual-rollouts" target="_blank" rel="noopener noreferrer">Progressive or gradual rollouts</a></li>
-              <li><a href="/topics/trunk-based-development" target="_blank" rel="noopener noreferrer">Trunk-based development</a></li>
-              <li><a href="/topics/kill-switches" target="_blank" rel="noopener noreferrer">Software kill switches</a></li>
-              <li><a href="/feature-flag-tutorials/use-cases/a-b-testing" target="_blank" rel="noopener noreferrer">A/B testing</a></li>
-              <li><a href="/topics/feature-management" target="_blank" rel="noopener noreferrer">Feature management</a></li>
-              <li><a href="/topics/canary-releases" target="_blank" rel="noopener noreferrer">Canary releases</a></li>
+              <li><a href="/guides/feature-flag-best-practices" target="_blank" rel="noopener noreferrer">Secure, scalable feature flags</a></li>
+              <li><a href="https://www.getunleash.io/feature-flag-use-cases-rollbacks" target="_blank" rel="noopener noreferrer">Rollbacks</a></li>
+              <li><a href="/privacy-and-compliance/compliance-overview" target="_blank" rel="noopener noreferrer">FedRAMP, SOC2, ISO2700 compliance</a></li>
+              <li><a href="/guides/gradual-rollout" target="_blank" rel="noopener noreferrer">Progressive or gradual rollouts</a></li>
+              <li><a href="/guides/trunk-based-development" target="_blank" rel="noopener noreferrer">Trunk-based development</a></li>
+              <li><a href="https://www.getunleash.io/feature-flag-use-cases-software-kill-switches" target="_blank" rel="noopener noreferrer">Software kill switches</a></li>
+              <li><a href="/guides/a-b-testing" target="_blank" rel="noopener noreferrer">A/B testing</a></li>
+              <li><a href="https://www.getunleash.io/blog/feature-management" target="_blank" rel="noopener noreferrer">Feature management</a></li>
+              <li><a href="https://www.getunleash.io/blog/canary-deployment-what-is-it" target="_blank" rel="noopener noreferrer">Canary releases</a></li>
             </ul>
           </div>
 
@@ -124,12 +124,12 @@ export const FernFooter: React.FC = () => {
             <ul className="footer-links">
               <li><a href="/get-started/quickstart" target="_blank" rel="noopener noreferrer">Quickstart</a></li>
               <li><a href="/get-started/unleash-overview" target="_blank" rel="noopener noreferrer">Unleash architecture</a></li>
-              <li><a href="/pricing" target="_blank" rel="noopener noreferrer">Pricing</a></li>
-              <li><a href="/product-vision" target="_blank" rel="noopener noreferrer">Product vision</a></li>
-              <li><a href="/demo" target="_blank" rel="noopener noreferrer">Open live demo</a></li>
-              <li><a href="/open-source" target="_blank" rel="noopener noreferrer">Open source</a></li>
-              <li><a href="/enterprise" target="_blank" rel="noopener noreferrer">Enterprise feature management platform</a></li>
-              <li><a href="/vs-launchdarkly" target="_blank" rel="noopener noreferrer">Unleash vs LaunchDarkly</a></li>
+              <li><a href="https://www.getunleash.io/pricing" target="_blank" rel="noopener noreferrer">Pricing</a></li>
+              <li><a href="https://www.getunleash.io/product-vision" target="_blank" rel="noopener noreferrer">Product vision</a></li>
+              <li><a href="https://app.unleash-hosted.com/demo/login" target="_blank" rel="noopener noreferrer">Open live demo</a></li>
+              <li><a href="https://www.getunleash.io/open-source" target="_blank" rel="noopener noreferrer">Open source</a></li>
+              <li><a href="https://www.getunleash.io/enterprise-feature-management-platform" target="_blank" rel="noopener noreferrer">Enterprise feature management platform</a></li>
+              <li><a href="https://www.getunleash.io/unleash-vs-launchdarkly" target="_blank" rel="noopener noreferrer">Unleash vs LaunchDarkly</a></li>
             </ul>
             </div>
 
@@ -137,9 +137,9 @@ export const FernFooter: React.FC = () => {
           <div className="footer-section">
             <h3 className="section-title">Support</h3>
             <ul className="footer-links">
-              <li><a href="/help" target="_blank" rel="noopener noreferrer">Help center</a></li>
-              <li><a href="/status" target="_blank" rel="noopener noreferrer">Status</a></li>
-              <li><a href="/changelog" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+              <li><a href="https://www.getunleash.io/support" target="_blank" rel="noopener noreferrer">Help center</a></li>
+              <li><a href="https://unleash.instatus.com" target="_blank" rel="noopener noreferrer">Status</a></li>
+              <li><a href="https://github.com/Unleash/unleash/releases" target="_blank" rel="noopener noreferrer">Changelog</a></li>
             </ul>
           </div>
         </div>

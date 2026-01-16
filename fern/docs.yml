@@ -330,7 +330,7 @@ navigation:
             contents:
               - endpoint: POST /api/client/metrics
               - endpoint: POST /api/client/metrics/custom
-                slug: /api/client-custom-metrics
+                slug: /client-custom-metrics
           - section: "Register SDK"
             skip-slug: true
             contents:
