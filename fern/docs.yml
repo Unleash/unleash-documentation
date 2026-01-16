@@ -96,6 +96,8 @@ navigation:
           - section: Release management
             skip-slug: true
             contents:
+              - page: Release management overview
+                path: pages/concepts/release-management-overview.mdx
               - page: Release templates
                 path: pages/concepts/release-templates.mdx
               - page: Impact metrics
@@ -661,6 +663,9 @@ navigation:
           - page: Create and configure a feature flag
             path: pages/guides/how-to-create-feature-flags.mdx
             slug: how-to-create-feature-flags
+          - page: Get started with release management
+            path: pages/guides/getting-started-release-management.mdx
+            slug: getting-started-release-management
           - page: Schedule a feature release
             path: pages/guides/how-to-schedule-feature-releases.mdx
             slug: how-to-schedule-feature-releases
