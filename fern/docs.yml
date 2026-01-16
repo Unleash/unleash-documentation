@@ -124,7 +124,7 @@ navigation:
                 path: pages/concepts/change-requests.mdx
               - page: Public invite links
                 path: pages/concepts/public-signup.mdx
-                slug: public-invite-links
+                slug: public-signup
 
           - section: Instance health and configuration
             skip-slug: true
@@ -319,7 +319,6 @@ navigation:
       - api: Client API
         api-name: client-api
         skip-slug: true
-        summary: pages/apis/client-api-overview.mdx
         layout:
           - section: "Feature flags"
             skip-slug: true
@@ -331,6 +330,7 @@ navigation:
             contents:
               - endpoint: POST /api/client/metrics
               - endpoint: POST /api/client/metrics/custom
+                slug: /api/client-custom-metrics
           - section: "Register SDK"
             skip-slug: true
             contents:
@@ -339,7 +339,6 @@ navigation:
       - api: Frontend API
         api-name: frontend-api
         skip-slug: true
-        summary: pages/apis/frontend-api-overview.mdx
         layout:
           - section: "Feature flags"
             skip-slug: true
@@ -359,7 +358,6 @@ navigation:
         api-name: admin-api
         skip-slug: true
         display-errors: true
-        summary: pages/apis/admin-api-overview.mdx
         layout:
           - section: "Addons"
             referenced-packages:
@@ -469,10 +467,20 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Instance admin"
-            referenced-packages:
-              - Instance Admin
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/logins
+                title: Get login history
+              - endpoint: GET /api/admin/license
+                title: Get license
+              - endpoint: POST /api/admin/license
+                title: Update license
+              - endpoint: GET /api/admin/license/check
+                title: Validate license
+              - endpoint: GET /api/admin/instance-admin/statistics
+                title: Get instance statistics
+              - endpoint: GET /api/admin/instance-admin/statistics/csv
+                title: Get instance statistics (CSV)
           - section: "Maintenance"
             referenced-packages:
               - Maintenance

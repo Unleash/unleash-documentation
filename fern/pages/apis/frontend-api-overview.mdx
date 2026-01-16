@@ -1,6 +1,5 @@
 ---
 title: Frontend API overview
-slug: api/frontend-api
 og:site_name: Unleash Documentation
 og:title: Frontend API Overview - Unleash Documentation
 description: The Frontend API is used by frontend SDKs to fetch enabled feature flags for a specific Unleash Context.
@@ -8,7 +7,7 @@ keywords: frontend api, frontend sdk, feature flags, api tokens, unleash context
 max-toc-depth: 3
 ---
 
-The Frontend API is designed for [frontend SDKs](/sdks/react) running in browsers, mobile apps, and other client-side environments. Unlike the [Client API](/api/client-api), it only returns enabled feature flags for a specific [Unleash Context](/concepts/unleash-context), providing security and performance benefits.
+The Frontend API is designed for [frontend SDKs](/sdks/react) running in browsers, mobile apps, and other client-side environments. Unlike the [Client API](/api), it only returns enabled feature flags for a specific [Unleash Context](/concepts/unleash-context), providing security and performance benefits.
 
 **Base path**: `<your-unleash-url>/api/frontend`
 
@@ -16,10 +15,10 @@ The Frontend API is designed for [frontend SDKs](/sdks/react) running in browser
 
 ## Key differences from Client API
 
-| Aspect | [Client API](/api/client-api) | Frontend API |
+| Aspect | [Client API](/api) | Frontend API |
 |--------|------------|--------------|
 | **Payload** | All [feature flags](/concepts/feature-flags) and [strategies](/concepts/activation-strategies). | Only enabled [feature flags](/concepts/feature-flags) for the provided context. |
-| **Evaluation** | Server-side by SDK. | Evaluated by the Unleash server or [Unleash Enterprise Edge](/unleash-edge/overview). |
+| **Evaluation** | Server-side by SDK. | Evaluated by the Unleash server or [Unleash Enterprise Edge](/unleash-edge). |
 | **Token type** | [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens). | [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens). |
 
 ## Authentication
@@ -55,7 +54,7 @@ Learn more about [context fields and constraints](/concepts/unleash-context).
 
 ## Using with Unleash Edge
 
-For production applications, use [Unleash Edge](/unleash-edge/overview) to improve performance, privacy, and reduce latency. Edge caches evaluations closer to your users and provides built-in fallback mechanisms.
+For production applications, use [Unleash Edge](/unleash-edge) to improve performance, privacy, and reduce latency. Edge caches evaluations closer to your users and provides built-in fallback mechanisms.
 
 Point your SDK to your Edge instance instead of directly to Unleash:
 

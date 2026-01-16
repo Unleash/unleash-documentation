@@ -1,6 +1,5 @@
 ---
 title: Client API overview
-slug: api/client-api
 og:site_name: Unleash Documentation
 og:title: Client API Overview - Unleash Documentation
 description: The Client API is used by backend SDKs to fetch feature flag configurations and report metrics to Unleash.
@@ -8,7 +7,7 @@ keywords: client api, backend sdk, feature flags, api tokens, unleash api
 max-toc-depth: 3
 ---
 
-The Client API is designed for [backend SDKs](/sdks/node) and [Unleash Edge](/unleash-edge/overview) to fetch feature flag configurations. This API returns all [feature flags](/concepts/feature-flags) and [activation strategies](/concepts/activation-strategies) for server-side evaluation.
+The Client API is designed for [backend SDKs](/sdks/node) and [Unleash Edge](/unleash-edge) to fetch feature flag configurations. This API returns all [feature flags](/concepts/feature-flags) and [activation strategies](/concepts/activation-strategies) for server-side evaluation.
 
 **Base path**: `<your-unleash-url>/api/client`
 
@@ -32,7 +31,7 @@ To create a backend token, go to **Admin settings > Access control > API access 
 
 ## Using with Unleash Edge
 
-[Unleash Enterprise Edge](/unleash-edge/overview) uses the Client API to stay synchronized with your Unleash instance. Edge provides:
+[Unleash Enterprise Edge](/unleash-edge) uses the Client API to stay synchronized with your Unleash instance. Edge provides:
 
 - Reduced latency for distributed applications.
 - Built-in caching and fallback.
