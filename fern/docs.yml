@@ -259,7 +259,7 @@ navigation:
                 path: pages/integrate/mcp.mdx
                 slug: integrate/mcp
               - page: Slack
-                path: pages/integrate/slack-app.mdx 
+                path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
               - page: Microsoft Teams
                 path: pages/integrate/teams.mdx
