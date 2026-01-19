@@ -90,26 +90,100 @@ body:has(.landing-page) .fern-page-actions {
     display: flex;
     align-items: flex-start;
     gap: 4rem;
+    flex-wrap: wrap;
 }
 
 .hero-text-column {
     flex: 1;
-    min-width: 0;
+    min-width: 300px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    word-break: normal;
+    overflow-wrap: normal;
 }
 
 .hero-text-column p {
     margin: 0;
 }
 
+/* Tablet and below - stack vertically, smaller video */
+@media (max-width: 1024px) {
+    .hero-row {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .hero-text-column {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .hero-video {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+/* Mobile - hide video, ensure text is readable */
+@media (max-width: 768px) {
+    .landing-page {
+        margin-left: 1.5rem !important;
+        margin-right: 1.5rem !important;
+    }
+
+    .hero {
+        gap: 1.5rem;
+    }
+
+    .hero h1 {
+        white-space: normal !important;
+        font-size: 2rem !important;
+    }
+
+    .hero-row {
+        display: block !important;
+    }
+
+    .hero-text-column {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Hide video on mobile */
+    .hero-video {
+        display: none !important;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .landing-page {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem !important;
+    }
+
+    .hero-text-column {
+        gap: 1rem;
+    }
+}
+
 .hero-video {
-    flex-shrink: 0;
+    flex: 1 1 400px;
+    min-width: 300px;
+    max-width: 500px;
 }
 
 .hero-video iframe {
     border-radius: 12px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 500 / 292;
 }
 
 /* Card bottom stripe styles */
