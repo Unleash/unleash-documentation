@@ -240,9 +240,14 @@ body:has(.landing-page) .fern-card:before {
     filter: brightness(0.4) contrast(1.8) !important;
 }
 
+.light body:has(.landing-page) .fern-card:hover:before {
+    opacity: 0.3 !important;
+    filter: brightness(0.4) contrast(1.8) !important;
+}
+
 /* Dark mode - use Fern's dark theme class */
 .dark body:has(.landing-page) .fern-card:before {
-    opacity: 0.2 !important;
+    opacity: 0.1 !important;
     filter: none !important;
     z-index: 0 !important;
 }
@@ -297,9 +302,13 @@ body:has(.landing-page) .fern-card div {
     color: var(--text-color) !important;
 }
 
-/* Remove purple border on hover */
-body:has(.landing-page) .fern-card:hover {
-    border-color: transparent !important;
+/* Preserve default border color on hover */
+.light body:has(.landing-page) .fern-card:hover {
+    border-color: #e5e7eb !important;
+}
+
+.dark body:has(.landing-page) .fern-card:hover {
+    border-color: #374151 !important;
 }
 
 /* Equal height cards */
