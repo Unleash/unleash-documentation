@@ -258,12 +258,15 @@ body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
     gap: 0 0.75rem !important;
-    align-items: start;
+    align-items: center;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
     grid-column: 1;
     grid-row: 1 / 2;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    color: var(--nav-text-color) !important;
 }
 
 body:has(.landing-page) .fern-card .w-full.space-y-1 {
@@ -281,11 +284,14 @@ body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 0.5rem !important;
+    margin-top: 1rem !important;
 }
 
 /* Card text colors */
-body:has(.landing-page) .fern-card h3,
+body:has(.landing-page) .fern-card h3 {
+    color: var(--nav-text-color) !important;
+}
+
 body:has(.landing-page) .fern-card p,
 body:has(.landing-page) .fern-card div {
     color: var(--text-color) !important;
@@ -294,6 +300,18 @@ body:has(.landing-page) .fern-card div {
 /* Remove purple border on hover */
 body:has(.landing-page) .fern-card:hover {
     border-color: transparent !important;
+}
+
+/* Equal height cards */
+body:has(.landing-page) .fern-card {
+    height: 100%;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+body:has(.landing-page) .fern-card > div.flex {
+    flex: 1;
 }
 
 img {
