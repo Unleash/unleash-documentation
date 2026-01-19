@@ -89,8 +89,18 @@ body:has(.landing-page) .fern-card {
     padding-bottom: 3rem;
 }
 
-body:has(.landing-page) .fern-card:hover {
+/* Dark mode - add background to card itself */
+.dark body:has(.landing-page) .fern-card {
+    background-color: #222130 !important;
+}
+
+/* Hover states for both light and dark modes */
+.light body:has(.landing-page) .fern-card:hover {
     background-color: var(--card-hover-bg-color) !important;
+}
+
+.dark body:has(.landing-page) .fern-card:hover {
+    background-color: #23233a !important;
 }
 
 body:has(.landing-page) .fern-card::after {
@@ -127,8 +137,9 @@ body:has(.landing-page) .fern-card:before {
 
 /* Dark mode - use Fern's dark theme class */
 .dark body:has(.landing-page) .fern-card:before {
-    opacity: 0.6 !important;
+    opacity: 0.2 !important;
     filter: none !important;
+    z-index: 0 !important;
 }
 
 /* Ensure card content is positioned above background */
