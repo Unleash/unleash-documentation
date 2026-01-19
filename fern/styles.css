@@ -1,7 +1,8 @@
 /* Light theme variables */
 :root {
     --container-bg-color: #fff;
-    --nav-text-color: #1a4049;
+    --nav-text-color: #1E373F;
+    --text-color: #202021;
     --page-bg-light-color: #EAEAED;
     --sidebar-nav-bg-color: var(--page-bg-light-color);
     --accent-color: #817afe;
@@ -16,6 +17,7 @@
 .dark {
     --container-bg-color: #232130;
     --nav-text-color: #E3E3E3;
+    --text-color: #E3E3E3;
     --sidebar-nav-bg-color: #1A1924;
     --accent-color: #BBB9FF;
     --button-bg-color: #E3E3E3;
@@ -26,10 +28,15 @@
 
 #fern-docs {
     background-color: var(--sidebar-nav-bg-color);
+    color: var(--text-color);
 }
 
 #fern-header {
     background-color: var(--sidebar-nav-bg-color);
+}
+
+body {
+    color: var(--text-color);
 }
 
 .fern-layout-guide, .fern-layout-reference .fern-layout-page {
@@ -61,20 +68,44 @@ body:has(.landing-page) .fern-page-actions {
 /* Hero section styles */
 .hero {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
     gap: 2rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
     padding-bottom: 2.5rem;
 }
 
-.hero-content {
+.hero h1 {
+    white-space: nowrap;
+    margin-bottom: 0;
+    color: var(--nav-text-color);
+}
+
+/* Dark mode - keep hero h1 white */
+.dark .hero h1 {
+    color: #ffffff !important;
+}
+
+.hero-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 4rem;
+}
+
+.hero-text-column {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.hero-text-column p {
+    margin: 0;
 }
 
 .hero-video {
-    flex: 0 0 500px;
-    margin-top: 5rem;
+    flex-shrink: 0;
 }
 
 .hero-video iframe {
@@ -146,6 +177,49 @@ body:has(.landing-page) .fern-card:before {
 body:has(.landing-page) .fern-card > * {
     position: relative;
     z-index: 1;
+}
+
+/* Make card icon and heading display inline using grid */
+body:has(.landing-page) .fern-card > div.flex {
+    display: grid !important;
+    grid-template-columns: auto 1fr;
+    gap: 0 0.75rem !important;
+    align-items: start;
+}
+
+body:has(.landing-page) .fern-card .card-icon {
+    grid-column: 1;
+    grid-row: 1 / 2;
+}
+
+body:has(.landing-page) .fern-card .w-full.space-y-1 {
+    grid-column: 1 / -1;
+    display: contents !important;
+}
+
+/* Heading next to icon */
+body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* Description full width below */
+body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 0.5rem !important;
+}
+
+/* Card text colors */
+body:has(.landing-page) .fern-card h3,
+body:has(.landing-page) .fern-card p,
+body:has(.landing-page) .fern-card div {
+    color: var(--text-color) !important;
+}
+
+/* Remove purple border on hover */
+body:has(.landing-page) .fern-card:hover {
+    border-color: transparent !important;
 }
 
 img {
