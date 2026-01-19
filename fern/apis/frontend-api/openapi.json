@@ -3137,7 +3137,8 @@
                   "Editor",
                   "Viewer",
                   "Owner",
-                  "Member"
+                  "Member",
+                  "Reader"
                 ]
               }
             ]
@@ -3176,6 +3177,12 @@
             "type": "string",
             "nullable": true,
             "example": "01HTMEXAMPLESCIMID7SWWGHN6"
+          },
+          "seatType": {
+            "description": "The seat type of this user",
+            "type": "string",
+            "nullable": true,
+            "example": "Regular"
           },
           "activeSessions": {
             "description": "Count of active browser sessions for this user",
@@ -3234,7 +3241,8 @@
                   "Editor",
                   "Viewer",
                   "Owner",
-                  "Member"
+                  "Member",
+                  "Reader"
                 ]
               }
             ]
@@ -6888,6 +6896,12 @@
               "2024-10": 0.45
             }
           },
+          "readOnlyUsers": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 1,
+            "description": "The number of ReadOnly users in this instance"
+          },
           "sum": {
             "type": "string",
             "description": "A SHA-256 checksum of the instance statistics to be used to verify that the data in this object has not been tampered with",
@@ -10299,6 +10313,12 @@
             "type": "integer",
             "example": 5,
             "description": "The maximum number of release templates allowed."
+          },
+          "readOnlyUsers": {
+            "type": "integer",
+            "example": 50,
+            "description": "The maximum number of read-only users allowed.",
+            "minimum": 0
           }
         }
       },
@@ -11391,7 +11411,8 @@
               "projects": 500,
               "segments": 300,
               "featureFlags": 5000,
-              "releaseTemplates": 5
+              "releaseTemplates": 5,
+              "readOnlyUsers": 50
             }
           },
           "prometheusAPIAvailable": {
@@ -11913,7 +11934,8 @@
                   "Editor",
                   "Viewer",
                   "Owner",
-                  "Member"
+                  "Member",
+                  "Reader"
                 ]
               }
             ]
@@ -12307,6 +12329,12 @@
             "type": "string",
             "nullable": true,
             "example": "01HTMEXAMPLESCIMID7SWWGHN6"
+          },
+          "seatType": {
+            "description": "The seat type of this user",
+            "type": "string",
+            "nullable": true,
+            "example": "Regular"
           },
           "activeSessions": {
             "description": "Count of active browser sessions for this user",
@@ -18489,6 +18517,10 @@
               },
               "edgeInstances": {
                 "description": "Number of Edge instances in the license.",
+                "type": "number"
+              },
+              "readOnlyUsers": {
+                "description": "Number of read-only users in the license.",
                 "type": "number"
               }
             }
