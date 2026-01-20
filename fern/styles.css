@@ -682,6 +682,34 @@ html.dark .unleash-academy-level-badge {
 }
 
 /* =====================================
+   CHANGELOG RESPONSIVE LAYOUT
+   ===================================== */
+
+/* Stack changelog labels above content on narrower screens */
+@media (max-width: 1300px) {
+    article.fern-changelog-content[data-has-aside="true"] {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    article.fern-changelog-content[data-has-aside="true"] > aside {
+        position: relative !important;
+        width: 100% !important;
+        top: auto !important;
+        height: auto !important;
+    }
+
+    .fern-changelog-content .eyebrow {
+        margin-bottom: 1rem !important;
+    }
+
+    .fern-changelog-label {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* =====================================
    CUSTOM FOOTER HOVER STYLING
    ===================================== */
 
