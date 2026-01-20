@@ -1,0 +1,83 @@
+---
+title: Admin API overview
+og:site_name: Unleash Documentation
+og:title: Admin API Overview - Unleash Documentation
+description: The Admin API provides full programmatic access to manage all resources within Unleash, including feature flags, projects, environments, users, and integrations.
+keywords: admin api, rest api, api tokens, service accounts, personal access tokens, integrations, automation
+max-toc-depth: 3
+---
+
+The Admin API provides comprehensive programmatic access to all Unleash resources. Use it to manage [feature flags](/concepts/feature-flags), [projects](/concepts/projects), [environments](/concepts/environments), [users and roles](/concepts/rbac), [integrations](/integrate), and more. This API powers the Unleash Admin UI and enables automation workflows.
+
+**Base path**: `<your-unleash-url>/api/admin`
+
+**Primary use**: Create and manage flags, configure projects, control access, integrate with third-party tools, and automate deployment workflows.
+
+## Authentication
+
+Use **[service account tokens](/concepts/service-accounts)** or **personal access tokens** for authentication. Service accounts are preferred for production integrations as they're not tied to individual users.
+
+To create a service account, go to **Admin settings > Service accounts > New service account**.
+
+To create a personal access token, go to **Profile > View profile settings > Personal API tokens > New API token**.
+
+All requests require the `Authorization` header:
+
+```bash
+curl -H "Authorization: YOUR_PERSONAL_ACCESS_TOKEN" \
+  https://your-unleash-instance.com/api/admin/projects
+```
+
+Learn more about [API tokens and client keys](/concepts/api-tokens-and-client-keys).
+
+## API specification
+
+You can also access the OpenAPI specification from your Unleash instance:
+
+- **Interactive Swagger UI**: `<your-unleash-url>/docs/openapi/`
+- **Raw JSON**: `<your-unleash-url>/docs/openapi.json`
+
+<Note>
+OpenAPI is enabled by default in v5.2+. For v4.13+, set `ENABLE_OAS` environment variable.
+</Note>
+
+## Example requests
+
+### Create a feature flag
+
+```bash
+curl -X POST \
+  https://your-unleash-instance.com/api/admin/projects/default/features \
+  -H "Authorization: YOUR_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "new-feature",
+    "description": "A new feature flag",
+    "type": "release"
+  }'
+```
+
+### Enable a flag in an environment
+
+```bash
+curl -X POST \
+  https://your-unleash-instance.com/api/admin/projects/default/features/new-feature/environments/production/on \
+  -H "Authorization: YOUR_ADMIN_TOKEN"
+```
+
+### Add a strategy to a flag
+
+```bash
+curl -X POST \
+  https://your-unleash-instance.com/api/admin/projects/default/features/new-feature/environments/production/strategies \
+  -H "Authorization: YOUR_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "flexibleRollout",
+    "parameters": {
+      "rollout": "50",
+      "stickiness": "default",
+      "groupId": "new-feature"
+    }
+  }'
+```

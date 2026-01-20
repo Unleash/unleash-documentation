@@ -4,15 +4,74 @@ slug: /api
 description: An overview of the three main Unleash APIs - Client API, Frontend API, and Admin API.
 ---
 
-## Unleash APIs
-
 Unleash provides a set of APIs to give you full programmatic control over your feature flags and to connect your applications and services to Unleash. There are three main APIs, each designed for a specific purpose.
 
 | API            | Path | Used by | Primary use case |
 |---------------|----|-----|---|
-| [Client API](/api/) | `<your-unleash-url>/api/client` | Backend SDKs | Fetch feature flag configurations. |
-| [Frontend API](/api/) | `<your-unleash-url>/api/frontend` | Frontend SDKs | Fetch enabled feature flags for a specific Unleash Context. |
-| [Admin API](/api/get-addons) | `<your-unleash-url>/api/admin` | Admin UI, internal tooling, and third-party integrations | Access and manage all resources within Unleash, such as context, environments, events, metrics, and users. |
+| Client API | `<your-unleash-url>/api/client` | [Backend SDKs](/sdks/node), [Unleash Edge](/unleash-edge) | Fetch all [feature flags](/concepts/feature-flags) and [strategies](/concepts/activation-strategies) for server-side evaluation. |
+| Frontend API| `<your-unleash-url>/api/frontend` | [Frontend SDKs](/sdks/react) | Fetch enabled [feature flags](/concepts/feature-flags) for a specific [Unleash Context](/concepts/unleash-context). |
+| Admin API| `<your-unleash-url>/api/admin` | Admin UI, integrations, automation | Manage [feature flags](/concepts/feature-flags), [projects](/concepts/projects), [environments](/concepts/environments), [users](/concepts/rbac), and [integrations](/integrate). |
+
+## Client API
+
+The Client API is designed for backend services and returns complete flag configurations with all [activation strategies](/concepts/activation-strategies) for server-side evaluation.
+
+**Authentication**: [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens).
+
+**Key endpoints**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/client/features` | GET | Fetch all [feature flags](/concepts/feature-flags) and configurations. |
+| `/api/client/metrics` | POST | Report flag usage [metrics](/concepts/impression-data). |
+| `/api/client/register` | POST | Register SDK instance. |
+
+Backend tokens can be scoped to specific [projects](/concepts/projects) and [environments](/concepts/environments). Create them at **Admin settings > Access control > API access**.
+
+## Frontend API
+
+The Frontend API is designed for client-side environments and returns only enabled flags for a specific [Unleash Context](/concepts/unleash-context), providing security and performance benefits.
+
+**Authentication**: [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens).
+
+**Key endpoints**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/frontend` | GET/POST | Fetch enabled [feature flags](/concepts/feature-flags) for provided context. |
+| `/api/frontend/client/metrics` | POST | Report usage [metrics](/concepts/impression-data). |
+| `/api/frontend/client/register` | POST | Register [SDK](/sdks) instance. |
+
+### Frontend vs Client API
+
+| Aspect | Client API | Frontend API |
+|--------|------------|--------------|
+| **Payload** | All [feature flags](/concepts/feature-flags) and [strategies](/concepts/activation-strategies). | Only enabled [feature flags](/concepts/feature-flags) for the provided context. |
+| **Evaluation** | Server-side by SDK. | Evaluated by the Unleash server or [Unleash Edge](/unleash-edge). |
+| **Token type** | [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens). | [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens). |
+
+Each Frontend API request requires an [Unleash Context](/concepts/unleash-context) for flag evaluation:
+
+```json
+{
+  "userId": "user-123",
+  "properties": {
+    "region": "us-east",
+    "plan": "premium"
+  }
+}
+```
+
+## Admin API
+
+The Admin API provides comprehensive programmatic access to all Unleash resources. This API powers the Unleash Admin UI and enables automation workflows.
+
+All requests require the `Authorization` header:
+
+```bash
+curl -H "Authorization: YOUR_TOKEN" \
+  https://your-unleash-instance.com/api/admin/projects
+```
 
 ## API authentication and tokens
 
@@ -21,12 +80,12 @@ All Unleash APIs require authentication using an API token. The type of token yo
 ### Token types
 
 Unleash supports four types of API tokens:
-- **Backend tokens**: Used to connect backend SDKs, Unleash Edge, and the Unleash Proxy to the Client API. Can be scoped to a specific project and environment.
-- **Frontend tokens**: Used to connect frontend SDKs to the Frontend API or Unleash Edge. These tokens are designed to be publicly accessible and have limited permissions. Can be scoped to a specific project and environment.
-- **Personal access tokens**: Tied to a specific user account. They are useful for testing, debugging, or providing temporary access to tools and scripts that need to interact with the Admin API.
+- **Backend tokens**: Used to connect backend SDKs and [Unleash Edge](/unleash-edge) to the Client API. Can be scoped to a specific project and environment. Must remain secret.
+- **Frontend tokens**: Used to connect frontend SDKs to the Frontend API or [Unleash Edge](/unleash-edge). These tokens are designed to be publicly accessible and have limited permissions. Can be scoped to a specific project and environment.
+- **Personal access tokens**: Tied to a specific user account. Useful for testing, debugging, or providing temporary access to tools and scripts that need to interact with the Admin API.
 - **Service account tokens**: The recommended method for providing API access to integrations, automation tools, and other non-human users. Service accounts provide a more secure and manageable way to grant Admin API access.
 
-For an end-to-end Unleash integration, you might need to use multiple token types. For example, when connecting a frontend SDK to Unleash using Unleash Edge, you'll need the following tokens:
+For an end-to-end Unleash integration, you might need to use multiple token types. For example, when connecting a frontend SDK to Unleash using [Unleash Edge](/unleash-edge), you'll need:
 - A frontend token for the frontend SDK to securely communicate with Unleash Edge.
 - A backend token for Unleash Edge to communicate with the main Unleash server.
 
@@ -34,12 +93,14 @@ Ensure that the backend token has access to the same project and environment (or
 
 ### Create an API token
 
-Depending on your permissions, you can create API tokens in the Unleash Admin UI in four ways:
+Depending on your permissions, you can create API tokens in the Unleash Admin UI:
 
 - **Admin settings > Access control > API access**: for backend or frontend tokens; requires the Admin root role, or a custom root role with API token permissions.
 - **Admin settings > Service accounts > New service account**: for creating a service account and assigning a token.
 - **Settings > API access** [inside a project]: for project-specific client or frontend tokens; permitted for project Members or users with a corresponding root role.
 - **Profile > View profile settings > Personal API tokens**: for personal access tokens.
+
+Learn more about [API tokens and client keys](/concepts/api-tokens-and-client-keys).
 
 ## API specification
 

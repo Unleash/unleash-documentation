@@ -124,7 +124,7 @@ navigation:
                 path: pages/concepts/change-requests.mdx
               - page: Public invite links
                 path: pages/concepts/public-signup.mdx
-                slug: public-invite-links
+                slug: public-signup
 
           - section: Instance health and configuration
             skip-slug: true
@@ -239,28 +239,36 @@ navigation:
             contents:
               - page: Integrations overview
                 path: pages/integrate/integrations.mdx
+                slug: integrate
               - page: Datadog
                 path: pages/integrate/datadog.mdx
+                slug: integrate/data
 
               - section: Jira Cloud
                 skip-slug: true
                 contents:
                   - page: Jira Cloud plugin installation
                     path: pages/integrate/jira-cloud-plugin-installation.mdx
+                    slug: integrate/jira-cloud-plugin-installation
                   - page: Jira Cloud plugin usage
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
+                    slug: integrate/jira-cloud-plugin-usage
 
               - page: MCP
                 availability: beta
                 path: pages/integrate/mcp.mdx
-              - page: App for Slack
+                slug: integrate/mcp
+              - page: Slack
                 path: pages/integrate/slack-app.mdx
+                slug: integrate/slack
               - page: Microsoft Teams
                 path: pages/integrate/teams.mdx
+                slug: integrate/teams
               - page: Terraform
-                path: pages/concepts/terraform.mdx
+                path: pages/integrate/terraform.mdx
               - page: Webhook
                 path: pages/integrate/webhook.mdx
+                slug: integrate/webhook
 
       - section: Data privacy and compliance
         slug: privacy-and-compliance
@@ -299,20 +307,9 @@ navigation:
             slug: support/oss-comparison
             path: pages/support/oss-comparison.mdx
 
-          - section: Contribute to Unleash
+          - page: Contribute to Unleash
             slug: contributing
-            collapsed: true
-            contents:
-              - page: Developer guide
-                path: pages/contributing/developer-guide.mdx
-              - page: Client specification
-                path: pages/contributing/client-specification.mdx
-              - page: Frontend
-                slug: frontend/overview
-                path: pages/contributing/frontend/overview.mdx
-              - page: Backend
-                path: pages/contributing/backend/overview.mdx
-                slug: backend/overview
+            path: pages/contribute.mdx
 
   - tab: api-docs
     layout:
@@ -333,6 +330,7 @@ navigation:
             contents:
               - endpoint: POST /api/client/metrics
               - endpoint: POST /api/client/metrics/custom
+                slug: /client-custom-metrics
           - section: "Register SDK"
             skip-slug: true
             contents:
@@ -392,10 +390,47 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Change requests"
-            referenced-packages:
-              - Change Requests
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/config
+                title: Get change request configuration
+              - endpoint: PUT /api/admin/projects/{projectId}/environments/{environment}/change-requests/config
+                title: Update change request configuration
+              - endpoint: POST /api/admin/projects/{projectId}/environments/{environment}/change-requests
+                title: Create or add change to request
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests
+                title: Get all change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/count
+                title: Get change request count
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/scheduled
+                title: Get scheduled change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/pending
+                title: Get pending change requests
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/pending/{featureName}
+                title: Get pending requests for a feature
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/{id}
+                title: Get a change request
+              - endpoint: DELETE /api/admin/projects/{projectId}/change-requests/{id}
+                title: Delete a change request
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/state
+                title: Update change request state
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/title
+                title: Update change request title
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+                title: Edit a change
+              - endpoint: DELETE /api/admin/projects/{projectId}/change-requests/{changeRequestId}/changes/{changeId}
+                title: Discard a change
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/{id}/approvers
+                title: Get change request approvers
+              - endpoint: PUT /api/admin/projects/{projectId}/change-requests/{id}/approvers
+                title: Add change request reviewers
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/available-reviewers/{environment}
+                title: Get available reviewers
+              - endpoint: POST /api/admin/projects/{projectId}/change-requests/{id}/comments
+                title: Add a comment
+              - endpoint: GET /api/admin/projects/{projectId}/change-requests/open
+                title: Get open change requests (deprecated)
+                hidden: true
           - section: "Context"
             referenced-packages:
               - Context
@@ -432,10 +467,20 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Instance admin"
-            referenced-packages:
-              - Instance Admin
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/logins
+                title: Get login history
+              - endpoint: GET /api/admin/license
+                title: Get license
+              - endpoint: POST /api/admin/license
+                title: Update license
+              - endpoint: GET /api/admin/license/check
+                title: Validate license
+              - endpoint: GET /api/admin/instance-admin/statistics
+                title: Get instance statistics
+              - endpoint: GET /api/admin/instance-admin/statistics/csv
+                title: Get instance statistics (CSV)
           - section: "Maintenance"
             referenced-packages:
               - Maintenance
@@ -477,15 +522,60 @@ navigation:
             contents: []
             skip-slug: true
           - section: "Release templates"
-            referenced-packages:
-              - Release Templates
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/release-plan-templates
+                title: Get all release templates
+              - endpoint: POST /api/admin/release-plan-templates
+                title: Create a release template
+              - endpoint: GET /api/admin/release-plan-templates/{templateId}
+                title: Get a release template
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}
+                title: Update a release template
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}
+                title: Delete a release template
+              - endpoint: POST /api/admin/release-plan-templates/archive/{templateId}
+                title: Archive a release template
+              - endpoint: POST /api/admin/release-plan-templates/{templateId}/milestones
+                title: Add a milestone
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+                title: Update a milestone
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}
+                title: Remove a milestone
+              - endpoint: POST /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies
+                title: Add a strategy to milestone
+              - endpoint: PUT /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+                title: Update milestone strategy
+              - endpoint: DELETE /api/admin/release-plan-templates/{templateId}/milestones/{milestoneId}/strategies/{strategyId}
+                title: Remove milestone strategy
+              - endpoint: GET /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans
+                title: Get release plans
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans
+                title: Add a release plan
+              - endpoint: DELETE /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans/{planId}
+                title: Remove a release plan
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release-plans/{planId}/milestones/{milestoneId}/start
+                title: Start a milestone
+              - endpoint: GET /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+                title: Get release plans (deprecated)
+                hidden: true
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans
+                title: Add a release plan (deprecated)
+                hidden: true
+              - endpoint: DELETE /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}
+                title: Remove a release plan (deprecated)
+                hidden: true
+              - endpoint: POST /api/admin/projects/{project}/features/{featureName}/environments/{environment}/release_plans/{planId}/milestones/{milestoneId}/start
+                title: Start a milestone (deprecated)
+                hidden: true
           - section: "Search"
-            referenced-packages:
-              - Search
-            contents: []
             skip-slug: true
+            contents:
+              - endpoint: GET /api/admin/search/features
+                title: Search features
+                slug: /search-features
+              - endpoint: GET /api/admin/search/change-requests
+                title: Search change requests
           - section: "Segments"
             referenced-packages:
               - Segments
@@ -809,8 +899,10 @@ navigation:
         path: pages/academy/foundational.mdx
       - page: Advanced for Developers
         path: pages/academy/advanced-for-devs.mdx
+        slug: advanced-for-devs
       - page: Managing Unleash for DevOps/Admins
         path: pages/academy/managing-unleash-for-devops.mdx
+        slug: managing-unleash-for-devops
 
   - tab: release-notes
 
@@ -854,5 +946,12 @@ js:
   - path: ./footer-dist/output.js
     strategy: afterInteractive
 
+redirects:
+  - source: /contributing/:slug
+    destination: /contribute
+    permanent: true
+  - source: /contributing/ADRs/:slug*
+    destination: /contribute
+    permanent: true
 settings:
   hide-404-page: true

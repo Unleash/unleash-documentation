@@ -1,0 +1,66 @@
+---
+title: Frontend API overview
+og:site_name: Unleash Documentation
+og:title: Frontend API Overview - Unleash Documentation
+description: The Frontend API is used by frontend SDKs to fetch enabled feature flags for a specific Unleash Context.
+keywords: frontend api, frontend sdk, feature flags, api tokens, unleash context, client-side
+max-toc-depth: 3
+---
+
+The Frontend API is designed for [frontend SDKs](/sdks/react) running in browsers, mobile apps, and other client-side environments. Unlike the [Client API](/api), it only returns enabled feature flags for a specific [Unleash Context](/concepts/unleash-context), providing security and performance benefits.
+
+**Base path**: `<your-unleash-url>/api/frontend`
+
+**Primary use**: Fetch enabled flags for a specific user context without exposing your entire flag configuration. Frontend SDKs handle registration, polling, and metrics automatically.
+
+## Key differences from Client API
+
+| Aspect | [Client API](/api) | Frontend API |
+|--------|------------|--------------|
+| **Payload** | All [feature flags](/concepts/feature-flags) and [strategies](/concepts/activation-strategies). | Only enabled [feature flags](/concepts/feature-flags) for the provided context. |
+| **Evaluation** | Server-side by SDK. | Evaluated by the Unleash server or [Unleash Enterprise Edge](/unleash-edge). |
+| **Token type** | [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens). | [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens). |
+
+## Authentication
+
+Use **[frontend tokens](/concepts/api-tokens-and-client-keys)** for authentication. These tokens can be scoped to specific [projects](/concepts/projects) and [environments](/concepts/environments) and are safe to embed in client-side code.
+
+To create a frontend token, go to **Admin settings > Access control > API access > New API token**.
+
+## Available endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/frontend` | GET | Fetch enabled [feature flags](/concepts/feature-flags) (using query params). |
+| `/api/frontend` | POST | Fetch enabled [feature flags](/concepts/feature-flags) (using request body). |
+| `/api/frontend/client/metrics` | POST | Report usage [metrics](/concepts/impression-data). |
+| `/api/frontend/client/register` | POST | Register [SDK](/sdks) instance. |
+
+## Unleash Context
+
+Each request requires an [Unleash Context](/concepts/unleash-context) to evaluate flags. For example, include fields like `userId`, `sessionId`, and custom `properties` for targeting:
+
+```json
+{
+  "userId": "user-123",
+  "properties": {
+    "region": "us-east",
+    "plan": "premium"
+  }
+}
+```
+
+Learn more about [context fields and constraints](/concepts/unleash-context).
+
+## Using with Unleash Edge
+
+For production applications, use [Unleash Edge](/unleash-edge) to improve performance, privacy, and reduce latency. Edge caches evaluations closer to your users and provides built-in fallback mechanisms.
+
+Point your SDK to your Edge instance instead of directly to Unleash:
+
+```javascript
+const config = {
+  url: 'https://your-edge-instance.com/api/frontend',
+  clientKey: 'YOUR_FRONTEND_TOKEN',
+};
+```

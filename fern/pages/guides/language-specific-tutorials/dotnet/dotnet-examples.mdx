@@ -58,7 +58,9 @@ var responseBody = await response.Content.ReadAsStringAsync();
 Console.WriteLine(responseBody);
 ```
 
-Learn more about [gradual rollouts in our docs](/concepts/activation-strategies). Also, learn more about our [API for creating a new strategy](/api/update-feature-strategy) for your flags.
+Learn more about [gradual rollouts in our docs](/concepts/activation-strategies).
+<EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/strategies" />
+Also, learn more about our API for creating a new strategy for your flags.
 
 ## Canary Deployments in .NET
 
@@ -175,7 +177,8 @@ Console.WriteLine(responseBody);
 > If you already have a gradual rollout strategy for your flag, use a PUT request to update it.
 > If you’re creating a new strategy, use a POST request.
 
-Check out our [API docs on updating flag strategies](/api/update-feature-strategy) to learn more.
+<EndpointRequestSnippet endpoint="PUT /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/strategies/{strategyId}" />
+Check out our API docs on updating flag strategies to learn more.
 
 Read our documentation for more context on [strategy constraint configurations](/concepts/activation-strategies#constraints) and use cases.
 
@@ -295,7 +298,8 @@ var responseBody = await response.Content.ReadAsStringAsync();
 Console.WriteLine(responseBody);
 ```
 
-Take a look at our [API docs](/api/patch-feature) to learn more about how to change different flag properties right from your code.
+<EndpointRequestSnippet endpoint="PATCH /api/admin/projects/{projectId}/features/{featureName}" />
+Take a look at our API docs to learn more about how to change different flag properties right from your code.
 
 You can find more information in our [impression data docs](/concepts/impression-data#impression-event-data).
 
@@ -316,7 +320,8 @@ Our metrics are great for understanding user traffic. You can get a better sense
 
 Another use case for reviewing metrics is verifying that the right users are being exposed to your feature based on how you’ve configured your strategies and/or variants.
 
-Take a look at our [Metrics API documentation](/api/metrics) to understand how it works from a code perspective.
+<EndpointRequestSnippet endpoint="GET /api/admin/metrics/feature-usage" />
+Take a look at our Metrics API documentation to understand how it works from a code perspective.
 
 ## Feature Flag Audit Logs in .NET
 
@@ -355,7 +360,8 @@ var responseBody = await response.Content.ReadAsStringAsync();
 Console.WriteLine(responseBody);
 ```
 
-Read our documentation on [Event Log](/concepts/events#event-log) and [APIs](/api/get-events-for-toggle) to learn more.
+Read our documentation on [Event Log](/concepts/events#event-log) and
+<EndpointRequestSnippet endpoint="GET /api/admin/events" /> to learn more.
 
 ## Flag Automation and Workflow Integration for .NET Apps
 
@@ -382,7 +388,8 @@ Here’s how this can be done via our API:
         Console.WriteLine(responseBody);
     ```
 
-    Review our [API docs on flag enablement](/api/toggle-feature-environment-on).
+  <EndpointRequestSnippet endpoint="POST /api/admin/projects/{projectId}/features/{featureName}/environments/{environment}/on" />
+  Review our API docs on flag enablement.
 
 2. Update a flag.
 
@@ -408,7 +415,8 @@ Here’s how this can be done via our API:
         Console.WriteLine(responseBody);
     ```
 
-    Review our [API docs on updating feature flags](/api/update-feature).
+  <EndpointRequestSnippet endpoint="PUT /api/admin/projects/{projectId}/features/{featureName}" />
+  Review our API docs on updating feature flags.
 
 3. Archive a flag.
 
@@ -425,6 +433,7 @@ Here’s how this can be done via our API:
         Console.WriteLine(responseBody);
     ```
 
-    Review [API docs on archiving flags](/api/archive-feature).
+  <EndpointRequestSnippet endpoint="DELETE /api/admin/projects/{projectId}/features/{featureName}" />
+  Review API docs on archiving flags.
 
 Learn more about different use cases in our [.NET SDK documentation](/sdks/dotnet).
