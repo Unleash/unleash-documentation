@@ -54,15 +54,12 @@ We recommend that you initialize the Unleash client SDK **as early as possible**
 application. The SDK will set up an in-memory repository and poll for updates from the Unleash
 server at regular intervals.
 
-```js
-import { initialize } from 'unleash-client';
-
-const unleash = initialize({
-  url: 'https://YOUR-API-URL',
-  appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
-});
-```
+<Code
+  src="../examples/node/node-sdk-initialize.mjs"
+  title="Initialize Node.js SDK"
+  language="js"
+  lines="[1-8]"
+/>
 
 The `initialize` function will configure a **global** Unleash instance. If you call this method
 multiple times, the global instance will be changed. You will **not** create multiple instances.
@@ -73,12 +70,12 @@ Because the SDK takes care of talking to the server in the background, it can be
 exactly when it has connected and is ready to evaluate toggles. If you want to run some code when
 the SDK becomes ready, you can listen for the `'synchronized'` event:
 
-```js
-unleash.on('synchronized', () => {
-  // the SDK has synchronized with the server
-  // and is ready to serve
-});
-```
+<Code
+  src="../examples/node/node-sdk-initialize.mjs"
+  title="synchronized event"
+  language="js"
+  lines="[9-12]"
+/>
 
 Refer to the [events reference](#events) later in this document for more information on events and
 an exhaustive list of all the events the SDK can emit.
@@ -96,20 +93,12 @@ request**. Most applications are expected to only have a single Unleash instance
 Unleash instance will maintain a connection to the Unleash API, which may result in flooding the
 Unleash API.
 
-```js
-import { Unleash } from 'unleash-client';
-
-const unleash = new Unleash({
-  url: 'https://YOUR-API-URL',
-  appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
-});
-
-unleash.on('ready', console.log.bind(console, 'ready'));
-
-// optional error handling when using unleash directly
-unleash.on('error', console.error);
-```
+<Code
+  src="../examples/node/node-sdk-new-instance.mjs"
+  language="javascript"
+  title="Create new instance"
+  lines="[1-14]"
+/>
 
 #### Synchronous Initialization
 
@@ -117,18 +106,12 @@ You can also use the `startUnleash` function and `await` to wait for the SDK to 
 synchronized with the Unleash API. This guarantees that the SDK is not operating on local and
 potentially stale feature toggle configuration.
 
-```js
-import { startUnleash } from 'unleash-client';
-
-const unleash = await startUnleash({
-  url: 'https://YOUR-API-URL',
-  appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
-});
-
-// The Unleash SDK now has a fresh state from the Unleash API
-const isEnabled = unleash.isEnabled('Demo');
-```
+<Code
+  src="../examples/node/node-sdk-start.mjs"
+  language="javascript"
+  title="Synchronous Initialization"
+  lines="[1-11]"
+/>
 
 ### 3. Check Features
 
@@ -162,13 +145,12 @@ You can use the `getVariant` method to retrieve the variant of a feature flag. I
 disabled or doesn't have any variants, the method returns the
 [disabled variant](https://docs.getunleash.io/reference/feature-toggle-variants#the-disabled-variant).
 
-```js
-const variant = unleash.getVariant('demo-variant');
-
-if (variant.name === 'blue') {
-  // do something with the blue variant...
-}
-```
+<Code
+  src="../examples/node/node-sdk-start.mjs"
+  language="javascript"
+  title="Check Variants"
+  lines="[13-17]"
+/>
 
 #### Providing an Unleash Context
 
@@ -182,28 +164,23 @@ evaluate some of the built-in strategies.
 
 The `isEnabled` accepts an Unleash context object as a second argument:
 
-```js
-const unleashContext = {
-  userId: '123',
-  sessionId: 'some-session-id',
-  remoteAddress: '127.0.0.1',
-  properties: {
-    region: 'EMEA',
-  },
-};
-
-const enabled = unleash.isEnabled('someToggle', unleashContext);
-```
+<Code
+  src="../examples/node/node-sdk-start.mjs"
+  language="javascript"
+  title="Unleash Context"
+  lines="[20-29]"
+/>
 
 ### 4. Stop unleash
 
 To shut down the client (turn off the polling) you can simply call the `destroy` method. This is
 typically not required.
 
-```js
-import { destroy } from 'unleash-client';
-destroy();
-```
+<Code
+  src="../examples/node/node-sdk-destroy.mjs"
+  language="javascript"
+  title="Stop unleash"
+/>
 
 ### Built-in Activation Strategies
 
@@ -212,20 +189,6 @@ The client supports all built-in activation strategies provided by Unleash.
 Read more about
 [activation strategies in the official docs](https://docs.getunleash.io/reference/activation-strategies).
 
-### Unleash Context
-
-In order to use some of the common activation strategies you must provide an
-[Unleash context](https://docs.getunleash.io/reference/unleash-context). This client SDK allows you
-to send in the unleash context as part of the `isEnabled` call:
-
-```javascript
-const unleashContext = {
-  userId: '123',
-  sessionId: 'some-session-id',
-  remoteAddress: '127.0.0.1',
-};
-unleash.isEnabled('someToggle', unleashContext);
-```
 
 ## TypeScript: Custom Feature Toggle Names
 
