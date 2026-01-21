@@ -39,6 +39,12 @@ body {
     color: var(--text-color);
 }
 
+/* Reduce mountain background opacity in dark mode */
+.dark body::before,
+.dark #fern-docs::before {
+    opacity: 0.3 !important;
+}
+
 .fern-layout-guide, .fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
@@ -746,6 +752,11 @@ body::after {
     background-repeat: no-repeat;
     pointer-events: none;
     user-select: none;
+}
+
+/* Make mountain more subtle in dark mode */
+.dark body::after {
+    opacity: 0.3;
 }
 
 /* =====================================
