@@ -12,6 +12,18 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
+typography:
+  headingsFont:
+    name: Sen
+    paths:
+      - path: ./fonts/Sen-VariableFont_wght.woff2
+        weight: 400 700
+  bodyFont:
+    name: Sen
+    paths:
+      - path: ./fonts/Sen-VariableFont_wght.woff2
+        weight: 400 700
+
 tabs:
   product-docs:
     display-name: Docs
