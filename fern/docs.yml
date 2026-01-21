@@ -12,6 +12,10 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
+analytics:
+  gtm:
+    container-id: GTM-KV5PRR2
+
 typography:
   headingsFont:
     name: Sen
