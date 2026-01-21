@@ -177,6 +177,7 @@ body:has(.landing-page) .fern-page-actions {
     flex: 1 1 400px;
     min-width: 300px;
     max-width: 500px;
+    aspect-ratio: 500 / 292;
 }
 
 .hero-video iframe {
@@ -262,8 +263,10 @@ body:has(.landing-page) .fern-card > * {
 body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
     gap: 0 0.75rem !important;
     align-items: center;
+    align-content: start;
 }
 
 body:has(.landing-page) .fern-card .card-icon {

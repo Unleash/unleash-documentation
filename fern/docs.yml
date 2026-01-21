@@ -55,7 +55,7 @@ navigation:
     layout:
       - page: Home
         path: pages/welcome.mdx
-        slug: ""
+        slug: "/"
 
       - section: Get started
         contents:
@@ -927,16 +927,16 @@ navbar-links:
     value: https://github.com/Unleash/unleash
   - type: minimal
     text: Product
-    url: https://www.getunleash.io/product
+    url: https://www.getunleash.io/enterprise-feature-management-platform
   - type: minimal
     text: Plans
-    url: https://www.getunleash.io/plans
+    url: https://www.getunleash.io/pricing
   - type: minimal
     text: Sign in
-    url: https://www.getunleash.io/signin
+    url: https://app.unleash-hosted.com/sign-in
   - type: filled
     text: Start free trial
-    url: https://www.getunleash.io/plans/enterprise-payg
+    url: https://www.getunleash.io/pricing
       
 colors:
   accent-primary:
