@@ -58,6 +58,7 @@ body {
     margin-right: auto !important;
     padding-left: 4rem;
     padding-right: 4rem;
+    padding-bottom: 4rem;
 }
 
 body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
@@ -713,6 +714,38 @@ html.dark .unleash-academy-level-badge {
         flex-wrap: wrap !important;
         gap: 0.5rem !important;
     }
+}
+
+/* =====================================
+   FOOTER SPACING
+   ===================================== */
+
+/* Add spacing above footer */
+#fern-footer {
+    margin-top: 4rem;
+    position: relative;
+    z-index: 1;
+    background-color: var(--sidebar-nav-bg-color);
+}
+
+/* =====================================
+   MOUNTAIN BACKDROP
+   ===================================== */
+
+body::after {
+    content: "";
+    background-image: url("https://cdn.getunleash.io/docs-assets/mountain-texture.png");
+    position: fixed;
+    display: block;
+    z-index: 0;
+    bottom: 0;
+    right: 0;
+    width: 350px;
+    aspect-ratio: 652 / 905;
+    background-size: cover;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    user-select: none;
 }
 
 /* =====================================
