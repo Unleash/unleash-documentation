@@ -11,7 +11,7 @@ This Svelte SDK is designed to help you integrate with Unleash and evaluate feat
 
 You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=svelte) or [Unleash Open Source](https://github.com/Unleash/unleash).
 
-# Installation
+## Installation
 
 ```bash
 npm install @unleash/proxy-client-svelte
@@ -19,7 +19,7 @@ npm install @unleash/proxy-client-svelte
 yarn add @unleash/proxy-client-svelte
 ```
 
-# How to Use
+## How to Use
 
 ## Initialize the Client
 
@@ -149,9 +149,9 @@ This code sample shows you how to update the unleash context dynamically:
 </script>
 ```
 
-# Advanced Use Cases
+## Advanced Use Cases
 
-## Deferring Client Start
+### Deferring Client Start
 
 By default, the Unleash client will start polling for toggles immediately when the `FlagProvider` component renders. You can prevent it by setting `startClient` prop to `false`. This is useful when you'd like to for example bootstrap the client and work offline.
 
@@ -176,7 +176,7 @@ To start the client, use the client's `start` method. The below snippet of pseud
 </FlagProvider>
 ```
 
-## Use Unleash Client Directly
+### Use Unleash Client Directly
 
 ```svelte
 <script lang="ts">
