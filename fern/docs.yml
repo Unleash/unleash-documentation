@@ -229,27 +229,28 @@ navigation:
 
           - section: Single sign-on
             contents:
-              - page: How to add SSO with OpenID Connect
+              - page: OpenID Connect
                 path: pages/single-sign-on/how-to-add-sso-open-id-connect.mdx
-              - page: How to add SSO with SAML 2.0
+              - page: SAML 2.0
                 path: pages/single-sign-on/how-to-add-sso-saml.mdx
-              - page: How to add SSO with SAML Keycloak
+              - page: SAML Keycloak
                 path: pages/single-sign-on/how-to-add-sso-saml-keycloak.mdx
-              - page: How to add SSO with Azure SAML
+              - page: Azure SAML
                 path: pages/single-sign-on/how-to-add-sso-azure-saml.mdx
-              - page: How to add SSO with Google
+              - page: Google Auth
                 path: pages/single-sign-on/how-to-add-sso-google.mdx
-              - page: How to set up Keycloak group syncing
+                hidden: true
+              - page: Keycloak group syncing
                 path: pages/single-sign-on/how-to-setup-sso-keycloak-group-sync.mdx
-              - page: How to set up group SSO sync
+              - page: Group SSO sync
                 path: pages/single-sign-on/how-to-set-up-group-sso-sync.mdx
 
           - section: Automatic provisioning
             slug: provisioning
             contents:
-              - page: How to set up provisioning with Okta
+              - page: Okta
                 path: pages/provisioning/how-to-setup-provisioning-with-okta.mdx
-              - page: How to set up provisioning with Entra
+              - page: Entra
                 path: pages/provisioning/how-to-setup-provisioning-with-entra.mdx
 
           - section: Integrations
