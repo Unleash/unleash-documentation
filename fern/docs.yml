@@ -938,7 +938,7 @@ navbar-links:
     url: https://app.unleash-hosted.com/sign-in
   - type: filled
     text: Start free trial
-    url: https://www.getunleash.io/pricing
+    url: https://www.getunleash.io/plans/enterprise-payg
       
 colors:
   accent-primary:

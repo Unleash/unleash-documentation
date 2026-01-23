@@ -13,7 +13,7 @@ npm install -g fern-api
 
 ## Local development
 
-Start the local development server (automatically fetches latest API spec):
+Start the local development server:
 
 ```bash
 npm run dev
@@ -23,7 +23,14 @@ This will:
 1. Fetch the latest OpenAPI spec from the hosted Unleash instance
 2. Split it into three separate API definitions (see [API Structure](#api-structure))
 3. Save them to `fern/apis/*/openapi.json`
-4. Start the dev server at `http://localhost:3000`
+4. Build the custom footer component (see [Custom Footer](#custom-footer))
+5. Start the dev server at `http://localhost:3000`
+
+If you don't need to fetch the latest OpenAPI spec or rebuild the footer, you can run the Fern dev server directly for faster startup:
+
+```bash
+fern docs dev
+```
 
 ### Manual commands
 
@@ -33,24 +40,27 @@ If you need to run commands separately:
 # Fetch OpenAPI spec only
 npm run fetch
 
-# Start dev server without fetching
+# Build footer only
+npm run build:footer
+
+# Start dev server without fetching or building footer
 fern docs dev
 
-# Build docs (with automatic fetch)
+# Build docs (with automatic fetch and footer build)
 npm run build
 ```
 
-## API Structure
+## API structure
 
 The Unleash API documentation is split into three separate API definitions to enable better organization and URL structure:
 
-### API Definitions
+### API definitions
 
 - **Client API** (`fern/apis/client-api/`): Contains only endpoints with the "Client" tag
 - **Frontend API** (`fern/apis/frontend-api/`): Contains only endpoints with the "Frontend API" tag
 - **Admin API** (`fern/apis/admin-api/`): Contains all remaining endpoints (excludes Client and Frontend API tags)
 
-### How It Works
+### How it works
 
 The `scripts/fetch-openapi.mjs` script:
 
@@ -62,13 +72,31 @@ The `scripts/fetch-openapi.mjs` script:
 3. Strips image markdown (`![Unleash Enterprise]` and `![Beta]`) that doesn't work in Fern
 4. Replaces server URL with `https://app.unleash-instance.example.com`
 
-### Benefits
+## Custom footer
 
-This approach allows:
-- **Flat URL structure**: Endpoints appear at `/api/endpoint-name` instead of `/api/tag-name/endpoint-name`
-- **Granular organization**: Each API can have custom sections and layouts in `docs.yml`
-- **Clear separation**: Client, Frontend, and Admin APIs are logically separated
-- **Single source**: All three APIs are generated from the same upstream OpenAPI spec
+We build a custom footer built with React. The footer source code is in `footer/src/` and is compiled to `fern/footer-dist/`.
+
+### How it works
+
+Fern supports [custom JavaScript and CSS](https://buildwithfern.com/learn/docs/customization/custom-css-js) that can replace or enhance the default components. The footer is built as a React component using Vite:
+
+- **Source**: `footer/src/FernFooter.tsx` and `footer/src/main.css`
+- **Output**: `fern/footer-dist/output.js` and `fern/footer-dist/output.css`
+- **Config**: Referenced in `fern/docs.yml` under `css` and `js` sections
+
+### Building the footer
+
+The footer is built automatically when running `npm run dev` or `npm run build`. To build it manually:
+
+```bash
+npm run build:footer
+```
+
+Or directly:
+
+```bash
+cd footer && npm install && npm run build
+```
 
 ## Validation
 

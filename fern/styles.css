@@ -341,17 +341,17 @@ img {
 }
 
 /* Navbar links styling */
-#fern-header a[href="https://www.getunleash.io/product"],
-#fern-header a[href="https://www.getunleash.io/plans"],
-#fern-header a[href="https://www.getunleash.io/signin"] {
+#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"],
+#fern-header a[href="https://www.getunleash.io/pricing"],
+#fern-header a[href="https://app.unleash-hosted.com/sign-in"] {
     font-weight: 600 !important;
     color: var(--nav-text-color) !important;
     border: none !important;
 }
 
-#fern-header a[href="https://www.getunleash.io/product"]:hover,
-#fern-header a[href="https://www.getunleash.io/plans"]:hover,
-#fern-header a[href="https://www.getunleash.io/signin"]:hover {
+#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"]:hover,
+#fern-header a[href="https://www.getunleash.io/pricing"]:hover,
+#fern-header a[href="https://app.unleash-hosted.com/sign-in"]:hover {
     color: var(--accent-color) !important;
 }
 
