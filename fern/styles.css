@@ -39,6 +39,12 @@ body {
     color: var(--text-color);
 }
 
+/* Reduce mountain background opacity in dark mode */
+.dark body::before,
+.dark #fern-docs::before {
+    opacity: 0.3 !important;
+}
+
 .fern-layout-guide, .fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
@@ -53,8 +59,12 @@ body {
 }
 
 .landing-page {
-    margin-left: 4rem !important;
-    margin-right: 4rem !important;
+    max-width: 1300px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 4rem;
+    padding-right: 4rem;
+    padding-bottom: 4rem;
 }
 
 body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
@@ -70,14 +80,14 @@ body:has(.landing-page) .fern-page-actions {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
     margin-bottom: 2rem;
     padding-bottom: 2.5rem;
 }
 
 .hero h1 {
     white-space: nowrap;
-    margin-bottom: 0;
+    margin-bottom: 1.75rem;
     color: var(--nav-text-color);
 }
 
@@ -129,8 +139,8 @@ body:has(.landing-page) .fern-page-actions {
 /* Mobile - hide video, ensure text is readable */
 @media (max-width: 768px) {
     .landing-page {
-        margin-left: 1.5rem !important;
-        margin-right: 1.5rem !important;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
     .hero {
@@ -160,8 +170,8 @@ body:has(.landing-page) .fern-page-actions {
 /* Small mobile */
 @media (max-width: 480px) {
     .landing-page {
-        margin-left: 1rem !important;
-        margin-right: 1rem !important;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .hero h1 {
@@ -174,23 +184,24 @@ body:has(.landing-page) .fern-page-actions {
 }
 
 .hero-video {
-    flex: 1 1 400px;
-    min-width: 300px;
-    max-width: 500px;
+    flex: 1 1 450px;
+    min-width: 320px;
+    max-width: 580px;
+    aspect-ratio: 600 / 330;
 }
 
 .hero-video iframe {
     border-radius: 12px;
     width: 100%;
     height: auto;
-    aspect-ratio: 500 / 292;
+    aspect-ratio: 600 / 330;
 }
 
 /* Card bottom stripe styles */
 body:has(.landing-page) .fern-card {
     position: relative;
     overflow: hidden;
-    padding: 1.5rem;
+    padding: 1.75rem;
     padding-bottom: 3rem;
 }
 
@@ -262,8 +273,10 @@ body:has(.landing-page) .fern-card > * {
 body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
     gap: 0 0.75rem !important;
     align-items: center;
+    align-content: start;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
@@ -314,7 +327,7 @@ body:has(.landing-page) .fern-card div {
 /* Equal height cards */
 body:has(.landing-page) .fern-card {
     height: 100%;
-    min-height: 180px;
+    min-height: 240px;
     display: flex;
     flex-direction: column;
 }
@@ -328,17 +341,17 @@ img {
 }
 
 /* Navbar links styling */
-#fern-header a[href="https://www.getunleash.io/product"],
-#fern-header a[href="https://www.getunleash.io/plans"],
-#fern-header a[href="https://www.getunleash.io/signin"] {
+#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"],
+#fern-header a[href="https://www.getunleash.io/pricing"],
+#fern-header a[href="https://app.unleash-hosted.com/sign-in"] {
     font-weight: 600 !important;
     color: var(--nav-text-color) !important;
     border: none !important;
 }
 
-#fern-header a[href="https://www.getunleash.io/product"]:hover,
-#fern-header a[href="https://www.getunleash.io/plans"]:hover,
-#fern-header a[href="https://www.getunleash.io/signin"]:hover {
+#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"]:hover,
+#fern-header a[href="https://www.getunleash.io/pricing"]:hover,
+#fern-header a[href="https://app.unleash-hosted.com/sign-in"]:hover {
     color: var(--accent-color) !important;
 }
 
@@ -707,6 +720,43 @@ html.dark .unleash-academy-level-badge {
         flex-wrap: wrap !important;
         gap: 0.5rem !important;
     }
+}
+
+/* =====================================
+   FOOTER SPACING
+   ===================================== */
+
+/* Add spacing above footer */
+#fern-footer {
+    margin-top: 4rem;
+    position: relative;
+    z-index: 1;
+    background-color: var(--sidebar-nav-bg-color);
+}
+
+/* =====================================
+   MOUNTAIN BACKDROP
+   ===================================== */
+
+body::after {
+    content: "";
+    background-image: url("https://cdn.getunleash.io/docs-assets/mountain-texture.png");
+    position: fixed;
+    display: block;
+    z-index: 0;
+    bottom: 0;
+    right: 0;
+    width: 350px;
+    aspect-ratio: 652 / 905;
+    background-size: cover;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Make mountain more subtle in dark mode */
+.dark body::after {
+    opacity: 0.3;
 }
 
 /* =====================================

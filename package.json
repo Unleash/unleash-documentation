@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "fetch": "node scripts/fetch-openapi.mjs",
-    "dev": "npm run fetch && fern docs dev",
-    "build": "npm run fetch && fern generate --docs"
+    "build:footer": "cd footer && npm install && npm run build",
+    "dev": "npm run fetch && npm run build:footer && fern docs dev",
+    "build": "npm run fetch && npm run build:footer && fern generate --docs"
   }
 }

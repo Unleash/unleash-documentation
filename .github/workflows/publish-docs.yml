@@ -21,6 +21,12 @@ jobs:
       - name: Fetch OpenAPI spec
         run: node scripts/fetch-openapi.mjs
 
+      - name: Build footer
+        run: |
+          cd footer
+          npm install
+          npm run build
+
       - name: Install Fern CLI tool
         run: npm install -g fern-api
 

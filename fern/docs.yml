@@ -28,6 +28,11 @@ typography:
       - path: ./fonts/Sen-VariableFont_wght.woff2
         weight: 400 700
 
+landing-page: 
+  page: Unleash Documentation
+  path: pages/welcome.mdx
+  slug: "/"
+
 tabs:
   product-docs:
     display-name: Docs
@@ -53,10 +58,7 @@ tabs:
 navigation:
   - tab: product-docs
     layout:
-      - page: Home
-        path: pages/welcome.mdx
-        slug: ""
-
+      
       - section: Get started
         contents:
           - page: Quickstart
@@ -927,13 +929,13 @@ navbar-links:
     value: https://github.com/Unleash/unleash
   - type: minimal
     text: Product
-    url: https://www.getunleash.io/product
+    url: https://www.getunleash.io/enterprise-feature-management-platform
   - type: minimal
     text: Plans
-    url: https://www.getunleash.io/plans
+    url: https://www.getunleash.io/pricing
   - type: minimal
     text: Sign in
-    url: https://www.getunleash.io/signin
+    url: https://app.unleash-hosted.com/sign-in
   - type: filled
     text: Start free trial
     url: https://www.getunleash.io/plans/enterprise-payg
@@ -969,5 +971,40 @@ redirects:
   - source: /contributing/ADRs/:slug*
     destination: /contribute
     permanent: true
+  # --- Pre-migration ---   
+  - source: "/how-to/:slug*"
+    destination: "/guides/:slug*"
+  - source: "/reference/:slug*"
+    destination: "/concepts/:slug*"
+  - source: "/integrations/:slug*"
+    destination: "/integrate/:slug*"
+  - source: "/using-unleash/deploy/:slug*"
+    destination: "/deploy/:slug*"
+  - source: "/using-unleash/compliance/:slug*"
+    destination: "/privacy-and-compliance/:slug*"
+  - source: "/feature-flag-tutorials/use-cases/:slug*"
+    destination: "/guides/:slug*"
+  - source: "/feature-flag-tutorials/:lang/examples"
+    destination: "/guides/feature-flag-examples-:lang"
+  - source: "/feature-flag-tutorials/:lang"
+    destination: "/guides/implement-feature-flags-in-:lang"
+  - source: "/how-to/how-to-add-sso-:slug"
+    destination: "/single-sign-on/how-to-add-sso-:slug"
+  - source: "/client-sdk"
+    destination: "/sdks"
+  - source: "/sdks/android_proxy_sdk"
+    destination: "/sdks/android"
+  - source: "/sdks/proxy-ios"
+    destination: "/sdks/ios"
+  - source: "/sdks/proxy-javascript"
+    destination: "/sdks/javascript-browser"
+  - source: "/sdks/proxy-react"
+    destination: "/sdks/react"
+  - source: "/unleash-proxy"
+    destination: "/unleash-edge"
+  - source: "/get-started"
+    destination: "/get-started/quickstart"
+  - source: "/deploy"
+    destination: "/deploy/getting-started"
 settings:
   hide-404-page: true
