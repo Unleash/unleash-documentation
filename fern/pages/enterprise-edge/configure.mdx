@@ -1,7 +1,7 @@
 ---
 title: Configure Enterprise Edge
 description: Complete configuration reference for Enterprise Edge self-hosted including environment variables, CLI flags, and operating modes.
-keywords: enterprise edge, configure, environment variables, cli, edge mode, offline mode, redis, s3, tls, cors
+keywords: enterprise edge, configure, environment variables, cli, edge mode, offline mode, redis, s3, tls, cors, opentelemetry, otlp, observability
 og:site_name: Unleash
 og:title: Configure Enterprise Edge
 max-toc-depth: 3
@@ -173,6 +173,60 @@ These settings apply when running Unleash Edge in Edge mode.
 | **Sentry rate** | `SENTRY_TRACING_RATE` | `--sentry-tracing-rate` | Tracing rate (Default `0.1`). |
 | **Sentry debug** | `SENTRY_DEBUG` | `--sentry-debug` | Enable Sentry debugging. |
 | **Sentry logs** | `SENTRY_ENABLE_LOGS` | `--sentry-enable-logs` | Enable sending application logs to Sentry |
+
+#### OpenTelemetry exporting
+
+<Button small outlined className="version-button" href="/support/availability">Edge v20.2</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+Unleash Enterprise Edge allows you to export tracing and logs to an OpenTelemetry Protocol (OTLP) compatible collector.
+
+If `OTEL_EXPORTER_OTLP_ENDPOINT` is not set, Edge logs to stdout using `RUST_LOG` settings and the `LOG_FORMAT` setting (`json`, `pretty`, or `plain`).
+
+**GRPC exporter**
+
+To export to an OTLP/GRPC compatible collector:
+
+```shell
+# Default GRPC collector listens on port 4317
+unleash-edge edge \
+  --otel-exporter-otlp-endpoint http://localhost:4317 \
+  --upstream-url https://your-unleash.com \
+  --tokens your-token
+```
+
+**HTTP exporter**
+
+Edge supports HTTP/JSON for OTLP export. HTTP/Protobuf is not supported.
+
+To export to an HTTP/JSON compatible collector:
+
+```shell
+# Default HTTP collector listens on port 4318
+unleash-edge edge \
+  --otel-exporter-otlp-endpoint http://localhost:4318 \
+  --otel-exporter-otlp-protocol http \
+  --upstream-url https://your-unleash.com \
+  --tokens your-token
+```
+
+| Feature | Environment variable | CLI flag | Description |
+| :---- | :---- | :---- | :---- |
+| **Endpoint** | `OTEL_EXPORTER_OTLP_ENDPOINT` | `--otel-exporter-otlp-endpoint` | URL of the OTLP collector. |
+| **Protocol** | `OTEL_EXPORTER_OTLP_PROTOCOL` | `--otel-exporter-otlp-protocol` | Set to `http` for HTTP/JSON export. Default is GRPC. |
+
+**Custom headers**
+
+You can add custom headers to OTLP requests using standard [OpenTelemetry environment variables](https://opentelemetry.io/docs/specs/otel/protocol/exporter/). Headers use [W3C Baggage format](https://www.w3.org/TR/baggage/).
+
+| Environment variable | Description |
+| :---- | :---- |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Headers for both tracing and logs. |
+| `OTEL_EXPORTER_OTLP_TRACES_HEADERS` | Headers for tracing only. |
+| `OTEL_EXPORTER_OTLP_LOGS_HEADERS` | Headers for logs only. |
+
+<Note>
+Configuring different endpoints for tracing and logs is not currently supported.
+</Note>
 
 ### Upstream mTLS
 
