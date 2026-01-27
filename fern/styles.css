@@ -50,6 +50,10 @@ main {
     opacity: 0.3 !important;
 }
 
+#fern-sidebar {
+    margin-right: 16px;
+}
+
 .fern-layout-guide, .fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
@@ -375,7 +379,11 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"],
 button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
 button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 .fern-header-tabs a[aria-selected="true"],
-.fern-header-tabs a[data-state="active"] {
+.fern-header-tabs a[data-state="active"],
+button.fern-header-tabs__tab[role="tab"]:hover,
+button.fern-header-tabs__tab[role="tab"]:hover span,
+button.fern-header-tabs__tab[role="tab"]:hover .truncate,
+.fern-header-tabs a:hover {
     color: var(--accent-color) !important;
 }
 

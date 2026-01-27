@@ -208,19 +208,53 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: var(--grayscale-8);
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease;
   text-decoration: none;
 }
 
 #fern-footer .social-links a:hover {
-  color: var(--grayscale-9);
+  opacity: 0.7;
 }
 
-#fern-footer .social-links svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
+/* Social icon dark/light switching */
+#fern-footer .social-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Light mode: show light icons, hide dark icons */
+#fern-footer .social-icon-light {
+  display: block;
+}
+
+#fern-footer .social-icon-dark {
+  display: none;
+}
+
+/* Dark mode: show dark icons, hide light icons */
+[data-theme="dark"] #fern-footer .social-icon-light,
+.dark #fern-footer .social-icon-light {
+  display: none;
+}
+
+[data-theme="dark"] #fern-footer .social-icon-dark,
+.dark #fern-footer .social-icon-dark {
+  display: block;
+}
+
+/* Heart icon styling */
+#fern-footer .heart-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+#fern-footer .made-with-love {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Responsive adjustments */
@@ -336,14 +370,14 @@
   #fern-footer .social-links {
     gap: 1.5rem;
   }
-  
+
   #fern-footer .social-links a {
     width: 40px;
     height: 40px;
   }
-  
-  #fern-footer .social-links svg {
-    width: 20px;
-    height: 20px;
+
+  #fern-footer .social-icon {
+    width: 40px;
+    height: 40px;
   }
 }
