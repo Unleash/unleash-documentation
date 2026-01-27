@@ -39,6 +39,11 @@ body {
     color: var(--text-color);
 }
 
+/* Ensure main content appears above the mountain backdrop */
+main {
+    z-index: 1 !important;
+}
+
 /* Reduce mountain background opacity in dark mode */
 .dark body::before,
 .dark #fern-docs::before {
@@ -49,7 +54,7 @@ body {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
     margin-top: 2rem;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
