@@ -772,12 +772,3 @@ body::after {
     opacity: 0.3;
 }
 
-/* =====================================
-   CUSTOM FOOTER HOVER STYLING
-   ===================================== */
-
-/* Footer link hover - purple with underline */
-#fern-footer .footer-links a:hover {
-    color: #817afe !important;
-    text-decoration: underline !important;
-}
