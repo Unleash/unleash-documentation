@@ -61,32 +61,31 @@ export const FernFooter: React.FC = () => {
       <footer>
         {/* Top Container - Main Navigation */}
         <div className="top-container">
-          {/* Left section with logo and description */}
+          {/* Left section with logo and description - uses CSS Grid for alignment */}
           <div className="footer-section logo-section">
-            <div className="logo-and-text">
-              <div className="logo-container">
-                {/* Dark logo for light mode */}
-                <svg className="unleash-logo unleash-logo-dark" width="48" height="48" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M80 160C124.183 160 160 124.183 160 80C160 35.8172 124.183 0 80 0C35.8172 0 0 35.8172 0 80C0 124.183 35.8172 160 80 160Z" fill="#1A4049"/>
-                  <path d="M91.43 45.71V91.43H114.28V45.71H91.43ZM68.57 68.57V45.71H45.71V114.28H91.43V91.43H68.57V68.57Z" fill="white"/>
-                  <path d="M91.43 45.71V91.43H114.28V45.71H91.43ZM68.57 68.57V45.71H45.71V114.28H91.43V91.43H68.57V68.57Z" fill="white"/>
-                  <path d="M91.4299 91.43H114.29V114.29H91.4299V91.43Z" fill="#817AFE"/>
-                </svg>
-                
-                {/* White logo for dark mode */}
-                <svg className="unleash-logo unleash-logo-light" width="48" height="48" viewBox="0 0 161 161" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M80.6201 160.62C124.803 160.62 160.62 124.803 160.62 80.62C160.62 36.4372 124.803 0.619995 80.6201 0.619995C36.4373 0.619995 0.620117 36.4372 0.620117 80.62C0.620117 124.803 36.4373 160.62 80.6201 160.62Z" fill="white"/>
-                  <path d="M92.0501 46.33V92.05H114.9V46.33H92.0501ZM69.1901 69.19V46.33H46.3301V114.9H92.0501V92.05H69.1901V69.19Z" fill="white"/>
-                  <path d="M92.0501 46.33V92.05H114.9V46.33H92.0501ZM69.1901 69.19V46.33H46.3301V114.9H92.0501V92.05H69.1901V69.19Z" fill="#1A4049"/>
-                  <path d="M92.05 92.05H114.91V114.91H92.05V92.05Z" fill="#817AFE"/>
-                </svg>
-              </div>
-              <p className="company-description">
-                Unleash reduces the risk of releasing new features, drives innovation by streamlining the software release process, and increases revenue by optimizing end-user experience. While we serve the needs of the world's largest, most security-conscious organizations, we are also rated the "Easiest Feature Management system to use" by G2.
-              </p>
+            <div className="logo-container">
+              {/* Dark logo for light mode */}
+              <svg className="unleash-logo unleash-logo-dark" width="48" height="48" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M80 160C124.183 160 160 124.183 160 80C160 35.8172 124.183 0 80 0C35.8172 0 0 35.8172 0 80C0 124.183 35.8172 160 80 160Z" fill="#1A4049"/>
+                <path d="M91.43 45.71V91.43H114.28V45.71H91.43ZM68.57 68.57V45.71H45.71V114.28H91.43V91.43H68.57V68.57Z" fill="white"/>
+                <path d="M91.43 45.71V91.43H114.28V45.71H91.43ZM68.57 68.57V45.71H45.71V114.28H91.43V91.43H68.57V68.57Z" fill="white"/>
+                <path d="M91.4299 91.43H114.29V114.29H91.4299V91.43Z" fill="#817AFE"/>
+              </svg>
+
+              {/* White logo for dark mode */}
+              <svg className="unleash-logo unleash-logo-light" width="48" height="48" viewBox="0 0 161 161" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M80.6201 160.62C124.803 160.62 160.62 124.803 160.62 80.62C160.62 36.4372 124.803 0.619995 80.6201 0.619995C36.4373 0.619995 0.620117 36.4372 0.620117 80.62C0.620117 124.803 36.4373 160.62 80.6201 160.62Z" fill="white"/>
+                <path d="M92.0501 46.33V92.05H114.9V46.33H92.0501ZM69.1901 69.19V46.33H46.3301V114.9H92.0501V92.05H69.1901V69.19Z" fill="white"/>
+                <path d="M92.0501 46.33V92.05H114.9V46.33H92.0501ZM69.1901 69.19V46.33H46.3301V114.9H92.0501V92.05H69.1901V69.19Z" fill="#1A4049"/>
+                <path d="M92.05 92.05H114.91V114.91H92.05V92.05Z" fill="#817AFE"/>
+              </svg>
             </div>
-            
-            {/* Social Links section - under logo and text */}
+
+            <p className="company-description">
+              Unleash reduces the risk of releasing new features, drives innovation by streamlining the software release process, and increases revenue by optimizing end-user experience. While we serve the needs of the world's largest, most security-conscious organizations, we are also rated the "Easiest Feature Management system to use" by G2.
+            </p>
+
+            {/* Social Links section - aligned with description via grid */}
             <div className="social-links">
               <SocialLink href="https://github.com/Unleash" label="GitHub" lightIcon={githubLight} darkIcon={githubDark} />
               <SocialLink href="https://www.linkedin.com/company/unleash-hosted/" label="LinkedIn" lightIcon={linkedinLight} darkIcon={linkedinDark} />
@@ -169,8 +168,9 @@ export const FernFooter: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Container - Copyright only */}
+        {/* Bottom Container - uses same grid alignment as logo section */}
         <div className="bottom-container">
+          <div className="logo-spacer" aria-hidden="true"></div>
           <div className="copyright-section">
             <span className="made-with-love"><HeartIcon /> Made in a cosy atmosphere in the Nordic countries.</span>
             <div className="built-with">
