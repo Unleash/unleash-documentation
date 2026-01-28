@@ -21242,6 +21242,14 @@
               "enterprise-self-hosted"
             ],
             "description": "A marker that tells Unleash whether this Edge instance is self-hosted, enterprise self-hosted, or hosted by Unleash."
+          },
+          "apiKeyRevisionIds": {
+            "type": "array",
+            "description": "List of API keys (represented by their environment and projects) and revision ids to make it easier to track sync state of edge",
+            "items": {
+              "$ref": "#/components/schemas/edgeApiKeyRevisionIdSchema"
+            },
+            "nullable": true
           }
         }
       },
@@ -21398,6 +21406,38 @@
           },
           "edge": {
             "$ref": "#/components/schemas/edgeLatencyMetricsSchema"
+          }
+        }
+      },
+      "edgeApiKeyRevisionIdSchema": {
+        "description": "Represents Edge sync state of api keys",
+        "type": "object",
+        "required": [
+          "environment",
+          "projects",
+          "revisionId"
+        ],
+        "properties": {
+          "environment": {
+            "description": "The Unleash Environment this apiKey is synced for",
+            "type": "string"
+          },
+          "projects": {
+            "type": "array",
+            "description": "The list of projects this key is valid for or * if valid for all projects",
+            "items": {
+              "type": "string"
+            }
+          },
+          "revisionId": {
+            "description": "The revision id of Edge's last successful sync of this key",
+            "type": "number",
+            "minimum": 0
+          },
+          "lastUpdated": {
+            "description": "The timestamp of the last successful sync of this key",
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -39394,7 +39434,18 @@
               }
             }
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "include",
+            "schema": {
+              "type": "string",
+              "example": "project"
+            },
+            "description": "Whether the response should include project-specific or root context fields in addition to the fields in the default response. When querying the root context API, `include=project` will yield a response that includes all project-specific context fields in addition to all root context fields. Conversely, when querying a project-specific context API, using `include=root` will yield a response that includes all root context fields in addition to the project-specific context fields. The other combinations have no effect, because the responses already include those fields. When including project-specific context fields via the root-level API, context fields in private projects the user does not have access to will be omitted.",
+            "in": "query"
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -51006,6 +51057,398 @@
           },
           {
             "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context": {
+      "get": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Gets configured context fields",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nReturns all configured [Context fields](https://docs.getunleash.io/concepts/unleash-context) that have been created.",
+        "operationId": "getContextFieldsForProject",
+        "responses": {
+          "200": {
+            "description": "contextFieldsSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contextFieldsSchema"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "schema": {
+              "type": "string",
+              "example": "project"
+            },
+            "description": "Whether the response should include project-specific or root context fields in addition to the fields in the default response. When querying the root context API, `include=project` will yield a response that includes all project-specific context fields in addition to all root context fields. Conversely, when querying a project-specific context API, using `include=root` will yield a response that includes all root context fields in addition to the project-specific context fields. The other combinations have no effect, because the responses already include those fields. When including project-specific context fields via the root-level API, context fields in private projects the user does not have access to will be omitted.",
+            "in": "query"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Context"
+        ],
+        "operationId": "createContextFieldForProject",
+        "summary": "Create a context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nEndpoint that allows creation of [custom context fields](https://docs.getunleash.io/concepts/unleash-context#custom-context-fields)",
+        "requestBody": {
+          "description": "createContextFieldSchema",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createContextFieldSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "headers": {
+              "location": {
+                "description": "The location of the newly created resource.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "description": "The resource was successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contextFieldSchema"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context/{contextField}": {
+      "get": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Gets context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nReturns specific [context field](https://docs.getunleash.io/concepts/unleash-context) identified by the name in the path",
+        "operationId": "getContextFieldForProject",
+        "responses": {
+          "200": {
+            "description": "contextFieldSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contextFieldSchema"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Update an existing context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nEndpoint that allows updating a custom context field. Used to toggle stickiness and add/remove legal values for this context field",
+        "operationId": "updateContextFieldForProject",
+        "requestBody": {
+          "description": "updateContextFieldSchema",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/updateContextFieldSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "This response has no body."
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Delete an existing context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nEndpoint that allows deletion of a custom context field. Does not validate that context field is not in use, but since context field configuration is stored in a json blob for the strategy, existing strategies are safe.",
+        "operationId": "deleteContextFieldForProject",
+        "responses": {
+          "200": {
+            "description": "This response has no body."
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context/{contextField}/strategies": {
+      "get": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "getStrategiesByContextFieldForProject",
+        "summary": "Get strategies that use a context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nRetrieves a list of all strategies that use the specified context field. If the context field doesn't exist, returns an empty list of strategies",
+        "responses": {
+          "200": {
+            "description": "contextFieldStrategiesSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contextFieldStrategiesSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid. Provide a valid API token as the `authorization` header, e.g. `authorization:*.*.my-admin-token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "AuthenticationRequired",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You must log in to use Unleash. Your request had no authorization header, so we could not authorize you. Try logging in at /auth/simple/login.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context/{contextField}/legal-values": {
+      "post": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Add or update legal value for the context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nEndpoint that allows adding or updating a single custom context field legal value. If the legal value already exists, it will be updated with the new description",
+        "operationId": "updateContextFieldLegalValueForProject",
+        "requestBody": {
+          "description": "legalValueSchema",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/legalValueSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "This response has no body."
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context/{contextField}/legal-values/{legalValue}": {
+      "delete": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Delete legal value for the context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nRemoves the specified custom context field legal value. Does not validate that the legal value is not in use and does not remove usage from constraints that use it.",
+        "operationId": "deleteContextFieldLegalValueForProject",
+        "responses": {
+          "200": {
+            "description": "This response has no body."
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contextField",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "legalValue",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/admin/projects/{projectId}/context/validate": {
+      "post": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "Validate a context field",
+        "description": "This is a beta endpoint and it may change or be removed in the future.\n\nCheck whether the provided data can be used to create a context field. If the data is not valid, returns a 400 status code with the reason why it is not valid.",
+        "operationId": "validateContextFieldNameForProject",
+        "requestBody": {
+          "description": "nameSchema",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nameSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "This response has no body."
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
             "in": "path",
             "required": true,
             "schema": {

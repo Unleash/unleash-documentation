@@ -39,17 +39,26 @@ body {
     color: var(--text-color);
 }
 
+/* Ensure main content appears above the mountain backdrop */
+main {
+    z-index: 1 !important;
+}
+
 /* Reduce mountain background opacity in dark mode */
 .dark body::before,
 .dark #fern-docs::before {
     opacity: 0.3 !important;
 }
 
+#fern-sidebar {
+    margin-right: 16px;
+}
+
 .fern-layout-guide, .fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
     margin-top: 2rem;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -269,40 +278,38 @@ body:has(.landing-page) .fern-card > * {
     z-index: 1;
 }
 
-/* Make card icon and heading display inline using grid */
+/* Card grid layout for icon + title inline, description full width */
 body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
-    gap: 0 0.75rem !important;
+    grid-template-rows: auto auto;
+    gap: 0 0.5rem !important;
     align-items: center;
     align-content: start;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
     grid-column: 1;
-    grid-row: 1 / 2;
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    color: var(--nav-text-color) !important;
+    grid-row: 1;
+}
+
+body:has(.landing-page) .fern-card h3 {
+    line-height: 1 !important;
 }
 
 body:has(.landing-page) .fern-card .w-full.space-y-1 {
-    grid-column: 1 / -1;
     display: contents !important;
 }
 
-/* Heading next to icon */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
     grid-column: 2;
     grid-row: 1;
 }
 
-/* Description full width below */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 1rem !important;
+    margin-top: 2rem !important;
 }
 
 /* Card text colors */
@@ -370,7 +377,11 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"],
 button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
 button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 .fern-header-tabs a[aria-selected="true"],
-.fern-header-tabs a[data-state="active"] {
+.fern-header-tabs a[data-state="active"],
+button.fern-header-tabs__tab[role="tab"]:hover,
+button.fern-header-tabs__tab[role="tab"]:hover span,
+button.fern-header-tabs__tab[role="tab"]:hover .truncate,
+.fern-header-tabs a:hover {
     color: var(--accent-color) !important;
 }
 
@@ -723,6 +734,31 @@ html.dark .unleash-academy-level-badge {
 }
 
 /* =====================================
+   SIDEBAR BORDER
+   ===================================== */
+
+#fern-sidebar {
+    border-right: none !important;
+}
+
+/* =====================================
+   TOC MOBILE BUTTON
+   ===================================== */
+
+.toc-mobile button {
+    background-color: var(--container-bg-color) !important;
+    transition: background-color 0.15s ease;
+}
+
+.light .toc-mobile button:hover {
+    background-color: #f0f0f3 !important;
+}
+
+.dark .toc-mobile button:hover {
+    background-color: #2b2a3d !important;
+}
+
+/* =====================================
    FOOTER SPACING
    ===================================== */
 
@@ -759,12 +795,3 @@ body::after {
     opacity: 0.3;
 }
 
-/* =====================================
-   CUSTOM FOOTER HOVER STYLING
-   ===================================== */
-
-/* Footer link hover - purple with underline */
-#fern-footer .footer-links a:hover {
-    color: #817afe !important;
-    text-decoration: underline !important;
-}
