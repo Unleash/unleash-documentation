@@ -278,20 +278,19 @@ body:has(.landing-page) .fern-card > * {
     z-index: 1;
 }
 
-/* Make card icon and heading display inline using grid */
+/* Card grid layout for icon + title inline, description full width */
 body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
-    gap: 0 0.75rem !important;
+    grid-template-rows: auto auto;
+    gap: 0 0.5rem !important;
     align-items: center;
     align-content: start;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    margin-inline-end: 0 !important;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 body:has(.landing-page) .fern-card h3 {
@@ -299,21 +298,18 @@ body:has(.landing-page) .fern-card h3 {
 }
 
 body:has(.landing-page) .fern-card .w-full.space-y-1 {
-    grid-column: 1 / -1;
     display: contents !important;
 }
 
-/* Heading next to icon */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
     grid-column: 2;
     grid-row: 1;
 }
 
-/* Description full width below */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 1rem !important;
+    margin-top: 2rem !important;
 }
 
 /* Card text colors */
@@ -735,6 +731,14 @@ html.dark .unleash-academy-level-badge {
         flex-wrap: wrap !important;
         gap: 0.5rem !important;
     }
+}
+
+/* =====================================
+   SIDEBAR BORDER
+   ===================================== */
+
+#fern-sidebar {
+    border-right: none !important;
 }
 
 /* =====================================
