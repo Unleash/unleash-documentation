@@ -289,11 +289,13 @@ body:has(.landing-page) .fern-card > div.flex {
 }
 
 body:has(.landing-page) .fern-card .card-icon {
-    grid-column: 1;
-    grid-row: 1 / 2;
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
-    color: var(--nav-text-color) !important;
+    margin-inline-end: 0 !important;
+}
+
+body:has(.landing-page) .fern-card h3 {
+    line-height: 1 !important;
 }
 
 body:has(.landing-page) .fern-card .w-full.space-y-1 {
