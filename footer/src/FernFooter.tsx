@@ -1,18 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 
-// Import social icons (light/dark variants)
-import githubLight from './assets/githubLight.png';
-import githubDark from './assets/githubDark.png';
-import linkedinLight from './assets/linkedinLight.png';
-import linkedinDark from './assets/linkedinDark.png';
-import twitterLight from './assets/twitterLight.png';
-import twitterDark from './assets/twitterDark.png';
-import slackLight from './assets/slackLight.png';
-import slackDark from './assets/slackDark.png';
-import stackoverflowLight from './assets/stackoverflowLight.png';
-import stackoverflowDark from './assets/stackoverflowDark.png';
-import youtubeLight from './assets/youtubeLight.png';
-import youtubeDark from './assets/youtubeDark.png';
+// CDN base URL for assets
+const CDN_BASE = 'https://cdn.getunleash.io/docs-assets';
+
+// Social icons (light/dark variants) from CDN
+const githubLight = `${CDN_BASE}/githubLight.png`;
+const githubDark = `${CDN_BASE}/githubDark.png`;
+const linkedinLight = `${CDN_BASE}/linkedinLight.png`;
+const linkedinDark = `${CDN_BASE}/linkedinDark.png`;
+const twitterLight = `${CDN_BASE}/twitterLight.png`;
+const twitterDark = `${CDN_BASE}/twitterDark.png`;
+const slackLight = `${CDN_BASE}/slackLight.png`;
+const slackDark = `${CDN_BASE}/slackDark.png`;
+const stackoverflowLight = `${CDN_BASE}/stackoverflowLight.png`;
+const stackoverflowDark = `${CDN_BASE}/stackoverflowDark.png`;
+const youtubeLight = `${CDN_BASE}/youtubeLight.png`;
+const youtubeDark = `${CDN_BASE}/youtubeDark.png`;
 
 // Heart icon component
 const HeartIcon = () => (
