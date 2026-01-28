@@ -738,6 +738,23 @@ html.dark .unleash-academy-level-badge {
 }
 
 /* =====================================
+   TOC MOBILE BUTTON
+   ===================================== */
+
+.toc-mobile button {
+    background-color: var(--container-bg-color) !important;
+    transition: background-color 0.15s ease;
+}
+
+.light .toc-mobile button:hover {
+    background-color: #f0f0f3 !important;
+}
+
+.dark .toc-mobile button:hover {
+    background-color: #2b2a3d !important;
+}
+
+/* =====================================
    FOOTER SPACING
    ===================================== */
 
