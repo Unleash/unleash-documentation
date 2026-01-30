@@ -21242,6 +21242,14 @@
               "enterprise-self-hosted"
             ],
             "description": "A marker that tells Unleash whether this Edge instance is self-hosted, enterprise self-hosted, or hosted by Unleash."
+          },
+          "apiKeyRevisionIds": {
+            "type": "array",
+            "description": "List of API keys (represented by their environment and projects) and revision ids to make it easier to track sync state of edge",
+            "items": {
+              "$ref": "#/components/schemas/edgeApiKeyRevisionIdSchema"
+            },
+            "nullable": true
           }
         }
       },
@@ -21398,6 +21406,38 @@
           },
           "edge": {
             "$ref": "#/components/schemas/edgeLatencyMetricsSchema"
+          }
+        }
+      },
+      "edgeApiKeyRevisionIdSchema": {
+        "description": "Represents Edge sync state of api keys",
+        "type": "object",
+        "required": [
+          "environment",
+          "projects",
+          "revisionId"
+        ],
+        "properties": {
+          "environment": {
+            "description": "The Unleash Environment this apiKey is synced for",
+            "type": "string"
+          },
+          "projects": {
+            "type": "array",
+            "description": "The list of projects this key is valid for or * if valid for all projects",
+            "items": {
+              "type": "string"
+            }
+          },
+          "revisionId": {
+            "description": "The revision id of Edge's last successful sync of this key",
+            "type": "number",
+            "minimum": 0
+          },
+          "lastUpdated": {
+            "description": "The timestamp of the last successful sync of this key",
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
