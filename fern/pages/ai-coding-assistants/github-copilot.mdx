@@ -1,0 +1,666 @@
+---
+title: Integrate Unleash with GitHub Copilot
+description: Configure the Unleash MCP server to automate feature flag management in GitHub Copilot.
+max-toc-depth: 2
+---
+
+The [Unleash MCP](/integrate/mcp) server connects [GitHub Copilot](https://github.com/features/copilot) to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. You can evaluate code changes, create flags, automatically wrap changes in feature flags, manage rollouts, and clean up flags without leaving your editor.
+
+GitHub Copilot supports MCP in several environments:
+- [Visual Studio Code](https://code.visualstudio.com/) with full MCP support available in versions 1.102+.
+- [JetBrains IDEs](https://www.jetbrains.com/) with IntelliJ IDEA, PyCharm, WebStorm, and others with AI Assistant.
+- [Visual Studio](https://visualstudio.microsoft.com/) with the GitHub Copilot extension.
+- [Neovim](https://neovim.io/) with community plugins like [mcphub.nvim](https://github.com/ravitemer/mcphub.nvim).
+- [Copilot CLI](https://github.com/features/copilot/cli), a command-line interface.
+- On [GitHub.com](https://github.com/features/copilot), a web-based Copilot (limited MCP support).
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: the MCP server is distributed as an npm package.
+- A supported IDE, see environment-specific requirements [here](#configure-your-ide).
+- An Unleash instance: cloud or self-hosted, with API access enabled.
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) with permissions to create and manage feature flags.
+
+## Install the MCP server
+
+The Unleash MCP server runs as a local stdio process. Configuration differs by environment, but all IDEs use the same npm package and credentials.
+
+First, create a shared credentials file that works across all environments:
+
+```bash title="~/.unleash/mcp.env"
+UNLEASH_BASE_URL=https://your-instance.getunleash.io/api
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+```
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+
+### Configure your IDE
+
+<Tabs>
+<Tab title="Visual Studio Code">
+
+**Requirements:** VS Code 1.102 or later with GitHub Copilot extension.
+
+<Steps>
+<Step title="Create the configuration file">
+Create a file at `.vscode/mcp.json` in your project root:
+
+```json title=".vscode/mcp.json"
+{
+  "servers": {
+    "unleash-mcp": {
+      "name": "Unleash MCP",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "envFile": "~/.unleash/mcp.env"
+    }
+  }
+}
+```
+</Step>
+
+<Step title="Reload VS Code">
+After saving the file, reload VS Code by running **Developer: reload window** from the Command Palette. The MCP server starts automatically when you open the project.
+</Step>
+
+<Step title="Verify the installation">
+1. Open the Chat view (`Cmd+Shift+I` on Mac, `Ctrl+Alt+I` on Windows/Linux).
+2. Click the **Tools** icon (wrench) in the chat toolbar.
+3. Select the Unleash MCP tools in the list.
+
+<Tip>
+If the tools don't appear, run **MCP: List Servers** from the Command Palette and select **Show Output** to view server logs.
+</Tip>
+</Step>
+</Steps>
+
+**Global configuration:** To use the MCP server across all projects, run **MCP: Add Server** from the Command Palette and choose **Global**.
+
+**Remote development:** For Dev Containers, WSL, or SSH, define the server in the remote `.vscode/mcp.json` or in the `customizations.vscode.mcp` section of `devcontainer.json`.
+
+</Tab>
+
+<Tab title="JetBrains IDEs">
+
+**Requirements:** IntelliJ IDEA, PyCharm, WebStorm, or another JetBrains IDE with AI Assistant plugin.
+
+<Info>
+JetBrains AI Assistant MCP support is evolving. Check the [JetBrains AI Assistant documentation](https://www.jetbrains.com/help/idea/ai-assistant.html) for the latest capabilities.
+</Info>
+
+<Steps>
+<Step title="Go to AI Assistant settings">
+Go to **Settings** → **Tools** → **AI Assistant** → **MCP Servers**.
+</Step>
+
+<Step title="Add the Unleash MCP server">
+Click **Add** and configure:
+
+- **Name:** `Unleash MCP`
+- **Command:** `npx`
+- **Arguments:** `-y @unleash/mcp@latest --log-level error`
+- **Environment variables:**
+  - `UNLEASH_BASE_URL`: Your Unleash API URL
+  - `UNLEASH_PAT`: Your personal access token
+  - `UNLEASH_DEFAULT_PROJECT`: Your default project
+</Step>
+
+<Step title="Enable the server">
+Ensure the server is enabled and restart the IDE if prompted.
+</Step>
+</Steps>
+
+<Note>
+JetBrains does not currently support `envFile`. You must configure environment variables directly in the settings or use system environment variables.
+</Note>
+
+</Tab>
+
+<Tab title="Visual Studio">
+
+**Requirements:** Visual Studio 2022 or later with GitHub Copilot extension.
+
+<Info>
+Visual Studio MCP support is currently in preview. Check the [Visual Studio Copilot documentation](https://learn.microsoft.com/en-us/visualstudio/ide/visual-studio-github-copilot-extension) for the latest capabilities.
+</Info>
+
+<Steps>
+<Step title="Open Copilot settings">
+Go to **Tools** → **Options** → **GitHub Copilot** → **MCP Servers**.
+</Step>
+
+<Step title="Add the Unleash MCP server">
+Click **Add** and configure:
+
+- **Name:** `Unleash MCP`
+- **Command:** `npx -y @unleash/mcp@latest --log-level error`
+- **Working directory:** Your project root
+- **Environment variables:** Configure `UNLEASH_BASE_URL`, `UNLEASH_PAT`, and `UNLEASH_DEFAULT_PROJECT`
+</Step>
+
+<Step title="Restart Visual Studio">
+Restart Visual Studio to activate the MCP server.
+</Step>
+</Steps>
+
+</Tab>
+
+<Tab title="Neovim">
+
+**Requirements:** Neovim 0.9+ with a Copilot plugin and MCP support.
+
+<Info>
+The official copilot.vim plugin does not support MCP. Use community plugins like [mcphub.nvim](https://github.com/ravitemer/mcphub.nvim) for MCP integration.
+</Info>
+
+<Steps>
+<Step title="Install mcphub.nvim">
+Add mcphub.nvim to your plugin manager. For example, with lazy.nvim:
+
+```lua title="init.lua"
+{
+  "ravitemer/mcphub.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = function()
+    require("mcphub").setup({
+      servers = {
+        ["unleash-mcp"] = {
+          command = "npx",
+          args = { "-y", "@unleash/mcp@latest", "--log-level", "error" },
+          env = {
+            UNLEASH_BASE_URL = os.getenv("UNLEASH_BASE_URL"),
+            UNLEASH_PAT = os.getenv("UNLEASH_PAT"),
+            UNLEASH_DEFAULT_PROJECT = os.getenv("UNLEASH_DEFAULT_PROJECT"),
+          },
+        },
+      },
+    })
+  end,
+}
+```
+</Step>
+
+<Step title="Set environment variables">
+Export the required variables in your shell configuration:
+
+```bash title="~/.zshrc or ~/.bashrc"
+export UNLEASH_BASE_URL="https://your-instance.getunleash.io/api"
+export UNLEASH_PAT="your-personal-access-token"
+export UNLEASH_DEFAULT_PROJECT="default"
+```
+</Step>
+
+<Step title="Restart Neovim">
+Restart Neovim and verify the MCP server is available.
+</Step>
+</Steps>
+
+</Tab>
+
+<Tab title="Copilot CLI (Preview)">
+
+**Requirements:** [GitHub Copilot CLI](https://github.com/github/copilot-cli) installed and authenticated.
+
+GitHub Copilot CLI is a terminal-native interface to GitHub Copilot's coding agent. It supports custom MCP servers via the `/mcp add` slash command, which means you can use the Unleash MCP server directly from your terminal.
+
+<Warning>
+Copilot CLI is in public preview. The configuration interface may change. Check the [official Copilot CLI documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli#add-an-mcp-server) for the latest instructions.
+</Warning>
+
+<Steps>
+<Step title="Install Copilot CLI">
+Choose your preferred installation method:
+
+```bash
+# macOS/Linux (Homebrew)
+brew install copilot-cli
+
+# Windows (WinGet)
+winget install GitHub.Copilot
+
+# npm (cross-platform)
+npm install -g @github/copilot
+```
+</Step>
+
+<Step title="Start Copilot CLI">
+Navigate to your project directory and launch the CLI:
+
+```bash
+cd /path/to/your/project
+copilot
+```
+
+If prompted, trust the current directory and authenticate with `/login`.
+</Step>
+
+<Step title="Add the Unleash MCP server">
+Use the `/mcp add` slash command:
+
+```text
+/mcp add
+```
+
+Fill in the following details (use Tab to move between fields):
+
+| Field | Value |
+|-------|-------|
+| **Name** | `unleash-mcp` |
+| **Type** | `local` |
+| **Command** | `npx -y @unleash/mcp@latest --log-level error` |
+| **Tools** | `*` |
+
+For environment variables, add:
+- `UNLEASH_BASE_URL`: `https://your-instance.getunleash.io/api`
+- `UNLEASH_PAT`: Your personal access token
+- `UNLEASH_DEFAULT_PROJECT`: `default`
+
+Press `Ctrl+S` to save the configuration.
+
+You will see a confirmation message such as "MCP configuration saved successfully! Changes will take effect immediately."
+</Step>
+
+<Step title="Verify the installation">
+Run the `/mcp show` command to confirm the server is configured:
+
+```text
+/mcp show
+```
+
+You should see `unleash-mcp` listed with its tools. Alternatively, ask Copilot to evaluate a change or create a feature flag to confirm the tools are working. If Copilot cannot see the Unleash MCP server, check the `~/.copilot/mcp-config.json` file and verify if the environment variables have been configured correctly.
+</Step>
+</Steps>
+
+<Note>
+Configuration is stored in `~/.copilot/mcp-config.json`. You can also edit this file directly using the [MCP JSON structure](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp#writing-a-json-configuration-for-mcp-servers).
+</Note>
+
+</Tab>
+
+<Tab title="GitHub.com">
+
+**Status:** No MCP support
+
+GitHub Copilot on github.com (web interface) is designed for code review, issue triage, and pull request descriptions. It does not currently support custom MCP servers for feature flag management.
+
+**Recommended workflow:**
+- Use your IDE (VS Code, JetBrains, etc.) for feature flag creation and wrapping
+- Use github.com Copilot for reviewing flag-related pull requests
+
+<Info>
+If MCP support extends to the web interface in the future, this section will be updated with configuration instructions.
+</Info>
+
+</Tab>
+</Tabs>
+
+## Verify the installation
+
+After configuring your IDE, verify that the Unleash MCP tools are available. You should see the following nine tools:
+
+- `evaluate_change`
+- `detect_flag`
+- `create_flag`
+- `wrap_change`
+- `set_flag_rollout`
+- `get_flag_state`
+- `toggle_flag_environment`
+- `remove_flag_strategy`
+- `cleanup_flag`
+
+## Tool reference
+
+The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+
+## Workflows
+
+This section describes common workflows for using the Unleash MCP server with GitHub Copilot.
+
+### Evaluate and wrap a risky change
+
+Use this workflow when you're implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+<Step title="Evaluate the change">
+Ask Copilot to assess whether the change needs a feature flag:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+Copilot calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+Copilot automatically calls `detect_flag` to search for existing flags. If a suitable flag exists, Copilot suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists, ask Copilot to create one:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+Copilot calls `create_flag` with the appropriate name, type, and description. The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+Copilot calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js"
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+</Steps>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+Copilot calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+Copilot calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
+</Tab>
+
+<Tab title="Configure rollout">
+```text
+Set up a gradual rollout for stripe-payment-integration:
+10% for 24 hours, then 50% for 48 hours, then 100%.
+```
+
+Copilot calls `set_flag_rollout` to configure the rollout strategy.
+
+<Warning>
+Automated progression with Impact Metrics is coming soon. For now, milestones require manual advancement or external triggers.
+</Warning>
+</Tab>
+</Tabs>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+Copilot calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
+</Tip>
+
+## Define custom instructions
+
+You can configure project-level instructions to make feature flag evaluation automatic. When custom instructions are present, Copilot considers them on every interaction.
+
+Create a file at `.github/copilot-instructions.md` in your repository:
+
+```markdown title=".github/copilot-instructions.md"
+## Feature flag policy
+
+When implementing new features or modifying high-risk code paths:
+
+1. Always use the `evaluate_change` tool to assess whether the change needs a feature flag
+2. Prefer reusing existing flags over creating new ones (use `detect_flag`)
+3. Follow kebab-case naming: `domain-action-variant`
+4. All payment, authentication, and external API changes MUST be flagged
+5. Use `wrap_change` to generate framework-appropriate guard code
+
+Default project: `checkout-team`
+```
+
+With these instructions in place, when a developer asks Copilot to "add Stripe payments," Copilot automatically evaluates, detects, creates, and wraps without explicit prompting.
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** Copilot calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** Copilot calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** Copilot calls `toggle_flag_environment` or `get_flag_state`.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** Copilot calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="MCP tools not showing up (VS Code)">
+- Check that `.vscode/mcp.json` is in the project root
+- Verify the env file path is correct and the file exists
+- Confirm Node.js and npm are available in your terminal
+- Check that your Unleash PAT has the required permissions
+
+Run **MCP: List Servers** from the Command Palette and select **Show Output** to view server logs.
+</Accordion>
+
+<Accordion title="MCP tools not showing up (JetBrains)">
+- Verify the AI Assistant plugin is installed and enabled
+- Check that the MCP server is listed in **Settings** → **Tools** → **AI Assistant** → **MCP Servers**
+- Confirm environment variables are set correctly
+- Restart the IDE after making changes
+</Accordion>
+
+<Accordion title="MCP tools not showing up (Neovim)">
+- Verify mcphub.nvim or your MCP plugin is installed correctly
+- Check that environment variables are exported in your shell
+- Run `:checkhealth` to verify plugin status
+- Check plugin logs for connection errors
+</Accordion>
+
+<Accordion title="MCP tools not showing up (Copilot CLI)">
+- Verify the server was saved after running `/mcp add`
+- Check `~/.copilot/mcp-config.json` for syntax errors
+- Confirm environment variables are set in the server configuration
+- Restart the Copilot CLI session after adding a new server
+- Check that Node.js and npm are available in your PATH
+</Accordion>
+
+<Accordion title="Authentication failed">
+- Confirm your PAT is valid and has flag creation permissions
+- Check that `UNLEASH_BASE_URL` includes `/api` at the end
+- For Enterprise plans, ensure the "MCP servers in Copilot" policy is enabled
+
+<Note>
+Enterprise-managed Users may have PAT authentication disabled. Contact your GitHub Enterprise admin.
+</Note>
+</Accordion>
+
+<Accordion title="Too many tools in the tool picker">
+VS Code limits a single chat session to 128 tools. If you have many MCP servers installed:
+
+- Create a tool set with only the Unleash tools you need
+- Deselect tools from other MCP servers you're not actively using
+</Accordion>
+
+<Accordion title="Server not starting in remote containers">
+When using Dev Containers, WSL, or SSH remote development:
+
+- Define the server in the remote `.vscode/mcp.json` or in the `customizations.vscode.mcp` section of `devcontainer.json`
+- Ensure Node.js is available in the container
+</Accordion>
+
+<Accordion title="envFile not supported">
+Some IDEs (JetBrains, Visual Studio) do not support the `envFile` property. In these cases:
+
+- Set environment variables directly in the IDE's MCP configuration
+- Use system-level environment variables in your shell profile
+- For CI/CD, use secrets management to inject variables
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with AI assistants.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check" iconSize={8}>
+While the MCP server can automate flag creation, high-risk changes should involve human review. Approve flag creation, rollout plans, and cleanup decisions.
+</Card>
+
+<Card title="Define naming conventions" icon="tag" iconSize={8}>
+Establish organization-wide standards for flag names (e.g., `domain-action-variant`) and types (release, experiment, kill-switch). The MCP server enforces these rules.
+</Card>
+
+<Card title="Prevent duplication" icon="clone" iconSize={8} >
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across microservices.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock" iconSize={8}>
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+</CardGroup>
+
+## Architecture
+
+The following diagram shows how the Unleash MCP server fits into your development workflow.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                     Developer workflow                     │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│   ┌──────────────┐           ┌──────────────────┐          │
+│   │   Your IDE   │     MCP   │   Unleash MCP    │          │
+│   │  + Copilot   │◄─────────►│  server (local)  │          │
+│   └──────────────┘    stdio  └────────┬─────────┘          │
+│                                       │                    │
+│   VS Code, JetBrains,                 │ HTTPS              │
+│   Visual Studio, Neovim               ▼                    │
+│                               ┌───────────────────┐        │
+│                               │ Unleash Admin API │        │
+│                               └───────┬───────────┘        │
+│                                       │                    │
+├───────────────────────────────────────│────────────────────┤
+│                    Runtime evaluation                      │
+├───────────────────────────────────────│────────────────────┤
+│                                       │                    │
+│   ┌──────────────────┐          ┌─────▼─────────────┐      │
+│   │ Your application │◄────────►│ Unleash SDK / Edge│      │
+│   └──────────────────┘  Feature └───────────────────┘      │
+│                          flags                             │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Key points:**
+
+- The MCP server runs locally on your machine as a stdio process.
+- It communicates with the Unleash Admin API using your PAT.
+- Feature flag evaluations happen locally in your application via [SDKs](/sdks) or [Unleash Edge](/concepts/unleash-edge).
+- No user data is sent to the Unleash server during flag evaluation.
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [GitHub Copilot meets progressive delivery](/blog/github-copilot-meets-progressive-delivery)
+- [How to automate feature flags in GitHub Copilot](/blog/automate-feature-flags-github-copilot)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
+- [VS Code MCP server documentation](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
