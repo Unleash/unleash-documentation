@@ -1,0 +1,406 @@
+---
+title: Cursor integration
+og:site_name: Unleash Documentation
+og:title: Cursor integration for Unleash enabling AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in Cursor IDE.
+keywords: cursor, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation, ide
+max-toc-depth: 3
+---
+
+The [Unleash MCP](/integrate/mcp) server connects Cursor to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. You can evaluate code changes, create [feature flags](/concepts/feature-flags), automatically wrap code in flags, manage rollouts, and clean up flags without leaving your editor.
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later. The MCP server is distributed as an npm package.
+- [Cursor](https://cursor.com/) with [MCP support](https://cursor.com/docs/cli/mcp) enabled.
+- An Unleash instance: cloud or self-hosted, with API access enabled.
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) with permissions to create and manage feature flags.
+
+## Install the MCP server
+
+You can run the Unleash MCP server using `npx` without installing it globally. Configure Cursor to start the server automatically by adding the MCP configuration to your project or global settings.
+
+<Steps>
+
+<Step title="Create the configuration file">
+Create a file at `.cursor/mcp.json` in your project root:
+
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "unleash-mcp": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "env": {
+        "UNLEASH_BASE_URL": "https://your-instance.getunleash.io/api",
+        "UNLEASH_PAT": "your-personal-access-token",
+        "UNLEASH_DEFAULT_PROJECT": "default"
+      }
+    }
+  }
+}
+```
+
+Replace the placeholder values with your actual Unleash instance URL, PAT, and default project name.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
+| `UNLEASH_PAT` | A Personal Access Token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+<Tip>
+To keep credentials out of version control, add `.cursor/mcp.json` to your `.gitignore` file. Alternatively, configure the MCP server globally in `~/.cursor/mcp.json` to reuse it across all projects.
+</Tip>
+</Step>
+
+<Step title="Restart Cursor">
+
+After saving the configuration file, restart Cursor. The MCP server starts automatically when you open the project.
+
+</Step>
+
+<Step title="Verify the installation">
+
+To confirm the MCP server is running:
+
+1. Open Cursor Settings (`Cmd+,` on Mac, `Ctrl+,` on Windows/Linux).
+2. Navigate to **Features > MCP**.
+3. Check that the Unleash MCP server is listed and shows a green status.
+
+You can also verify by opening the chat panel (`Cmd+L` on Mac, `Ctrl+L` on Windows/Linux) and checking that the Unleash tools are available. You should see the following tools:
+
+- `evaluate_change`
+- `detect_flag`
+- `create_flag`
+- `wrap_change`
+- `set_flag_rollout`
+- `get_flag_state`
+- `toggle_flag_environment`
+- `remove_flag_strategy`
+- `cleanup_flag`
+
+<Tip>
+If the tools don't appear, check the MCP server status in Cursor Settings > Features > MCP. Click on the server entry to view logs.
+</Tip>
+
+</Step>
+
+</Steps>
+
+## Tool reference
+
+The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+
+## Workflows
+
+This section describes common workflows for using the Unleash MCP server with Cursor.
+
+### Evaluate and wrap a risky change
+
+Use this workflow when you're implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+<Step title="Evaluate the change">
+Ask Cursor to assess whether the change needs a feature flag:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+Cursor calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+Cursor automatically calls `detect_flag` to search for existing flags. If a suitable flag exists, Cursor suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists, ask Cursor to create one:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+Cursor calls `create_flag` with the appropriate name, type, and description. The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+Cursor calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js"
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+</Steps>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+Cursor calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+Cursor calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
+</Tab>
+
+<Tab title="Configure rollout">
+```text
+Set up a gradual rollout for stripe-payment-integration:
+10% for 24 hours, then 50% for 48 hours, then 100%.
+```
+
+Cursor calls `set_flag_rollout` to configure the rollout strategy.
+
+<Warning>
+Automated progression with Impact Metrics is coming soon. For now, milestones require manual advancement or external triggers.
+</Warning>
+</Tab>
+</Tabs>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+Cursor calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
+</Tip>
+
+## Automate with Cursor rules
+
+You can configure project-level rules to make feature flag evaluation automatic. When rules are present, Cursor considers them on every interaction.
+
+Create a file in the `.cursor/rules/` directory in your repository:
+
+```markdown title=".cursor/rules/feature-flags.mdc"
+---
+description: Feature flag policy for AI-assisted development
+globs:
+---
+## Feature flag policy
+
+When implementing new features or modifying high-risk code paths:
+
+1. Always use the `evaluate_change` tool to assess whether the change needs a feature flag
+2. Prefer reusing existing flags over creating new ones (use `detect_flag`)
+3. Follow kebab-case naming: `domain-action-variant`
+4. All payment, authentication, and external API changes MUST be flagged
+5. Use `wrap_change` to generate framework-appropriate guard code
+
+Default project: `checkout-team`
+```
+
+With these rules in place, when a developer asks Cursor to "add Stripe payments," Cursor automatically evaluates, detects, creates, and wraps without explicit prompting.
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** Cursor calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** Cursor calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** Cursor calls `toggle_flag_environment` or `get_flag_state`.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** Cursor calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="MCP tools not showing up">
+- Check that `.cursor/mcp.json` exists in the project root or `~/.cursor/mcp.json` for global configuration
+- Verify the configuration format uses `mcpServers` as the top-level key
+- Confirm Node.js and npm are available in your terminal
+- Check that your Unleash PAT has the required permissions
+
+Open Cursor Settings > Features > MCP to check the server status and view logs.
+</Accordion>
+
+<Accordion title="Authentication failed">
+- Confirm your PAT is valid and has flag creation permissions
+- Check that `UNLEASH_BASE_URL` includes `/api` at the end
+- Verify the environment variables are correctly set in the MCP configuration
+
+<Note>
+If you're using a corporate Unleash instance, ensure your network allows outbound connections to the Unleash API endpoint.
+</Note>
+</Accordion>
+
+<Accordion title="Server not starting">
+- Ensure Node.js 18 or later is installed and available in your PATH
+- Try running `npx -y @unleash/mcp@latest --help` in your terminal to verify the package works
+- Check for conflicting MCP server configurations
+- Restart Cursor after making configuration changes
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with AI assistants.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check" iconSize={6}>
+While the MCP server can automate flag creation, high-risk changes should involve human review. Approve flag creation, rollout plans, and cleanup decisions.
+</Card>
+
+<Card title="Define naming conventions" icon="tag" iconSize={6}>
+Establish organization-wide standards for flag names (e.g., `domain-action-variant`) and types (release, experiment, kill-switch). The MCP server enforces these rules.
+</Card>
+
+<Card title="Prevent duplication" icon="clone" iconSize={6}>
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across microservices.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock" iconSize={6}>
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+</CardGroup>
+
+## Architecture
+
+The following diagram shows how the Unleash MCP server fits into your development workflow.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Developer Workflow                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐         ┌──────────────────┐                │
+│   │   Cursor     │  MCP    │  Unleash MCP     │                │
+│   │   IDE        │◄───────►│  Server (local)  │                │
+│   └──────────────┘ stdio   └────────┬─────────┘                │
+│                                      │                          │
+│                                      │ HTTPS                    │
+│                                      ▼                          │
+│                            ┌──────────────────┐                │
+│                            │  Unleash Admin   │                │
+│                            │  API             │                │
+│                            └────────┬─────────┘                │
+│                                      │                          │
+├──────────────────────────────────────┼──────────────────────────┤
+│                        Runtime Evaluation                        │
+├──────────────────────────────────────┼──────────────────────────┤
+│                                      │                          │
+│   ┌──────────────┐         ┌────────▼─────────┐                │
+│   │ Application  │◄───────►│  Unleash SDK /   │                │
+│   │              │  flags  │  Unleash Edge    │                │
+│   └──────────────┘         └──────────────────┘                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key points:**
+
+- The MCP server runs locally on your machine as a stdio process
+- It communicates with the Unleash Admin API using your PAT
+- Feature flag evaluations happen locally in your application via SDKs or Unleash Edge
+- No user data is sent to the Unleash server during flag evaluation
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Unleash MCP server](/integrate/mcp)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
+- [Cursor documentation](https://docs.cursor.com)
