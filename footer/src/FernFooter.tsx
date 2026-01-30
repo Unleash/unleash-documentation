@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 // CDN base URL for assets
 const CDN_BASE = 'https://cdn.getunleash.io/docs-assets';
@@ -54,10 +54,6 @@ const SocialLink: React.FC<SocialLinkProps> = ({ href, label, lightIcon, darkIco
 
 export const FernFooter: React.FC = () => {
   const footerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.log('Unleash Footer component mounted');
-  }, []);
 
   return (
     <div ref={footerRef} id="fern-footer">
