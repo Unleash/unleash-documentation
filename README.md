@@ -2,6 +2,7 @@
     <img src="./.github/github_header_opaque_landscape.svg" alt="Visit the Unleash website">
 </a>
 
+# Unleash Documentation
 ## What is Unleash?
 
 Unleash is a powerful open-source solution for feature management. It streamlines your development workflow, accelerates software delivery, and empowers teams to control how and when they roll out new features to end users. With Unleash, you can deploy code to production in smaller, more manageable releases at your own pace.
