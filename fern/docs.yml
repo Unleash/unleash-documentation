@@ -973,6 +973,11 @@ js:
     strategy: afterInteractive
 
 redirects:
+  # --- Helm charts ---
+  - source: "/helm-charts/index.yaml"
+    destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/index.yaml"
+  - source: "/helm-charts"
+    destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/README.md"
   - source: /contributing/:slug
     destination: /contribute
     permanent: true
