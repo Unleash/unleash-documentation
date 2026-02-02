@@ -974,10 +974,10 @@ js:
 
 redirects:
   # --- Helm charts ---
-  - source: "/helm-charts/index.yaml"
+  - source: /helm-charts/index.yaml
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/index.yaml"
     permanent: false
-  - source: "/helm-charts"
+  - source: /helm-charts
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/README.md"
     permanent: false
   - source: /contributing/:slug
