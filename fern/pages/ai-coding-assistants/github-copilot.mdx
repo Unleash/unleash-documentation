@@ -4,7 +4,7 @@ og:site_name: Unleash Documentation
 og:title: Integrate Unleash with GitHub Copilot for AI-powered feature flag management
 description: Configure the Unleash MCP server to automate feature flag management in GitHub Copilot across VS Code, JetBrains, Visual Studio, Neovim, and Copilot CLI.
 keywords: github copilot, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation, vs code, jetbrains, visual studio, neovim
-max-toc-depth: 2
+max-toc-depth: 3
 slug: integrate/github-copilot
 ---
 
@@ -16,7 +16,7 @@ GitHub Copilot supports MCP in several environments:
 - [Visual Studio](https://visualstudio.microsoft.com/) with the GitHub Copilot extension.
 - [Neovim](https://neovim.io/) with community plugins like [mcphub.nvim](https://github.com/ravitemer/mcphub.nvim).
 - [Copilot CLI](https://github.com/features/copilot/cli), a command-line interface.
-- On [GitHub.com](https://github.com/features/copilot), a web-based Copilot (limited MCP support).
+- On [GitHub.com](https://github.com/features/copilot), a web-based Copilot (no MCP support).
 
 ## Prerequisites
 
@@ -319,17 +319,15 @@ GitHub Copilot on github.com is designed for code review, issue triage, and pull
 
 ## Verify the installation
 
-After configuring your IDE, verify that the Unleash MCP tools are available. You should see the following nine tools:
+After configuring your IDE, verify that the Unleash MCP tools are available (full list below).
 
-- `evaluate_change`
-- `detect_flag`
-- `create_flag`
-- `wrap_change`
-- `set_flag_rollout`
-- `get_flag_state`
-- `toggle_flag_environment`
-- `remove_flag_strategy`
-- `cleanup_flag`
+Try one of the following prompts (or the [prompt patterns](#prompt-patterns) below):
+
+```
+1. Show me the available tools of the Unleash MCP server.
+2. Use the Unleash MCP server to get the flag state of `your-flag-name`
+3. Use the Unleash MCP server to wrap the current change in a feature flag
+```
 
 ## Tool reference
 
