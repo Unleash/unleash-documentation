@@ -58,23 +58,16 @@ body {
     }
 }
 
-@media (min-width: 1025px) {
-    .fern-layout-guide, .fern-layout-reference .fern-layout-page {
-        background-color: var(--container-bg-color);
-        border-radius: 0.75rem;
-        margin-top: 2rem;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
-                    0 0px 1px 0 rgba(0, 0, 0, 0.1);
-    }
-}
-
-@media (min-width: 1025px) {
-    .fern-layout-reference {
-        padding: 0 2rem;
-    }
+.fern-layout-guide, .fern-layout-reference .fern-layout-page {
+    background-color: var(--container-bg-color);
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 
+                0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 .fern-layout-reference {
+    padding: 0 2rem;
     margin-bottom: calc(var(--spacing) * 12);
 }
 
@@ -289,38 +282,40 @@ body:has(.landing-page) .fern-card > * {
     z-index: 1;
 }
 
-/* Card grid layout for icon + title inline, description full width */
+/* Make card icon and heading display inline using grid */
 body:has(.landing-page) .fern-card > div.flex {
     display: grid !important;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    gap: 0 0.5rem !important;
+    grid-template-rows: auto 1fr;
+    gap: 0 0.75rem !important;
     align-items: center;
     align-content: start;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
     grid-column: 1;
-    grid-row: 1;
-}
-
-body:has(.landing-page) .fern-card h3 {
-    line-height: 1 !important;
+    grid-row: 1 / 2;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    color: var(--nav-text-color) !important;
 }
 
 body:has(.landing-page) .fern-card .w-full.space-y-1 {
+    grid-column: 1 / -1;
     display: contents !important;
 }
 
+/* Heading next to icon */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
     grid-column: 2;
     grid-row: 1;
 }
 
+/* Description full width below */
 body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 2rem !important;
+    margin-top: 1rem !important;
 }
 
 /* Card text colors */
@@ -388,11 +383,7 @@ button.fern-header-tabs__tab[role="tab"][data-state="active"],
 button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
 button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
 .fern-header-tabs a[aria-selected="true"],
-.fern-header-tabs a[data-state="active"],
-button.fern-header-tabs__tab[role="tab"]:hover,
-button.fern-header-tabs__tab[role="tab"]:hover span,
-button.fern-header-tabs__tab[role="tab"]:hover .truncate,
-.fern-header-tabs a:hover {
+.fern-header-tabs a[data-state="active"] {
     color: var(--accent-color) !important;
 }
 
@@ -716,30 +707,32 @@ html.dark .unleash-academy-level-badge {
     content: none !important;
 }
 
-
 /* =====================================
-   SIDEBAR BORDER
+   CHANGELOG RESPONSIVE LAYOUT
    ===================================== */
 
-#fern-sidebar {
-    border-right: none !important;
-}
+/* Stack changelog labels above content on narrower screens */
+@media (max-width: 1300px) {
+    article.fern-changelog-content[data-has-aside="true"] {
+        display: flex !important;
+        flex-direction: column !important;
+    }
 
-/* =====================================
-   TOC MOBILE BUTTON
-   ===================================== */
+    article.fern-changelog-content[data-has-aside="true"] > aside {
+        position: relative !important;
+        width: 100% !important;
+        top: auto !important;
+        height: auto !important;
+    }
 
-.toc-mobile button {
-    background-color: var(--container-bg-color) !important;
-    transition: background-color 0.15s ease;
-}
+    .fern-changelog-content .eyebrow {
+        margin-bottom: 1rem !important;
+    }
 
-.light .toc-mobile button:hover {
-    background-color: #f0f0f3 !important;
-}
-
-.dark .toc-mobile button:hover {
-    background-color: #2b2a3d !important;
+    .fern-changelog-label {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
 }
 
 /* =====================================
@@ -779,10 +772,19 @@ body::after {
     opacity: 0.3;
 }
 
+/* =====================================
+   CUSTOM FOOTER HOVER STYLING
+   ===================================== */
+
+/* Footer link hover - purple with underline */
+#fern-footer .footer-links a:hover {
+    color: #817afe !important;
+    text-decoration: underline !important;
+}
+
 /* Hide mountain on narrow screens where sidebar becomes an overlay */
 @media (max-width: 1024px) {
     body::after {
         display: none;
     }
 }
-
