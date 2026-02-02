@@ -290,7 +290,7 @@ navigation:
               - section: AI coding assistants
                 skip-slug: true
                 contents:
-                  - page: MCP
+                  - page: MCP server
                     availability: beta
                     path: pages/ai-coding-assistants/mcp.mdx
                   - page: GitHub Copilot
