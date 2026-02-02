@@ -39,9 +39,11 @@ body {
     color: var(--text-color);
 }
 
-/* Ensure main content appears above the mountain backdrop */
-main {
-    z-index: 1 !important;
+/* Ensure main content appears above the mountain backdrop (desktop only) */
+@media (min-width: 1025px) {
+    main {
+        z-index: 1 !important;
+    }
 }
 
 /* Reduce mountain background opacity in dark mode */
@@ -50,20 +52,29 @@ main {
     opacity: 0.3 !important;
 }
 
-#fern-sidebar {
-    margin-right: 16px;
+@media (min-width: 1025px) {
+    #fern-sidebar {
+        margin-right: 16px;
+    }
 }
 
-.fern-layout-guide, .fern-layout-reference .fern-layout-page {
-    background-color: var(--container-bg-color);
-    border-radius: 0.75rem;
-    margin-top: 2rem;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
-                0 0px 1px 0 rgba(0, 0, 0, 0.1);
+@media (min-width: 1025px) {
+    .fern-layout-guide, .fern-layout-reference .fern-layout-page {
+        background-color: var(--container-bg-color);
+        border-radius: 0.75rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
+                    0 0px 1px 0 rgba(0, 0, 0, 0.1);
+    }
+}
+
+@media (min-width: 1025px) {
+    .fern-layout-reference {
+        padding: 0 2rem;
+    }
 }
 
 .fern-layout-reference {
-    padding: 0 2rem;
     margin-bottom: calc(var(--spacing) * 12);
 }
 
@@ -766,5 +777,12 @@ body::after {
 /* Make mountain more subtle in dark mode */
 .dark body::after {
     opacity: 0.3;
+}
+
+/* Hide mountain on narrow screens where sidebar becomes an overlay */
+@media (max-width: 1024px) {
+    body::after {
+        display: none;
+    }
 }
 
