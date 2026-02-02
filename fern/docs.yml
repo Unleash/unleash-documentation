@@ -4,7 +4,7 @@ instances:
   - url: unleash.docs.buildwithfern.com
     custom-domain:
       - unleash.ferndocs.com
-      - docs-new.getunleash.io
+      - docs.getunleash.io
 
 title: Unleash Documentation
 

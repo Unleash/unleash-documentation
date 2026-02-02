@@ -199,12 +199,12 @@ provided by unleash.
 - RemoteAddressStrategy
 - ApplicationHostnameStrategy
 
-[Read more about activation strategies in the docs](https://docs.getunleash.io/reference/activation-strategies).
+[Read more about activation strategies in the docs](/concepts/activation-strategies).
 
 ### Unleash Context
 
 In order to use some of the common activation strategies you must provide an
-[unleash-context](https://docs.getunleash.io/reference/unleash-context).
+[unleash-context](/concepts/unleash-context).
 This client SDK allows you to send in the unleash context as part of the `isEnabled` call:
 
 ```go
@@ -265,7 +265,7 @@ unleash.IsEnabled("someToggle", unleash.WithContext(ctx), unleash.WithResolver(r
 
 ### Impression Data
 
-When impression data is enabled on a flag, the SDK will emit impression events during evaluation. You can hook into these with a custom listener to collect insights or integrate with analytics. You can [read more about impression data in Unleash's documentation](https://docs.getunleash.io/reference/impression-data).
+When impression data is enabled on a flag, the SDK will emit impression events during evaluation. You can hook into these with a custom listener to collect insights or integrate with analytics. You can [read more about impression data in Unleash's documentation](/concepts/impression-data).
 
 ```go
 type MyListener struct {
@@ -371,4 +371,4 @@ We can see a result of **854.3 ns/op**, which means around **101.131 billion** f
 
 ## Design Philosophy
 
-This feature flag SDK is designed according to our design philosophy. You can [read more about that here](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices).
+This feature flag SDK is designed according to our design philosophy. You can [read more about that here](/guides/feature-flag-best-practices).

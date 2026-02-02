@@ -44,7 +44,7 @@ you have a [bootstrapped configuration](#bootstrap).
 <Tip>
 All code samples in this section will initialize the SDK and try to connect to the
 Unleash instance you point it to. You will need an Unleash instance and a
-[server-side API token](https://docs.getunleash.io/reference/api-tokens-and-client-keys#client-tokens)
+[server-side API token](/concepts/api-tokens-and-client-keys#client-tokens)
 for the connection to be successful.
 </Tip>
 
@@ -160,7 +160,7 @@ required in normal apps.
 
 You can use the `getVariant` method to retrieve the variant of a feature flag. If the flag is
 disabled or doesn't have any variants, the method returns the
-[disabled variant](https://docs.getunleash.io/reference/feature-toggle-variants#the-disabled-variant).
+[disabled variant](/concepts/feature-flag-variants#the-disabled-variant).
 
 ```js
 const variant = unleash.getVariant('demo-variant');
@@ -174,10 +174,10 @@ if (variant.name === 'blue') {
 
 Calling the `isEnabled` method with just a feature name will work in simple use cases, but in many
 cases you'll also want to provide an
-[Unleash context](https://docs.getunleash.io/reference/unleash-context). The SDK uses the Unleash
+[Unleash context](/concepts/unleash-context). The SDK uses the Unleash
 context to evaluate any
-[activation strategy](https://docs.getunleash.io/reference/activation-strategies) with
-[strategy constraints](https://docs.getunleash.io/reference/strategy-constraints), and also to
+[activation strategy](/concepts/activation-strategies) with
+[strategy constraints](/concepts/activation-strategies#constraints), and also to
 evaluate some of the built-in strategies.
 
 The `isEnabled` accepts an Unleash context object as a second argument:
@@ -210,12 +210,12 @@ destroy();
 The client supports all built-in activation strategies provided by Unleash.
 
 Read more about
-[activation strategies in the official docs](https://docs.getunleash.io/reference/activation-strategies).
+[activation strategies in the official docs](/concepts/activation-strategies).
 
 ### Unleash Context
 
 In order to use some of the common activation strategies you must provide an
-[Unleash context](https://docs.getunleash.io/reference/unleash-context). This client SDK allows you
+[Unleash context](/concepts/unleash-context). This client SDK allows you
 to send in the unleash context as part of the `isEnabled` call:
 
 ```javascript
@@ -257,7 +257,7 @@ The initialize method takes the following arguments:
 - **appName** - The application name / codebase name (required).
 - **environment** - The value to put in the Unleash context's `environment` property. Automatically
   populated in the Unleash Context (optional). This does **not** set the SDK's
-  [Unleash environment](https://docs.getunleash.io/reference/environments).
+  [Unleash environment](/concepts/environments).
 - **instanceId** - A unique identifier, should/could be somewhat unique.
 - **refreshInterval** - The poll interval to check for updates. Defaults to 15000ms.
 - **metricsInterval** - How often the client should send metrics to Unleash API. Defaults to
@@ -567,4 +567,4 @@ variables: `HTTP_PROXY` or `HTTPS_PROXY`.
 ## Design Philosophy
 
 This feature flag SDK is designed according to our design philosophy. You can
-[read more about that here](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices).
+[read more about that here](/guides/feature-flag-best-practices).

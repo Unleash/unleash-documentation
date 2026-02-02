@@ -114,7 +114,7 @@ The `CreateClientAsync` method was introduced in version 1.5.0, making the previ
 
 #### Project-scoped Unleash Client
 
-If you're organizing your feature toggles in projects in Unleash Enterprise, you can [scope your API tokens](https://docs.getunleash.io/how-to/how-to-create-project-api-tokens) to include only the specific projects needed for your client. Then use that token when configuring the Unleash client:
+If you're organizing your feature toggles in projects in Unleash Enterprise, you can [scope your API tokens](/concepts/api-tokens-and-client-keys) to include only the specific projects needed for your client. Then use that token when configuring the Unleash client:
 
 ```csharp
 
@@ -155,7 +155,7 @@ unleash.IsEnabled("SuperAwesomeFeature", true)
 
 #### Providing Context
 
-You can also **provide an [Unleash context](https://docs.getunleash.io/reference/unleash-context)** to the `IsEnabled` method:
+You can also **provide an [Unleash context](/concepts/unleash-context)** to the `IsEnabled` method:
 
 ```csharp
 var context = new UnleashContext
@@ -171,7 +171,7 @@ Refer to the [Unleash context](#unleash-context) section for more information ab
 ## Handling Events
 
 Currently supported events:
--  [Impression data events](https://docs.getunleash.io/advanced/impression-data#impression-event-data)
+-  [Impression data events](/concepts/impression-data#impression-event-data)
 -  Error events
 -  Toggles updated event
 
@@ -208,11 +208,11 @@ The .NET client comes with implementations for the built-in activation strategie
 - ApplicationHostnameStrategy
 - FlexibleRolloutStrategy
 
-Read more about the strategies in [the activation strategy reference docs](https://docs.getunleash.io/reference/activation-strategies).
+Read more about the strategies in [the activation strategy reference docs](/concepts/activation-strategies).
 
 ### Custom Strategies
 
-You can also specify and implement your own [custom strategies](https://docs.getunleash.io/reference/custom-activation-strategies). The specification must be registered in the Unleash UI and you must register the strategy implementation when you wire up unleash.
+You can also specify and implement your own [custom strategies](/concepts/custom-activation-strategies). The specification must be registered in the Unleash UI and you must register the strategy implementation when you wire up unleash.
 
 ```csharp
 IStrategy s1 = new MyAwesomeStrategy();
@@ -223,7 +223,7 @@ IUnleash unleash = new DefaultUnleash(config, s1, s2);
 
 ## Unleash Context
 
-In order to use some of the common activation strategies you must provide an [Unleash context](https://docs.getunleash.io/reference/unleash-context).
+In order to use some of the common activation strategies you must provide an [Unleash context](/concepts/unleash-context).
 
 If you have configured custom stickiness and want to use that with the FlexibleRolloutStrategy or Variants, add the custom stickiness parameters to the Properties dictionary on the Unleash Context:
 
@@ -535,4 +535,4 @@ This starts the release workflow which builds the new release and pushes the art
 
 ## Other Information
 
-- Check out our guide for more information on how to build and scale [feature flag](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices) systems
+- Check out our guide for more information on how to build and scale [feature flag](/guides/feature-flag-best-practices) systems

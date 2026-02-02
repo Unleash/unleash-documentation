@@ -115,7 +115,7 @@ if(unleash.isEnabled("AwesomeFeature")) {
 
 The `isEnabled` method also accepts a second boolean argument. The SDK uses this as a fallback value if it can't find the feature you're trying to check. For example, if `unleash.isEnabled("non-existing-toggle")` returns `false` when `"non-existing-toggle"` doesn't exist, calling `unleash.isEnabled("non-existing-toggle", true)`, will return `true`.
 
-You can also **provide an [Unleash context](https://docs.getunleash.io/reference/unleash-context)** to the `isEnabled` method. Refer to the [Unleash context](#unleash-context) section for more information about using the Unleash context in the Java SDK.
+You can also **provide an [Unleash context](/concepts/unleash-context)** to the `isEnabled` method. Refer to the [Unleash context](#unleash-context) section for more information about using the Unleash context in the Java SDK.
 
 ### Activation Strategies
 
@@ -129,7 +129,7 @@ The Java client comes with implementations for the built-in activation strategie
 - RemoteAddressStrategy
 - ApplicationHostnameStrategy
 
-Read more about the strategies in the [activation strategies reference documentation](https://docs.getunleash.io/reference/activation-strategies).
+Read more about the strategies in the [activation strategies reference documentation](/concepts/activation-strategies).
 
 #### Custom Strategies
 You may also specify and implement your own strategy. The specification must be registered in the Unleash UI and
@@ -143,7 +143,7 @@ Unleash unleash = new DefaultUnleash(config, s1, s2);
 
 ### Unleash Context
 
-In order to use some of the common activation strategies you must provide an [Unleash context](https://docs.getunleash.io/reference/unleash-context).
+In order to use some of the common activation strategies you must provide an [Unleash context](/concepts/unleash-context).
 This client SDK provides two ways of providing the Unleash context:
 
 #### 1. As Part of the `isEnabled` Call
@@ -483,7 +483,7 @@ The `UnleashConfig$Builder` class (created via `UnleashConfig.builder()`) expose
 | `disablePolling`                           | A boolean indicating whether the client should poll the Unleash API for updates to toggles.                                                                                                                                                      |
 | `disableMetrics`                           | A boolean indicating whether the client should disable sending usage metrics to the Unleash server.                                                                                                                                              | No       | `false`                                                                                                              |
 | `enableProxyAuthenticationByJvmProperties` | Enable support for [using JVM properties for HTTP proxy authentication](#http-proxy-with-authentication).                                                                                                                                        | No       | `false`                                                                                                              |
-| `environment`                              | The value to set for the Unleash context's `environment` property. **Not** the same as [Unleash's environments](https://docs.getunleash.io/reference/environments).| No       | `null`                                                                                                               |
+| `environment`                              | The value to set for the Unleash context's `environment` property. **Not** the same as [Unleash's environments](/concepts/environments).| No       | `null`                                                                                                               |
 | `fallbackStrategy`                         | A strategy implementation that the client can use if it doesn't recognize the strategy type returned from the server.                                                                                                                            | No       | `null`                                                                                                               |
 | `fetchTogglesInterval`                     | How often (in seconds) the client should check for toggle updates. Set to `0` if you want to only check once.                                                                                                                                    | No       | `15`                                                                                                                 |
 | `instanceId`                               | A unique(-ish) identifier for your instance. Typically a hostname, pod id or something similar. Unleash uses this to separate metrics from the client SDKs with the same `appName`.                                                              | Yes      | `null`                                                                                                               |
@@ -520,4 +520,4 @@ Unleash unleash = new DefaultUnleash(config);
 
 ### Next Steps
 
-Check out our documentation for tips and best practices on [building and scaling feature flag systems](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices).
+Check out our documentation for tips and best practices on [building and scaling feature flag systems](/guides/feature-flag-best-practices).

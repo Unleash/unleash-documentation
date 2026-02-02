@@ -94,7 +94,7 @@ end
 | `url`                 | Unleash server URL.                                                                                                                                                                                                                                                                                                           | Y         | String                            | N/A                                            |
 | `app_name`            | Name of your program.                                                                                                                                                                                                                                                                                                         | Y         | String                            | N/A                                            |
 | `instance_id`         | Identifier for the running instance of your program—set this to be able trace where metrics are being collected from.                                                                                                                                                                  | N         | String                            | random UUID                                    |
-| `environment`         | Unleash context option, for example, `prod` or `dev`. Not yet in use. **Not** the same as the SDK's [Unleash environment](https://docs.getunleash.io/reference/environments).                                                                                                                                         | N         | String                            | `default`                                      |
+| `environment`         | Unleash context option, for example, `prod` or `dev`. Not yet in use. **Not** the same as the SDK's [Unleash environment](/concepts/environments).                                                                                                                                         | N         | String                            | `default`                                      |
 | `project_name`        | Name of the project to retrieve feature flags from. If not set, all feature flags will be retrieved.                                                                                                                                                                                                                               | N         | String                            | nil                                            |
 | `refresh_interval`    | How often the Unleash client should check with the server for configuration changes.                                                                                                                                                                                                                                          | N         | Integer                           | 15                                             |
 | `metrics_interval`    | How often the Unleash client should send metrics to server.                                                                                                                                                                                                                                                                   | N         | Integer                           | 60                                             |
@@ -520,7 +520,7 @@ This client comes with all the required strategies out of the box:
 
 ## Custom Strategies
 
-You can add [custom activation strategies](https://docs.getunleash.io/advanced/custom_activation_strategy) using configuration.
+You can add [custom activation strategies](/concepts/custom-activation-strategies) using configuration.
 In order for the strategy to work correctly it should support two methods `name` and `is_enabled?`.
 
 ```ruby
@@ -576,4 +576,4 @@ Be sure to run both `bundle exec rspec` and `bundle exec rubocop` in your branch
 
 Please include tests with any pull requests, to avoid regressions.
 
-Check out our guide for more information on how to build and scale [feature flag systems](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices).
+Check out our guide for more information on how to build and scale [feature flag systems](/guides/feature-flag-best-practices).

@@ -25,9 +25,8 @@ yarn add @unleash/proxy-client-svelte
 
 Depending on your needs and specific use-case, prepare one of:
 
-- [Front-end API](https://docs.getunleash.io/reference/front-end-api)
-- [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge)
-- [Unleash Proxy](https://docs.getunleash.io/reference/unleash-proxy)
+- [Front-end API](/api#frontend-api)
+- [Unleash Edge](/unleash-edge)
 
 And a respective frontend token (or, if you're using the Unleash Proxy, one of your proxy's designated client keys, previously known as proxy secrets).
 
@@ -52,11 +51,9 @@ Import the provider like this in your entrypoint file (typically index.svelte):
 
 ### Connection Options
 
-To connect this SDK to your Unleash instance's [front-end API](https://docs.getunleash.io/reference/front-end-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance. Refer to the [_how to create API tokens_](https://docs.getunleash.io/how-to/how-to-create-api-tokens) guide for the necessary steps.
+To connect this SDK to your Unleash instance's [front-end API](/api#frontend-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance.  Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information.
 
-To connect this SDK to the [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge), use the URL to your Unleash Edge instance as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash Edge instance. Refer to the [_how to create API tokens_](https://docs.getunleash.io/how-to/how-to-create-api-tokens) guide for the necessary steps. Ensure that your Unleash Edge instance is correctly configured to have access to the feature toggles your `FRONTEND` token is requesting.
-
-To connect this SDK to the [Unleash proxy](https://docs.getunleash.io/reference/unleash-proxy), use the proxy's URL and a [proxy client key](https://docs.getunleash.io/reference/api-tokens-and-client-keys#proxy-client-keys). The [_configuration_ section of the Unleash proxy docs](https://docs.getunleash.io/reference/unleash-proxy#configuration) contains more info on how to configure client keys for your proxy.
+To connect this SDK to the [Unleash Edge](/unleash-edge), use the URL to your Unleash Edge instance as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash Edge instance. Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information. Ensure that your Unleash Edge instance is correctly configured to have access to the feature toggles your `FRONTEND` token is requesting.
 
 ## Check Feature Toggle Status
 

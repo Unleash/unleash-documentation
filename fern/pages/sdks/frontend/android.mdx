@@ -13,7 +13,7 @@ You can use this client with [Unleash Enterprise](https://www.getunleash.io/pric
 
 ## Getting Started
 
-This is the Android SDK for [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge). It is a lightweight SDK that allows you to connect to the Unleash Frontend API and fetch feature toggles.
+This is the Android SDK for [Unleash Frontend API](/api#frontend-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge). It is a lightweight SDK that allows you to connect to the Unleash Frontend API and fetch feature toggles.
 
 This supersedes the [previous Unleash Android Proxy SDK](https://github.com/Unleash/unleash-android-proxy-sdk/) this one is an Android library instead of a Java library.
 
@@ -139,7 +139,7 @@ val toggles = listOf(
 instance.start(bootstrap = toggles)
 ```
 
-Alternatively, you can perform a query against the [frontend API](https://docs.getunleash.io/reference/front-end-api) using your HTTP client of choice and save the output as a json file. Then you can tell Unleash to use this file to set up toggle states.
+Alternatively, you can perform a query against the [frontend API](/api#frontend-api) using your HTTP client of choice and save the output as a json file. Then you can tell Unleash to use this file to set up toggle states.
 
 ```kotlin
 val toggles = File("/tmp/proxyresponse.json")
