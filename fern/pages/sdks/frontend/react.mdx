@@ -31,9 +31,9 @@ for running the example.
 This library uses the core [unleash-js-sdk](https://github.com/Unleash/unleash-js-sdk) client as a base.
 
 ### Initialize the Client
-<Note>[unleash-proxy](https://github.com/Unleash/unleash-proxy) is in maintenance mode. It is recommend to use the [Frontend API](https://docs.getunleash.io/reference/front-end-api) or [unleash-edge](https://docs.getunleash.io/reference/unleash-edge) instead.</Note>
+You can use the [Frontend API](/api#frontend-api) or [unleash-edge](/unleash-edge).
 
-For the following step you will need a [frontend API Token](https://docs.getunleash.io/reference/front-end-api) or [unleash-edge pretrusted token](https://docs.getunleash.io/reference/unleash-edge#pretrusted-tokens).
+For the following step you will need a [frontend API Token](/api#frontend-api) or [unleash-edge pretrusted token](/unleash-edge#pretrusted-tokens).
 
 Import the provider like this in your entrypoint file (typically index.js/ts):
 
@@ -62,7 +62,7 @@ root.render(
 
 ### Connection Options
 
-To connect this SDK to your Unleash instance's [front-end API](https://docs.getunleash.io/reference/front-end-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance. Refer to the [_how to create API tokens_](https://docs.getunleash.io/how-to/how-to-create-api-tokens) guide for the necessary steps.
+To connect this SDK to your Unleash instance's [front-end API](/api#frontend-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance.  Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information.
 
 To connect this SDK to unleash-edge, follow the documentation provided in the [unleash-edge repository](https://github.com/unleash/unleash-edge).
 
@@ -368,4 +368,4 @@ The major release is driven by Node14 end of life and represents no other change
 [FlagContext public interface changed](https://github.com/Unleash/unleash-react-sdk/commit/b783ef4016dbb881ac3d878cffaf5241b047cc35#diff-825c82ad66c3934257e0ee3e0511d9223db22e7ddf5de9cbdf6485206e3e02cfL20-R20). If you used FlagContext directly you may have to adjust your code slightly to accommodate the new type changes.
 
 ## Design Philosophy
-This feature flag SDK is designed according to our design philosophy. You can [read more about that here](https://docs.getunleash.io/topics/feature-flags/feature-flag-best-practices).
+This feature flag SDK is designed according to our design philosophy. You can [read more about that here](/guides/feature-flag-best-practices).

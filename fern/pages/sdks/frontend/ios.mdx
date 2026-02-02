@@ -13,12 +13,12 @@ You can use this client with [Unleash Enterprise](https://www.getunleash.io/pric
 
 You can connect the SDK to Unleash in two ways:
 
-- **Directly** to your Unleash instance using the [Frontend API](https://docs.getunleash.io/reference/front-end-api).
-- **Using Unleash Edge**, a lightweight service acting as a caching and evaluation layer between the SDK and your main Unleash instance. [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge) fetches flag configurations, caches them in-memory, and handles evaluation locally for faster responses and high availability.
+- **Directly** to your Unleash instance using the [Frontend API](/api#frontend-api).
+- **Using Unleash Edge**, a lightweight service acting as a caching and evaluation layer between the SDK and your main Unleash instance. [Unleash Edge](/unleash-edge) fetches flag configurations, caches them in-memory, and handles evaluation locally for faster responses and high availability.
 
-In both setups, the SDK retrieves feature flag configurations for the provided [context](https://docs.getunleash.io/docs/user_guide/unleash_context). The SDK caches the received flag configurations in memory and refreshes them periodically (at a configurable interval). This makes local evaluations like `isEnabled()` extremely fast.
+In both setups, the SDK retrieves feature flag configurations for the provided [context](/concepts/unleash-context). The SDK caches the received flag configurations in memory and refreshes them periodically (at a configurable interval). This makes local evaluations like `isEnabled()` extremely fast.
 
-<Note>If your current implementation relies on Unleash Proxy, please review our guide on how to [migrate to Unleash Edge](https://docs.getunleash.io/reference/unleash-edge/migration-guide).</Note>
+<Note>If your current implementation relies on Unleash Proxy, please review our guide on how to [migrate to Unleash Edge](/unleash-edge/migrate-from-proxy).</Note>
 
 ## Requirements
 
@@ -69,8 +69,8 @@ unleash.start()
 
 In the example above we import the UnleashProxyClientSwift and instantiate the client. You need to provide the following parameters:
 
-- `unleashUrl`: The full URL to either the [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) or an [Unleash Edge instance](https://docs.getunleash.io/reference/unleash-edge) [String]
-- `clientKey`: A [frontend API token](https://docs.getunleash.io/reference/api-tokens-and-client-keys#front-end-tokens) for authenticating with the Frontend API or Unleash Edge [String]
+- `unleashUrl`: The full URL to either the [Unleash Frontend API](/api#frontend-api) or an [Unleash Edge instance](/unleash-edge) [String]
+- `clientKey`: A [frontend API token](/concepts/api-tokens-and-client-keys#front-end-tokens) for authenticating with the Frontend API or Unleash Edge [String]
 - `refreshInterval`: The polling interval in seconds, set to `0` to only poll once and disable a periodic polling [Int]
 - `appName`: The application name identifier [String]
 - `context`: Initial Unleash context fields (like `userId`, `sessionId`, etc.), excluding `appName` and `environment` which are configured separately. [String: String]
@@ -89,7 +89,7 @@ if unleash.isEnabled(name: "ios") {
 }
 ```
 
-You can also set up [variants](https://docs.getunleash.io/docs/advanced/toggle_variants):
+You can also set up [variants](/concepts/feature-flag-variants):
 
 ```swift
 var variant = unleash.getVariant(name: "ios")
@@ -121,7 +121,7 @@ The Unleash SDK accepts the following initialization options:
 | bootstrap             | no       | empty list of feature flags    | Initial flag configurations provided to the Unleash client SDK. Can be a list of `Toggle` objects or the path to a JSON file matching the front-end API response format. Available immediately on init, before the first fetch. |
 
 ### Bootstrapping
-You can provide the initial feature flag state to the Unleash client SDK. This is useful when you have a known initial state for your feature flag. This state can be bootstrapped to the client via a list of `Toggle` objects, or from a file matching a response from the [Frontend API](https://docs.getunleash.io/reference/front-end-api). For example:
+You can provide the initial feature flag state to the Unleash client SDK. This is useful when you have a known initial state for your feature flag. This state can be bootstrapped to the client via a list of `Toggle` objects, or from a file matching a response from the [Frontend API](/api#frontend-api). For example:
 
 #### Bootstrap From Hard-coded List
 ```swift
@@ -229,8 +229,8 @@ unleash.updateContext(context: context)
 
 This will stop and start the polling interval in order to renew polling with new context values.
 
-You can use any of the [predefined fields](https://docs.getunleash.io/reference/unleash-context#structure). If you need to support
-[custom properties](https://docs.getunleash.io/reference/unleash-context#the-properties-field) pass them as the second argument:
+You can use any of the [predefined fields](/concepts/unleash-context#structure). If you need to support
+[custom properties](/concepts/unleash-context#the-properties-field) pass them as the second argument:
 
 ```swift
 var context: [String: String] = [:]
@@ -347,7 +347,7 @@ unleash.subscribe(.ready, callback: handleUpdate)
 
 ### Impression Data Events
 
-This SDK allows you to subscribe to [Impression Data](https://docs.getunleash.io/reference/impression-data) events. These events provide granular, real-time tracking of feature exposures. You must specifically [enable impression data](https://docs.getunleash.io/reference/impression-data#enabling-impression-data) for the feature flags you'd like to track.
+This SDK allows you to subscribe to [Impression Data](/concepts/impression-data) events. These events provide granular, real-time tracking of feature exposures. You must specifically [enable impression data](/concepts/impression-data#enabling-impression-data) for the feature flags you'd like to track.
 
 When `isEnabled(name:)` or `getVariant(name:)` is called for a feature flag that has impression data enabled, the SDK creates an `ImpressionEvent` object that is broadcast internally using the event name `impression` (also accessible via the `UnleashEvent.impression` enum case).
 

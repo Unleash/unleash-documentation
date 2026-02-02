@@ -11,7 +11,7 @@ This JavaScript Frontend SDK is designed to help you integrate with Unleash and 
 
 You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=js) or [Unleash Open Source](https://github.com/Unleash/unleash).
 
-The JavaScript client is a tiny Unleash client written in JavaScript without any external dependencies (except from browser APIs). This client stores toggles relevant for the current user in `localStorage` and synchronizes with Unleash (the [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) _or_ [Unleash edge](https://docs.getunleash.io/reference/unleash-edge)) in the background. Because toggles are stored in the user's browser, the client can use them to bootstrap itself the next time the user visits the same web page.
+The JavaScript client is a tiny Unleash client written in JavaScript without any external dependencies (except from browser APIs). This client stores toggles relevant for the current user in `localStorage` and synchronizes with Unleash (the [Unleash Frontend API](/api#frontend-api) _or_ [Unleash edge](/unleash-edge)) in the background. Because toggles are stored in the user's browser, the client can use them to bootstrap itself the next time the user visits the same web page.
 
 This client expect `fetch` to be available.
 
@@ -19,7 +19,7 @@ This client expect `fetch` to be available.
 
 This package is not tied to any framework, but can be used together most popular frameworks, examples:
 
-- [Unleash React SDK](https://docs.getunleash.io/reference/sdks/react)
+- [Unleash React SDK](/sdks/react)
 - [React](https://reactjs.org/)
 - [React Native](https://reactnative.dev/)
 - [Angular JS](https://angularjs.org/)
@@ -55,9 +55,9 @@ unleash.start();
 
 #### Connection Options
 
-To connect this SDK to your Unleash instance's [Frontend API](https://docs.getunleash.io/reference/front-end-api), use the URL to your Unleash instance's Frontend API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance. Refer to the [_how to create API tokens_](https://docs.getunleash.io/how-to/how-to-create-api-tokens) guide for the necessary steps.
+To connect this SDK to your Unleash instance's [Frontend API](/api#frontend-api), use the URL to your Unleash instance's Frontend API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance.  Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information.
 
-This SDK can also be used with [Unleash Edge](https://docs.getunleash.io/reference/unleash-edge).
+This SDK can also be used with [Unleash Edge](/unleash-edge).
 
 ### Step 3: Let the Client Synchronize
 
@@ -83,7 +83,7 @@ Once the client is ready, you can start checking features in your application. U
 unleash.isEnabled('js.demo');
 ```
 
-You can use the `getVariant` method to get the variant of an **enabled feature that has variants**. If the feature is disabled or if it has no variants, then you will get back the [**disabled variant**](https://docs.getunleash.io/reference/feature-toggle-variants#the-disabled-variant)
+You can use the `getVariant` method to get the variant of an **enabled feature that has variants**. If the feature is disabled or if it has no variants, then you will get back the [**disabled variant**](/concepts/feature-flag-variants#the-disabled-variant)
 
 ```js
 const variant = unleash.getVariant('proxy.demo');
@@ -94,7 +94,7 @@ if (variant.name === 'blue') {
 
 #### Updating the Unleash Context
 
-The [Unleash context](https://docs.getunleash.io/reference/unleash-context) is used to evaluate features against attributes of a the current user. To update and configure the Unleash context in this SDK, use the `updateContext`, `setContextField` and `removeContextField` methods.
+The [Unleash context](/concepts/unleash-context) is used to evaluate features against attributes of a the current user. To update and configure the Unleash context in this SDK, use the `updateContext`, `setContextField` and `removeContextField` methods.
 
 The context you set in your app will be passed along to the Unleash Edge or the Frontend API as query parameters for feature evaluation.
 
@@ -140,7 +140,7 @@ The Unleash SDK takes the following options:
 | headerName        | no| `Authorization` | Which header the SDK should use to authorize with Unleash / Unleash Edge. The header will be given the `clientKey` as its value. |
 | customHeaders     | no| `{}` | Additional headers to use when making HTTP requests to Unleash. In case of name collisions with the default headers, the `customHeaders` value will be used if it is not `null` or `undefined`. `customHeaders` values that are `null` or `undefined` will be ignored. |
 | impressionDataAll | no| `false` | Allows you to trigger "impression" events for **all** `getToggle` and `getVariant` invocations. This is particularly useful for "disabled" feature toggles that are not visible to frontend SDKs. |
-| environment | no | `default` | Sets the `environment` option of the [Unleash context](https://docs.getunleash.io/reference/unleash-context). This does **not** affect the SDK's [Unleash environment](https://docs.getunleash.io/reference/environments). |
+| environment | no | `default` | Sets the `environment` option of the [Unleash context](/concepts/unleash-context). This does **not** affect the SDK's [Unleash environment](/concepts/environments). |
 | usePOSTrequests | no | `false` | Configures the client to use POST requests instead of GET when requesting enabled features. This is helpful when sensitive information (like user email, when used as a user ID) is passed in the context to avoid leaking it in the URL. NOTE: Post requests are not supported by the frontend api built into Unleash. |
 | experimental | no | `{}` | Enabling optional experimentation. `togglesStorageTTL` : How long (Time To Live), in seconds, the toggles in storage are considered valid and should not be fetched on start. If set to 0 will disable expiration checking and will be considered always expired.                 |
 

@@ -76,7 +76,7 @@ client.destroy()
 
 ### Context
 
-Both the `is_enabled` and `get_variant` functions support [Unleash contexts](https://docs.getunleash.io/reference/unleash-context) as the second parameter.
+Both the `is_enabled` and `get_variant` functions support [Unleash contexts](/concepts/unleash-context) as the second parameter.
 
 ``` python
 app_context = {
@@ -99,7 +99,7 @@ The context values can be any type that has a `__str__` implementation. Types th
 - UUIDs
 
 <Note>
-Gradual rollout strategies require you to pass either a `userId` or a `sessionId` for [stickiness](https://docs.getunleash.io/reference/stickiness) to work correctly.
+Gradual rollout strategies require you to pass either a `userId` or a `sessionId` for [stickiness](/concepts/stickiness) to work correctly.
 </Note>
 
 ### Fallback Function
@@ -221,7 +221,7 @@ client = UnleashClient(
 
 ### Custom Strategies
 
-The Python SDK lets you define [custom activation strategies](https://docs.getunleash.io/reference/custom-activation-strategies) if the built-in ones don't cover your needs. This gives you more fine grained control over how your features evaluate.
+The Python SDK lets you define [custom activation strategies](/concepts/custom-activation-strategies) if the built-in ones don't cover your needs. This gives you more fine grained control over how your features evaluate.
 
 A custom strategy is just a class that implements an apply method.
 
@@ -254,7 +254,7 @@ client = UnleashClient(
 
 ### Events and Impression Data
 
-The Python SDK lets you tap into its behavior through [impression data](https://docs.getunleash.io/reference/impression-data) and lifecycle events.
+The Python SDK lets you tap into its behavior through [impression data](/concepts/impression-data) and lifecycle events.
 
 <Note>
 The SDK does not include a built-in event bus — you'll need to provide your own. The example below shows how to use [Blinker](https://pypi.org/project/blinker/) to send signals.
