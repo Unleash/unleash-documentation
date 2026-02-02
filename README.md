@@ -50,7 +50,7 @@ npm run dev
 
 Once the server starts, you can view the documentation at `http://localhost:3000`.
 
-### Command reference
+## Command reference
 
 | Command | Action |
 | --- | --- |
