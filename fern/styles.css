@@ -66,6 +66,16 @@ body {
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* Hide all anchor icons - they appear behind container backgrounds */
+.fern-anchor-icon {
+    display: none !important;
+}
+
+/* But show anchor icons inside steps */
+.fern-step .fern-anchor-icon {
+    display: flex !important;
+}
+
 .fern-layout-reference {
     padding: 0 2rem;
     margin-bottom: calc(var(--spacing) * 12);
@@ -787,4 +797,25 @@ body::after {
     body::after {
         display: none;
     }
+}
+
+/* =====================================
+   SCROLLBAR STYLING
+   ===================================== */
+
+/* Use OS colour-scheme for scrollbar colors instead of Fern accent */
+.fern-scroll-area-thumb {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.fern-scroll-area-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .fern-scroll-area-thumb {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.dark .fern-scroll-area-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5) !important;
 }
