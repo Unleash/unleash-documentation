@@ -1,5 +1,5 @@
 <a href="https://getunleash.io" title="Unleash - Empowering developers to release with confidence">
-    <img src="./.github/github_header_opaque_landscape.svg" alt="Visit the Unleash website">
+    <img src="./.github/github_header_opaque_landscape.svg" alt="Unleash logo banner">
 </a>
 
 # Unleash Documentation
