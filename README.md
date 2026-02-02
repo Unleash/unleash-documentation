@@ -1,122 +1,102 @@
-# Unleash Documentation
+<a href="https://getunleash.io" title="Unleash - Empowering developers to release with confidence">
+    <img src="./.github/github_header_opaque_landscape.svg" alt="Visit the Unleash website">
+</a>
 
-Work in progress. This repository contains the Unleash documentation built with Fern.
+## What is Unleash?
 
-## Prerequisites
+Unleash is a powerful open-source solution for feature management. It streamlines your development workflow, accelerates software delivery, and empowers teams to control how and when they roll out new features to end users. With Unleash, you can deploy code to production in smaller, more manageable releases at your own pace.
 
+Feature flags in Unleash let you test your code with real production data, reducing the risk of negatively impacting your users' experience. It also enables your team to work on multiple features simultaneously without the need for separate feature branches.
+
+Unleash is the most popular open-source solution for feature flagging on GitHub. It supports 15 official client and server SDKs and over 15 community SDKs. You can even create your own SDK if you wish. Unleash is compatible with any language and framework.
+
+**[Try Unleash Enterprise for free](https://www.getunleash.io/plans/enterprise-payg)**
+
+## About this repository
+
+This repository contains the source code for the official [Unleash documentation](https://docs.getunleash.io), powered by [Fern](https://buildwithfern.com/).
+
+## Quickstart
+
+### Prerequisites
 - Node.js 20+
-- Fern CLI (installed globally):
+
+To get the documentation environment running locally, follow these steps:
+
+### Clone the repository
+
+```bash
+git clone https://github.com/Unleash/unleash-documentation.git
+cd unleash-documentation
+```
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Install the Fern CLI
 
 ```bash
 npm install -g fern-api
 ```
 
-## Local development
-
-Start the local development server:
+### Start the development server
 
 ```bash
 npm run dev
 ```
 
-This will:
-1. Fetch the latest OpenAPI spec from the hosted Unleash instance
-2. Split it into three separate API definitions (see [API Structure](#api-structure))
-3. Save them to `fern/apis/*/openapi.json`
-4. Build the custom footer component (see [Custom Footer](#custom-footer))
-5. Start the dev server at `http://localhost:3000`
+Once the server starts, you can view the documentation at `http://localhost:3000`.
 
-If you don't need to fetch the latest OpenAPI spec or rebuild the footer, you can run the Fern dev server directly for faster startup:
+### Command reference
 
-```bash
-fern docs dev
-```
+| Command | Action |
+| --- | --- |
+| `npm run dev` | Fetches latest specs, builds the custom footer, and starts the dev server. |
+| `fern docs dev` | Starts the dev server directly (does not fetch spec or build the footer). |
+| `npm run fetch` | Updates the local `openapi.json` files from the hosted instance. |
+| `npm run build:footer` | Recompiles the React-based custom footer. |
+| `fern check --strict-broken-links` | Validates the documentation and fails on broken links. |
 
-### Manual commands
+## Architecture and tooling
 
-If you need to run commands separately:
+Our docs stack has the following components:
+- **Engine**: [Fern](https://buildwithfern.com/).
+- **API specs**: OpenAPI spec fetched dynamically from the Unleash instance.
+- **Custom components**: React + Vite (for the custom footer).
 
-```bash
-# Fetch OpenAPI spec only
-npm run fetch
+### API structure
 
-# Build footer only
-npm run build:footer
+To keep our API reference navigable, we split the main Unleash OpenAPI spec into three distinct domains:
 
-# Start dev server without fetching or building footer
-fern docs dev
-
-# Build docs (with automatic fetch and footer build)
-npm run build
-```
-
-## API structure
-
-The Unleash API documentation is split into three separate API definitions to enable better organization and URL structure:
-
-### API definitions
-
-- **Client API** (`fern/apis/client-api/`): Contains only endpoints with the "Client" tag
-- **Frontend API** (`fern/apis/frontend-api/`): Contains only endpoints with the "Frontend API" tag
-- **Admin API** (`fern/apis/admin-api/`): Contains all remaining endpoints (excludes Client and Frontend API tags)
-
-### How it works
-
-The `scripts/fetch-openapi.mjs` script:
-
-1. Fetches the complete OpenAPI spec from `https://us.app.unleash-hosted.com/ushosted/docs/openapi.json`
-2. Filters the spec by OpenAPI tags to create three separate files:
-   - `filterOpenApiSpec(data, ['Client'])` → `fern/apis/client-api/openapi.json`
-   - `filterOpenApiSpec(data, ['Frontend API'])` → `fern/apis/frontend-api/openapi.json`
-   - `filterOpenApiSpec(data, null, ['Client', 'Frontend API'])` → `fern/apis/admin-api/openapi.json`
-3. Strips image markdown (`![Unleash Enterprise]` and `![Beta]`) that doesn't work in Fern
-4. Replaces server URL with `https://app.unleash-instance.example.com`
+- **Client API** (`fern/apis/client-api/`): Contains only endpoints with the "Client" tag.
+- **Frontend API** (`fern/apis/frontend-api/`): Contains only endpoints with the "Frontend API" tag.
+- **Admin API** (`fern/apis/admin-api/`): Contains all remaining endpoints (excludes Client and Frontend API tags).
 
 ## Custom footer
 
-We build a custom footer built with React. The footer source code is in `footer/src/` and is compiled to `fern/footer-dist/`.
-
-### How it works
-
-Fern supports [custom JavaScript and CSS](https://buildwithfern.com/learn/docs/customization/custom-css-js) that can replace or enhance the default components. The footer is built as a React component using Vite:
-
-- **Source**: `footer/src/FernFooter.tsx` and `footer/src/main.css`
-- **Output**: `fern/footer-dist/output.js` and `fern/footer-dist/output.css`
-- **Config**: Referenced in `fern/docs.yml` under `css` and `js` sections
-
-### Building the footer
-
-The footer is built automatically when running `npm run dev` or `npm run build`. To build it manually:
+The footer is a standalone React component. If you modify the code in `footer/src/`, you must rebuild it to see changes in the preview.
 
 ```bash
 npm run build:footer
 ```
 
-Or directly:
+## Contributing
 
-```bash
-cd footer && npm install && npm run build
-```
+We welcome contributions to the Unleash documentation. If you find something that's wrong, unclear, or missing, feel free to open an issue or submit a pull request.
 
-## Validation
+To contribute:
 
-Check for errors and warnings (does not fail on broken links):
+1. Fork and clone this repository.
+2. Create a new branch for your changes.
+3. Run the dev server locally to preview your changes using `npm run dev`.
+4. Submit a pull request to this repository.
 
-```bash
-fern check --warnings --broken-links
-```
+For contributions to the Unleash product itself, see the main [Unleash repository](https://github.com/Unleash/unleash).
 
-Check with strict mode (fails on broken links):
+## Migration history
 
-```bash
-fern check --strict-broken-links
-```
+This documentation was migrated to its own repository on 2 February 2026. It previously lived in the `website` folder of the main [Unleash repository](https://github.com/Unleash/unleash).
 
-## Preview and publishing
-
-Generate a preview URL:
-
-```bash
-fern generate --docs --preview
-```
-
+You can find the commit history prior to the migration date in the [`Unleash/unleash`](https://github.com/Unleash/unleash) repository.
