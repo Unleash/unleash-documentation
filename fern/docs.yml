@@ -275,10 +275,6 @@ navigation:
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
                     slug: integrate/jira-cloud-plugin-usage
 
-              - page: MCP
-                availability: beta
-                path: pages/integrate/mcp.mdx
-                slug: integrate/mcp
               - page: Slack
                 path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
@@ -290,6 +286,15 @@ navigation:
               - page: Webhook
                 path: pages/integrate/webhook.mdx
                 slug: integrate/webhook
+
+              - section: AI coding assistants
+                skip-slug: true
+                contents:
+                  - page: MCP server
+                    availability: beta
+                    path: pages/ai-coding-assistants/mcp.mdx
+                  - page: GitHub Copilot
+                    path: pages/ai-coding-assistants/github-copilot.mdx
 
       - section: Data privacy and compliance
         slug: privacy-and-compliance
