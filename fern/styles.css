@@ -343,18 +343,14 @@ img {
     border-radius: 12px !important;
 }
 
-/* Navbar links styling */
-#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"],
-#fern-header a[href="https://www.getunleash.io/pricing"],
-#fern-header a[href="https://app.unleash-hosted.com/sign-in"] {
+/* Navbar links styling (exclude GitHub button which keeps Fern defaults) */
+#fern-header .fern-button.minimal:not([href*="github"]) {
     font-weight: 600 !important;
     color: var(--nav-text-color) !important;
     border: none !important;
 }
 
-#fern-header a[href="https://www.getunleash.io/enterprise-feature-management-platform"]:hover,
-#fern-header a[href="https://www.getunleash.io/pricing"]:hover,
-#fern-header a[href="https://app.unleash-hosted.com/sign-in"]:hover {
+#fern-header .fern-button.minimal:not([href*="github"]):hover {
     color: var(--accent-color) !important;
 }
 
@@ -382,13 +378,13 @@ button.fern-header-tabs__tab[role="tab"]:hover .truncate,
 }
 
 /* Navbar button styling */
-#fern-header a[href*="enterprise-payg"].fern-button {
+#fern-header .fern-button.filled {
     background-color: var(--button-bg-color) !important;
     color: var(--button-text-color) !important;
     font-weight: 600 !important;
 }
 
-#fern-header a[href*="enterprise-payg"].fern-button:hover {
+#fern-header .fern-button.filled:hover {
     background-color: var(--button-hover-bg-color) !important;
 }
 
