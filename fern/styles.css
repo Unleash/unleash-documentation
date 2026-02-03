@@ -433,10 +433,8 @@ button.fern-header-tabs__tab[role="tab"]:hover .truncate,
     max-width: 1140px;
 }
 
-html[data-theme="dark"] .unleash-academy-links-container,
-html[data-theme="dark"] .unleash-academy-banner,
-html.dark .unleash-academy-links-container,
-html.dark .unleash-academy-banner {
+.dark .unleash-academy-links-container,
+.dark .unleash-academy-banner {
     --ifm-color-emphasis-100: #1a1a1b;
     --ifm-color-emphasis-200: #2a2a2b;
     --ifm-link-color: #a29bfe;
@@ -619,14 +617,12 @@ html.dark .unleash-academy-banner {
     display: inline-block;
 }
 
-html[data-theme="light"] .unleash-academy-level-badge,
-html:not([data-theme="dark"]) .unleash-academy-level-badge {
+.light .unleash-academy-level-badge {
     border-color: var(--unleash-logo-purple);
     color: var(--unleash-logo-purple);
 }
 
-html[data-theme="dark"] .unleash-academy-level-badge,
-html.dark .unleash-academy-level-badge {
+.dark .unleash-academy-level-badge {
     border-color: var(--ifm-link-color);
     color: var(--ifm-link-color);
 }

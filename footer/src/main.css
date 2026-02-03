@@ -129,13 +129,10 @@
   display: none;
 }
 
-/* Also support explicit dark mode class if Fern uses it */
-[data-theme="dark"] #fern-footer .unleash-logo-dark,
 .dark #fern-footer .unleash-logo-dark {
   display: none;
 }
 
-[data-theme="dark"] #fern-footer .unleash-logo-light,
 .dark #fern-footer .unleash-logo-light {
   display: block;
 }
@@ -241,12 +238,10 @@
 }
 
 /* Dark mode: show dark icons, hide light icons */
-[data-theme="dark"] #fern-footer .social-icon-light,
 .dark #fern-footer .social-icon-light {
   display: none;
 }
 
-[data-theme="dark"] #fern-footer .social-icon-dark,
 .dark #fern-footer .social-icon-dark {
   display: block;
 }
