@@ -76,10 +76,6 @@ main {
     padding-bottom: 4rem;
 }
 
-body:has(.landing-page) .flex.flex-row.items-center.justify-between.gap-2 {
-    display: none !important;
-}
-
 body:has(.landing-page) .fern-page-actions {
     display: none !important;
 }
@@ -279,7 +275,7 @@ body:has(.landing-page) .fern-card > * {
 }
 
 /* Card grid layout for icon + title inline, description full width */
-body:has(.landing-page) .fern-card > div.flex {
+body:has(.landing-page) .fern-card > div:first-child {
     display: grid !important;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
@@ -297,16 +293,16 @@ body:has(.landing-page) .fern-card h3 {
     line-height: 1 !important;
 }
 
-body:has(.landing-page) .fern-card .w-full.space-y-1 {
+body:has(.landing-page) .fern-card .card-icon ~ div {
     display: contents !important;
 }
 
-body:has(.landing-page) .fern-card .w-full.space-y-1 > div:first-child {
+body:has(.landing-page) .fern-card .card-icon ~ div > div:first-child {
     grid-column: 2;
     grid-row: 1;
 }
 
-body:has(.landing-page) .fern-card .w-full.space-y-1 > div:last-child {
+body:has(.landing-page) .fern-card .card-icon ~ div > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
     margin-top: 2rem !important;
@@ -339,7 +335,7 @@ body:has(.landing-page) .fern-card {
     flex-direction: column;
 }
 
-body:has(.landing-page) .fern-card > div.flex {
+body:has(.landing-page) .fern-card > div:first-child {
     flex: 1;
 }
 
