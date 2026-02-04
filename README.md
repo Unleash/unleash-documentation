@@ -83,6 +83,17 @@ The footer is a standalone React component. If you modify the code in `footer/sr
 npm run build:footer
 ```
 
+## Custom styling
+
+We apply custom CSS on top of Fern's defaults to achieve our branded look (floating content containers, mountain backdrop, custom navbar styling, academy section). The main stylesheet is `fern/styles.css`.
+
+Key design elements:
+- **Floating container**: Guide and reference pages render inside a white rounded card over a gray background.
+- **Mountain backdrop**: A decorative mountain texture fixed to the bottom-right corner via `body::after`, layered behind content with z-index management.
+- **Custom footer**: A standalone React component in `footer/src/`, compiled to `fern/footer-dist/`.
+
+For detailed architecture notes, gotchas, and instructions for working on the CSS, see [CLAUDE.md](./CLAUDE.md).
+
 ## Contributing
 
 We welcome contributions to the Unleash documentation. If you find something that's wrong, unclear, or missing, feel free to open an issue or submit a pull request.

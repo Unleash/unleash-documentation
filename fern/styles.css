@@ -39,22 +39,37 @@ body {
     color: var(--text-color);
 }
 
-/* Ensure main content appears above the mountain backdrop */
+/* Ensure main content and footer appear above the mountain backdrop (z-index: 0) */
+/* Gap: spacing between flex children (sidebar↔content, content↔ToC) */
+/* Padding-right: spacing between last child and viewport right edge */
 main {
     z-index: 1 !important;
+    gap: 16px;
+    padding-right: 16px;
 }
 
-/* Reduce mountain background opacity in dark mode */
-.dark body::before,
-.dark #fern-docs::before {
-    opacity: 0.3 !important;
+/* Below 1024px: sidebar collapses and header tabs expand into a dropdown panel
+   between the header and main. Remove z-index so main doesn't block the tabs.
+   Mountain is hidden at this width so z-index elevation is unnecessary.
+   Add left padding since sidebar no longer provides a left boundary. */
+@media (max-width: 1024px) {
+    main {
+        z-index: auto !important;
+        padding-left: 16px;
+    }
 }
 
-#fern-sidebar {
-    margin-right: 16px;
+/* Below 768px: also reset gap/padding so Fern's responsive layout works unimpeded */
+@media (max-width: 768px) {
+    main {
+        gap: initial;
+        padding-left: initial;
+        padding-right: initial;
+    }
 }
 
-.fern-layout-guide, .fern-layout-reference .fern-layout-page {
+.fern-layout-guide,
+.fern-layout-reference .fern-layout-page {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
     margin-top: 2rem;
@@ -62,9 +77,39 @@ main {
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* Below 1024px: sidebar collapses to mobile menu */
+@media (max-width: 1024px) {
+    .fern-layout-guide,
+    .fern-layout-reference .fern-layout-page {
+        margin-top: 1rem;
+    }
+}
+
+/* Small screens: keep container look with small edge margins, reduced rounding */
+@media (max-width: 768px) {
+    .fern-layout-guide,
+    .fern-layout-reference .fern-layout-page {
+        border-radius: 0.5rem;
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+}
+
 .fern-layout-reference {
     padding: 0 2rem;
     margin-bottom: calc(var(--spacing) * 12);
+}
+
+@media (max-width: 768px) {
+    .fern-layout-reference {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .fern-layout-reference {
+        padding: 0 0.5rem;
+    }
 }
 
 .landing-page {
@@ -352,6 +397,14 @@ img {
 
 #fern-header .fern-button.minimal:not([href*="github"]):hover {
     color: var(--accent-color) !important;
+}
+
+/* Safety net: ensure header tabs panel stacks above main.
+   At <=1024px main has z-index: auto so this is technically redundant,
+   but protects against Fern changing its breakpoints. */
+.fern-header-tabs,
+div:has(> [role="tablist"]) {
+    z-index: 2 !important;
 }
 
 /* Header tabs */
@@ -743,12 +796,20 @@ body::after {
     z-index: 0;
     bottom: 0;
     right: 0;
-    width: 350px;
+    width: clamp(200px, 25vw, 400px);
     aspect-ratio: 652 / 905;
     background-size: cover;
     background-repeat: no-repeat;
     pointer-events: none;
     user-select: none;
+}
+
+/* Hide mountain below 1024px — removes the need for z-index: 1 on main,
+   which otherwise blocks Fern's expanded tabs panel */
+@media (max-width: 1024px) {
+    body::after {
+        display: none;
+    }
 }
 
 /* Make mountain more subtle in dark mode */
