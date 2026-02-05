@@ -6,12 +6,52 @@ Instructions and gotchas for working on the custom CSS in this Fern-powered docu
 
 - `fern/styles.css` — Main custom stylesheet. Overrides Fern's defaults for theming, layout, landing page, academy, and the mountain backdrop.
 - `fern/docs.yml` — Fern configuration. Defines colors, typography, navbar links, layout, redirects. CSS/JS files are registered here.
+- `footer/src/main.tsx` — Footer injection logic. Finds or creates `#fern-footer` and renders the React footer component.
 - `footer/src/main.css` — Footer component styles (source). Must run `npm run build:footer` after changes to recompile into `fern/footer-dist/`.
 - `fern/footer-dist/output.css` + `output.js` — Compiled footer assets. Do not edit directly.
 
 ## Fern CSS Overriding — How It Works
 
-Fern uses Tailwind CSS internally. Custom styles in `styles.css` override Fern's defaults, which often requires `!important` because Fern's utility classes have high specificity.
+Fern uses Tailwind CSS internally. Custom styles in `styles.css` override Fern's defaults.
+
+### Specificity Strategy (No `!important`)
+
+The stylesheet uses **specificity boosting** instead of `!important` to override Fern's styles. Only 3 structural `!important` declarations remain (z-index on `main` and header tabs — see Mountain Backdrop section).
+
+**Techniques used:**
+
+1. **ID selectors** — `#fern-header .fern-button.filled` gives specificity (1,2,0), easily beating Fern's class-based selectors (0,1,0–0,2,0).
+
+2. **Doubled class selectors** — `.unleash-academy-links.unleash-academy-links` matches the same elements as `.unleash-academy-links` but with double the specificity (0,2,0 vs 0,1,0). Used extensively in the Academy section.
+
+3. **Doubled ID selectors** — `#fern-sidebar#fern-sidebar` for (2,0,0). Used where a single ID isn't enough.
+
+4. **Context-adding prefixes** — `.fern-button.cta-button` adds Fern's own class as context, raising specificity to match Fern's `.fern-button.filled` at (0,2,0). Since our stylesheet loads after Fern's, equal specificity means we win.
+
+### Gotcha: Doubled Selectors Must Be Consistent
+
+When you double a class in a base rule, **every media query or variant for that selector must also be doubled**. Otherwise the base rule's higher specificity wins regardless of the media query.
+
+```css
+/* Base rule: specificity (0,2,0) */
+.landing-page.landing-page {
+    padding-left: 4rem;
+}
+
+/* WRONG: specificity (0,1,0) — base rule wins, padding stays 4rem */
+@media (max-width: 768px) {
+    .landing-page {
+        padding-left: 1.5rem;
+    }
+}
+
+/* CORRECT: specificity (0,2,0) — later in file, so this wins */
+@media (max-width: 768px) {
+    .landing-page.landing-page {
+        padding-left: 1.5rem;
+    }
+}
+```
 
 ### Stable Fern Selectors
 
@@ -37,9 +77,21 @@ Fern's built-in CSS custom properties: `--accent-*`, `--grayscale-*`, `--backgro
 
 Fern's internal markup uses Tailwind classes like `.flex`, `.w-full`, `.space-y-1`, etc. These are implementation details and **will change between Fern versions**. Use structural selectors (`> div:first-child`, `.card-icon ~ div`) or Fern's documented classes instead.
 
-### Gotcha: `!important` Is Sometimes Unavoidable
+## Fern Theme Configuration
 
-Fern applies styles via Tailwind utilities which have high specificity. Some overrides genuinely require `!important`. Before adding one, try specificity boosting first (e.g., `#fern-header#fern-header a` or `.fern-card.fern-card`). If that doesn't work, `!important` is acceptable — just add a comment explaining why.
+Some styling is handled in `docs.yml` rather than CSS:
+
+```yaml
+colors:
+  background:
+    light: "#EAEAED"    # Page background — avoids needing #fern-docs { background-color }
+    dark: "#1A1924"
+theme:
+  sidebar: minimal      # Cleaner sidebar appearance
+  page-actions: toolbar # Page actions as toolbar
+```
+
+When Fern's config can handle a style, prefer it over custom CSS. The `background` color replaced custom `#fern-docs` and `#fern-header` background-color rules.
 
 ## Dark Mode
 
@@ -105,6 +157,11 @@ Fern's `<main>` element has Tailwind class `z-0` (z-index: 0). For the mountain 
 
 This trade-off hides the mountain on tablet/mobile (where it was already small) in exchange for correct tab panel behavior.
 
+These are the **only 3 `!important` declarations** in the stylesheet, and all are for z-index:
+1. `main { z-index: 1 !important }` — Override Tailwind's `z-0`
+2. `main { z-index: auto !important }` — Override both Tailwind's `z-0` and our own `z-index: 1`
+3. `.fern-header-tabs { z-index: 2 !important }` — Safety net for the tabs panel
+
 ### Approaches That Don't Work
 
 1. **`z-index: -1` on the mountain** — Puts the mountain behind `#fern-docs`, which has an opaque `background-color`. The mountain becomes invisible.
@@ -146,6 +203,8 @@ Since both `github` and `minimal` types share the `.fern-button.minimal` class, 
 
 The Academy section uses custom HTML components in MDX with custom CSS classes (`unleash-academy-*`). Variables are namespaced as `--academy-*` (previously `--ifm-*` from the Docusaurus migration). These are self-contained — defined and consumed within the Academy section only.
 
+All Academy selectors use doubled classes (e.g., `.unleash-academy-links.unleash-academy-links`) for specificity over Fern's default list/heading/paragraph styling.
+
 ## Footer
 
 The footer is a standalone React + Vite component in `footer/src/`. After editing footer source files:
@@ -155,6 +214,12 @@ npm run build:footer
 ```
 
 This compiles to `fern/footer-dist/output.css` + `output.js`. The footer uses its own CSS custom properties and supports dark mode via `.dark` class.
+
+### Footer Injection
+
+The footer script (`main.tsx`) injects `#fern-footer` as a direct child of `document.body`. It only looks for an existing `#fern-footer` element by ID — if found inside Fern's layout (e.g., inside `.fern-layout-guide`), it moves it to `body` level. This prevents the footer from appearing inside the white content container.
+
+**Do not** add generic selectors like `footer`, `.footer`, `[data-fern-footer]` to the injection logic — Fern may render its own `<footer>` element inside the layout container, which would cause our footer to render inside the white card.
 
 ## Testing Checklist
 
@@ -172,7 +237,7 @@ When modifying CSS, test these pages at the breakpoints below in both light and 
 - Mountain backdrop — visible at >1024px in bottom-right, behind all content. Hidden at <=1024px.
 - Expanded tabs panel — at <=1024px, clicking a tab section should show the full navigation panel above the content (not behind it).
 - Container edge spacing — at all widths, the white container should have visible space between it and the viewport edges. No content should be cut off.
-- Footer — renders above mountain at desktop. Proper spacing at all widths.
+- Footer — renders below the white container (not inside it). Proper spacing at all widths.
 
 ## Useful Links
 

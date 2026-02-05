@@ -183,7 +183,7 @@ body:has(.landing-page) .fern-page-actions {
 
 /* Mobile - hide video, ensure text is readable */
 @media (max-width: 768px) {
-    .landing-page {
+    .landing-page.landing-page {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
@@ -214,7 +214,7 @@ body:has(.landing-page) .fern-page-actions {
 
 /* Small mobile */
 @media (max-width: 480px) {
-    .landing-page {
+    .landing-page.landing-page {
         padding-left: 1rem;
         padding-right: 1rem;
     }
@@ -242,12 +242,16 @@ body:has(.landing-page) .fern-page-actions {
     aspect-ratio: 600 / 330;
 }
 
-/* Card bottom stripe styles */
+/* Card styles */
 body:has(.landing-page) .fern-card {
     position: relative;
     overflow: hidden;
     padding: 1.75rem;
     padding-bottom: 3rem;
+    height: 100%;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Dark mode - add background to card itself */
@@ -329,10 +333,6 @@ body:has(.landing-page) .fern-card .card-icon {
     grid-row: 1;
 }
 
-body:has(.landing-page) .fern-card h3 {
-    line-height: 1;
-}
-
 body:has(.landing-page) .fern-card .card-icon ~ div {
     display: contents;
 }
@@ -348,9 +348,10 @@ body:has(.landing-page) .fern-card .card-icon ~ div > div:last-child {
     margin-top: 2rem;
 }
 
-/* Card text colors */
+/* Card text colors — h3 also gets line-height from the grid rule above */
 body:has(.landing-page) .fern-card h3 {
     color: var(--nav-text-color);
+    line-height: 1;
 }
 
 body:has(.landing-page) .fern-card p,
@@ -365,14 +366,6 @@ body:has(.landing-page) .fern-card div {
 
 .dark body:has(.landing-page) .fern-card:hover {
     border-color: #374151;
-}
-
-/* Equal height cards */
-body:has(.landing-page) .fern-card {
-    height: 100%;
-    min-height: 240px;
-    display: flex;
-    flex-direction: column;
 }
 
 body:has(.landing-page) .fern-card > div:first-child {
@@ -460,8 +453,8 @@ div:has(> [role="tablist"]) {
    ===================================== */
 
 /* Variables & Container Setup */
-.unleash-academy-links-container,
-.unleash-academy-banner {
+.unleash-academy-links-container.unleash-academy-links-container,
+.unleash-academy-banner.unleash-academy-banner {
     --academy-spacing-vertical: 1rem;
     --academy-spacing-horizontal: 1rem;
     --academy-radius: 0.5rem;
@@ -471,8 +464,8 @@ div:has(> [role="tablist"]) {
     --academy-link-color: #6c5ce7;
     --unleash-logo-purple: #6c5ce7;
     --unleash-font-size-smaller: 0.9rem;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin-left: auto;
+    margin-right: auto;
     max-width: 1140px;
 }
 
@@ -484,11 +477,11 @@ div:has(> [role="tablist"]) {
 }
 
 /* Banner */
-.unleash-academy-banner {
-    margin-block: 15px !important;
+.unleash-academy-banner.unleash-academy-banner {
+    margin-block: 15px;
     position: relative;
     border: var(--academy-border-width) solid var(--academy-border-color);
-    padding: 45px !important;
+    padding: 45px;
     border-radius: var(--academy-radius);
     background-color: #f1f0fc;
     background-image: url("https://cdn.getunleash.io/docs-assets/banner-bg-pixels.svg");
@@ -498,46 +491,46 @@ div:has(> [role="tablist"]) {
     color: #000;
 }
 
-.academy-banner-main-text h1,
-.academy-banner-main-text h2,
-.academy-banner-main-text h3,
-.academy-banner-main-text p {
+.academy-banner-main-text.academy-banner-main-text h1,
+.academy-banner-main-text.academy-banner-main-text h2,
+.academy-banner-main-text.academy-banner-main-text h3,
+.academy-banner-main-text.academy-banner-main-text p {
     font-weight: normal;
-    font-size: 21px !important;
-    margin: 0 0 0.5rem !important;
-    line-height: 1.4 !important;
-    padding-top: 0 !important;
+    font-size: 21px;
+    margin: 0 0 0.5rem;
+    line-height: 1.4;
+    padding-top: 0;
 }
 
 /* Banner Bullets */
-.unleash-academy-banner-list {
+.unleash-academy-banner-list.unleash-academy-banner-list {
     grid-area: bullets;
     display: flex;
     flex-flow: column;
     gap: 0.5rem;
     padding-inline-start: 0;
-    list-style: none !important;
-    margin: 0 !important;
+    list-style: none;
+    margin: 0;
 }
 
 @media (min-width: 700px) {
-    .unleash-academy-banner-list {
-        flex-direction: row !important;
-        align-items: center !important;
-        gap: 2rem !important;
+    .unleash-academy-banner-list.unleash-academy-banner-list {
+        flex-direction: row;
+        align-items: center;
+        gap: 2rem;
     }
 }
 
-.unleash-academy-banner-list > li {
+.unleash-academy-banner-list.unleash-academy-banner-list > li {
     font-weight: bold;
-    font-size: 15px !important;
-    list-style: none !important;
+    font-size: 15px;
+    list-style: none;
     background-image: url("https://cdn.getunleash.io/docs-assets/bullet-check.svg");
     background-repeat: no-repeat;
     background-position: left center;
-    padding-left: 28px !important;
-    line-height: 1.5 !important;
-    margin: 0 !important;
+    padding-left: 28px;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* Banner Grid Layout */
@@ -593,69 +586,69 @@ div:has(> [role="tablist"]) {
 }
 
 /* Course Cards */
-.unleash-academy-links {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+.unleash-academy-links.unleash-academy-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-flow: column;
     gap: var(--academy-spacing-vertical);
     align-items: stretch;
 }
 
-.unleash-academy-links > li {
+.unleash-academy-links.unleash-academy-links > li {
     display: flex;
     flex-direction: column;
     height: 100%;
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 @media (min-width: 711px) {
-    .unleash-academy-links {
+    .unleash-academy-links.unleash-academy-links {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-.unleash-academy-links-container article {
+.unleash-academy-links-container.unleash-academy-links-container article {
     border-radius: var(--academy-radius);
     border: var(--academy-border-width) solid var(--academy-border-color);
-    padding: 1.25rem !important;
-    gap: 0.75rem !important;
-    display: flex !important;
+    padding: 1.25rem;
+    gap: 0.75rem;
+    display: flex;
     flex-direction: column;
     height: 100%;
     background-position: top right;
     background-repeat: no-repeat;
 }
 
-.unleash-academy-links-container article .header {
+.unleash-academy-links-container.unleash-academy-links-container article .header {
     margin-bottom: 0.5rem;
 }
 
-.unleash-academy-links-container article h3 {
-    font-size: 18.5px !important;
-    margin-top: 7.5px !important;
-    margin-bottom: 0 !important;
-    line-height: 1.3 !important;
+.unleash-academy-links-container.unleash-academy-links-container article h3 {
+    font-size: 18.5px;
+    margin-top: 7.5px;
+    margin-bottom: 0;
+    line-height: 1.3;
 }
 
-.unleash-academy-links-container article p {
+.unleash-academy-links-container.unleash-academy-links-container article p {
     font-size: var(--unleash-font-size-smaller);
     flex-grow: 1;
-    margin-top: 0 !important;
-    margin-bottom: 1rem !important;
+    margin-top: 0;
+    margin-bottom: 1rem;
     line-height: 1.4;
 }
 
-.unleash-academy-level-badge {
+.unleash-academy-level-badge.unleash-academy-level-badge {
     border: 2px solid;
     border-radius: 60px;
     padding-inline: 0.5em;
     text-transform: capitalize;
-    font-size: 15px !important;
+    font-size: 15px;
     line-height: 1.4;
     display: inline-block;
 }
@@ -679,69 +672,69 @@ div:has(> [role="tablist"]) {
 }
 
 /* Buttons */
-.unleash-academy-buttons {
+.unleash-academy-buttons.unleash-academy-buttons {
     display: flex;
     flex-direction: column;
-    gap: 7.5px !important;
-    padding-bottom: 0 !important;
+    gap: 7.5px;
+    padding-bottom: 0;
 }
 
-.unleash-academy-buttons .button-spacing {
-    display: none !important;
+.unleash-academy-buttons.unleash-academy-buttons .button-spacing {
+    display: none;
 }
 
-.unleash-academy-buttons a.unleash-action-button,
-.unleash-academy-buttons a.get-certified {
-    display: block !important;
+.unleash-academy-buttons.unleash-academy-buttons a.unleash-action-button,
+.unleash-academy-buttons.unleash-academy-buttons a.get-certified {
+    display: block;
     width: 100%;
     text-align: center;
-    text-decoration: none !important;
+    text-decoration: none;
     border-radius: var(--academy-radius);
-    padding: 0 !important;
-    margin: 0 !important;
-    min-height: 0 !important;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
 }
 
-.unleash-academy-buttons a p {
-    padding: 7.5px 16px !important;
-    margin: 0 !important;
-    line-height: 1.2 !important;
-    font-size: 15px !important;
-    font-weight: 600 !important;
+.unleash-academy-buttons.unleash-academy-buttons a p {
+    padding: 7.5px 16px;
+    margin: 0;
+    line-height: 1.2;
+    font-size: 15px;
+    font-weight: 600;
 }
 
-.unleash-academy-buttons a.unleash-action-button {
+.unleash-academy-buttons.unleash-academy-buttons a.unleash-action-button {
     background: #6c5ce7;
-    color: white !important;
+    color: white;
     border: 1px solid #6c5ce7;
 }
 
-.unleash-academy-buttons a.unleash-action-button:hover {
+.unleash-academy-buttons.unleash-academy-buttons a.unleash-action-button:hover {
     background: #5b4dc4;
 }
 
-.unleash-academy-buttons a.get-certified {
+.unleash-academy-buttons.unleash-academy-buttons a.get-certified {
     background: #f5f6f7;
-    color: #6c5ce7 !important;
+    color: #6c5ce7;
     border: 2px solid #6c5ce7;
 }
 
-.unleash-academy-buttons a.get-certified:hover {
+.unleash-academy-buttons.unleash-academy-buttons a.get-certified:hover {
     background: #ebedf0;
 }
 
-/* Remove unwanted decorations */
-.unleash-action-button::after,
-.unleash-action-button svg,
-.unleash-academy-buttons a::after,
-.unleash-academy-buttons a svg,
-.unleash-academy-banner-list > li::after,
-.unleash-academy-banner-list > li::marker,
-.unleash-academy-banner-list > li::before,
-.unleash-academy-links > li::marker,
-.unleash-academy-links > li::before {
-    display: none !important;
-    content: none !important;
+/* Remove unwanted decorations (Fern adds arrows to links, bullets to lists) */
+.unleash-action-button.unleash-action-button::after,
+.unleash-action-button.unleash-action-button svg,
+.unleash-academy-buttons.unleash-academy-buttons a::after,
+.unleash-academy-buttons.unleash-academy-buttons a svg,
+.unleash-academy-banner-list.unleash-academy-banner-list > li::after,
+.unleash-academy-banner-list.unleash-academy-banner-list > li::marker,
+.unleash-academy-banner-list.unleash-academy-banner-list > li::before,
+.unleash-academy-links.unleash-academy-links > li::marker,
+.unleash-academy-links.unleash-academy-links > li::before {
+    display: none;
+    content: none;
 }
 
 
@@ -757,17 +750,23 @@ div:has(> [role="tablist"]) {
    TOC MOBILE BUTTON
    ===================================== */
 
-.toc-mobile.toc-mobile button {
-    background-color: var(--container-bg-color);
+/* ToC mobile: both the toggle button and the dropdown panel use Fern's
+   bg-background (page background color). Override to match the white container. */
+.toc-mobile button,
+.toc-mobile-dropdown {
+    background-color: var(--container-bg-color) !important;
+}
+
+.toc-mobile button {
     transition: background-color 0.15s ease;
 }
 
-.light .toc-mobile.toc-mobile button:hover {
-    background-color: #f0f0f3;
+.light .toc-mobile button:hover {
+    background-color: #f0f0f3 !important;
 }
 
-.dark .toc-mobile.toc-mobile button:hover {
-    background-color: #2b2a3d;
+.dark .toc-mobile button:hover {
+    background-color: #2b2a3d !important;
 }
 
 /* =====================================
