@@ -107,17 +107,17 @@ main {
     }
 }
 
-.landing-page {
+.landing-page.landing-page {
     max-width: 1300px;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin-left: auto;
+    margin-right: auto;
     padding-left: 4rem;
     padding-right: 4rem;
     padding-bottom: 4rem;
 }
 
 body:has(.landing-page) .fern-page-actions {
-    display: none !important;
+    display: none;
 }
 
 /* Hero section styles */
@@ -138,7 +138,7 @@ body:has(.landing-page) .fern-page-actions {
 
 /* Dark mode - keep hero h1 white */
 .dark .hero h1 {
-    color: #ffffff !important;
+    color: #ffffff;
 }
 
 .hero-row {
@@ -193,12 +193,12 @@ body:has(.landing-page) .fern-page-actions {
     }
 
     .hero h1 {
-        white-space: normal !important;
-        font-size: 2rem !important;
+        white-space: normal;
+        font-size: 2rem;
     }
 
     .hero-row {
-        display: block !important;
+        display: block;
     }
 
     .hero-text-column {
@@ -208,7 +208,7 @@ body:has(.landing-page) .fern-page-actions {
 
     /* Hide video on mobile */
     .hero-video {
-        display: none !important;
+        display: none;
     }
 }
 
@@ -220,7 +220,7 @@ body:has(.landing-page) .fern-page-actions {
     }
 
     .hero h1 {
-        font-size: 1.75rem !important;
+        font-size: 1.75rem;
     }
 
     .hero-text-column {
@@ -252,16 +252,16 @@ body:has(.landing-page) .fern-card {
 
 /* Dark mode - add background to card itself */
 .dark body:has(.landing-page) .fern-card {
-    background-color: #222130 !important;
+    background-color: #222130;
 }
 
 /* Hover states for both light and dark modes */
 .light body:has(.landing-page) .fern-card:hover {
-    background-color: var(--card-hover-bg-color) !important;
+    background-color: var(--card-hover-bg-color);
 }
 
 .dark body:has(.landing-page) .fern-card:hover {
-    background-color: #23233a !important;
+    background-color: #23233a;
 }
 
 body:has(.landing-page) .fern-card::after {
@@ -292,20 +292,20 @@ body:has(.landing-page) .fern-card:before {
 
 /* Light mode - use Fern's light theme class */
 .light body:has(.landing-page) .fern-card:before {
-    opacity: 0.7 !important;
-    filter: brightness(0.4) contrast(1.8) !important;
+    opacity: 0.7;
+    filter: brightness(0.4) contrast(1.8);
 }
 
 .light body:has(.landing-page) .fern-card:hover:before {
-    opacity: 0.3 !important;
-    filter: brightness(0.4) contrast(1.8) !important;
+    opacity: 0.3;
+    filter: brightness(0.4) contrast(1.8);
 }
 
 /* Dark mode - use Fern's dark theme class */
 .dark body:has(.landing-page) .fern-card:before {
-    opacity: 0.1 !important;
-    filter: none !important;
-    z-index: 0 !important;
+    opacity: 0.1;
+    filter: none;
+    z-index: 0;
 }
 
 /* Ensure card content is positioned above background */
@@ -316,10 +316,10 @@ body:has(.landing-page) .fern-card > * {
 
 /* Card grid layout for icon + title inline, description full width */
 body:has(.landing-page) .fern-card > div:first-child {
-    display: grid !important;
+    display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
-    gap: 0 0.5rem !important;
+    gap: 0 0.5rem;
     align-items: center;
     align-content: start;
 }
@@ -330,11 +330,11 @@ body:has(.landing-page) .fern-card .card-icon {
 }
 
 body:has(.landing-page) .fern-card h3 {
-    line-height: 1 !important;
+    line-height: 1;
 }
 
 body:has(.landing-page) .fern-card .card-icon ~ div {
-    display: contents !important;
+    display: contents;
 }
 
 body:has(.landing-page) .fern-card .card-icon ~ div > div:first-child {
@@ -345,26 +345,26 @@ body:has(.landing-page) .fern-card .card-icon ~ div > div:first-child {
 body:has(.landing-page) .fern-card .card-icon ~ div > div:last-child {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 2rem !important;
+    margin-top: 2rem;
 }
 
 /* Card text colors */
 body:has(.landing-page) .fern-card h3 {
-    color: var(--nav-text-color) !important;
+    color: var(--nav-text-color);
 }
 
 body:has(.landing-page) .fern-card p,
 body:has(.landing-page) .fern-card div {
-    color: var(--text-color) !important;
+    color: var(--text-color);
 }
 
 /* Preserve default border color on hover */
 .light body:has(.landing-page) .fern-card:hover {
-    border-color: #e5e7eb !important;
+    border-color: #e5e7eb;
 }
 
 .dark body:has(.landing-page) .fern-card:hover {
-    border-color: #374151 !important;
+    border-color: #374151;
 }
 
 /* Equal height cards */
