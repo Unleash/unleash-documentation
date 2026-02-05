@@ -34,11 +34,6 @@ typography:
       - path: ./fonts/Sen-VariableFont_wght.woff2
         weight: 400 700
 
-landing-page: 
-  page: Unleash Documentation
-  path: pages/welcome.mdx
-  slug: "/"
-
 tabs:
   product-docs:
     display-name: Docs
@@ -63,8 +58,10 @@ tabs:
 
 navigation:
   - tab: product-docs
-    layout:
-      
+    layout:   
+      - page: Home
+        path: pages/welcome.mdx
+        slug: "/"
       - section: Get started
         contents:
           - page: Quickstart

@@ -125,7 +125,7 @@ body:has(.landing-page) .fern-page-actions {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin-top: 3rem;
+    margin-top: 1rem;
     margin-bottom: 2rem;
     padding-bottom: 2.5rem;
 }
