@@ -8,7 +8,7 @@ max-toc-depth: 3
 slug: integrate/github-copilot
 ---
 
-The [Unleash MCP](/integrate/mcp) server connects [GitHub Copilot](https://github.com/features/copilot) to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. You can evaluate code changes, create flags, automatically wrap changes in feature flags, manage rollouts, and clean up flags without leaving your editor.
+The [Unleash MCP server](/integrate/mcp) connects [GitHub Copilot](https://github.com/features/copilot) to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. You can evaluate code changes, create flags, automatically wrap changes in feature flags, manage rollouts, and clean up flags without leaving your editor.
 
 GitHub Copilot supports MCP in several environments:
 - [Visual Studio Code](https://code.visualstudio.com/) with full MCP support available in versions 1.102+.
@@ -625,44 +625,6 @@ Feature flags should be removed after successful rollouts. Use `cleanup_flag` re
 </Card>
 </CardGroup>
 
-## Architecture
-
-The following diagram shows how the Unleash MCP server fits into your development workflow.
-
-```md maxLines=0 showLineNumbers={false}
-┌────────────────────────────────────────────────────────────┐
-│                     Developer workflow                     │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│   ┌──────────────┐           ┌──────────────────┐          │
-│   │   Your IDE   │     MCP   │   Unleash MCP    │          │
-│   │  + Copilot   │◄─────────►│  server (local)  │          │
-│   └──────────────┘    stdio  └────────┬─────────┘          │
-│                                       │                    │
-│   VS Code, JetBrains,                 │ HTTPS              │
-│   Visual Studio, Neovim               │                    │
-│                               ┌───────▼───────────┐        │
-│                               │ Unleash Admin API │        │
-│                               └───────┬───────────┘        │
-│                                       │                    │
-├───────────────────────────────────────│────────────────────┤
-│                    Runtime evaluation                      │
-├───────────────────────────────────────│────────────────────┤
-│                                       │                    │
-│   ┌──────────────────┐          ┌─────▼─────────────┐      │
-│   │ Your application │◄────────►│ Unleash SDK / Edge│      │
-│   └──────────────────┘  Feature └───────────────────┘      │
-│                          flags                             │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
-```
-
-**Key points:**
-
-- The MCP server runs locally on your machine as a stdio process.
-- It communicates with the Unleash Admin API using your PAT.
-- Feature flag evaluations happen locally in your application via [SDKs](/sdks) or [Unleash Edge](/unleash-edge).
-- No user data is sent to the Unleash server during flag evaluation.
 
 ## Related resources
 
