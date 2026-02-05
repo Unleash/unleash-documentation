@@ -14,6 +14,10 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
+theme:
+  sidebar: minimal
+  page-actions: toolbar
+
 analytics:
   gtm:
     container-id: GTM-KV5PRR2
@@ -953,8 +957,8 @@ colors:
     dark: "#817afe"
     light: "#817afe"
   background:
-    dark: "#1a1924"
-    light: "#ffffff"
+    dark: "#1A1924"
+    light: "#EAEAED"
 
 logo:
   dark: assets/logo-dark.svg

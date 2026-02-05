@@ -5,39 +5,17 @@ import { createRoot } from 'react-dom/client'
 
 import { FernFooter } from './FernFooter.js'
 
-// Function to render the Unleash footer - similar to the original custom-footer.js approach
+// Function to render the Unleash footer
 function renderUnleashFooter() {
-  console.log('🔍 Attempting to render Unleash Footer...');
-  console.log('📍 Current URL:', window.location.href);
-  console.log('📄 Document ready state:', document.readyState);
-  
-  // Look for common footer selectors that Fern might use
-  const possibleSelectors = [
-    '#fern-footer',
-    '[data-fern-footer]', 
-    '.fern-footer',
-    'footer',
-    '#footer',
-    '.footer'
-  ];
-  
-  let footerContainer: HTMLElement | null = null;
-  
-  // Try to find an existing footer container
-  for (const selector of possibleSelectors) {
-    footerContainer = document.querySelector(selector);
-    if (footerContainer) {
-      console.log(`✅ Found footer container using selector: ${selector}`);
-      break;
-    }
-  }
-  
-  // If no footer found, create one at the end of body
+  // Always use a dedicated container as a direct child of body,
+  // so the footer never ends up inside Fern's layout containers.
+  let footerContainer = document.getElementById('fern-footer');
   if (!footerContainer) {
-    console.log('📦 Creating new footer container at end of body');
     footerContainer = document.createElement('div');
     footerContainer.id = 'fern-footer';
-    footerContainer.setAttribute('data-react-footer', 'true');
+    document.body.appendChild(footerContainer);
+  } else if (footerContainer.parentElement !== document.body) {
+    // If Fern placed #fern-footer inside the layout, move it to body
     document.body.appendChild(footerContainer);
   }
   

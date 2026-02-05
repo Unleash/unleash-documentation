@@ -27,12 +27,7 @@
 }
 
 #fern-docs {
-    background-color: var(--sidebar-nav-bg-color);
     color: var(--text-color);
-}
-
-#fern-header {
-    background-color: var(--sidebar-nav-bg-color);
 }
 
 body {
@@ -384,19 +379,21 @@ body:has(.landing-page) .fern-card > div:first-child {
     flex: 1;
 }
 
-img {
-    border-radius: 12px !important;
+/* Rounded corners for images in content areas only (not nav, footer, etc.) */
+.fern-layout-guide img,
+.fern-layout-reference img {
+    border-radius: 12px;
 }
 
 /* Navbar links styling (exclude GitHub button which keeps Fern defaults) */
 #fern-header .fern-button.minimal:not([href*="github"]) {
-    font-weight: 600 !important;
-    color: var(--nav-text-color) !important;
-    border: none !important;
+    font-weight: 600;
+    color: var(--nav-text-color);
+    border: none;
 }
 
 #fern-header .fern-button.minimal:not([href*="github"]):hover {
-    color: var(--accent-color) !important;
+    color: var(--accent-color);
 }
 
 /* Safety net: ensure header tabs panel stacks above main.
@@ -407,54 +404,55 @@ div:has(> [role="tablist"]) {
     z-index: 2 !important;
 }
 
-/* Header tabs */
-button.fern-header-tabs__tab[role="tab"],
-button.fern-header-tabs__tab[role="tab"] span,
-button.fern-header-tabs__tab[role="tab"] .truncate,
-.fern-header-tabs a {
-    color: var(--nav-text-color) !important;
+/* Header tabs — doubled class for specificity over Fern's Tailwind classes */
+.fern-header-tabs.fern-header-tabs button[role="tab"],
+.fern-header-tabs.fern-header-tabs button[role="tab"] span,
+.fern-header-tabs.fern-header-tabs button[role="tab"] .truncate,
+.fern-header-tabs.fern-header-tabs a {
+    color: var(--nav-text-color);
 }
 
-button.fern-header-tabs__tab[role="tab"][aria-selected="true"],
-button.fern-header-tabs__tab[role="tab"][aria-selected="true"] span,
-button.fern-header-tabs__tab[role="tab"][aria-selected="true"] .truncate,
-button.fern-header-tabs__tab[role="tab"][data-state="active"],
-button.fern-header-tabs__tab[role="tab"][data-state="active"] span,
-button.fern-header-tabs__tab[role="tab"][data-state="active"] .truncate,
-.fern-header-tabs a[aria-selected="true"],
-.fern-header-tabs a[data-state="active"],
-button.fern-header-tabs__tab[role="tab"]:hover,
-button.fern-header-tabs__tab[role="tab"]:hover span,
-button.fern-header-tabs__tab[role="tab"]:hover .truncate,
-.fern-header-tabs a:hover {
-    color: var(--accent-color) !important;
+.fern-header-tabs.fern-header-tabs button[role="tab"][aria-selected="true"],
+.fern-header-tabs.fern-header-tabs button[role="tab"][aria-selected="true"] span,
+.fern-header-tabs.fern-header-tabs button[role="tab"][aria-selected="true"] .truncate,
+.fern-header-tabs.fern-header-tabs button[role="tab"][data-state="active"],
+.fern-header-tabs.fern-header-tabs button[role="tab"][data-state="active"] span,
+.fern-header-tabs.fern-header-tabs button[role="tab"][data-state="active"] .truncate,
+.fern-header-tabs.fern-header-tabs a[aria-selected="true"],
+.fern-header-tabs.fern-header-tabs a[data-state="active"],
+.fern-header-tabs.fern-header-tabs button[role="tab"]:hover,
+.fern-header-tabs.fern-header-tabs button[role="tab"]:hover span,
+.fern-header-tabs.fern-header-tabs button[role="tab"]:hover .truncate,
+.fern-header-tabs.fern-header-tabs a:hover {
+    color: var(--accent-color);
 }
 
 /* Navbar button styling */
 #fern-header .fern-button.filled {
-    background-color: var(--button-bg-color) !important;
-    color: var(--button-text-color) !important;
-    font-weight: 600 !important;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-weight: 600;
 }
 
 #fern-header .fern-button.filled:hover {
-    background-color: var(--button-hover-bg-color) !important;
+    background-color: var(--button-hover-bg-color);
 }
 
-/* CTA button styling (for inline buttons matching header style) */
-.cta-button {
-    background-color: var(--button-bg-color) !important;
-    color: var(--button-text-color) !important;
-    font-weight: 600 !important;
-    border: none !important;
+/* CTA button styling (for inline buttons matching header style)
+   .fern-button prefix needed to match Fern's .fern-button.filled specificity */
+.fern-button.cta-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-weight: 600;
+    border: none;
 }
 
-.cta-button:hover {
-    background-color: var(--button-hover-bg-color) !important;
+.fern-button.cta-button:hover {
+    background-color: var(--button-hover-bg-color);
 }
 
-.version-button {
-    font-weight: 600 !important;
+.fern-button.version-button {
+    font-weight: 600;
 }
 
 /* =====================================
@@ -751,25 +749,25 @@ button.fern-header-tabs__tab[role="tab"]:hover .truncate,
    SIDEBAR BORDER
    ===================================== */
 
-#fern-sidebar {
-    border-right: none !important;
+#fern-sidebar#fern-sidebar {
+    border-right: none;
 }
 
 /* =====================================
    TOC MOBILE BUTTON
    ===================================== */
 
-.toc-mobile button {
-    background-color: var(--container-bg-color) !important;
+.toc-mobile.toc-mobile button {
+    background-color: var(--container-bg-color);
     transition: background-color 0.15s ease;
 }
 
-.light .toc-mobile button:hover {
-    background-color: #f0f0f3 !important;
+.light .toc-mobile.toc-mobile button:hover {
+    background-color: #f0f0f3;
 }
 
-.dark .toc-mobile button:hover {
-    background-color: #2b2a3d !important;
+.dark .toc-mobile.toc-mobile button:hover {
+    background-color: #2b2a3d;
 }
 
 /* =====================================
