@@ -295,6 +295,8 @@ navigation:
                     path: pages/ai-coding-assistants/mcp.mdx
                   - page: GitHub Copilot
                     path: pages/ai-coding-assistants/github-copilot.mdx
+                  - page: Claude Code
+                    path: pages/ai-coding-assistants/claude-code.mdx
 
       - section: Data privacy and compliance
         slug: privacy-and-compliance
