@@ -276,10 +276,12 @@ body:has(.landing-page) .fern-card {
 /* Hover states for both light and dark modes */
 .light body:has(.landing-page) .fern-card:hover {
     background-color: var(--card-hover-bg-color);
+    border-color: #e5e7eb;
 }
 
 .dark body:has(.landing-page) .fern-card:hover {
     background-color: #23233a;
+    border-color: #374151;
 }
 
 body:has(.landing-page) .fern-card::after {
@@ -340,6 +342,7 @@ body:has(.landing-page) .fern-card > div:first-child {
     gap: 0 0.5rem;
     align-items: center;
     align-content: start;
+    flex: 1;
 }
 
 body:has(.landing-page) .fern-card .card-icon {
@@ -371,19 +374,6 @@ body:has(.landing-page) .fern-card h3 {
 body:has(.landing-page) .fern-card p,
 body:has(.landing-page) .fern-card div {
     color: var(--text-color);
-}
-
-/* Preserve default border color on hover */
-.light body:has(.landing-page) .fern-card:hover {
-    border-color: #e5e7eb;
-}
-
-.dark body:has(.landing-page) .fern-card:hover {
-    border-color: #374151;
-}
-
-body:has(.landing-page) .fern-card > div:first-child {
-    flex: 1;
 }
 
 /* Rounded corners for images in content areas only (not nav, footer, etc.) */
