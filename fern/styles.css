@@ -72,6 +72,20 @@ main {
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* =====================================
+   HEADING ANCHOR ICONS
+   ===================================== */
+
+/* Hide all anchor icons — they appear behind container backgrounds */
+.fern-anchor-icon {
+    display: none !important;
+}
+
+/* But show anchor icons inside steps */
+.fern-step .fern-anchor-icon {
+    display: flex !important;
+}
+
 /* Below 1024px: sidebar collapses to mobile menu */
 @media (max-width: 1024px) {
     .fern-layout-guide,
@@ -812,5 +826,26 @@ body::after {
 /* Make mountain more subtle in dark mode */
 .dark body::after {
     opacity: 0.3;
+}
+
+/* =====================================
+   SCROLLBAR STYLING
+   ===================================== */
+
+/* Use OS colour-scheme for scrollbar colors instead of Fern accent */
+.fern-scroll-area-thumb {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.fern-scroll-area-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.dark .fern-scroll-area-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark .fern-scroll-area-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
