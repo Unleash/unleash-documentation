@@ -32,13 +32,19 @@
 
 body {
     color: var(--text-color);
+    /* this contains z-index layering to body element */
+    isolation: isolate;
 }
 
-/* Ensure main content and footer appear above the mountain backdrop (z-index: 0) */
+/* put all body content above the mountain background */
+body > * {
+  position: relative;
+  z-index: 1 !important;
+}
+
 /* Gap: spacing between flex children (sidebar↔content, content↔ToC) */
 /* Padding-right: spacing between last child and viewport right edge */
 main {
-    z-index: 1 !important;
     gap: 16px;
     padding-right: 16px;
 }
@@ -49,7 +55,6 @@ main {
    Add left padding since sidebar no longer provides a left boundary. */
 @media (max-width: 1024px) {
     main {
-        z-index: auto !important;
         padding-left: 16px;
     }
 }
@@ -75,11 +80,6 @@ main {
 /* =====================================
    HEADING ANCHOR ICONS
    ===================================== */
-
-/* Hide all anchor icons — they appear behind container backgrounds */
-.fern-anchor-icon {
-    display: none !important;
-}
 
 /* But show anchor icons inside steps */
 .fern-step .fern-anchor-icon {
