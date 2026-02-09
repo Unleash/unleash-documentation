@@ -5,10 +5,8 @@ Instructions and gotchas for working on the custom CSS in this Fern-powered docu
 ## Key Files
 
 - `fern/styles.css` — Main custom stylesheet. Overrides Fern's defaults for theming, layout, landing page, academy, and the mountain backdrop.
-- `fern/docs.yml` — Fern configuration. Defines colors, typography, navbar links, layout, redirects. CSS/JS files are registered here.
-- `footer/src/main.tsx` — Footer injection logic. Finds or creates `#fern-footer` and renders the React footer component.
-- `footer/src/main.css` — Footer component styles (source). Must run `npm run build:footer` after changes to recompile into `fern/footer-dist/`.
-- `fern/footer-dist/output.css` + `output.js` — Compiled footer assets. Do not edit directly.
+- `fern/docs.yml` — Fern configuration. Defines colors, typography, navbar links, layout, redirects. The `footer:` property registers the custom footer component.
+- `fern/components/CustomFooter.tsx` — Custom footer component. Uses Tailwind classes with `dark:` prefix for dark mode. Server-side rendered by Fern (no build step needed).
 
 ## Fern CSS Overriding — How It Works
 
@@ -152,7 +150,7 @@ Fern's `<main>` element has Tailwind class `z-0` (z-index: 0). For the mountain 
 
 ### The Solution: Breakpoint-Dependent Z-Index
 
-- **>1024px**: Mountain visible at `z-index: 0`, main at `z-index: 1 !important`, footer at `z-index: 1`.
+- **>1024px**: Mountain visible at `z-index: 0`, main at `z-index: 1 !important`, footer at `z-index: 1` (set via Tailwind class in `CustomFooter.tsx`).
 - **<=1024px**: Mountain hidden (`display: none`), main at `z-index: auto !important` (no stacking context), tabs panel renders normally above main.
 
 This trade-off hides the mountain on tablet/mobile (where it was already small) in exchange for correct tab panel behavior.
@@ -207,19 +205,14 @@ All Academy selectors use doubled classes (e.g., `.unleash-academy-links.unleash
 
 ## Footer
 
-The footer is a standalone React + Vite component in `footer/src/`. After editing footer source files:
+The footer uses Fern's native `footer:` configuration in `docs.yml`, which server-side renders a React component. No build step is needed — Fern handles compilation, placement, and SPA navigation automatically.
 
-```bash
-npm run build:footer
+```yaml
+# fern/docs.yml
+footer: ./components/CustomFooter.tsx
 ```
 
-This compiles to `fern/footer-dist/output.css` + `output.js`. The footer uses its own CSS custom properties and supports dark mode via `.dark` class.
-
-### Footer Injection
-
-The footer script (`main.tsx`) injects `#fern-footer` as a direct child of `document.body`. It only looks for an existing `#fern-footer` element by ID — if found inside Fern's layout (e.g., inside `.fern-layout-guide`), it moves it to `body` level. This prevents the footer from appearing inside the white content container.
-
-**Do not** add generic selectors like `footer`, `.footer`, `[data-fern-footer]` to the injection logic — Fern may render its own `<footer>` element inside the layout container, which would cause our footer to render inside the white card.
+The component (`fern/components/CustomFooter.tsx`) is a default-export React component. Layout and styling are handled by CSS classes in `styles.css` (under the `FOOTER` section). Dark mode icon switching uses Tailwind's `dark:` prefix (`block dark:hidden` / `hidden dark:block`). The `#fern-footer` wrapper gets `z-index: 1` via `styles.css` to render above the mountain backdrop.
 
 ## Testing Checklist
 
