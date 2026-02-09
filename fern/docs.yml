@@ -802,7 +802,7 @@ navigation:
             slug: user-management-access-controls
           - page: Security and compliance
             path: pages/guides/security-compliance.mdx
-            slug: security-compliance
+            slug: security-and-compliance
           - page: Scaling Unleash
             path: pages/guides/scaling-unleash.mdx
           - page: Managing feature flags in code
