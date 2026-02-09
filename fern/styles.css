@@ -397,7 +397,7 @@ body:has(.landing-page) .fern-card div {
    At <=1024px main has z-index: auto so this is technically redundant,
    but protects against Fern changing its breakpoints. */
 .fern-header-tabs,
-div:has(> [role="tablist"]) {
+#fern-header div:has(> [role="tablist"]) {
     z-index: 2 !important;
 }
 
