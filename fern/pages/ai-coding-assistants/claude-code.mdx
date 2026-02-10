@@ -263,7 +263,7 @@ The [Claude Desktop app](https://claude.com/download) provides a native interfac
 
 <Steps>
 <Step title="Open MCP settings">
-Open **Settings** → **Developer** → **Edit Config**. This opens the `claude_desktop_config.json` file.
+Open **Settings > Developer > Edit Config**. This opens the `claude_desktop_config.json` file.
 </Step>
 
 <Step title="Add the Unleash MCP server">
@@ -314,7 +314,7 @@ Use `@anthropics/claude-code-action` to run Claude Code in CI/CD pipelines. For 
 
 <Steps>
 <Step title="Add secrets to your repository">
-Go to **Settings** → **Secrets and variables** → **Actions** and add:
+Go to **Settings > Secrets and variables > Actions** and add:
 - `ANTHROPIC_API_KEY`
 - `UNLEASH_BASE_URL`
 - `UNLEASH_PAT`
@@ -731,7 +731,7 @@ For WSL environments, use the standard Unix syntax.
 </Accordion>
 
 <Accordion title="Tool results truncated">
-Claude Code limits tool output to 16,000 characters for read-only operations and 8,000 for others. Large flag audits may be truncated. Use filters (e.g., request specific projects or flag types) to reduce result size.
+Claude Code limits tool output size to prevent context overflow. If results appear truncated, use filters (such as specific projects or flag types) to reduce result size. For current limits, see the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
 </Accordion>
 
 ## Best practices
