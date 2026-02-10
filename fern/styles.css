@@ -38,7 +38,6 @@ body {
 
 /* put all body content above the mountain background */
 body > * {
-  position: relative;
   z-index: 1 !important;
 }
 
@@ -971,7 +970,7 @@ body::after {
     background-image: url("https://cdn.getunleash.io/docs-assets/mountain-texture.png");
     position: fixed;
     display: block;
-    z-index: 0;
+    z-index: -1;
     bottom: 0;
     right: 0;
     width: clamp(200px, 25vw, 400px);
