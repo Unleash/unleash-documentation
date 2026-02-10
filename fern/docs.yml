@@ -14,6 +14,10 @@ layout:
   tabs-placement: header
   content-width: 55rem
 
+theme:
+  sidebar: minimal
+  page-actions: toolbar
+
 analytics:
   gtm:
     container-id: GTM-KV5PRR2
@@ -29,11 +33,6 @@ typography:
     paths:
       - path: ./fonts/Sen-VariableFont_wght.woff2
         weight: 400 700
-
-landing-page: 
-  page: Unleash Documentation
-  path: pages/welcome.mdx
-  slug: "/"
 
 tabs:
   product-docs:
@@ -59,8 +58,10 @@ tabs:
 
 navigation:
   - tab: product-docs
-    layout:
-      
+    layout:   
+      - page: Home
+        path: pages/welcome.mdx
+        slug: "/"
       - section: Get started
         contents:
           - page: Quickstart
@@ -801,7 +802,7 @@ navigation:
             slug: user-management-access-controls
           - page: Security and compliance
             path: pages/guides/security-compliance.mdx
-            slug: security-compliance
+            slug: security-and-compliance
           - page: Scaling Unleash
             path: pages/guides/scaling-unleash.mdx
           - page: Managing feature flags in code
@@ -953,8 +954,8 @@ colors:
     dark: "#817afe"
     light: "#817afe"
   background:
-    dark: "#1a1924"
-    light: "#ffffff"
+    dark: "#1A1924"
+    light: "#EAEAED"
 
 logo:
   dark: assets/logo-dark.svg
@@ -964,13 +965,10 @@ logo:
 
 favicon: assets/favicon.svg
 
-css: 
-  - styles.css
-  - ./footer-dist/output.css
+footer: ./components/CustomFooter.tsx
 
-js:
-  - path: ./footer-dist/output.js
-    strategy: afterInteractive
+css:
+  - styles.css
 
 redirects:
   # --- Helm charts ---

@@ -114,8 +114,6 @@ The Unleash Admin UI is served through a global CDN for fast loading worldwide.
 #### Handling bursts
 Our managed environment is designed for elasticity. Auto-scaling adjusts resources automatically. We continuously monitor load and performance metrics, allowing the system to handle sudden traffic peaks, such as those from product launches or marketing campaigns, ensuring consistent performance.
 
-%%ACCORDION%%
-
 ### Self-hosting Unleash: Designing for high availability
 
 When designing for high availability and resilience in a self-hosted environment, we recommend that you implement the following strategies:
@@ -128,8 +126,6 @@ Key benefits:
 - Supports zero-downtime maintenance and upgrades.
 - Allows for auto-scaling based on CPU/memory or request latency.
 
-%%ACCORDION%%
-
 #### Databases and replication
 For enterprise-scale deployments, a robust, managed service (such as AWS RDS for PostgreSQL) is recommended. 
 
@@ -137,8 +133,6 @@ Configure the following:
 - Multi-AZ deployment for automatic failover within the primary region.
 - A cross-region read replica or continuous backups shipped to a secondary region for disaster recovery purposes.
 - Point-in-time recovery (PITR) to handle accidental data deletion or corruption scenarios.
-
-%%ACCORDION%%
 
   #### Handling failover
   
@@ -176,8 +170,6 @@ With Unleash Enterprise Edge Cloud, this complexity is handled for you—you sim
 - [SDKs](/sdks) automatically connect to the nearest available region. Traffic fails over to other regions if one region becomes unavailable.
 - Edge nodes are always up to date due to streaming, SDKs connected to Edge can continue evaluating flags even if the connection to the primary Unleash API server is temporarily lost.
 
-%%ACCORDION%%
-
 ### Lower scale or single-region scenarios
 
 Even when global scaling and minimizing cross-region latency are not immediate priorities, implementing high availability is crucial for reliable production workloads using Unleash.
@@ -197,8 +189,6 @@ Unleash Cloud provides built-in observability dashboards, usage metrics, and sys
 Underlying infrastructure monitoring, alerting, and scaling are handled by Unleash SREs.
 
 Use the [Connected Edges dashboard](/concepts/network-view#connected-edges) to get observability metrics for Unleash Edge instances, such as ID, region, resource usage, and latency.
-
-%%ACCORDION%%
 
 Unleash is architected with scalability, performance, and resilience in mind, designed specifically for supporting demanding enterprise workloads. With fast, local feature flag evaluations, Unleash Edge for added scalability, and flexible deployment models, organizations can achieve reliable, high-performance feature management at a global scale, enabling faster, safer software delivery.
 

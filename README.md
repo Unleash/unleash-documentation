@@ -54,10 +54,9 @@ Once the server starts, you can view the documentation at `http://localhost:3000
 
 | Command | Action |
 | --- | --- |
-| `npm run dev` | Fetches latest specs, builds the custom footer, and starts the dev server. |
-| `fern docs dev` | Starts the dev server directly (does not fetch spec or build the footer). |
+| `npm run dev` | Fetches latest specs and starts the dev server. |
+| `fern docs dev` | Starts the dev server directly (does not fetch specs). |
 | `npm run fetch` | Updates the local `openapi.json` files from the hosted instance. |
-| `npm run build:footer` | Recompiles the React-based custom footer. |
 | `fern check --strict-broken-links` | Validates the documentation and fails on broken links. |
 
 ## Architecture and tooling
@@ -65,7 +64,8 @@ Once the server starts, you can view the documentation at `http://localhost:3000
 Our docs stack has the following components:
 - **Engine**: [Fern](https://buildwithfern.com/).
 - **API specs**: OpenAPI spec fetched dynamically from the Unleash instance.
-- **Custom components**: React + Vite (for the custom footer).
+- **Custom footer**: A React component (`fern/components/CustomFooter.tsx`) server-side rendered by Fern via the `footer:` property in `docs.yml`.
+- **Custom styling**: CSS overrides in `fern/styles.css`.
 
 ### API structure
 
@@ -75,13 +75,16 @@ To keep our API reference navigable, we split the main Unleash OpenAPI spec into
 - **Frontend API** (`fern/apis/frontend-api/`): Contains only endpoints with the "Frontend API" tag.
 - **Admin API** (`fern/apis/admin-api/`): Contains all remaining endpoints (excludes Client and Frontend API tags).
 
-## Custom footer
+## Custom styling
 
-The footer is a standalone React component. If you modify the code in `footer/src/`, you must rebuild it to see changes in the preview.
+We apply custom CSS on top of Fern's defaults to achieve our branded look (floating content containers, mountain backdrop, custom navbar styling, academy section, footer). The main stylesheet is `fern/styles.css`.
 
-```bash
-npm run build:footer
-```
+Key design elements:
+- **Floating container**: Guide and reference pages render inside a white rounded card over a gray background.
+- **Mountain backdrop**: A decorative mountain texture fixed to the bottom-right corner via `body::after`, layered behind content with z-index management.
+- **Custom footer**: A React component at `fern/components/CustomFooter.tsx`, server-side rendered by Fern. Styled via CSS classes in `styles.css`.
+
+For detailed architecture notes, gotchas, and instructions for working on the CSS, see [CLAUDE.md](./CLAUDE.md).
 
 ## Contributing
 

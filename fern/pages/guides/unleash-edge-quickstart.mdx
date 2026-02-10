@@ -62,13 +62,13 @@ First, make sure your Unleash instance is running (locally or remotely) and gene
     curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Unleash/unleash-edge/releases/download/<version>/unleash-edge-installer.sh | sh
     ```
 
-    :::info[GitHub Releases versioning]
+    <Info>
 
     Make sure to replace `<version>` with a valid GitHub Release tag such as `v20.1.0`.
 
     You can pick a valid version from the list of [releases on GitHub](https://github.com/Unleash/unleash-edge/releases).
 
-    :::
+    </Info>
 
     Then launch it:
 
@@ -115,13 +115,13 @@ First, make sure your Unleash instance is running (locally or remotely) and gene
       edge
     ```
 
-    :::info[Docker Image versioning]
+    <Info>
 
     By default, the command above uses the latest `unleashorg/unleash-edge` tag.
 
     You can also pick a specific version from the list of [tags on Docker Hub](https://hub.docker.com/r/unleashorg/unleash-edge).
 
-    :::
+    </Info>
 
 
 </Tab>
@@ -136,12 +136,12 @@ First, make sure your Unleash instance is running (locally or remotely) and gene
     docker compose up
     ```
 
-    :::info[Docker Compose services]
+    <Info>
 
     Please note that the sample Docker Compose file includes a Redis service for caching.
     In case you want to run Unleash Edge without Redis, make sure to remove the `REDIS_URL` environment variable and the Redis service.
 
-    :::
+    </Info>
 
 
 </Tab>
@@ -175,10 +175,11 @@ Let's break down the parameters you need to replace in the launch command.
 
     Use the base URL, e.g. `https://app.unleash-hosted.com/testclient`.
 
-    :::warning[Important note about Docker and localhost]
+    <Warning>
 
     When using Docker with a local Unleash instance, `localhost` refers to the container itself, so you cannot reference your Unleash instance with `http://localhost:4242`.
     You'll need to use a different hostname, depending on where the Unleash instance is running.
+    </Warning>
 
     <Tabs>
 
@@ -215,8 +216,6 @@ Let's break down the parameters you need to replace in the launch command.
 </Tab>
 
     </Tabs>
-
-    :::
   </Tab>
 
   <Tab title="Docker Compose">
@@ -322,12 +321,11 @@ Then you can start updating your application:
       )
     ```
 
-    :::warning[Important note about localhost and device emulators]
+    <Warning>
 
     Please note that you need to use the `10.0.2.2` IP address from the Android emulator to access `localhost`.
 
-    :::
-
+    </Warning>
 </Tab>
 
   <Tab title="Flutter" language="dart">
@@ -345,7 +343,7 @@ Then you can start updating your application:
       );
     ```
 
-    :::warning[Important note about localhost and device emulators]
+    <Warning>
 
     Please note that you need to use the `10.0.2.2` IP address from the Android emulator to access `localhost`.
 
@@ -353,7 +351,7 @@ Then you can start updating your application:
 
     When using a real iOS device, you need to use your computer's IP address. Run `ipconfig` on Windows or `ifconfig` on Linux/macOS to identify your IP address.
 
-    :::
+    </Warning>
 
 </Tab>
 
@@ -518,13 +516,13 @@ Then you can start updating your application:
     )
     ```
 
-    :::warning[Important note about localhost and device emulators]
+    <Warning>
 
     Please note that you can use `localhost` from the iOS emulator without issues.
 
     When using a real iOS device, you need to use your computer's IP address. Run `ipconfig` on Windows or `ifconfig` on Linux/macOS to identify your IP address.
 
-    :::
+    </Warning>
 
 </Tab>
 
