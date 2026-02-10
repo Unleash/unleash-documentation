@@ -9,7 +9,7 @@
     --button-bg-color: #244049;
     --button-text-color: #FFF;
     --button-hover-bg-color: #635DC5;
-    --card-hover-bg-color: #f5f6fa80;
+    --card-hover-bg-color: #f5f6fa;
     --card-stripe-color: #6c64e5;
 }
 
@@ -23,7 +23,7 @@
     --button-bg-color: #E3E3E3;
     --button-text-color: var(--sidebar-nav-bg-color);
     --button-hover-bg-color: #BBB9FF;
-    --card-hover-bg-color: #23233a80;
+    --card-hover-bg-color: #23233a;
 }
 
 #fern-docs {
@@ -34,11 +34,6 @@ body {
     color: var(--text-color);
     /* this contains z-index layering to body element */
     isolation: isolate;
-}
-
-/* put all body content above the mountain background */
-body > * {
-  z-index: 1 !important;
 }
 
 /* Gap: spacing between flex children (sidebar↔content, content↔ToC) */
@@ -265,21 +260,19 @@ body:has(.landing-page) .fern-card {
     min-height: 240px;
     display: flex;
     flex-direction: column;
-}
-
-/* Dark mode - add background to card itself */
-.dark body:has(.landing-page) .fern-card {
-    background-color: #222130;
+    background-color: var(--container-bg-color);
 }
 
 /* Hover states for both light and dark modes */
-.light body:has(.landing-page) .fern-card:hover {
+body:has(.landing-page) .fern-card:hover {
     background-color: var(--card-hover-bg-color);
+}
+
+.light body:has(.landing-page) .fern-card:hover {
     border-color: #e5e7eb;
 }
 
 .dark body:has(.landing-page) .fern-card:hover {
-    background-color: #23233a;
     border-color: #374151;
 }
 
@@ -297,7 +290,7 @@ body:has(.landing-page) .fern-card::after {
 /* Card background */
 body:has(.landing-page) .fern-card:before {
     content: "";
-    z-index: -1;
+    z-index: 0;
     background-image: url(https://cdn.getunleash.io/docs-assets/card-hover-bg.png);
     background-size: cover;
     border-top-right-radius: 12px;
@@ -309,22 +302,9 @@ body:has(.landing-page) .fern-card:before {
     opacity: 0.8;
 }
 
-/* Light mode - use Fern's light theme class */
-.light body:has(.landing-page) .fern-card:before {
-    opacity: 0.7;
-    filter: brightness(0.4) contrast(1.8);
-}
-
-.light body:has(.landing-page) .fern-card:hover:before {
-    opacity: 0.3;
-    filter: brightness(0.4) contrast(1.8);
-}
-
 /* Dark mode - use Fern's dark theme class */
 .dark body:has(.landing-page) .fern-card:before {
     opacity: 0.1;
-    filter: none;
-    z-index: 0;
 }
 
 /* Ensure card content is positioned above background */
