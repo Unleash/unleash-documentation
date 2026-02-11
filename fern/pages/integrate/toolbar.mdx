@@ -8,7 +8,7 @@ max-toc-depth: 3
 slug: integrate/toolbar
 ---
 
-The Unleash Developer Toolbar lets you override feature flag values and context properties at runtime without making server changes. It's designed for local development and testing workflows where you need to quickly test different flag configurations or context values.
+The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you override feature flag values and context properties at runtime without making server changes. It's designed for local development and testing workflows where you need to quickly test different flag configurations or context values.
 
 <Frame background="subtle">
 ![The Unleash Developer Toolbar showing flag overrides and context settings](/assets/toolbar-screenshot.png)
@@ -16,18 +16,18 @@ The Unleash Developer Toolbar lets you override feature flag values and context 
 
 ## Key features
 
-- **Flag overrides**: Force boolean flags ON/OFF or select specific variant values
+- **Flag overrides**: Force boolean flags on or off, or select specific variant values
 - **Context overrides**: Modify `userId`, `sessionId`, and custom properties to test targeting rules
 - **Persistence**: Choose between memory, session, or local storage for your overrides
 - **Framework support**: Works with React, Next.js, Vue, Angular, and vanilla JavaScript
 - **SSR support**: Cookie-based state sync for server-side rendering in Next.js
 
 <Warning>
-The toolbar is intended for development and testing environments only. Don't ship it to production unless you're building a public demo where users interact with feature flags without Unleash access.
+The toolbar is intended for development and testing environments only. Don't use it in production unless you're building a public demo where users interact with feature flags without Unleash access.
 </Warning>
 
 ## Installation
-
+Choose the installation command for your framework:
 <Tabs>
   <Tab title="JavaScript">
     ```bash
@@ -46,13 +46,13 @@ The toolbar is intended for development and testing environments only. Don't shi
   </Tab>
 </Tabs>
 
-Don't forget to import the CSS file:
+Import the CSS file to load the toolbar styles:
 
 ```javascript
 import '@unleash/toolbar/toolbar.css';
 ```
 
-## Quick start
+## Quickstart
 
 <Tabs>
   <Tab title="Vanilla JavaScript">
