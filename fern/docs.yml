@@ -8,6 +8,9 @@ instances:
 
 title: Unleash Documentation
 
+announcement:
+  message: "Live Webinar: Designing for Failure and Speed in Agentic AI Workflows with FeatureOps | 24th February ➩ <a href=\"https://www.getunleash.io/design-for-failure-agentic-ai\" target=\"_blank\"><b>Register Here</b></a>"
+
 layout:
   searchbar-placement: header
   page-width: full
