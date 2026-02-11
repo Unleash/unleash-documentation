@@ -300,6 +300,10 @@ navigation:
                   - page: GitHub Copilot
                     path: pages/ai-coding-assistants/github-copilot.mdx
 
+          - page: Developer Toolbar
+            path: pages/integrate/toolbar.mdx
+            slug: toolbar
+
       - section: Data privacy and compliance
         slug: privacy-and-compliance
         collapsed: true

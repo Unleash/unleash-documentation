@@ -1,0 +1,445 @@
+---
+title: Developer Toolbar
+description: Override feature flags and context at runtime during development with the Unleash Toolbar
+og:site_name: Unleash Documentation
+og:title: Developer Toolbar
+keywords: developer toolbar, feature flags, debugging, local development, testing, overrides
+max-toc-depth: 3
+slug: integrate/toolbar
+---
+
+The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you override feature flag values and context properties at runtime without making server changes. It's designed for local development and testing workflows where you need to quickly test different flag configurations or context values.
+
+<Frame background="subtle">
+![The Unleash Developer Toolbar showing flag overrides and context settings](/assets/toolbar-screenshot.png)
+</Frame>
+
+## Key features
+
+- **Flag overrides**: Force boolean flags on or off, or select specific variant values
+- **Context overrides**: Modify `userId`, `sessionId`, and custom properties to test targeting rules
+- **Persistence**: Choose between memory, session, or local storage for your overrides
+- **Framework support**: Works with React, Next.js, Vue, Angular, and JavaScript
+- **SSR support**: Cookie-based state sync for server-side rendering in Next.js
+
+<Warning>
+The toolbar is intended for development and testing environments only. Don't use it in production unless you're building a public demo where users interact with feature flags without Unleash access.
+</Warning>
+
+## Installation
+Choose the installation command for your framework:
+<Tabs>
+  <Tab title="JavaScript">
+    ```bash
+    npm install @unleash/toolbar unleash-proxy-client
+    ```
+  </Tab>
+  <Tab title="React">
+    ```bash
+    npm install @unleash/toolbar @unleash/proxy-client-react unleash-proxy-client
+    ```
+  </Tab>
+  <Tab title="Next.js">
+    ```bash
+    npm install @unleash/toolbar @unleash/nextjs
+    ```
+  </Tab>
+</Tabs>
+
+Import the CSS file to load the toolbar styles:
+
+```javascript
+import '@unleash/toolbar/toolbar.css';
+```
+
+## Quickstart
+
+<Tabs>
+  <Tab title="JavaScript">
+    The `initUnleashToolbar` function wraps your `UnleashClient` and returns a client with the same API. Use the wrapped client for all flag evaluations.
+
+    ```javascript {5-12}
+    import { initUnleashToolbar } from '@unleash/toolbar';
+    import { UnleashClient } from 'unleash-proxy-client';
+    import '@unleash/toolbar/toolbar.css';
+
+    const client = initUnleashToolbar(new UnleashClient({
+      url: 'https://your-unleash.com/api/frontend',
+      clientKey: 'your-frontend-token',
+      appName: 'my-app'
+    }), {
+      storageMode: 'local',
+      position: 'bottom-right'
+    });
+
+    await client.start();
+
+    // Use the wrapped client for flag checks
+    const isEnabled = client.isEnabled('my-feature');
+    const variant = client.getVariant('my-experiment');
+
+    // Listen for changes from toolbar or SDK updates
+    client.on('update', () => {
+      const newValue = client.isEnabled('my-feature');
+      updateUI(newValue);
+    });
+    ```
+
+    [View the complete JavaScript example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/vanilla)
+  </Tab>
+  <Tab title="React">
+    Use `UnleashToolbarProvider` as a drop-in replacement for `FlagProvider`. Pass your configuration directly and use hooks from the official React SDK.
+
+    ```tsx {14-17}
+    import { useFlag, useVariant } from '@unleash/proxy-client-react';
+    import { UnleashToolbarProvider } from '@unleash/toolbar/react';
+    import '@unleash/toolbar/toolbar.css';
+
+    const config = {
+      url: 'https://your-unleash.com/api/frontend',
+      clientKey: 'your-frontend-token',
+      appName: 'my-app',
+      refreshInterval: 15
+    };
+
+    function App() {
+      return (
+        <UnleashToolbarProvider 
+          config={config}
+          toolbarOptions={{ storageMode: 'local', position: 'bottom-right' }}
+        >
+          <MyComponent />
+        </UnleashToolbarProvider>
+      );
+    }
+
+    function MyComponent() {
+      const isEnabled = useFlag('my-feature');
+      const variant = useVariant('my-experiment');
+      
+      return (
+        <div>
+          {isEnabled && <NewFeature />}
+          {variant.name === 'variant-a' && <VariantA />}
+        </div>
+      );
+    }
+    ```
+
+    [View the complete React example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/react)
+  </Tab>
+  <Tab title="Next.js">
+    Wrap your app in `UnleashToolbarProvider` and conditionally enable the toolbar based on environment.
+
+    ### Client components
+
+    ```tsx {9-20}
+    // app/layout.tsx
+    import { UnleashToolbarProvider } from '@unleash/toolbar/next';
+    import '@unleash/toolbar/toolbar.css';
+
+    export default function RootLayout({ children }) {
+      return (
+        <html>
+          <body>
+            <UnleashToolbarProvider
+              config={{
+                url: process.env.NEXT_PUBLIC_UNLEASH_URL!,
+                clientKey: process.env.NEXT_PUBLIC_UNLEASH_CLIENT_KEY!,
+                appName: 'my-next-app',
+              }}
+              toolbarOptions={
+                process.env.NODE_ENV !== 'production' 
+                  ? { themePreset: 'dark', initiallyVisible: false }
+                  : undefined
+              }
+            >
+              {children}
+            </UnleashToolbarProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+
+    ```tsx {4}
+    // app/page.tsx
+    'use client';
+
+    import { useFlag, useVariant } from '@unleash/toolbar/next';
+
+    export default function HomePage() {
+      const isEnabled = useFlag('new-checkout');
+      const variant = useVariant('payment-provider');
+
+      return (
+        <div>
+          {isEnabled && <NewCheckout />}
+          <PaymentForm provider={variant.name} />
+        </div>
+      );
+    }
+    ```
+
+    ### Server components (SSR)
+
+    The toolbar supports server-side rendering through cookie-based state sync. Client-side toolbar changes automatically sync to cookies, which server components can read.
+
+    ```tsx {14}
+    // app/server-page/page.tsx
+    import { cookies } from 'next/headers';
+    import { getDefinitions, evaluateFlags, flagsClient } from '@unleash/nextjs';
+    import { applyToolbarOverrides } from '@unleash/toolbar/next/server';
+
+    export default async function ServerPage() {
+      // Fetch definitions from Unleash API
+      const definitions = await getDefinitions({
+        fetchOptions: { next: { revalidate: 15 } },
+      });
+
+      // Apply toolbar overrides from cookies
+      const cookieStore = await cookies();
+      const modifiedDefinitions = applyToolbarOverrides(definitions, cookieStore);
+
+      // Evaluate flags with context
+      const { toggles } = evaluateFlags(modifiedDefinitions, {
+        userId: 'user-123',
+      });
+
+      const flags = flagsClient(toggles);
+      const isEnabled = flags.isEnabled('new-feature');
+
+      return <div>{isEnabled ? 'Feature ON' : 'Feature OFF'}</div>;
+    }
+    ```
+
+    ### Environment variables
+
+    ```shell
+    # Server-side (used by @unleash/nextjs SDK)
+    UNLEASH_SERVER_API_URL=https://your-unleash.com/api
+    UNLEASH_SERVER_API_TOKEN=your-server-token
+    UNLEASH_APP_NAME=my-app
+
+    # Client-side (used by toolbar)
+    NEXT_PUBLIC_UNLEASH_URL=https://your-unleash.com/api/frontend
+    NEXT_PUBLIC_UNLEASH_CLIENT_KEY=your-frontend-token
+    ```
+
+    [View the complete Next.js example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/nextjs)
+  </Tab>
+  <Tab title="Vue">
+    Create a composable that wraps the Unleash client with the toolbar in development mode.
+
+    ```typescript {20-27}
+    // composables/useUnleash.ts
+    import { ref, onMounted } from 'vue'
+    import { UnleashClient } from 'unleash-proxy-client'
+    import { initUnleashToolbar } from '@unleash/toolbar'
+    import '@unleash/toolbar/toolbar.css'
+
+    export function useUnleash() {
+      const isReady = ref(false)
+      const unleashClient = ref(null)
+      const updateTrigger = ref(0)
+
+      onMounted(async () => {
+        const client = new UnleashClient({
+          url: import.meta.env.VITE_UNLEASH_URL,
+          clientKey: import.meta.env.VITE_UNLEASH_CLIENT_KEY,
+          appName: import.meta.env.VITE_UNLEASH_APP_NAME,
+        })
+
+        // Wrap with toolbar in development mode
+        if (import.meta.env.DEV) {
+          unleashClient.value = initUnleashToolbar(client, {
+            themePreset: 'dark',
+            initiallyVisible: false,
+          })
+        } else {
+          unleashClient.value = client
+        }
+
+        await unleashClient.value.start()
+        isReady.value = true
+
+        // Trigger re-evaluation on updates
+        unleashClient.value.on('update', () => {
+          updateTrigger.value++
+        })
+      })
+
+      return { unleashClient, isReady, updateTrigger }
+    }
+    ```
+
+    [View the complete Vue example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/vue)
+  </Tab>
+  <Tab title="Angular">
+    Create a service that wraps the Unleash client with the toolbar.
+
+    ```typescript {19-26}
+    // unleash.service.ts
+    import { Injectable, isDevMode } from '@angular/core';
+    import { UnleashClient } from 'unleash-proxy-client';
+    import { initUnleashToolbar } from '@unleash/toolbar';
+    import '@unleash/toolbar/toolbar.css';
+    import { environment } from '../environments/environment';
+
+    @Injectable({ providedIn: 'root' })
+    export class UnleashService {
+      private client: any;
+
+      constructor() {
+        const unleashClient = new UnleashClient({
+          url: environment.unleash.url,
+          clientKey: environment.unleash.clientKey,
+          appName: environment.unleash.appName,
+        });
+
+        if (isDevMode()) {
+          this.client = initUnleashToolbar(unleashClient, {
+            themePreset: 'dark',
+            initiallyVisible: false,
+          });
+        } else {
+          this.client = unleashClient;
+        }
+      }
+
+      async start() {
+        await this.client.start();
+      }
+
+      isEnabled(flagName: string): boolean {
+        return this.client.isEnabled(flagName);
+      }
+
+      getVariant(flagName: string): any {
+        return this.client.getVariant(flagName);
+      }
+
+      onUpdate(callback: () => void): void {
+        this.client.on('update', callback);
+      }
+    }
+    ```
+
+    [View the complete Angular example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/angular)
+  </Tab>
+</Tabs>
+
+## Configuration options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `storageMode` | `'memory'` \| `'session'` \| `'local'` | `'local'` | Where to persist overrides. `local` survives browser restarts, `session` clears when tab closes, `memory` clears on reload. |
+| `storageKey` | `string` | `'unleash-toolbar-state'` | Storage key for persistence. |
+| `position` | `'top-left'` \| `'top-right'` \| `'bottom-left'` \| `'bottom-right'` \| `'left'` \| `'right'` | `'bottom-right'` | Toolbar button position. |
+| `initiallyVisible` | `boolean` | `false` | Whether the toolbar panel is open on load. |
+| `sortAlphabetically` | `boolean` | `false` | Sort flags alphabetically instead of by evaluation order. |
+| `themePreset` | `'light'` \| `'dark'` | `'light'` | Color theme preset. |
+| `theme` | `object` | - | Custom theme with `primaryColor`, `backgroundColor`, `textColor`, `borderColor`, `fontFamily`. |
+| `container` | `HTMLElement` | `document.body` | DOM element to render the toolbar into. |
+| `enableCookieSync` | `boolean` | `false` | Enable cookie sync for SSR frameworks like Next.js. |
+
+### Storage modes explained
+
+- **`local`** (recommended for development): Persists across all tabs and browser restarts. Set overrides once, test everywhere.
+- **`session`**: Persists within the current tab only. Useful for testing different configurations in multiple tabs simultaneously.
+- **`memory`**: No persistence. Clears on every page reload. Use for quick one-off tests.
+
+## API reference
+
+Access the toolbar instance via `window.unleashToolbar`:
+
+```typescript
+const toolbar = window.unleashToolbar;
+
+// Show/hide the toolbar panel
+toolbar.show();
+toolbar.hide();
+
+// Get current state
+const state = toolbar.getState();
+
+// Set flag overrides
+toolbar.setFlagOverride('my-feature', { type: 'flag', value: true });
+toolbar.setFlagOverride('my-variant', { type: 'variant', variantKey: 'variant-b' });
+toolbar.setFlagOverride('my-feature', null); // Clear override
+
+// Set context overrides
+toolbar.setContextOverride({
+  userId: 'test-user-123',
+  properties: { tier: 'premium' }
+});
+
+// Reset all overrides
+toolbar.resetOverrides();
+toolbar.resetContextOverrides();
+
+// Clean up
+toolbar.destroy();
+```
+
+### Next.js server utilities
+
+```typescript
+import { 
+  applyToolbarOverrides, 
+  applyToolbarOverridesToToggles, 
+  getToolbarStateFromCookies 
+} from '@unleash/toolbar/next/server';
+
+// Apply overrides to definitions before evaluation (recommended)
+const modifiedDefinitions = applyToolbarOverrides(definitions, cookieStore);
+
+// Apply overrides to toggles after evaluation (alternative)
+const modifiedToggles = applyToolbarOverridesToToggles(toggles, cookieStore);
+
+// Read toolbar state directly from cookies
+const state = getToolbarStateFromCookies(cookieStore);
+```
+
+## Bundle size
+
+The toolbar is optimized for minimal impact:
+
+| Package | Size (gzipped) |
+|---------|----------------|
+| Core | ~8 KB |
+| React wrapper | ~0.2 KB |
+| Next.js utilities | ~0.6 KB |
+| CSS | ~2.4 KB |
+
+## Requirements
+
+- **Browser**: ES2020 support (Chrome 90+, Firefox 88+, Safari 14+)
+- **SDK versions**: 
+  - `unleash-proxy-client` ^3.0.0
+  - `@unleash/proxy-client-react` ^5.0.0 (optional)
+  - `@unleash/nextjs` ^1.0.0 (optional)
+
+## Troubleshooting
+
+<Accordion title="Toolbar doesn't appear">
+  Make sure you've imported the CSS file:
+  
+  ```javascript
+  import '@unleash/toolbar/toolbar.css';
+  ```
+
+  Check that you're using the wrapped client returned by `initUnleashToolbar()`, not the original client.
+</Accordion>
+
+<Accordion title="Overrides don't persist">
+  Check your `storageMode` setting. If set to `'memory'`, overrides clear on page reload. Use `'local'` for persistent overrides across sessions.
+</Accordion>
+
+<Accordion title="Server components don't reflect overrides">
+  For Next.js SSR, ensure you're using `applyToolbarOverrides()` in your server components and that `enableCookieSync` is enabled in your toolbar options.
+</Accordion>
+
+<Accordion title="Hooks not re-rendering on override changes">
+  The wrapped client emits `'update'` events when overrides change. If you're using a custom setup, make sure you're listening to these events and triggering re-renders.
+</Accordion>

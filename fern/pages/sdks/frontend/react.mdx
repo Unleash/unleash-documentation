@@ -59,6 +59,9 @@ root.render(
 );
 ```
 
+<Tip>
+**Testing feature flags locally?** The [Developer Toolbar](#developer-toolbar) provides a drop-in replacement for `FlagProvider` that lets you override flag values and context at runtime. Use `UnleashToolbarProvider` from `@unleash/toolbar/react` during development.
+</Tip>
 
 ### Connection Options
 
@@ -314,6 +317,90 @@ Wrap your components like so:
   )}
 />
 ```
+
+## Developer Toolbar
+
+The [Developer Toolbar](/integrate/toolbar) provides runtime flag and context overrides during development. It wraps the standard React SDK with override capabilities while maintaining the same hook API.
+
+### Installation
+
+```bash
+npm install @unleash/toolbar @unleash/proxy-client-react unleash-proxy-client
+```
+
+### Usage
+
+Replace `FlagProvider` with `UnleashToolbarProvider` from `@unleash/toolbar/react`. The provider accepts the same `config` prop, plus optional `toolbarOptions`:
+
+```tsx {14-21}
+import { useFlag, useVariant } from '@unleash/proxy-client-react';
+import { UnleashToolbarProvider } from '@unleash/toolbar/react';
+import '@unleash/toolbar/toolbar.css';
+
+const config = {
+  url: 'https://your-unleash.com/api/frontend',
+  clientKey: 'your-frontend-token',
+  appName: 'my-app',
+  refreshInterval: 15
+};
+
+function App() {
+  return (
+    <UnleashToolbarProvider
+      config={config}
+      toolbarOptions={{
+        storageMode: 'local',
+        position: 'bottom-right',
+        themePreset: 'dark'
+      }}
+    >
+      <MyComponent />
+    </UnleashToolbarProvider>
+  );
+}
+
+function MyComponent() {
+  // Hooks from the official SDK work seamlessly with toolbar overrides
+  const isEnabled = useFlag('my-feature');
+  const variant = useVariant('my-experiment');
+
+  return (
+    <div>
+      {isEnabled && <NewFeature />}
+      {variant.name === 'variant-a' && <VariantA />}
+    </div>
+  );
+}
+```
+
+Key points:
+- Import hooks from `@unleash/proxy-client-react` (the official SDK)
+- The toolbar automatically handles `FlagProvider` internally
+- All hooks re-render automatically when you change overrides in the toolbar UI
+
+### Conditional initialization
+
+Enable the toolbar only in development to avoid shipping it to production:
+
+```tsx {5-7}
+import { FlagProvider } from '@unleash/proxy-client-react';
+import { UnleashToolbarProvider } from '@unleash/toolbar/react';
+import '@unleash/toolbar/toolbar.css';
+
+const Provider = import.meta.env.DEV
+  ? UnleashToolbarProvider
+  : FlagProvider;
+
+function App() {
+  return (
+    <Provider config={config}>
+      <MyComponent />
+    </Provider>
+  );
+}
+```
+
+Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configuration options, API reference, and the [complete React example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/react).
 
 ## React Native
 
