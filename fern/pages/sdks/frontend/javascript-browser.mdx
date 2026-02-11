@@ -249,6 +249,29 @@ console.log(isEnabled);
 ```
 *index.mjs*
 
+## Developer Toolbar
+
+The [Developer Toolbar](/integrate/toolbar) wraps your Unleash client to provide runtime flag overrides during development. Install `@unleash/toolbar` and wrap your client:
+
+```javascript {5}
+import { initUnleashToolbar } from '@unleash/toolbar';
+import { UnleashClient } from 'unleash-proxy-client';
+import '@unleash/toolbar/toolbar.css';
+
+const client = initUnleashToolbar(new UnleashClient({
+  url: 'https://your-unleash.com/api/frontend',
+  clientKey: 'your-frontend-token',
+  appName: 'my-app'
+}));
+
+await client.start();
+
+// Use the wrapped client for all flag checks
+const isEnabled = client.isEnabled('my-feature');
+```
+
+The wrapped client has the same API as the original. Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configuration options and framework guides.
+
 ## How to Use the Client via CDN
 
 ```html

@@ -226,3 +226,37 @@ watch(userId, () => {
   run()
 })
 ```
+
+## Developer Toolbar
+
+The [Developer Toolbar](/integrate/toolbar) provides runtime flag overrides during development.
+
+```typescript {14-18}
+// composables/useUnleash.ts
+import { ref, onMounted } from 'vue'
+import { UnleashClient } from 'unleash-proxy-client'
+import { initUnleashToolbar } from '@unleash/toolbar'
+import '@unleash/toolbar/toolbar.css'
+
+export function useUnleash() {
+  const unleashClient = ref(null)
+  const isReady = ref(false)
+
+  onMounted(async () => {
+    const client = new UnleashClient({ /* your config */ })
+
+    if (import.meta.env.DEV) {
+      unleashClient.value = initUnleashToolbar(client, { themePreset: 'dark' })
+    } else {
+      unleashClient.value = client
+    }
+
+    await unleashClient.value.start()
+    isReady.value = true
+  })
+
+  return { unleashClient, isReady }
+}
+```
+
+Refer to the [complete Vue example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/vue) for a full implementation.
