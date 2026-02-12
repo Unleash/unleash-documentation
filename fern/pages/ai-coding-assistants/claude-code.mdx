@@ -1,0 +1,764 @@
+---
+title: Integrate Unleash with Claude Code
+og:site_name: Unleash Documentation
+og:title: Integrate Unleash with Claude Code for AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in Claude Code across terminal, VS Code, JetBrains IDEs, Desktop app, and GitHub Actions.
+keywords: claude code, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
+max-toc-depth: 3
+slug: integrate/claude-code
+---
+
+The [Unleash MCP server](/integrate/mcp) connects [Claude Code](https://claude.com/product/claude-code) to your Unleash instance, enabling AI-assisted feature flag management. You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from your terminal or IDE.
+
+Claude Code supports MCP across multiple interfaces:
+
+- **Terminal CLI** — The primary interface, built for developers who live in the terminal.
+- **VS Code** — Extension for Visual Studio Code.
+- **JetBrains IDEs** — Plugin for IntelliJ IDEA, PyCharm, WebStorm, and others.
+- **Desktop app** — Standalone application.
+- **GitHub Actions** — CI/CD automation with `@anthropics/claude-code-action`.
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: the MCP server is distributed as an npm package.
+- Claude Code, installed via your preferred method (see installation tabs).
+- An Unleash instance: cloud or self-hosted, with API access enabled.
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) with permissions to create and manage feature flags.
+
+## Install the MCP server
+
+The Unleash MCP server runs as a local stdio process. Configuration differs by interface, but all use the same npm package and credentials.
+
+Claude Code uses environment variable expansion, and we recommend creating a credentials file and source it from your shell profile:
+
+<Steps>
+<Step title="Create credentials file">
+```bash
+mkdir -p ~/.unleash
+cat > ~/.unleash/mcp.env << 'EOF'
+UNLEASH_BASE_URL=https://your-instance.getunleash.io/api
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+EOF
+chmod 600 ~/.unleash/mcp.env
+```
+</Step>
+
+<Step title="Source in shell profile">
+Add to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+if [ -f ~/.unleash/mcp.env ]; then
+  source ~/.unleash/mcp.env
+  export UNLEASH_BASE_URL UNLEASH_PAT UNLEASH_DEFAULT_PROJECT
+fi
+```
+</Step>
+
+<Step title="Reload your shell">
+```bash
+source ~/.zshrc  # or ~/.bashrc
+```
+</Step>
+</Steps>
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+### Configure your interface
+
+<Tabs>
+<Tab title="Terminal CLI">
+
+**Requirements:** [Claude Code CLI](https://github.com/anthropics/claude-code) installed.
+
+The terminal CLI is Claude Code's native interface. Use the `claude mcp add` command to register the Unleash MCP server.
+
+<Steps>
+<Step title="Install Claude Code">
+
+Choose your preferred [installation method](https://github.com/anthropics/claude-code?tab=readme-ov-file#get-started).
+
+</Step>
+
+<Step title="Add the Unleash MCP server">
+
+You can either run the `claude mcp add` command or create the `.mcp.json` file manually.
+
+Both approaches create the same `.mcp.json` file at your project root. Choose whichever you prefer.
+
+<Tabs>
+<Tab title="CLI command">
+Run the following command from your project directory:
+
+```bash
+claude mcp add --transport stdio --scope project unleash \
+  -e UNLEASH_BASE_URL='${UNLEASH_BASE_URL}' \
+     UNLEASH_PAT='${UNLEASH_PAT}' \
+     UNLEASH_DEFAULT_PROJECT='${UNLEASH_DEFAULT_PROJECT:-default}' \
+  -- npx -y @unleash/mcp@latest --log-level error
+```
+
+**Syntax notes:**
+- The server name (`unleash`) comes before the `-e` flag
+- Multiple environment variables are space-separated after a single `-e`
+- Single quotes around `${VAR}` preserve the literal string for runtime expansion
+</Tab>
+
+<Tab title="Create file manually">
+Create a `.mcp.json` file at your project root:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "env": {
+        "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "${UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+      }
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+The resulting `.mcp.json` file can be committed to version control since it contains no credentials, only variable references that expand at runtime.
+
+</Step>
+
+<Step title="Verify the installation">
+```bash
+claude mcp get unleash
+```
+
+You should see output confirming the server configuration:
+
+```
+Name: unleash
+Type: stdio
+Command: npx -y @unleash/mcp@latest --log-level error
+Scope: Project config (shared via .mcp.json)
+```
+
+Within a Claude Code session, you can also run `/mcp` to see connected servers and available tools.
+</Step>
+</Steps>
+
+**Installation scopes:**
+
+| Scope | Storage | Use case |
+|-------|---------|----------|
+| **Local** (default) | `~/.claude.json` | Personal, single-project configs |
+| **Project** | `.mcp.json` in project root | Team-shared, version controlled |
+| **User** | `~/.claude.json` | Available across all projects |
+
+For team collaboration, use `--scope project` so the configuration is stored in `.mcp.json` and can be committed to version control.
+
+</Tab>
+
+<Tab title="VS Code">
+
+**Requirements:** VS Code with Claude Code extension installed.
+
+<Steps>
+<Step title="Install the Claude Code extension">
+Install the Claude Code extension from the VS Code Marketplace or via the Extensions view (`Cmd+Shift+X`).
+</Step>
+
+<Step title="Create the configuration file">
+If you have already configured the MCP server via the terminal CLI with `--scope project`, the `.mcp.json` file is automatically used by the VS Code extension.
+
+Alternatively, create `.mcp.json` manually at your project root:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "env": {
+        "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "${UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+      }
+    }
+  }
+}
+```
+</Step>
+
+<Step title="Reload VS Code">
+After saving the file, reload VS Code by running **Developer: Reload Window** from the Command Palette. The MCP server starts automatically.
+</Step>
+
+<Step title="Verify the installation">
+Open the Claude Code panel and run `/mcp` to see connected servers and available tools.
+</Step>
+</Steps>
+
+<Note>
+Note: The Claude Code VS Code extension uses `.mcp.json` at the project root (not `.vscode/mcp.json`) and the root key is `"mcpServers"` rather than `"servers"`.
+</Note>
+
+</Tab>
+
+<Tab title="JetBrains IDEs">
+
+**Requirements:** IntelliJ IDEA, PyCharm, WebStorm, or another JetBrains IDE with the Claude Code plugin or AI Assistant with MCP support.
+
+<Steps>
+<Step title="Go to AI Assistant settings">
+Go to **Settings > Tools > AI Assistant  > Model Context Protocol (MCP)**.
+</Step>
+
+<Step title="Add the Unleash MCP server">
+Click **Add** and provide the following JSON configuration:
+
+```json
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"]
+    }
+  }
+}
+```
+
+Set environment variables (`UNLEASH_BASE_URL`, `UNLEASH_PAT`, `UNLEASH_DEFAULT_PROJECT`) in your system environment or working directory. JetBrains does not support `envFile` or variable expansion in the configuration.
+</Step>
+
+<Step title="Choose scope and enable">
+Select **Global** or **Project** level depending on your needs. Ensure the server is enabled and restart the IDE if prompted.
+</Step>
+</Steps>
+
+For detailed instructions, see the [JetBrains AI Assistant MCP documentation](https://www.jetbrains.com/help/ai-assistant/mcp.html).
+
+</Tab>
+
+<Tab title="Desktop App">
+
+**Requirements:** Claude Desktop application installed.
+
+The [Claude Desktop app](https://claude.com/download) provides a native interface for configuring MCP servers through its settings.
+
+<Steps>
+<Step title="Open MCP settings">
+Open **Settings > Developer > Edit Config**. This opens the `claude_desktop_config.json` file.
+</Step>
+
+<Step title="Add the Unleash MCP server">
+Add the Unleash server to the `mcpServers` object:
+
+```json title="claude_desktop_config.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "env": {
+        "UNLEASH_BASE_URL": "https://your-instance.getunleash.io/api",
+        "UNLEASH_PAT": "your-personal-access-token",
+        "UNLEASH_DEFAULT_PROJECT": "default"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+Unlike project-scoped configurations, the desktop app config does not support `${VAR}` environment variable expansion. Enter your credentials directly in the file, or use the Terminal CLI for project-scoped setup with variable expansion.
+</Warning>
+</Step>
+
+<Step title="Restart and verify">
+Save the file and restart Claude Desktop. The MCP server starts automatically. You can verify by asking Claude to list available Unleash tools.
+</Step>
+</Steps>
+
+**Config file locations:**
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+
+
+</Tab>
+
+<Tab title="GitHub Actions">
+
+**Requirements:** GitHub repository with Actions enabled, Anthropic API key stored as a secret.
+
+Use `@anthropics/claude-code-action` to run Claude Code in CI/CD pipelines. For MCP servers that require secrets, create a config file step.
+
+<Steps>
+<Step title="Add secrets to your repository">
+Go to **Settings > Secrets and variables > Actions** and add:
+- `ANTHROPIC_API_KEY`
+- `UNLEASH_BASE_URL`
+- `UNLEASH_PAT`
+</Step>
+
+<Step title="Create workflow file">
+```yaml title=".github/workflows/feature-flag-review.yml"
+name: Feature Flag Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  flag-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create MCP Config
+        run: |
+          cat > /tmp/mcp-config.json << 'EOF'
+          {
+            "mcpServers": {
+              "unleash": {
+                "command": "npx",
+                "args": ["-y", "@unleash/mcp@latest"],
+                "env": {
+                  "UNLEASH_BASE_URL": "${{ secrets.UNLEASH_BASE_URL }}",
+                  "UNLEASH_PAT": "${{ secrets.UNLEASH_PAT }}",
+                  "UNLEASH_DEFAULT_PROJECT": "default"
+                }
+              }
+            }
+          }
+          EOF
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --mcp-config /tmp/mcp-config.json
+            --allowedTools mcp__unleash__evaluate_change,mcp__unleash__detect_flag,mcp__unleash__wrap_change
+          prompt: "Review this PR and check if any high-risk changes should be feature flagged"
+```
+</Step>
+</Steps>
+
+**Headless mode for scripts:**
+
+For fully non-interactive execution outside GitHub Actions, use the `--print` flag:
+
+```bash
+claude --print --allowedTools "mcp__unleash__*" \
+  "Audit feature flags and report stale ones" > report.md
+
+# JSON output for parsing
+claude --print --output-format json \
+  "List flags older than 90 days" > audit.json
+```
+
+</Tab>
+</Tabs>
+
+
+## Tool reference
+
+The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+
+## Workflows
+
+This section describes common workflows for using the Unleash MCP server with Claude Code.
+
+### Evaluate and wrap a risky change
+
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+<Step title="Evaluate the change">
+Tell Claude Code what you are working on:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+Claude Code calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+Claude Code automatically calls `detect_flag` to search for existing flags. If a suitable flag exists, Claude Code suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+Claude Code calls `create_flag` with the appropriate name, type, and description. The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+Claude Code calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js"
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+</Steps>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+Claude Code calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+Claude Code calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
+</Tab>
+
+<Tab title="Configure rollout">
+```text
+Set up a gradual rollout for stripe-payment-integration:
+10% for 24 hours, then 50% for 48 hours, then 100%.
+```
+
+Claude Code calls `set_flag_rollout` to configure the rollout strategy.
+
+</Tab>
+</Tabs>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+Claude Code calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
+</Tip>
+
+## CLAUDE.md templates
+
+Claude Code reads a `CLAUDE.md` file at the project root and applies its guidance automatically. You can encode your team's feature flag policies in this file so Claude Code considers them on every interaction.
+
+### Basic template
+
+```markdown title="CLAUDE.md"
+# Project Instructions
+
+## Feature Flag Guidelines
+
+When making changes to this codebase:
+
+1. **Always evaluate risk** — Before implementing changes to payments, authentication, 
+   data migrations, or external integrations, use the Unleash MCP server to evaluate 
+   whether a feature flag is needed.
+
+2. **Naming conventions** — Use the format `{domain}-{feature}-{variant}`. 
+   Examples: `checkout-stripe-integration`, `auth-sso-google`, `api-rate-limiting`.
+
+3. **Flag types**:
+   - `release` — For gradual feature rollouts
+   - `experiment` — For A/B tests
+   - `operational` — For system behavior toggles
+   - `kill-switch` — For emergency shutdowns
+
+4. **Check before creating** — Always check for existing flags before creating new ones.
+
+5. **Clean up after rollout** — Once a feature is at 100% for 2+ weeks, use cleanup_flag.
+
+## Unleash MCP Server
+
+This project uses the Unleash MCP server. Configuration is in `.mcp.json`.
+```
+
+### Advanced template with domain rules
+
+```markdown title="CLAUDE.md"
+# Project Instructions
+
+## Feature Flag Guidelines
+
+### Domain-specific rules
+
+- **Payments domain** (`src/payments/`): Always require flags for any changes.
+- **Authentication domain** (`src/auth/`): Require flags for SSO, MFA, and session changes.
+- **UI components** (`src/components/`): Flags optional for styling, required for behavior.
+- **API endpoints** (`src/api/`): Require flags for breaking changes.
+
+### Rollout defaults
+
+When using set_flag_rollout, apply these defaults:
+- Start at 10%
+- Wait 24 hours before advancing
+- Pause if error rate exceeds 1%
+
+### Cleanup cadence
+
+Run cleanup_flag weekly for flags at 100% for more than 14 days.
+```
+
+Commit your `CLAUDE.md` file to version control so all team members share the same policies.
+
+## Piped workflow recipes
+
+Claude Code's pipe-friendly interface enables batch operations. Combine standard Unix tools with Claude Code to process data that the MCP server cannot access directly.
+
+### Find commits that should have been flagged
+
+```bash
+git log --oneline -20 | claude -p "Review these commits. For each, use evaluate_change to determine if it should have been feature flagged. Report gaps."
+```
+
+### Analyze a diff before merging
+
+```bash
+git diff main...feature-branch | claude -p "Analyze this diff. Use evaluate_change to determine which changes need feature flags."
+```
+
+### Pre-commit hook for flag evaluation
+
+```bash title=".git/hooks/pre-commit"
+#!/bin/bash
+git diff --cached | claude -p "Evaluate this staged diff for feature flag requirements" --output-format json
+```
+
+### Find flag references and check their state
+
+```bash
+grep -r "isEnabled\|is_enabled" src/ | claude -p "Extract flag names from these references. Use get_flag_state to check if each exists in Unleash and report mismatches."
+```
+
+### Direct Unleash queries
+
+For operations that only need Unleash data, ask Claude Code directly:
+
+```bash
+claude -p "List all feature flags and identify any that haven't been modified in 90 days"
+claude -p "Check all flags against our naming convention and report violations"
+claude -p "Generate a cleanup report for flags at 100% rollout for more than 2 weeks"
+```
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** Claude Code calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** Claude Code calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** Claude Code calls `toggle_flag_environment` or `get_flag_state`.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** Claude Code calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+## Enterprise governance
+
+For enterprise deployments, IT administrators can deploy centralized MCP configuration using managed settings.
+
+### Managed MCP configuration
+
+Deploy `managed-mcp.json` to system directories to control which MCP servers are available:
+
+| Platform | Path |
+|----------|------|
+| macOS | `/Library/Application Support/ClaudeCode/managed-mcp.json` |
+| Linux/WSL | `/etc/claude-code/managed-mcp.json` |
+| Windows | `C:\Program Files\ClaudeCode\managed-mcp.json` |
+
+When this file is present, users cannot add, modify, or use any MCP servers other than those defined in the file.
+
+### Policy-based control
+
+Use `allowedMcpServers` and `deniedMcpServers` in managed settings to restrict which servers users can configure while still allowing some flexibility.
+
+## Troubleshooting
+
+<Accordion title="MCP tools not showing up">
+- Verify the server is listed with `claude mcp list`
+- Check that environment variables are exported: `echo $UNLEASH_BASE_URL`
+- Test credentials directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/api/admin/projects"`
+- Restart your terminal after modifying your shell profile
+</Accordion>
+
+<Accordion title="Environment variables not expanding">
+- Restart your terminal after modifying `~/.zshrc` or `~/.bashrc`
+- Verify variables are exported: `export UNLEASH_BASE_URL UNLEASH_PAT`
+- Check that single quotes were used in the `claude mcp add` command to prevent premature expansion
+</Accordion>
+
+<Accordion title="Authentication failed">
+- Confirm your Unleash PAT is valid and has not expired
+- Check that the PAT has permissions to create and manage feature flags
+- Verify that `UNLEASH_BASE_URL` includes `/api` at the end
+- For self-hosted instances, ensure the API is accessible from your machine
+</Accordion>
+
+<Accordion title="Server crashes repeatedly">
+Claude Code automatically restarts MCP servers that crash. If a server fails repeatedly, it will be disabled for the session. Check your credentials and restart Claude Code.
+</Accordion>
+
+<Accordion title="Node.js not found">
+Local servers using npx require Node.js 18+. Verify with `node --version`. If Node.js is installed but not found, check your PATH.
+</Accordion>
+
+<Accordion title="Windows-specific issues">
+On native Windows (not WSL), local MCP servers using `npx` require the `cmd /c` wrapper:
+
+```bash
+claude mcp add --transport stdio my-server -- cmd /c npx -y @unleash/mcp@latest
+```
+
+For WSL environments, use the standard Unix syntax.
+</Accordion>
+
+<Accordion title="Tool results truncated">
+Claude Code limits tool output size to prevent context overflow. If results appear truncated, use filters (such as specific projects or flag types) to reduce result size. For current limits, see the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with Claude Code.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check">
+While the MCP server can automate flag creation, high-risk changes should involve human review. Approve flag creation, rollout plans, and cleanup decisions.
+</Card>
+
+<Card title="Define naming conventions" icon="tag">
+Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in your CLAUDE.md file.
+</Card>
+
+<Card title="Prevent duplication" icon="copy-slash">
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock">
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+
+<Card title="Use project scope for teams" icon="users">
+Configure MCP servers with `--scope project` so the `.mcp.json` file is shared via version control. All team members get the same configuration.
+</Card>
+
+<Card title="Encode policies in CLAUDE.md" icon="file-code">
+Write your feature flag guidelines in CLAUDE.md. Claude Code reads this file and applies its guidance automatically.
+</Card>
+</CardGroup>
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Claude Code and Unleash: When Agentic AI Gets Release Governance](https://getunleash.io/blog/claude-code-unleash-agentic-ai-release-governance)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
+- [Claude Code documentation](https://code.claude.com/docs)
