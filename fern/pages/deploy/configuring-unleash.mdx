@@ -144,6 +144,20 @@ To connect to a PostgreSQL database using a self-signed certificate, you need to
 
 Set the public URL where your Unleash instance can be accessed using the environment variable `UNLEASH_URL`. For example, `https://unleash.mycompany.com` or `https://app.mycompany.com/unleash`. This URL is used for creating password reset links, signup links for new users, and links within integrations, such as Slack or Datadog.
 
+
+| Environment variable | Default value                  | Description                                                                        |
+| :------------------- | :----------------------------- | :--------------------------------------------------------------------------------- |
+| `UNLEASH_URL`        | `http://localhost:4242`        | Public URL where your Unleash instance can be accessed.                            |
+
+## Configure the Unleash Enterprise Edge public URL
+
+Use the `EDGE_URL` environment variable to set the public URL for your [Enterprise Edge](/unleash-edge) instance. For example, `https://yourcompany.edge.getunleash.io`. This URL appears on the **Admin > API access** page alongside the Client and Frontend API URLs, so your team can copy it when connecting SDKs to Edge.
+
+| Environment variable | Default value                  | Description                                                                        |
+| :------------------- | :----------------------------- | :--------------------------------------------------------------------------------- |
+| `EDGE_URL`           | N/A                            | Public URL where your Unleash Enterprise Edge can be accessed.                     |
+
+
 ## Configure an email server
 
 Configure an SMTP server to enable password resets and user welcome emails. If not configured, self-service password resets will not be available.
