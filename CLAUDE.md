@@ -23,7 +23,7 @@ fern/
     academy/            # Unleash Academy courses
     apis/               # API overview pages
     integrate/          # Integrations (Datadog, Slack, Jira, Terraform, etc.)
-  apis/                 # OpenAPI specs (fetched dynamically)
+  apis/                 # OpenAPI specs (committed, updated by CI)
     admin-api/          # All endpoints except Client and Frontend
     client-api/         # Client-tagged endpoints only
     frontend-api/       # Frontend API-tagged endpoints only
@@ -38,10 +38,9 @@ scripts/
 
 | Command | What it does |
 |---------|-------------|
-| `npm run dev` | Fetches latest API specs, starts Fern dev server at localhost:3000 |
-| `fern docs dev` | Starts dev server without fetching specs |
-| `npm run fetch` | Updates local OpenAPI JSON files |
+| `fern docs dev` | Starts Fern dev server at localhost:3000 |
 | `fern check --strict-broken-links` | Validates docs and checks for broken links |
+| `node scripts/fetch-openapi.mjs` | Manually refreshes API specs |
 
 ## Fern verification requirement
 
@@ -78,8 +77,6 @@ The OpenAPI spec is split into 3 domains to keep the API reference navigable:
 - **Admin API** — all endpoints except Client and Frontend
 - **Client API** — Client-tagged endpoints only
 - **Frontend API** — Frontend API-tagged endpoints only
-
-Specs are fetched from a hosted Unleash instance via `npm run fetch`.
 
 ## Writing standards
 

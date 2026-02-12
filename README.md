@@ -15,87 +15,59 @@ Unleash is the most popular open-source solution for feature flagging on GitHub.
 
 ## About this repository
 
-This repository contains the source code for the official [Unleash documentation](https://docs.getunleash.io), powered by [Fern](https://buildwithfern.com/).
+This repository contains the source code for the official [Unleash documentation](https://docs.getunleash.io). The site is built entirely by the [Fern CLI](https://buildwithfern.com/).
+
+API specs are committed to the repo and kept up to date by CI — you don't need to fetch them locally.
 
 ## Quickstart
 
 ### Prerequisites
-- Node.js 20+
+- [Node.js](https://nodejs.org/) 20+ (required to install and run the Fern CLI)
+- [Fern CLI](https://buildwithfern.com/learn/cli-api/cli-reference/global-options): `npm install -g fern-api`
 
-To get the documentation environment running locally, follow these steps:
-
-### Clone the repository
+### Clone and run
 
 ```bash
 git clone https://github.com/Unleash/unleash-documentation.git
 cd unleash-documentation
-```
-### Install dependencies
-
-```bash
-npm install
+fern docs dev
 ```
 
-### Install the Fern CLI
-
-```bash
-npm install -g fern-api
-```
-
-### Start the development server
-
-```bash
-npm run dev
-```
-
-Once the server starts, you can view the documentation at `http://localhost:3000`.
+That's it. The dev server starts at `http://localhost:3000`.
 
 ## Command reference
 
-| Command | Action |
+| Command | What it does |
 | --- | --- |
-| `npm run dev` | Fetches latest specs and starts the dev server. |
-| `fern docs dev` | Starts the dev server directly (does not fetch specs). |
-| `npm run fetch` | Updates the local `openapi.json` files from the hosted instance. |
-| `fern check --strict-broken-links` | Validates the documentation and fails on broken links. |
+| `fern docs dev` | Starts the local dev server. |
+| `fern check --strict-broken-links` | Validates the documentation and checks for broken links. |
+| `node scripts/fetch-openapi.mjs` | Manually refreshes the API specs from the hosted Unleash instance. Only needed if you want a newer spec than what's committed. |
 
-## Architecture and tooling
+## How API specs are updated
 
-Our docs stack has the following components:
-- **Engine**: [Fern](https://buildwithfern.com/).
-- **API specs**: OpenAPI spec fetched dynamically from the Unleash instance.
-- **Custom footer**: A React component (`fern/components/CustomFooter.tsx`) server-side rendered by Fern via the `footer:` property in `docs.yml`.
-- **Custom styling**: CSS overrides in `fern/styles.css`.
+CI automatically fetches the latest OpenAPI spec from the hosted Unleash instance on every push to `main` and every PR. The spec is split into three domains to keep the API reference navigable:
 
-### API structure
+- **Admin API** (`fern/apis/admin-api/`): All endpoints except Client and Frontend.
+- **Client API** (`fern/apis/client-api/`): Client-tagged endpoints only.
+- **Frontend API** (`fern/apis/frontend-api/`): Frontend API-tagged endpoints only.
 
-To keep our API reference navigable, we split the main Unleash OpenAPI spec into three distinct domains:
+You only need to run `node scripts/fetch-openapi.mjs` locally if you're working on API reference content and need a spec that's newer than the last CI run.
 
-- **Client API** (`fern/apis/client-api/`): Contains only endpoints with the "Client" tag.
-- **Frontend API** (`fern/apis/frontend-api/`): Contains only endpoints with the "Frontend API" tag.
-- **Admin API** (`fern/apis/admin-api/`): Contains all remaining endpoints (excludes Client and Frontend API tags).
+## Architecture
 
-## Custom styling
-
-We apply custom CSS on top of Fern's defaults to achieve our branded look (floating content containers, mountain backdrop, custom navbar styling, academy section, footer). The main stylesheet is `fern/styles.css`.
-
-Key design elements:
-- **Floating container**: Guide and reference pages render inside a white rounded card over a gray background.
-- **Mountain backdrop**: A decorative mountain texture fixed to the bottom-right corner via `body::after`, layered behind content with z-index management.
-- **Custom footer**: A React component at `fern/components/CustomFooter.tsx`, server-side rendered by Fern. Styled via CSS classes in `styles.css`.
-
-For detailed architecture notes, gotchas, and instructions for working on the CSS, see [CLAUDE.md](./CLAUDE.md).
+- **Engine**: [Fern](https://buildwithfern.com/)
+- **API specs**: OpenAPI JSON files in `fern/apis/`, fetched by CI from a hosted Unleash instance
+- **Custom footer**: React component (`fern/components/CustomFooter.tsx`), server-side rendered by Fern
+- **Custom styling**: CSS overrides in `fern/styles.css`. For detailed architecture notes and conventions, see [CLAUDE.md](./CLAUDE.md).
 
 ## Contributing
 
-We welcome contributions to the Unleash documentation. If you find something that's wrong, unclear, or missing, feel free to open an issue or submit a pull request.
-
-To contribute:
+We welcome contributions. If you find something that's wrong, unclear, or missing, feel free to open an issue or submit a pull request.
 
 1. Fork and clone this repository.
 2. Create a new branch for your changes.
-3. Run the dev server locally to preview your changes using `npm run dev`.
-4. Submit a pull request to this repository.
+3. Run `fern docs dev` to preview locally.
+4. Submit a pull request.
 
 For contributions to the Unleash product itself, see the main [Unleash repository](https://github.com/Unleash/unleash).
 
