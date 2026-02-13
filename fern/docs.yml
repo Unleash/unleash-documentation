@@ -981,23 +981,29 @@ css:
 
 redirects:
   # --- Helm charts ---
-  - source: /helm-charts/index.yaml
+  - source: "/helm-charts/index.yaml"
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/index.yaml"
     permanent: false
-  - source: /helm-charts
+  - source: "/helm-charts"
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/README.md"
     permanent: false
-  - source: /contributing/:slug
-    destination: /contribute
-    permanent: true
-  - source: /contributing/ADRs/:slug*
-    destination: /contribute
-    permanent: true
-  # --- Pre-migration ---   
+  - source: "/contributing/:slug"
+    destination: "/contribute"
+  - source: "/contributing/ADRs/:slug*"
+    destination: "/contribute"
+  # --- Pre-migration ---
   - source: "/how-to/:slug*"
     destination: "/guides/:slug*"
+  - source: "/reference/sdks/:slug*"
+    destination: "/sdks/:slug*"
+  - source: "/reference/feature-toggles"
+    destination: "/concepts/feature-flags"
+  - source: "/reference/environment-import-export"
+    destination: "/concepts/import-export"
   - source: "/reference/:slug*"
     destination: "/concepts/:slug*"
+  - source: "/topics/feature-flags/best-practices-using-feature-flags-at-scale"
+    destination: "/guides/best-practices-using-feature-flags-at-scale"
   - source: "/integrations/:slug*"
     destination: "/integrate/:slug*"
   - source: "/using-unleash/deploy/:slug*"
