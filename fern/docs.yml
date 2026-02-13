@@ -993,11 +993,19 @@ redirects:
   - source: /contributing/ADRs/:slug*
     destination: /contribute
     permanent: true
-  # --- Pre-migration ---   
+  # --- Pre-migration ---
   - source: "/how-to/:slug*"
     destination: "/guides/:slug*"
+  - source: "/reference/sdks/:slug*"
+    destination: "/sdks/:slug*"
+  - source: "/reference/feature-toggles"
+    destination: "/concepts/feature-flags"
+  - source: "/reference/environment-import-export"
+    destination: "/concepts/import-export"
   - source: "/reference/:slug*"
     destination: "/concepts/:slug*"
+  - source: "/topics/feature-flags/best-practices-using-feature-flags-at-scale"
+    destination: "/guides/best-practices-using-feature-flags-at-scale"
   - source: "/integrations/:slug*"
     destination: "/integrate/:slug*"
   - source: "/using-unleash/deploy/:slug*"
