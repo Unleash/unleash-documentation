@@ -989,10 +989,8 @@ redirects:
     permanent: false
   - source: /contributing/:slug
     destination: /contribute
-    permanent: true
   - source: /contributing/ADRs/:slug*
     destination: /contribute
-    permanent: true
   # --- Pre-migration ---
   - source: "/how-to/:slug*"
     destination: "/guides/:slug*"
