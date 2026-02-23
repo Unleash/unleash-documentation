@@ -1,0 +1,512 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450"
+     preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <title>Constellation Network</title>
+  <desc>A sprawling network of small square nodes connected by hairline paths with traveling activation pulses, evoking feature flags propagating through distributed infrastructure. Designed for dark backgrounds.</desc>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║  LAYER 0 — Background texture dots                         ║
+       ║  Very faint scattered squares adding subtle grain           ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <g id="texture" fill="#BBB9FF" opacity="0.025">
+    <rect x="45"   y="30"  width="3" height="3" rx="0.5"/>
+    <rect x="170"  y="420" width="2" height="2" rx="0.5"/>
+    <rect x="230"  y="80"  width="3" height="3" rx="0.5"/>
+    <rect x="350"  y="210" width="2" height="2" rx="0.5"/>
+    <rect x="420"  y="400" width="3" height="3" rx="0.5"/>
+    <rect x="490"  y="45"  width="2" height="2" rx="0.5"/>
+    <rect x="560"  y="330" width="3" height="3" rx="0.5"/>
+    <rect x="630"  y="180" width="2" height="2" rx="0.5"/>
+    <rect x="710"  y="410" width="3" height="3" rx="0.5"/>
+    <rect x="780"  y="60"  width="2" height="2" rx="0.5"/>
+    <rect x="860"  y="390" width="3" height="3" rx="0.5"/>
+    <rect x="930"  y="120" width="2" height="2" rx="0.5"/>
+    <rect x="1010" y="310" width="3" height="3" rx="0.5"/>
+    <rect x="1070" y="50"  width="2" height="2" rx="0.5"/>
+    <rect x="1150" y="380" width="3" height="3" rx="0.5"/>
+    <rect x="100"  y="300" width="2" height="2" rx="0.5"/>
+    <rect x="320"  y="360" width="3" height="3" rx="0.5"/>
+    <rect x="540"  y="110" width="2" height="2" rx="0.5"/>
+    <rect x="680"  y="350" width="3" height="3" rx="0.5"/>
+    <rect x="820"  y="200" width="2" height="2" rx="0.5"/>
+    <rect x="970"  y="420" width="3" height="3" rx="0.5"/>
+    <rect x="1120" y="240" width="2" height="2" rx="0.5"/>
+    <rect x="150"  y="130" width="2" height="2" rx="0.5"/>
+    <rect x="450"  y="280" width="3" height="3" rx="0.5"/>
+    <rect x="750"  y="430" width="2" height="2" rx="0.5"/>
+  </g>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║  LAYER 1 — Static connection lines                         ║
+       ║  Hairline paths forming the network topology                ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <g id="connections" stroke="#BBB9FF" stroke-width="0.6" fill="none" opacity="0.05">
+    <!-- Left cluster internal -->
+    <line x1="83"  y1="98"  x2="143" y2="58"/>
+    <line x1="83"  y1="98"  x2="198" y2="123"/>
+    <line x1="143" y1="58"  x2="198" y2="123"/>
+    <line x1="133" y1="188" x2="198" y2="123"/>
+    <line x1="133" y1="188" x2="228" y2="248"/>
+    <line x1="133" y1="188" x2="58"  y2="268"/>
+    <line x1="58"  y1="268" x2="163" y2="343"/>
+    <line x1="228" y1="248" x2="278" y2="178"/>
+    <line x1="228" y1="248" x2="288" y2="318"/>
+    <line x1="278" y1="178" x2="313" y2="103"/>
+    <line x1="278" y1="178" x2="343" y2="253"/>
+    <line x1="163" y1="343" x2="108" y2="398"/>
+    <line x1="163" y1="343" x2="288" y2="318"/>
+    <line x1="313" y1="103" x2="253" y2="63"/>
+
+    <!-- Left-to-center bridges -->
+    <line x1="313" y1="103" x2="403" y2="138"/>
+    <line x1="343" y1="253" x2="448" y2="268"/>
+    <line x1="253" y1="63"  x2="368" y2="53"/>
+    <line x1="288" y1="318" x2="368" y2="398"/>
+
+    <!-- Center cluster internal -->
+    <line x1="403" y1="138" x2="498" y2="93"/>
+    <line x1="403" y1="138" x2="448" y2="268"/>
+    <line x1="498" y1="93"  x2="628" y2="83"/>
+    <line x1="448" y1="268" x2="528" y2="218"/>
+    <line x1="448" y1="268" x2="518" y2="338"/>
+    <line x1="528" y1="218" x2="608" y2="148"/>
+    <line x1="528" y1="218" x2="648" y2="258"/>
+    <line x1="568" y1="318" x2="518" y2="338"/>
+    <line x1="568" y1="318" x2="648" y2="258"/>
+    <line x1="568" y1="318" x2="588" y2="408"/>
+    <line x1="478" y1="378" x2="518" y2="338"/>
+    <line x1="648" y1="258" x2="663" y2="373"/>
+    <line x1="608" y1="148" x2="628" y2="83"/>
+
+    <!-- Center-to-right bridges -->
+    <line x1="608" y1="148" x2="738" y2="168"/>
+    <line x1="648" y1="258" x2="778" y2="298"/>
+    <line x1="628" y1="83"  x2="818" y2="118"/>
+    <line x1="663" y1="373" x2="703" y2="428"/>
+
+    <!-- Right cluster internal -->
+    <line x1="738" y1="168" x2="818" y2="118"/>
+    <line x1="738" y1="168" x2="858" y2="248"/>
+    <line x1="778" y1="298" x2="858" y2="248"/>
+    <line x1="778" y1="298" x2="908" y2="358"/>
+    <line x1="818" y1="118" x2="948" y2="158"/>
+    <line x1="858" y1="248" x2="988" y2="288"/>
+    <line x1="948" y1="158" x2="1048" y2="198"/>
+    <line x1="988" y1="288" x2="1088" y2="348"/>
+    <line x1="1048" y1="198" x2="1133" y2="133"/>
+  </g>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║  LAYER 2 — Traveling pulses                                 ║
+       ║  Animated dashes flowing along select connections           ║
+       ║  Uses pathLength="1" for normalized dash patterns           ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <g id="pulses" stroke="#BBB9FF" stroke-width="1.2" fill="none" stroke-linecap="round">
+
+    <!-- Pulse path A: left origin → center (main propagation route) -->
+    <line x1="83" y1="98" x2="198" y2="123"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.22">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="6s" begin="0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="198" y1="123" x2="313" y2="103"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.22">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5s" begin="1.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="313" y1="103" x2="403" y2="138"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.25">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="4.5s" begin="3s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="403" y1="138" x2="528" y2="218"
+          pathLength="1" stroke-dasharray="0.06 0.94" opacity="0.28">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="6s" begin="4.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="528" y1="218" x2="648" y2="258"
+          pathLength="1" stroke-dasharray="0.06 0.94" opacity="0.28">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5.5s" begin="6s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="648" y1="258" x2="778" y2="298"
+          pathLength="1" stroke-dasharray="0.06 0.94" opacity="0.25">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5s" begin="7.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="778" y1="298" x2="858" y2="248"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.22">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="4s" begin="9s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="858" y1="248" x2="988" y2="288"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.20">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5.5s" begin="10s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+
+    <!-- Pulse path B: secondary route through top -->
+    <line x1="143" y1="58" x2="253" y2="63"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="7s" begin="2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="253" y1="63" x2="368" y2="53"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5s" begin="4s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="498" y1="93" x2="628" y2="83"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.20">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="6s" begin="5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="628" y1="83" x2="818" y2="118"
+          pathLength="1" stroke-dasharray="0.06 0.94" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="8s" begin="7s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="818" y1="118" x2="948" y2="158"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5.5s" begin="9s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="948" y1="158" x2="1048" y2="198"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.16">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5s" begin="11s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="1048" y1="198" x2="1133" y2="133"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.15">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="4.5s" begin="12.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+
+    <!-- Pulse path C: bottom route through lower nodes -->
+    <line x1="133" y1="188" x2="228" y2="248"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.16">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="6.5s" begin="3.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="228" y1="248" x2="288" y2="318"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.16">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="5s" begin="5.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="448" y1="268" x2="568" y2="318"
+          pathLength="1" stroke-dasharray="0.08 0.92" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="6s" begin="7.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+    <line x1="568" y1="318" x2="648" y2="258"
+          pathLength="1" stroke-dasharray="0.10 0.90" opacity="0.18">
+      <animate attributeName="stroke-dashoffset" values="1;0"
+               dur="4.5s" begin="9.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1"/>
+    </line>
+  </g>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║  LAYER 3 — Network nodes                                   ║
+       ║  Breathing squares with staggered opacity pulses            ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <g id="nodes" fill="#BBB9FF">
+
+    <!-- ── Left cluster (12 nodes) ── -->
+    <rect x="80" y="95" width="6" height="6" rx="1.5" opacity="0.12">
+      <animate attributeName="opacity" values="0.12;0.22;0.12"
+               dur="5.5s" begin="0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="140" y="55" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.18;0.10"
+               dur="6.2s" begin="0.8s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="130" y="185" width="7" height="7" rx="1.5" opacity="0.14">
+      <animate attributeName="opacity" values="0.14;0.24;0.14"
+               dur="5.8s" begin="1.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="195" y="120" width="6" height="6" rx="1.5" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.20;0.11"
+               dur="6.5s" begin="0.3s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="225" y="245" width="7" height="7" rx="1.5" opacity="0.13">
+      <animate attributeName="opacity" values="0.13;0.22;0.13"
+               dur="5.2s" begin="2.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="160" y="340" width="5" height="5" rx="1" opacity="0.09">
+      <animate attributeName="opacity" values="0.09;0.16;0.09"
+               dur="7.0s" begin="1.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="275" y="175" width="8" height="8" rx="2" opacity="0.15">
+      <animate attributeName="opacity" values="0.15;0.26;0.15"
+               dur="5.0s" begin="0.6s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="310" y="100" width="6" height="6" rx="1.5" opacity="0.12">
+      <animate attributeName="opacity" values="0.12;0.20;0.12"
+               dur="6.0s" begin="1.8s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="285" y="315" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.18;0.10"
+               dur="6.8s" begin="2.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="105" y="395" width="6" height="6" rx="1.5" opacity="0.08">
+      <animate attributeName="opacity" values="0.08;0.14;0.08"
+               dur="7.5s" begin="3.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="55" y="265" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.17;0.10"
+               dur="6.4s" begin="0.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="250" y="60" width="6" height="6" rx="1.5" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.19;0.11"
+               dur="5.6s" begin="1.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- ── Center cluster (12 nodes) ── -->
+    <rect x="400" y="135" width="7" height="7" rx="1.5" opacity="0.14">
+      <animate attributeName="opacity" values="0.14;0.25;0.14"
+               dur="5.4s" begin="0.4s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="445" y="265" width="6" height="6" rx="1.5" opacity="0.12">
+      <animate attributeName="opacity" values="0.12;0.21;0.12"
+               dur="6.2s" begin="1.4s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="495" y="90" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.19;0.10"
+               dur="5.8s" begin="2.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="525" y="215" width="8" height="8" rx="2" opacity="0.16">
+      <animate attributeName="opacity" values="0.16;0.28;0.16"
+               dur="5.0s" begin="0.7s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="475" y="375" width="6" height="6" rx="1.5" opacity="0.09">
+      <animate attributeName="opacity" values="0.09;0.16;0.09"
+               dur="7.2s" begin="3.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="565" y="315" width="5" height="5" rx="1" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.20;0.11"
+               dur="6.0s" begin="1.8s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="605" y="145" width="7" height="7" rx="1.5" opacity="0.13">
+      <animate attributeName="opacity" values="0.13;0.24;0.13"
+               dur="5.6s" begin="0.9s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="645" y="255" width="6" height="6" rx="1.5" opacity="0.14">
+      <animate attributeName="opacity" values="0.14;0.23;0.14"
+               dur="5.2s" begin="2.6s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="585" y="405" width="5" height="5" rx="1" opacity="0.08">
+      <animate attributeName="opacity" values="0.08;0.14;0.08"
+               dur="7.8s" begin="4.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="515" y="335" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.17;0.10"
+               dur="6.6s" begin="2.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="625" y="80" width="6" height="6" rx="1.5" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.20;0.11"
+               dur="6.4s" begin="1.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="365" y="50" width="5" height="5" rx="1" opacity="0.09">
+      <animate attributeName="opacity" values="0.09;0.16;0.09"
+               dur="7.0s" begin="3.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- ── Right cluster (10 nodes, sparser) ── -->
+    <rect x="735" y="165" width="7" height="7" rx="1.5" opacity="0.13">
+      <animate attributeName="opacity" values="0.13;0.22;0.13"
+               dur="5.8s" begin="1.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="775" y="295" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.18;0.10"
+               dur="6.5s" begin="2.8s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="815" y="115" width="6" height="6" rx="1.5" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.19;0.11"
+               dur="6.0s" begin="0.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="855" y="245" width="7" height="7" rx="1.5" opacity="0.14">
+      <animate attributeName="opacity" values="0.14;0.23;0.14"
+               dur="5.4s" begin="1.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="905" y="355" width="5" height="5" rx="1" opacity="0.09">
+      <animate attributeName="opacity" values="0.09;0.15;0.09"
+               dur="7.4s" begin="3.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="945" y="155" width="6" height="6" rx="1.5" opacity="0.11">
+      <animate attributeName="opacity" values="0.11;0.19;0.11"
+               dur="6.2s" begin="2.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="985" y="285" width="6" height="6" rx="1.5" opacity="0.12">
+      <animate attributeName="opacity" values="0.12;0.20;0.12"
+               dur="5.6s" begin="1.6s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="1045" y="195" width="5" height="5" rx="1" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.17;0.10"
+               dur="6.8s" begin="3.2s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="1085" y="345" width="6" height="6" rx="1.5" opacity="0.09">
+      <animate attributeName="opacity" values="0.09;0.15;0.09"
+               dur="7.2s" begin="4.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="1130" y="130" width="5" height="5" rx="1" opacity="0.08">
+      <animate attributeName="opacity" values="0.08;0.14;0.08"
+               dur="7.6s" begin="2.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- ── Scattered edge nodes (4 nodes) ── -->
+    <rect x="365" y="395" width="6" height="6" rx="1.5" opacity="0.08">
+      <animate attributeName="opacity" values="0.08;0.14;0.08"
+               dur="7.0s" begin="4.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="700" y="425" width="5" height="5" rx="1" opacity="0.07">
+      <animate attributeName="opacity" values="0.07;0.13;0.07"
+               dur="8.0s" begin="5.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="660" y="370" width="6" height="6" rx="1.5" opacity="0.10">
+      <animate attributeName="opacity" values="0.10;0.18;0.10"
+               dur="6.4s" begin="2.0s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+    <rect x="1005" y="70" width="5" height="5" rx="1" opacity="0.08">
+      <animate attributeName="opacity" values="0.08;0.15;0.08"
+               dur="7.4s" begin="1.5s" repeatCount="indefinite"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+    </rect>
+  </g>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║  LAYER 4 — Highlight flashes                               ║
+       ║  Select nodes that briefly activate to brighter purple      ║
+       ║  Long cycle with brief spike (keyTimes concentrate glow)    ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <g id="highlights" fill="#BBB9FF">
+    <!-- Hub node flash: left origin (N1) -->
+    <rect x="78" y="93" width="10" height="10" rx="2.5" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.40;0.40;0;0"
+               keyTimes="0;0.28;0.32;0.42;0.46;1"
+               dur="14s" begin="0s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Hub node flash: left junction (N7) -->
+    <rect x="273" y="173" width="12" height="12" rx="3" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.35;0.35;0;0"
+               keyTimes="0;0.15;0.19;0.29;0.33;1"
+               dur="16s" begin="2s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Hub node flash: center main (N18) -->
+    <rect x="523" y="213" width="12" height="12" rx="3" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.38;0.38;0;0"
+               keyTimes="0;0.35;0.39;0.49;0.53;1"
+               dur="18s" begin="4s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Hub node flash: center-right bridge (N22) -->
+    <rect x="643" y="253" width="10" height="10" rx="2.5" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.32;0.32;0;0"
+               keyTimes="0;0.50;0.54;0.64;0.68;1"
+               dur="15s" begin="6s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Hub node flash: right area (N30) -->
+    <rect x="853" y="243" width="10" height="10" rx="2.5" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.30;0.30;0;0"
+               keyTimes="0;0.60;0.64;0.74;0.78;1"
+               dur="17s" begin="8s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Hub node flash: far right endpoint (N34) -->
+    <rect x="1043" y="193" width="8" height="8" rx="2" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.25;0.25;0;0"
+               keyTimes="0;0.70;0.74;0.84;0.88;1"
+               dur="20s" begin="10s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Ambient glow ring around hub nodes: left origin -->
+    <rect x="74" y="89" width="18" height="18" rx="4.5" fill="none"
+          stroke="#BBB9FF" stroke-width="0.8" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.18;0.18;0;0"
+               keyTimes="0;0.28;0.32;0.42;0.46;1"
+               dur="14s" begin="0s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+
+    <!-- Ambient glow ring around hub nodes: center main -->
+    <rect x="519" y="209" width="20" height="20" rx="5" fill="none"
+          stroke="#BBB9FF" stroke-width="0.8" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.15;0.15;0;0"
+               keyTimes="0;0.35;0.39;0.49;0.53;1"
+               dur="18s" begin="4s" repeatCount="indefinite"
+               calcMode="spline"
+               keySplines="0.4 0 0.6 1;0.3 0 0.5 1;0.42 0 0.58 1;0.3 0 0.5 1;0.4 0 0.6 1"/>
+    </rect>
+  </g>
+
+</svg>
