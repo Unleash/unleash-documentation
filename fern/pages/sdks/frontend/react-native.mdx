@@ -159,7 +159,7 @@ function MyApp() {
 
 `flagsReady` requires a successful network request before it becomes `true`, even if cached data exists from a previous session. This means there is a brief loading state on every app launch when you gate rendering on `flagsReady`.
 
-If you need instant startup without a loading state, use [bootstrapping](#bootstrapping) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
+If you need instant startup without a loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
 
 ### Defer client start
 
