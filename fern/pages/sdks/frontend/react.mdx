@@ -404,31 +404,7 @@ Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configura
 
 ## React Native
 
-### localStorage
-
-IMPORTANT: This no longer comes included in the unleash-proxy-client-js library. You will need to install the storage adapter for your preferred storage solution.
-
-Because React Native doesn't run in a web browser, it doesn't have access to the `localStorage` API. Instead, you need to tell Unleash to use your specific storage provider. The most common storage provider for React Native is [AsyncStorage](https://github.com/react-native-async-storage/async-storage).
-To configure it, add the following property to your configuration object:
-
-```js
-const config = {
-  storageProvider: {
-    save: (name, data) => AsyncStorage.setItem(name, JSON.stringify(data)),
-    get: async (name) => {
-      const data = await AsyncStorage.getItem(name);
-      return data ? JSON.parse(data) : undefined;
-    },
-  },
-};
-```
-
-### startTransition
-
-If your version of React Native doesn't support `startTransition`, you can provide fallback implementation:
-```jsx
-  <FlagProvider startTransition={fn => fn()} ></FlagProvider>
-```
+For React Native and Expo applications, use the dedicated [React Native SDK](/sdks/react-native). It wraps this SDK and handles `AsyncStorage` and `startTransition` configuration automatically.
 
 ## Migration Guide
 
