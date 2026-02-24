@@ -44,7 +44,7 @@ Use `npx expo install` to select dependency versions compatible with your Expo S
 The following options are available when initializing the SDK. Pass them as the `config` prop on `FlagProvider`.
 
 <ParamField path="url" type="string" required={true}>
-  The URL of your [Unleash Edge](/unleash-edge) instance or [Frontend API](/api#frontend-api). For the Frontend API, use `https://<your-unleash-instance>/api/frontend`.
+  The `/api/frontend` endpoint of your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or [Unleash Edge](/unleash-edge) instance (`https://<your-edge-instance>/api/frontend`).
 </ParamField>
 
 <ParamField path="clientKey" type="string" required={true}>
@@ -76,7 +76,7 @@ The following options are available when initializing the SDK. Pass them as the 
 </ParamField>
 
 <ParamField path="context" type="object" default="{}">
-  The initial [Unleash context](/concepts/unleash-context).
+  The initial [Unleash context](/concepts/unleash-context). The SDK automatically sets `appName`, `environment`, and a persistent `sessionId` on the context, so gradual rollouts and session-based targeting work without additional configuration.
 </ParamField>
 
 <ParamField path="bootstrap" type="array" default="[]">
@@ -96,11 +96,7 @@ The following options are available when initializing the SDK. Pass them as the 
 </ParamField>
 
 <ParamField path="impressionDataAll" type="boolean" default="false">
-  If `true`, the SDK emits impression events for all `isEnabled` and `getVariant` calls, including flags that are disabled.
-</ParamField>
-
-<ParamField path="environment" type="string" default="default">
-  Sets the `environment` field in the Unleash context. This does not affect which Unleash environment the SDK connects to.
+  If `true`, the SDK emits impression events for all `isEnabled` and `getVariant` calls, including flags that are disabled or non-existent.
 </ParamField>
 
 ## Initialization
@@ -129,15 +125,19 @@ export default function App() {
 
 Frontend SDKs communicate with Unleash or [Unleash Edge](/unleash-edge) through the [Frontend API](/api) and require a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). Unlike backend SDKs, frontend SDKs do not perform the flag evaluation locally. Instead, they fetch all enabled feature flags for a given [Unleash context](/concepts/unleash-context). The flag evaluation happens either in [Unleash Edge](/unleash-edge), or in the Unleash server, when using the [Frontend API](/api) directly.
 
-To connect to Unleash using the [Frontend API](/api#frontend-api), set `url` to `<your-unleash-instance>/api/frontend`. To connect through [Unleash Edge](/unleash-edge), set `url` to your Edge instance URL.
+Set `url` to the `/api/frontend` endpoint of either your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or your Edge instance (`https://<your-edge-instance>/api/frontend`). The URL pattern is the same in both cases. Use [Unleash Edge](/unleash-edge) when you need lower latency or higher availability.
 
-You must use the frontend token as the `clientKey`, see [API tokens](/concepts/api-tokens-and-client-keys) for how to generate a token.
+Set `clientKey` to a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). See [API tokens](/concepts/api-tokens-and-client-keys) for how to generate one.
 
 ### Check if the SDK is ready
 
-When `FlagProvider` mounts, the SDK fetches flag configuration from Unleash. Until that first fetch completes, all hooks return default values (`false` for `useFlag`, `{ name: "disabled", enabled: false }` for `useVariant`).
+The SDK returns default values (`false` for `useFlag`, `{ name: "disabled", enabled: false }` for `useVariant`) until it loads flag data from one of these sources, checked in this order:
 
-Use the `useFlagsStatus` hook to check whether the SDK has loaded flag data:
+1. **Bootstrap data**: if provided and `bootstrapOverride` is `true` (or the cache is empty), the SDK uses bootstrap values immediately and `ready` fires before the first network request.
+2. **Cached data**: on subsequent launches, the SDK loads previously cached flag data from `AsyncStorage`. Flags are available, but `ready` does not fire until the SDK also completes a network request.
+3. **Network fetch**: the SDK fetches flag configuration from Unleash. The `ready` event fires on the first successful response (if it has not already fired from bootstrap).
+
+Use the `useFlagsStatus` hook to check whether the SDK has completed its first network fetch:
 
 ```tsx
 import { useFlagsStatus } from '@unleash/unleash-react-native-sdk';
@@ -157,9 +157,9 @@ function MyApp() {
 }
 ```
 
-`flagsReady` requires a successful network request before it becomes `true`, even if cached data exists from a previous session. This means there is a brief loading state on every app launch when you gate rendering on `flagsReady`.
+Because `flagsReady` requires a successful network request, there is a brief loading state on every app launch when you gate rendering on `flagsReady`, even if cached data exists from a previous session.
 
-If you need instant startup without a loading state, use [bootstrapping](#bootstrapping) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
+If you need instant startup without a loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
 
 ### Defer client start
 
@@ -391,14 +391,15 @@ function MyComponent() {
 
 | Event | Description |
 |---|---|
-| `ready` | The SDK completed its first successful flag fetch. |
+| `initialized` | The SDK finished loading bootstrap or cached data from storage. Fires before `ready`. |
+| `ready` | The SDK completed its first successful flag fetch, or bootstrap data was applied. |
 | `update` | The SDK received updated flag configuration from the server. |
 | `error` | A network request or initialization error occurred. |
 | `impression` | A flag was evaluated with [impression data](/concepts/impression-data) enabled. |
 | `recovered` | The SDK recovered from a previous error state. |
 | `sent` | The SDK successfully sent usage metrics to Unleash. |
 
-If you need to capture events that fire during initialization (such as `ready`), use the [deferred client start](#defer-client-start) pattern to attach listeners before the client starts.
+If you need to capture events that fire during initialization (such as `initialized` or `ready`), use the [deferred client start](#defer-client-start) pattern to attach listeners before the client starts.
 
 ## Unit testing
 
@@ -465,7 +466,7 @@ jest.mock('@unleash/unleash-react-native-sdk', () => ({
 
 If the SDK does not load flags on startup:
 
-- Verify that `url` points to your Unleash Edge instance or Frontend API endpoint (`<your-unleash-instance>/api/frontend`). The URL must include the full path.
+- Verify that `url` points to the `/api/frontend` endpoint of your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or Edge instance (`https://<your-edge-instance>/api/frontend`). The URL must include the full path.
 - Verify that `clientKey` is a valid [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). A 401 response means the token is invalid or does not have access to the requested environment.
 - Check that your device or simulator has network access to your Unleash instance.
 
