@@ -96,7 +96,7 @@ The following options are available when initializing the SDK. Pass them as the 
 </ParamField>
 
 <ParamField path="impressionDataAll" type="boolean" default="false">
-  If `true`, the SDK emits impression events for all `isEnabled` and `getVariant` calls, including flags that are disabled.
+  If `true`, the SDK emits impression events for all `isEnabled` and `getVariant` calls, including flags that are disabled or non-existent.
 </ParamField>
 
 <ParamField path="environment" type="string" default="default">
@@ -303,7 +303,7 @@ const config = {
       variant: {
         name: 'blue',
         enabled: true,
-        feature_enabled: true,
+        featureEnabled: true,
       },
     },
   ],
@@ -410,7 +410,7 @@ import { FlagProvider } from '@unleash/unleash-react-native-sdk';
 import { MyComponent } from './MyComponent';
 
 const testConfig = {
-  url: 'http://localhost', // not used during tests
+  url: 'http://example.com', // not used during tests
   clientKey: 'test-token',
   appName: 'test-app',
   disableRefresh: true,
@@ -449,7 +449,7 @@ jest.mock('@unleash/unleash-react-native-sdk', () => ({
   useVariant: jest.fn().mockReturnValue({
     name: 'blue',
     enabled: true,
-    feature_enabled: true,
+    featureEnabled: true,
   }),
   useFlagsStatus: jest.fn().mockReturnValue({
     flagsReady: true,
@@ -484,7 +484,7 @@ if (flagsError) {
 If `useFlag` always returns `false` or `useVariant` always returns `{ name: "disabled", enabled: false }`:
 
 - Confirm that `flagsReady` is `true`. Until the SDK completes its first fetch, all hooks return default values.
-- Confirm that the flag is enabled in the correct Unleash environment and that your frontend token has access to that environment.
+- Confirm that the flag is enabled in the correct Unleash environment and that your frontend token has access to that environment and project.
 - Check the [Unleash context](/concepts/unleash-context). If your flag uses a gradual rollout or user-based targeting, the `userId` or `sessionId` must match the targeting rules configured in Unleash. Use [Playground](/concepts/playground) for testing different context values.
 
 </Accordion>
