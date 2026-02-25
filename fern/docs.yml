@@ -783,6 +783,9 @@ navigation:
         skip-slug: true
         collapsed: true
         contents:
+          - page: Demo walkthrough
+            path: pages/guides/demo-walkthrough.mdx
+            slug: demo-walkthrough
           - page: Create and configure a feature flag
             path: pages/guides/how-to-create-feature-flags.mdx
             slug: how-to-create-feature-flags

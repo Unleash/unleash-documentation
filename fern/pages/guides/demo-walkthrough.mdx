@@ -1,0 +1,143 @@
+---
+title: Demo walkthrough
+slug: demo-walkthrough
+description: Follow along in the Unleash demo instance to learn how to create and control feature flags, from simple toggles to targeted rollouts.
+---
+
+This walkthrough is designed to follow along in the [Unleash demo instance](https://app.unleash-hosted.com/demo). It takes you from a simple on/off flag to targeted rollouts for specific users and percentages, using pre-configured feature flags in the demo project.
+
+<Note>
+The demo instance is a shared environment with limited features. For the best experience with the full feature set and your own app, we recommend that you [start a free 14-day Unleash Enterprise trial](https://www.getunleash.io/plans/enterprise-payg) instead.
+</Note>
+
+
+## Open the demo app
+
+Before you begin, open the demo app in a separate tab. You'll use it to see your changes take effect in real time.
+
+
+<Card
+  title="Open the demo app"
+  src="/assets/demo-qr.svg"
+  imagePosition="left"
+  imageHeight="200px"
+>
+  Scan the QR code with your phone or open [hello.unleash.run](https://hello.unleash.run) in another tab. For the best experience, keep the demo app and the Unleash instance side by side.
+</Card>
+
+## Enable a feature flag
+
+[Feature flags](/concepts/feature-flags) are the central concept of Unleash. They let you turn features on or off for your users without redeploying code.
+
+| Flag | What you'll see |
+|------|-----------------|
+| `demoApp.step1` | An expenses graph appears on the demo page when the flag is enabled, and disappears when it's disabled. |
+
+<Steps>
+  <Step>
+    In the sidebar, go to **Projects > Demo Application** and find the feature flag `demoApp.step1`.
+  </Step>
+  <Step>
+    Toggle the `dev` [environment](/concepts/environments) switch to **on** to enable the flag for everyone in development.
+  </Step>
+  <Step>
+    Look at the demo app to see your change take effect.
+  </Step>
+</Steps>
+
+<Tip>
+Feature flags are always evaluated per environment. Enabling a flag in `dev` does not affect `production`.
+</Tip>
+
+## Enable a flag for a specific user
+
+[Activation strategies](/concepts/activation-strategies) give you fine-grained control over when and for whom a feature is enabled. Here, you'll use a constraint to target a specific user by their `userId`.
+
+| Flag | What you'll see |
+|------|-----------------|
+| `demoApp.step2` | The app's background color changes on the demo page for the `userId` you specify. |
+
+<Steps>
+  <Step>
+    Open the feature flag `demoApp.step2`.
+  </Step>
+  <Step>
+    In the `dev` environment, click **Add strategy > Default strategy > Configure**. In the **Targeting** tab, go to the **Constraints** section and click **Add constraint**.
+  </Step>
+  <Step>
+    Set the context field to `userId`, the operator to **is one of**, then click **+ Add values**. Find your user ID on the demo page (displayed as **userId: xxxxxx**), enter it in the input field, and click **Add**.
+  </Step>
+  <Step>
+    Click **Save strategy**, then toggle the environment on.
+  </Step>
+  <Step>
+    Confirm the demo page shows the background color change for your user. Toggle the environment off to hide it again.
+  </Step>
+</Steps>
+
+<Tip>
+Multiple [strategies](/concepts/activation-strategies) on the same flag use OR logic: the flag activates if **any** strategy evaluates to true. [Constraints](/concepts/activation-strategies#constraints) within a single strategy use AND logic: **all** constraints must be met for that strategy to activate.
+</Tip>
+
+## Roll out to a percentage of users
+
+Use a gradual rollout to safely expose a feature to a portion of your user base.
+
+| Flag | What you'll see |
+|------|-----------------|
+| `demoApp.step3` | A chatbot button appears for a percentage of users. Because [stickiness](/concepts/stickiness) is based on `userId`, the same user always gets the same result. |
+
+<Steps>
+  <Step>
+    Open the feature flag `demoApp.step3`.
+  </Step>
+  <Step>
+    In the `dev` environment, click **Add strategy > Default strategy > Configure**. Set the rollout percentage to **25%** using the slider.
+  </Step>
+  <Step>
+    Leave stickiness as **default** to ensure each user consistently sees the same experience.
+  </Step>
+  <Step>
+    Click **Save strategy**, then toggle the environment on.
+  </Step>
+  <Step>
+    Check the demo page. Depending on your `userId`, you may or may not see the chatbot button (this is expected). Increase the percentage to 100% to guarantee you see it.
+  </Step>
+</Steps>
+
+<Tip>
+Gradual rollout uses a hash of the `userId` (or `sessionId`, or a random value) to decide whether a user falls within the rollout percentage. This means the same user always gets the same experience, even across sessions.
+</Tip>
+
+## Change the UI with variant payloads
+
+[Variants](/concepts/strategy-variants) extend what a feature flag returns beyond a simple on/off. Each variant has a name, a weight (how often it's shown), and an optional payload.
+
+| Flag | What you'll see |
+|------|-----------------|
+| `demoApp.step4` | Different users see a different accent color on the demo page, depending on which variant they are assigned. |
+
+<Steps>
+  <Step>
+    Open `demoApp.step4`.
+  </Step>
+  <Step>
+    In the `dev` environment, click **Add strategy > Default strategy > Configure**.
+  </Step>
+  <Step>
+    Go to the **Variants** tab and click **Add variant**. Give the variant a name, set the payload type to `String`, and enter a hex color value as the payload, for example `#6366f1`.
+  </Step>
+  <Step>
+    Click **Add variant** again, give it a different name, and enter a different hex color, for example `#22c55e`. The weights automatically split to 50/50.
+  </Step>
+  <Step>
+    Click **Save strategy**.
+  </Step>
+  <Step>
+    Check the demo page. The accent color reflects the hex value from whichever variant your `userId` was assigned. Open the demo in a different browser or incognito window to see the other variant's color.
+  </Step>
+</Steps>
+
+<Tip>
+[Stickiness](/concepts/stickiness) ensures the same user always sees the same variant, providing a consistent experience across sessions.
+</Tip>
