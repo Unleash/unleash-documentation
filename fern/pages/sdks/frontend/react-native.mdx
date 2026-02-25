@@ -63,7 +63,7 @@ The following options are available when initializing the SDK. Pass them as the 
   If `true`, the SDK does not poll for updates after the initial fetch.
 </ParamField>
 
-<ParamField path="metricsInterval" type="number" default="30">
+<ParamField path="metricsInterval" type="number" default="60">
   How often (in seconds) the SDK sends usage metrics to Unleash.
 </ParamField>
 
@@ -318,7 +318,7 @@ When `bootstrapOverride` is `true`, bootstrap data replaces any flag configurati
 The SDK caches data in `AsyncStorage` under two keys, both prefixed with the `appName` from your config:
 
 - `{appName}:repo`: the flag data returned by Unleash.
-- `{appName}:sessionId`: a persistent session identifier used for [gradual rollouts](/concepts/gradual-rollout), [constraints](/concepts/strategy-constraints), and [stickiness](/concepts/stickiness).
+- `{appName}:sessionId`: a persistent session identifier used for [gradual rollouts](/concepts/gradual-rollout), [constraints](/concepts/activation-strategies#constraints), and [stickiness](/concepts/stickiness).
 
 On each app launch, the SDK reads both values from `AsyncStorage` before making a network request. The session ID is generated once and persists across app restarts, which keeps flag evaluation consistent across sessions.
 
