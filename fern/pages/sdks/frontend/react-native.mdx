@@ -159,7 +159,7 @@ function MyApp() {
 
 Because `flagsReady` requires a successful network request, there is a brief loading state on every app launch when you gate rendering on `flagsReady`, even if cached data exists from a previous session.
 
-If you need instant startup without a loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
+If you need instant startup without a loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and fetches the latest flag data from Unleash in the background.
 
 ### Defer client start
 
@@ -222,9 +222,9 @@ import { useVariant } from '@unleash/unleash-react-native-sdk';
 function MyComponent() {
   const variant = useVariant('my-experiment');
 
-  if (variant.enabled && variant.name === 'blue') {
+  if (variant.name === 'blue') {
     return <BlueVariant />;
-  } else if (variant.enabled && variant.name === 'green') {
+  } else if (variant.name === 'green') {
     return <GreenVariant />;
   }
   return <DefaultVariant />;
@@ -315,14 +315,14 @@ When `bootstrapOverride` is `true`, bootstrap data replaces any flag configurati
 
 ## Local caching and offline behavior
 
-The SDK caches flag configuration in `AsyncStorage` under two keys, both prefixed with the `appName` from your config:
+The SDK caches data in `AsyncStorage` under two keys, both prefixed with the `appName` from your config:
 
-- `{appName}:repo`: the flag configuration returned by Unleash.
-- `{appName}:sessionId`: the persistent session identifier used for gradual rollouts.
+- `{appName}:repo`: the flag data returned by Unleash.
+- `{appName}:sessionId`: a persistent session identifier used for [gradual rollouts](/concepts/gradual-rollout), [constraints](/concepts/strategy-constraints), and [stickiness](/concepts/stickiness).
 
-On each app launch, the SDK reads both values from `AsyncStorage` before making a network request. The session ID persists across app restarts, which keeps flag evaluation consistent for anonymous users across sessions.
+On each app launch, the SDK reads both values from `AsyncStorage` before making a network request. The session ID is generated once and persists across app restarts, which keeps flag evaluation consistent across sessions.
 
-The cache is updated after every successful network fetch.
+The flag data cache is updated after every successful network fetch.
 
 ### What happens when Unleash is unreachable
 
@@ -484,16 +484,16 @@ if (flagsError) {
 
 If `useFlag` always returns `false` or `useVariant` always returns `{ name: "disabled", enabled: false }`:
 
-- Confirm that `flagsReady` is `true`. Until the SDK completes its first fetch, all hooks return default values.
+- Confirm that `flagsReady` is `true`. Until the SDK loads flag data from bootstrap, cached storage, or a network fetch, all hooks return default values.
 - Confirm that the flag is enabled in the correct Unleash environment and that your frontend token has access to that environment and project.
-- Check the [Unleash context](/concepts/unleash-context). If your flag uses a gradual rollout or user-based targeting, the `userId` or `sessionId` must match the targeting rules configured in Unleash. Use [Playground](/concepts/playground) for testing different context values.
+- Check the [Unleash context](/concepts/unleash-context). If your flag uses a gradual rollout or user-based targeting, the `userId` or `sessionId` must match the targeting rules configured in Unleash. If your flag uses [custom stickiness](/concepts/stickiness#custom-stickiness), you must set that value in the context, otherwise the flag evaluates to `false`. Use [Playground](/concepts/playground) for testing different context values.
 
 </Accordion>
 <Accordion title="Loading state on every app launch">
 
 `flagsReady` requires a successful network fetch before it becomes `true`, even when cached data exists from a previous session. If you gate rendering on `flagsReady`, there is a brief loading state on every launch.
 
-To eliminate the loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and updates it in the background once the network request completes.
+To eliminate the loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and fetches the latest flag data from Unleash in the background.
 
 </Accordion>
 </AccordionGroup>
