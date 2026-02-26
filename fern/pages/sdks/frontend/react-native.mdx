@@ -1,0 +1,499 @@
+---
+title: React Native SDK
+description: Integrate feature flags in your React Native and Expo applications using the Unleash React Native SDK
+og:site_name: Unleash
+og:title: React Native SDK
+keywords: React Native SDK, Expo SDK, feature flags, mobile development, React hooks
+max-toc-depth: 3
+---
+
+The [Unleash React Native SDK](https://github.com/Unleash/unleash-react-native-sdk) lets you evaluate feature flags in your React Native and Expo applications. It wraps the [React SDK](/sdks/react) and handles two React Native-specific requirements automatically: persistent storage using `AsyncStorage` instead of `localStorage`, and a polyfill for `crypto.getRandomValues`.
+
+You can use this SDK with [Unleash Enterprise](https://www.getunleash.io/pricing) or [Unleash Open Source](https://github.com/Unleash/unleash).
+
+## Requirements
+
+- React Native 0.81 or later (or equivalent Expo SDK version)
+- React 18 or later
+
+## Installation
+
+Install the SDK and its required peer dependency, `unleash-proxy-client`.
+
+<Tabs>
+<Tab title="npm">
+```bash
+npm install @unleash/unleash-react-native-sdk unleash-proxy-client
+```
+</Tab>
+<Tab title="yarn">
+```bash
+yarn add @unleash/unleash-react-native-sdk unleash-proxy-client
+```
+</Tab>
+<Tab title="Expo">
+```bash
+npx expo install @unleash/unleash-react-native-sdk unleash-proxy-client
+```
+Use `npx expo install` to select dependency versions compatible with your Expo SDK version.
+</Tab>
+</Tabs>
+
+## Configuration
+
+The following options are available when initializing the SDK. Pass them as the `config` prop on `FlagProvider`.
+
+<ParamField path="url" type="string" required={true}>
+  The `/api/frontend` endpoint of your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or [Unleash Edge](/unleash-edge) instance (`https://<your-edge-instance>/api/frontend`).
+</ParamField>
+
+<ParamField path="clientKey" type="string" required={true}>
+  A [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens) from your Unleash instance.
+</ParamField>
+
+<ParamField path="appName" type="string" required={true}>
+  The name of your application. Used in metrics, included in the Unleash context, and used as the prefix for local cache keys.
+</ParamField>
+
+<ParamField path="refreshInterval" type="number" default="30">
+  How often (in seconds) the SDK polls for updated flag configuration. Set to `0` to disable polling after the initial fetch.
+</ParamField>
+
+<ParamField path="disableRefresh" type="boolean" default="false">
+  If `true`, the SDK does not poll for updates after the initial fetch.
+</ParamField>
+
+<ParamField path="metricsInterval" type="number" default="60">
+  How often (in seconds) the SDK sends usage metrics to Unleash.
+</ParamField>
+
+<ParamField path="disableMetrics" type="boolean" default="false">
+  If `true`, the SDK does not send usage metrics.
+</ParamField>
+
+<ParamField path="storageProvider" type="IStorageProvider" default="AsyncStorageProvider">
+  The storage backend for cached flag configuration. Defaults to `AsyncStorageProvider`, which uses `@react-native-async-storage/async-storage`. You can provide a custom implementation that satisfies the `IStorageProvider` interface.
+</ParamField>
+
+<ParamField path="context" type="object" default="{}">
+  The initial [Unleash context](/concepts/unleash-context). The SDK automatically sets `appName`, `environment`, and a persistent `sessionId` on the context, so gradual rollouts and session-based targeting work without additional configuration.
+</ParamField>
+
+<ParamField path="bootstrap" type="array" default="[]">
+  Initial flag configuration to use before the SDK connects to Unleash. See [bootstrap flag data](#bootstrap-flag-data).
+</ParamField>
+
+<ParamField path="bootstrapOverride" type="boolean" default="true">
+  If `true`, bootstrap data overrides any cached flag configuration. If `false`, bootstrap data is only used when the cache is empty.
+</ParamField>
+
+<ParamField path="headerName" type="string" default="Authorization">
+  The header name used to send the `clientKey` to Unleash.
+</ParamField>
+
+<ParamField path="customHeaders" type="object" default="{}">
+  Additional HTTP headers to include in all requests to Unleash.
+</ParamField>
+
+<ParamField path="impressionDataAll" type="boolean" default="false">
+  If `true`, the SDK emits impression events for all `isEnabled` and `getVariant` calls, including flags that are disabled or non-existent.
+</ParamField>
+
+## Initialization
+
+Wrap your application in `FlagProvider` in your entry point file. All components inside the provider can access feature flags through hooks.
+
+```tsx
+import { FlagProvider } from '@unleash/unleash-react-native-sdk';
+
+const config = {
+  url: 'https://<your-unleash-instance>/api/frontend',
+  clientKey: '<your-frontend-token>',
+  appName: 'my-app',
+};
+
+export default function App() {
+  return (
+    <FlagProvider config={config}>
+      <MyApp />
+    </FlagProvider>
+  );
+}
+```
+
+### Connection options
+
+Frontend SDKs communicate with Unleash or [Unleash Edge](/unleash-edge) through the [Frontend API](/api) and require a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). Unlike backend SDKs, frontend SDKs do not perform the flag evaluation locally. Instead, they fetch all enabled feature flags for a given [Unleash context](/concepts/unleash-context). The flag evaluation happens either in [Unleash Edge](/unleash-edge), or in the Unleash server, when using the [Frontend API](/api) directly.
+
+Set `url` to the `/api/frontend` endpoint of either your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or your Edge instance (`https://<your-edge-instance>/api/frontend`). The URL pattern is the same in both cases. Use [Unleash Edge](/unleash-edge) when you need lower latency or higher availability.
+
+Set `clientKey` to a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). See [API tokens](/concepts/api-tokens-and-client-keys) for how to generate one.
+
+### Check if the SDK is ready
+
+The SDK returns default values (`false` for `useFlag`, `{ name: "disabled", enabled: false }` for `useVariant`) until it loads flag data from one of these sources, checked in this order:
+
+1. **Bootstrap data**: if provided and `bootstrapOverride` is `true` (or the cache is empty), the SDK uses bootstrap values immediately and `ready` fires before the first network request.
+2. **Cached data**: on subsequent launches, the SDK loads previously cached flag data from `AsyncStorage`. Flags are available, but `ready` does not fire until the SDK also completes a network request.
+3. **Network fetch**: the SDK fetches flag configuration from Unleash. The `ready` event fires on the first successful response (if it has not already fired from bootstrap).
+
+Use the `useFlagsStatus` hook to check whether the SDK has completed its first network fetch:
+
+```tsx
+import { useFlagsStatus } from '@unleash/unleash-react-native-sdk';
+
+function MyApp() {
+  const { flagsReady, flagsError } = useFlagsStatus();
+
+  if (flagsError) {
+    return <FallbackView />;
+  }
+
+  if (!flagsReady) {
+    return <LoadingSpinner />;
+  }
+
+  return <MainContent />;
+}
+```
+
+Because `flagsReady` requires a successful network request, there is a brief loading state on every app launch when you gate rendering on `flagsReady`, even if cached data exists from a previous session.
+
+If you need instant startup without a loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and fetches the latest flag data from Unleash in the background.
+
+### Defer client start
+
+By default, `FlagProvider` starts polling immediately when the component mounts. To defer this, pass a pre-created client with `startClient` set to `false` and call `start()` when you are ready:
+
+```tsx
+import { FlagProvider, UnleashClient } from '@unleash/unleash-react-native-sdk';
+import { useEffect } from 'react';
+
+const client = new UnleashClient({
+  url: 'https://<your-unleash-instance>/api/frontend',
+  clientKey: '<your-frontend-token>',
+  appName: 'my-app',
+});
+
+function MyApp() {
+  useEffect(() => {
+    async function init() {
+      await doSetup();
+      client.start();
+    }
+    init();
+  }, []);
+
+  return (
+    <FlagProvider unleashClient={client} startClient={false}>
+      <App />
+    </FlagProvider>
+  );
+}
+```
+
+This pattern is also useful when you need to attach [event listeners](#events) before the SDK starts.
+
+## Check flags
+
+### Check if a flag is enabled
+
+Use the `useFlag` hook to check whether a feature flag is enabled:
+
+```tsx
+import { useFlag } from '@unleash/unleash-react-native-sdk';
+
+function MyComponent() {
+  const isEnabled = useFlag('my-feature');
+
+  return isEnabled ? <NewFeature /> : <OldFeature />;
+}
+```
+
+If the SDK has not yet loaded flag configuration, `useFlag` returns `false`. The component re-renders automatically when the SDK receives flag data.
+
+### Check a flag's variant
+
+Use the `useVariant` hook to get the variant assigned to a feature flag:
+
+```tsx
+import { useVariant } from '@unleash/unleash-react-native-sdk';
+
+function MyComponent() {
+  const variant = useVariant('my-experiment');
+
+  if (variant.name === 'blue') {
+    return <BlueVariant />;
+  } else if (variant.name === 'green') {
+    return <GreenVariant />;
+  }
+  return <DefaultVariant />;
+}
+```
+
+If the flag is disabled or has no variants, `useVariant` returns `{ name: "disabled", enabled: false }`.
+
+## Unleash context
+
+The [Unleash context](/concepts/unleash-context) determines how flags are evaluated for a given user or session. You can set context fields at initialization and update them at runtime.
+
+### Set context at initialization
+
+Pass the context as part of the `config` object:
+
+```tsx
+const config = {
+  url: 'https://<your-unleash-instance>/api/frontend',
+  clientKey: '<your-frontend-token>',
+  appName: 'my-app',
+  context: {
+    userId: 'user-123',
+    properties: {
+      plan: 'enterprise',
+    },
+  },
+};
+```
+
+### Update context at runtime
+
+Use the `useUnleashContext` hook to update the context after initialization, for example when a user logs in:
+
+```tsx
+import { useUnleashContext, useFlag } from '@unleash/unleash-react-native-sdk';
+import { useEffect } from 'react';
+
+function MyComponent({ userId }) {
+  const updateContext = useUnleashContext();
+  const isEnabled = useFlag('my-feature');
+
+  useEffect(() => {
+    updateContext({ userId });
+  }, [userId]);
+
+  return isEnabled ? <NewFeature /> : <OldFeature />;
+}
+```
+
+`updateContext` triggers a new flag evaluation request with the updated context. To wait for the updated flags before taking action:
+
+```tsx
+useEffect(() => {
+  async function run() {
+    await updateContext({ userId });
+    // Flags have been re-evaluated with the new userId
+  }
+  run();
+}, [userId]);
+```
+
+## Bootstrap flag data
+
+Bootstrapping lets you provide initial flag values that the SDK uses immediately, before it connects to Unleash. This is useful for guaranteeing a specific flag state at app startup or providing fallback values for offline scenarios.
+
+```tsx
+const config = {
+  url: 'https://<your-unleash-instance>/api/frontend',
+  clientKey: '<your-frontend-token>',
+  appName: 'my-app',
+  bootstrap: [
+    {
+      name: 'my-feature',
+      enabled: true,
+      variant: {
+        name: 'blue',
+        enabled: true,
+        featureEnabled: true,
+      },
+    },
+  ],
+  bootstrapOverride: false,
+};
+```
+
+When `bootstrapOverride` is `true`, bootstrap data replaces any flag configuration already cached in `AsyncStorage`. When `bootstrapOverride` is `false`, bootstrap data is only used when the cache is empty.
+
+## Local caching and offline behavior
+
+The SDK caches data in `AsyncStorage` under two keys, both prefixed with the `appName` from your config:
+
+- `{appName}:repo`: the flag data returned by Unleash.
+- `{appName}:sessionId`: a persistent session identifier used for [gradual rollouts](/concepts/activation-strategies#gradual-rollout, [constraints](/concepts/activation-strategies#constraints), and [stickiness](/concepts/stickiness).
+
+On each app launch, the SDK reads both values from `AsyncStorage` before making a network request. The session ID is generated once and persists across app restarts, which keeps flag evaluation consistent across sessions.
+
+The flag data cache is updated after every successful network fetch.
+
+### What happens when Unleash is unreachable
+
+If the SDK cannot connect to Unleash on startup and no bootstrapped values are configured, `useFlag` returns `false` for all flags and `useVariant` returns `{ name: "disabled", enabled: false }`. The SDK does not have explicit retry logic. It continues to poll on the regular `refreshInterval` and returns to a healthy state on the next successful response.
+
+If bootstrapped values are configured, the SDK uses those values until it can reach Unleash.
+
+## App lifecycle
+
+The SDK does not automatically detect app lifecycle changes. When the app is backgrounded, JavaScript timers pause. When the app returns to the foreground, any overdue poll fires, but the timing is not guaranteed.
+
+To fetch fresh flags every time the app comes to the foreground, use `AppState` from React Native:
+
+```tsx
+import { useUnleashClient } from '@unleash/unleash-react-native-sdk';
+import { useEffect } from 'react';
+import { AppState } from 'react-native';
+
+function AppStateRefresh() {
+  const client = useUnleashClient();
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        client.updateToggles();
+      }
+    });
+    return () => subscription.remove();
+  }, [client]);
+
+  return null;
+}
+```
+
+Render `<AppStateRefresh />` inside `FlagProvider` alongside your app's root component.
+
+## Events
+
+Use the `useUnleashClient` hook to access the underlying client and attach event listeners:
+
+```tsx
+import { useUnleashClient } from '@unleash/unleash-react-native-sdk';
+import { useEffect } from 'react';
+
+function MyComponent() {
+  const client = useUnleashClient();
+
+  useEffect(() => {
+    const handleReady = () => {
+      console.log('Unleash SDK is ready');
+    };
+    const handleError = (error) => {
+      console.error('Unleash error:', error);
+    };
+
+    client.on('ready', handleReady);
+    client.on('error', handleError);
+
+    return () => {
+      client.off('ready', handleReady);
+      client.off('error', handleError);
+    };
+  }, [client]);
+}
+```
+
+| Event | Description |
+|---|---|
+| `initialized` | The SDK finished loading bootstrap or cached data from storage. Fires before `ready`. |
+| `ready` | The SDK completed its first successful flag fetch, or bootstrap data was applied. |
+| `update` | The SDK received updated flag configuration from the server. |
+| `error` | A network request or initialization error occurred. |
+| `impression` | A flag was evaluated with [impression data](/concepts/impression-data) enabled. |
+| `recovered` | The SDK recovered from a previous error state. |
+| `sent` | The SDK successfully sent usage metrics to Unleash. |
+
+If you need to capture events that fire during initialization (such as `initialized` or `ready`), use the [deferred client start](#defer-client-start) pattern to attach listeners before the client starts.
+
+## Unit testing
+
+To test components that use feature flags, wrap them in a `FlagProvider` with bootstrapped values. This avoids network requests during tests and gives you full control over flag state.
+
+```tsx
+import { render, screen } from '@testing-library/react-native';
+import { FlagProvider } from '@unleash/unleash-react-native-sdk';
+import { MyComponent } from './MyComponent';
+
+const testConfig = {
+  url: 'http://example.com', // not used during tests
+  clientKey: 'test-token',
+  appName: 'test-app',
+  disableRefresh: true,
+  disableMetrics: true,
+  bootstrap: [
+    {
+      name: 'my-feature',
+      enabled: true,
+      variant: {
+        name: 'disabled',
+        enabled: false,
+        feature_enabled: true,
+      },
+    },
+  ],
+};
+
+test('renders the new feature when the flag is enabled', async () => {
+  render(
+    <FlagProvider config={testConfig} startClient={false}>
+      <MyComponent />
+    </FlagProvider>
+  );
+
+  expect(await screen.findByText('New feature')).toBeTruthy();
+});
+```
+
+Set `disableRefresh` and `disableMetrics` to `true` in tests to prevent the SDK from making network requests. Use `startClient={false}` to prevent polling.
+
+Alternatively, you can mock the hooks directly in your test framework:
+
+```tsx
+jest.mock('@unleash/unleash-react-native-sdk', () => ({
+  useFlag: jest.fn().mockReturnValue(true),
+  useVariant: jest.fn().mockReturnValue({
+    name: 'blue',
+    enabled: true,
+    featureEnabled: true,
+  }),
+  useFlagsStatus: jest.fn().mockReturnValue({
+    flagsReady: true,
+    flagsError: null,
+  }),
+}));
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="The SDK is not connecting to Unleash">
+
+If the SDK does not load flags on startup:
+
+- Verify that `url` points to the `/api/frontend` endpoint of your Unleash instance (`https://<your-unleash-instance>/api/frontend`) or Edge instance (`https://<your-edge-instance>/api/frontend`). The URL must include the full path.
+- Verify that `clientKey` is a valid [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). A 401 response means the token is invalid or does not have access to the requested environment.
+- Check that your device or simulator has network access to your Unleash instance.
+
+Use `useFlagsStatus` to surface connection errors:
+
+```tsx
+const { flagsReady, flagsError } = useFlagsStatus();
+if (flagsError) {
+  console.log('Unleash connection error:', flagsError);
+}
+```
+
+</Accordion>
+<Accordion title="Flags always return false or the disabled variant">
+
+If `useFlag` always returns `false` or `useVariant` always returns `{ name: "disabled", enabled: false }`:
+
+- Confirm that `flagsReady` is `true`. Until the SDK loads flag data from bootstrap, cached storage, or a network fetch, all hooks return default values.
+- Confirm that the flag is enabled in the correct Unleash environment and that your frontend token has access to that environment and project.
+- Check the [Unleash context](/concepts/unleash-context). If your flag uses a gradual rollout or user-based targeting, the `userId` or `sessionId` must match the targeting rules configured in Unleash. If your flag uses [custom stickiness](/concepts/stickiness#custom-stickiness), you must set that value in the context, otherwise the flag evaluates to `false`. Use [Playground](/concepts/playground) for testing different context values.
+
+</Accordion>
+<Accordion title="Loading state on every app launch">
+
+`flagsReady` requires a successful network fetch before it becomes `true`, even when cached data exists from a previous session. If you gate rendering on `flagsReady`, there is a brief loading state on every launch.
+
+To eliminate the loading state, use [bootstrapping](#bootstrap-flag-data) to provide initial flag values. The SDK uses bootstrap data immediately and fetches the latest flag data from Unleash in the background.
+
+</Accordion>
+</AccordionGroup>

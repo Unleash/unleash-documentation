@@ -687,6 +687,8 @@ navigation:
         contents:
           - page: React
             path: pages/sdks/frontend/react.mdx
+          - page: React Native
+            path: pages/sdks/frontend/react-native.mdx
           - page: JavaScript
             path: pages/sdks/frontend/javascript-browser.mdx
             slug: javascript-browser
@@ -734,8 +736,6 @@ navigation:
             href: https://gitlab.com/minds/unleash-client-php
           - link: PHP Symfony
             href: https://github.com/Stogon/unleash-bundle
-          - link: React Native / Expo
-            href: https://github.com/nunogois/unleash-react-native
           - link: Solid
             href: https://github.com/nunogois/proxy-client-solid
 
