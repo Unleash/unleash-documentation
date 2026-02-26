@@ -7,7 +7,7 @@ description: Follow along in the Unleash demo instance to learn how to create an
 This walkthrough is designed to follow along in the [Unleash demo instance](https://app.unleash-hosted.com/demo). It takes you from a simple on/off flag to targeted rollouts for specific users and percentages, using pre-configured feature flags in the demo project.
 
 <Note>
-The demo instance is a shared environment with limited features. For the best experience with the full feature set and your own app, we recommend that you [start a free 14-day Unleash Enterprise trial](https://www.getunleash.io/plans/enterprise-payg) instead.
+The demo instance is a **shared** environment with limited features. For the best experience with the full feature set and your own app, we recommend that you [start a free 14-day Unleash Enterprise trial](https://www.getunleash.io/plans/enterprise-payg) instead.
 </Note>
 
 
@@ -71,7 +71,7 @@ Feature flags are always evaluated per environment. Enabling a flag in `dev` doe
     Click **Save strategy**, then toggle the environment on.
   </Step>
   <Step>
-    Confirm the demo page shows the background color change for your user. Toggle the environment off to hide it again.
+    Confirm the demo page shows the background color change for your user. Toggle the environment off to revert the color change.
   </Step>
 </Steps>
 
@@ -106,7 +106,7 @@ Use a gradual rollout to safely expose a feature to a portion of your user base.
 </Steps>
 
 <Tip>
-Gradual rollout uses a hash of the `userId` (or `sessionId`, or a random value) to decide whether a user falls within the rollout percentage. This means the same user always gets the same experience, even across sessions.
+Gradual rollout relies on [stickiness](/concepts/stickiness#calculation): a concept that uses a hash of the `userId` (or `sessionId`, or a random value) to decide whether a user falls within the rollout percentage. This means the same user always gets the same experience, even across sessions.
 </Tip>
 
 ## Change the UI with variant payloads
@@ -134,10 +134,10 @@ Gradual rollout uses a hash of the `userId` (or `sessionId`, or a random value) 
     Click **Save strategy**.
   </Step>
   <Step>
-    Check the demo page. The accent color reflects the hex value from whichever variant your `userId` was assigned. Open the demo in a different browser or incognito window to see the other variant's color.
+    Check the demo page. The accent color reflects the hex value from whichever variant your `userId` was assigned.
   </Step>
 </Steps>
 
 <Tip>
-[Stickiness](/concepts/stickiness) ensures the same user always sees the same variant, providing a consistent experience across sessions.
+Your `userId` always maps to the same variant, so you will only see one of the two colors. To see the other variant, open the demo app in a different browser or an incognito window. This generates a new `userId`, but since it is still a 50/50 split, you may need to try a few times.
 </Tip>
