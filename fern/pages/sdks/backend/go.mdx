@@ -429,6 +429,68 @@ if err != nil {
 
 `BootstrapStorage` falls back to the default on-disk cache if bootstrap parsing fails.
 
+### Custom bootstrap storage
+
+If you need more control over the bootstrap source, you can implement your own `Storage` and pass it with `WithStorage(...)`.
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"os"
+
+	unleash "github.com/Unleash/unleash-go-sdk/v6"
+	"github.com/Unleash/unleash-go-sdk/v6/api"
+)
+
+type CustomBootstrapStorage struct {
+	Backing       unleash.DefaultStorage
+	BootstrapJSON []byte
+}
+
+func (s *CustomBootstrapStorage) Init(backupPath, appName string) {
+	s.Backing.Init(backupPath, appName)
+}
+
+func (s *CustomBootstrapStorage) Load() (*api.FeatureResponse, error) {
+	if len(s.BootstrapJSON) > 0 {
+		var state api.FeatureResponse
+		if err := json.Unmarshal(s.BootstrapJSON, &state); err == nil {
+			return &state, nil
+		}
+	}
+
+	// Fallback to persisted cache when bootstrap data is missing or invalid.
+	return s.Backing.Load()
+}
+
+func (s *CustomBootstrapStorage) Persist(state *api.FeatureResponse) error {
+	return s.Backing.Persist(state)
+}
+
+func main() {
+	bootstrapJSON, err := os.ReadFile("bootstrap.json")
+	if err != nil {
+		panic(err)
+	}
+
+	err = unleash.Initialize(
+		unleash.WithAppName("my-go-service"),
+		unleash.WithUrl("https://<your-unleash-instance>/api/"),
+		unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+		unleash.WithStorage(&CustomBootstrapStorage{BootstrapJSON: bootstrapJSON}),
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer unleash.Close()
+}
+```
+
+Your bootstrap payload must match the `/client/features` response format (`api.FeatureResponse`).
+
 ## Local caching and offline behavior
 
 The default storage persists the latest feature payload to:
@@ -467,9 +529,9 @@ func (l *MyListener) OnImpression(event unleash.ImpressionEvent) {}
 | `OnError(error)` | SDK encountered an error. |
 | `OnWarning(error)` | SDK emitted a warning (for example, deprecated URL format). |
 | `OnCount(string, bool)` | A flag evaluation was counted for metrics. |
-| `OnSent(MetricsData)` | Metrics payload was sent. |
-| `OnRegistered(ClientData)` | SDK client registration was sent. |
-| `OnImpression(ImpressionEvent)` | Impression event emitted for flags with impression data enabled. |
+| `OnSent(MetricsData)` | Metrics payload was sent to Unleash. |
+| `OnRegistered(ClientData)` | SDK client registration was sent to Unleash. |
+| `OnImpression(ImpressionEvent)` | A flag was evaluated with [impression data](/concepts/impression-data) enabled. |
 
 Use `unleash.DebugListener{}` during development for built-in logging of all event types.
 
@@ -478,6 +540,8 @@ Use `unleash.DebugListener{}` during development for built-in logging of all eve
 Register custom strategies with `WithStrategies(...)`.
 
 ```go
+package main
+
 import (
 	unleashcontext "github.com/Unleash/unleash-go-sdk/v6/context"
 )
@@ -487,13 +551,13 @@ type EmailStrategy struct{}
 func (s EmailStrategy) Name() string {
 	return "ActiveForUserWithEmail"
 }
-
 func (s EmailStrategy) IsEnabled(params map[string]any, ctx *unleashcontext.Context) bool {
 	if ctx == nil || ctx.Properties == nil {
 		return false
 	}
 	return ctx.Properties["email"] == "user@example.com"
 }
+
 ```
 
 Then pass it:
@@ -502,28 +566,80 @@ Then pass it:
 unleash.WithStrategies(&EmailStrategy{})
 ```
 
-## Fallback behavior
+## Unit testing
 
-You can define fallback behavior for missing flags and unresolved variants.
+For unit tests, use an in-memory bootstrap storage and disable metrics. This gives deterministic flag state without depending on a real Unleash instance.
+The Go SDK does not have a direct `disableRefresh` option, so tests typically set a long `WithRefreshInterval(...)`.
 
 ```go
-fallback := func(feature string, ctx *unleashcontext.Context) bool {
-	return feature == "my-kill-switch"
+package mypkg_test
+
+import (
+	"testing"
+	"time"
+
+	unleash "github.com/Unleash/unleash-go-sdk/v6"
+	"github.com/Unleash/unleash-go-sdk/v6/api"
+)
+
+type testStorage map[string]api.Feature
+
+func (s testStorage) Init(string, string) {}
+
+func (s testStorage) Load() (*api.FeatureResponse, error) {
+	features := make([]api.Feature, 0, len(s))
+	for _, f := range s {
+		features = append(features, f)
+	}
+
+	return &api.FeatureResponse{
+		Features: features,
+		Segments: []api.Segment{},
+	}, nil
 }
 
-enabled := unleash.IsEnabled("unknown-flag", unleash.FeatureOptions{
-	FallbackFunc: fallback,
-})
-```
+func (s testStorage) Persist(*api.FeatureResponse) error { return nil }
 
-For variants, use `VariantFallback` or `VariantFallbackFunc` in `VariantOptions`.
+func TestFlags(t *testing.T) {
+	err := unleash.Initialize(
+		unleash.WithAppName("test-app"),
+		unleash.WithUrl("http://127.0.0.1:4242/api/"),
+		unleash.WithDisableMetrics(true),
+		unleash.WithRefreshInterval(24*time.Hour),
+		unleash.WithStorage(testStorage{
+			"my-feature": {
+				Name:    "my-feature",
+				Enabled: true,
+				Strategies: []api.Strategy{
+					{Name: "default"},
+				},
+				Variants: []api.VariantInternal{
+					{
+						Variant: api.Variant{
+							Name:           "blue",
+							Enabled:        true,
+							FeatureEnabled: true,
+						},
+						Weight: 1000,
+					},
+				},
+			},
+		}),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer unleash.Close()
 
-## Shutdown
+	if !unleash.IsEnabled("my-feature", unleash.FeatureOptions{}) {
+		t.Fatal("expected my-feature to be enabled")
+	}
 
-Call `Close()` when your process is shutting down:
-
-```go
-_ = unleash.Close()
+	variant := unleash.GetVariant("my-feature", unleash.VariantOptions{})
+	if variant.Name != "blue" {
+		t.Fatalf("expected variant blue, got %s", variant.Name)
+	}
+}
 ```
 
 ## Troubleshooting
@@ -547,15 +663,6 @@ If `IsEnabled` always returns `false`:
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 - Verify the SDK completed initial sync (`OnReady` fired, or `WaitForReady()` returned).
 - Set explicit `Fallback` or `FallbackFunc` if you need deterministic behavior for missing flags.
-
-</Accordion>
-<Accordion title="No local cache is persisted">
-
-If you do not see cached flag data:
-
-- Check write permissions for `WithBackupPath(...)`.
-- Ensure your process has enough lifetime for a successful fetch before shutdown.
-- If you use custom `WithStorage(...)`, verify `Persist` and `Load` are implemented correctly.
 
 </Accordion>
 </AccordionGroup>
