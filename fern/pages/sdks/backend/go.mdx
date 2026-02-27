@@ -429,7 +429,7 @@ if err != nil {
 
 `BootstrapStorage` falls back to the default on-disk cache if bootstrap parsing fails.
 
-### Custom bootstrap storage
+### Custom bootstrap
 
 If you need more control over the bootstrap source, you can implement your own `Storage` and pass it with `WithStorage(...)`.
 
@@ -662,7 +662,6 @@ If `IsEnabled` always returns `false`:
 - Confirm the flag exists and is enabled in the target environment.
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 - Verify the SDK completed initial sync (`OnReady` fired, or `WaitForReady()` returned).
-- Set explicit `Fallback` or `FallbackFunc` if you need deterministic behavior for missing flags.
 
 </Accordion>
 </AccordionGroup>
