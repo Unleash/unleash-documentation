@@ -116,10 +116,9 @@ func main() {
 
 Backend SDKs communicate with Unleash or [Unleash Edge](/unleash-edge) through the [Client API](/api#client-api) and require a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens). Backend SDKs perform flag evaluation locally on the fly.
 
-Set:
+Set `WithUrl` to the base API endpoint of your Unleash or [Unleash Edge](/unleash-edge) instance, typically `https://<your-unleash-instance>/api/`. The URL pattern is the same in both cases. Use [Unleash Edge](/unleash-edge) when you need lower latency or higher availability.
 
-- `WithUrl` to your Unleash API base URL (typically ending in `/api/`)
-- `WithCustomHeaders` with an `Authorization` header containing a [backend API token](/concepts/api-tokens-and-client-keys#client-tokens)
+Set `WithCustomHeaders` to include an `Authorization` header with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens). See [API tokens](/concepts/api-tokens-and-client-keys) for how to generate one.
 
 ### Wait until the SDK is ready
 
