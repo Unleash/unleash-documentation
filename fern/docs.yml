@@ -691,7 +691,6 @@ navigation:
             path: pages/sdks/frontend/react.mdx
           - page: React Native
             path: pages/sdks/frontend/react-native.mdx
-            hidden: true
           - page: JavaScript
             path: pages/sdks/frontend/javascript-browser.mdx
             slug: javascript-browser
