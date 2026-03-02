@@ -7,50 +7,28 @@ keywords: [unleash, php, sdk, feature flags, feature toggles]
 max-toc-depth: 3
 ---
 
-This PHP SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
+<Markdown src="/snippets/sdks/backend-intro.mdx" language="PHP" />
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=php) or [Unleash Open Source](https://github.com/Unleash/unleash).
+## Requirements
 
-## Unleash Client SDK
+- PHP 7.2 or newer
+- A [PSR-18](https://packagist.org/providers/psr/http-client-implementation) HTTP client (e.g. [Guzzle](https://packagist.org/packages/guzzlehttp/guzzle))
+- A [PSR-17](https://packagist.org/providers/psr/http-factory-implementation) request factory (e.g. [nyholm/psr7](https://packagist.org/packages/nyholm/psr7))
+- A [PSR-16](https://packagist.org/providers/psr/simple-cache-implementation) cache (e.g. [Symfony Cache](https://packagist.org/packages/symfony/cache))
 
-A PHP implementation of the [Unleash protocol](https://www.getunleash.io/)
-aka [Feature Flags](https://docs.gitlab.com/ee/operations/feature_flags.html) in GitLab.
-
-You may also be interested in the [Symfony Bundle](https://github.com/Unleash/unleash-client-symfony) for this package.
-
-<Note>
-Unleash allows you to gradually release your app's feature before doing a full release based on multiple strategies
-like releasing to only specific users or releasing to a percentage of your user base. Read more in the above linked
-documentations.
-</Note>
-
-## Migrating
-
-If you're migrating from 1.x to 2.x, you can read the [migration guide](https://github.com/Unleash/unleash-php-sdk/blob/main/doc/migrating-1.x-2.x.md).
+For event support, you also need `symfony/event-dispatcher`. See the [event documentation](https://github.com/Unleash/unleash-php-sdk/blob/main/doc/events.md).
 
 ## Installation
 
-`composer require unleash/client`
-
-Requires PHP 7.2 or newer.
-
-<Note>
-You will also need some implementation of [PSR-18](https://packagist.org/providers/psr/http-client-implementation)
-and [PSR-17](https://packagist.org/providers/psr/http-factory-implementation), for example
-[Guzzle](https://packagist.org/packages/guzzlehttp/guzzle)
-and [PSR-16](https://packagist.org/providers/psr/simple-cache-implementation), for example
-[Symfony Cache](https://packagist.org/packages/symfony/cache).
-Example:
-</Note>
-
-`composer require unleash/client guzzlehttp/guzzle symfony/cache`
+```bash
+composer require unleash/client guzzlehttp/guzzle symfony/cache
+```
 
 or
 
-`composer require unleash/client symfony/http-client nyholm/psr7 symfony/cache`
-
-If you want to make use of events you also need to install `symfony/event-dispatcher`.
-See [event documentation here](https://github.com/Unleash/unleash-php-sdk/blob/main/doc/events.md).
+```bash
+composer require unleash/client symfony/http-client nyholm/psr7 symfony/cache
+```
 
 ## Usage
 
@@ -198,7 +176,7 @@ $instance = UnleashBuilder::create()
     ->build();
 ```
 
-#### Required Parameters
+#### Required parameters
 
 The app name, instance id and app url are required as per the specification.
 
@@ -243,7 +221,7 @@ $builder = UnleashBuilder::create()
     ->withInstanceId('Some instance id');
 ```
 
-#### Optional Parameters
+#### Optional parameters
 
 Some optional parameters can be set, these include:
 
@@ -311,7 +289,7 @@ $builder = UnleashBuilder::create()
     ]);
 ```
 
-#### Returning Intermediate Objects
+#### Returning intermediate objects
 
 For some use cases the builder can return intermediate objects, for example the `UnleashRepository` object. This can be
 useful if you need to directly interact with the repository, to refresh the cache manually for example.
@@ -332,14 +310,13 @@ $repository = UnleashBuilder::create()
 $repository->refreshCache();
 ```
 
-## Proxy SDK
+## Frontend API mode
 
-By default the SDK uses the Backend endpoints on the Unleash API. You can also use the Proxy SDK, which is a
-lightweight SDK that uses the Frontend endpoints on the Unleash API. The Proxy SDK give a substantial performance improvement when using a large set of feature toggles (10K+).
+By default the SDK uses the backend endpoints on the Unleash API. You can also use Frontend API mode, which is a lightweight mode that uses the Frontend API endpoints. Frontend API mode provides a substantial performance improvement when using a large set of feature toggles (10K+).
 
-To use the Proxy SDK, you need to call `withProxy($apiKey)` on the builder. The `$apiKey` needs to be a [frontend token](/concepts/api-tokens-and-client-keys#front-end-tokens). Note that `withProxy($apiKey)` is in lieu of setting the API key header.
+To use Frontend API mode, call `withProxy($apiKey)` on the builder. The `$apiKey` needs to be a [frontend token](/concepts/api-tokens-and-client-keys#front-end-tokens). Note that `withProxy($apiKey)` sets the API key directly, so you don't need to set the API key header separately.
 
-Example of using the builder to create a Proxy SDK instance:
+Example of using the builder to create a Frontend API mode instance:
 
 ```php
 <?php
@@ -354,9 +331,9 @@ $unleash = $builder->build();
 $unleash.isEnabled("some-feature");
 ```
 
-As of version 1.12, the Proxy SDK requires [Edge](/unleash-edge), so the `appUrl` needs to point to the Edge server.
+As of version 1.12, Frontend API mode requires [Edge](/unleash-edge), so the `appUrl` needs to point to the Edge server.
 
-Not supported in the Proxy SDK:
+Not supported in Frontend API mode:
 - Custom strategies
 - Registration (this is handled by Edge)
 
@@ -429,7 +406,7 @@ $builder = UnleashBuilder::create()
 ;
 ```
 
-## Bootstrapping
+## Bootstrap
 
 You can set a default response from the SDK in cases when for some reason contacting Unleash server fails.
 
@@ -583,7 +560,7 @@ $builder = UnleashBuilder::create()
     ->withBootstrapProvider($provider);
 ```
 
-### Custom Bootstrap Provider
+### Custom bootstrap provider
 
 Creating a custom bootstrap provider is very simple, just implement the `BootstrapProvider` interface and use your
 class in the builder:
@@ -606,7 +583,7 @@ $builder = UnleashBuilder::create()
     ->withBootstrapProvider(new MyBootstrapProvider());
 ```
 
-### Disabling Communication With Unleash Server
+### Disabling communication with Unleash server
 
 It may be useful to disable communication with the Unleash server for local development and using a bootstrap instead.
 
@@ -638,12 +615,12 @@ Unleash servers can use multiple strategies for enabling or disabling features. 
 on the server. This implementation supports all v4 strategies.
 [More here](/concepts/activation-strategies).
 
-### Default Strategy
+### Default strategy
 
 This is the simplest of them and simply always returns true if the feature defines default as its chosen strategy
 and doesn't need any context parameters.
 
-### IP Address Strategy
+### IP address strategy
 
 Enables feature based on the IP address. Takes current user's IP address from the context object. You can provide your
 own IP address or use the default (`$_SERVER['REMOTE_ADDR']`). Providing your own is especially useful if you're behind
@@ -676,7 +653,7 @@ $context = (new UnleashContext())
 $enabled = $unleash->isEnabled('some-feature', $context);
 ```
 
-### User ID Strategy
+### User ID strategy
 
 Enables feature based on the user ID. The user ID can be any string. You must always provide your own user id via
 context.
@@ -697,7 +674,7 @@ $context = new UnleashContext(currentUserId: 'some-user-id');
 $enabled = $unleash->isEnabled('some-feature', $context);
 ```
 
-### Gradual Rollout Strategy
+### Gradual rollout strategy
 
 Also known as flexible rollout. Allows you to enable feature for only a percentage of users based on their user id,
 session id or randomly. The default is to try in this order: user id, session id, random.
@@ -758,7 +735,7 @@ $unleash->isEnabled('some-feature'); // works because the session is started
 $unleash->isEnabled('some-feature');
 ```
 
-### Hostname Strategy
+### Hostname strategy
 
 This strategy allows you to match against a list of server hostnames (which are not the same as http hostnames).
 
@@ -790,7 +767,7 @@ This library also implements some deprecated strategies, namely `gradualRolloutR
 and `gradualRolloutUserId` which all alias to the Gradual rollout strategy.
 </Note>
 
-### Context Provider
+### Context provider
 
 Manually creating relevant context can get tiring real fast. Luckily you can create your own context provider that
 will do it for you!
@@ -826,7 +803,7 @@ if ($unleash->isEnabled('someFeature')) { // this call will use your context pro
 }
 ```
 
-### Custom Strategies
+### Custom strategies
 
 To implement your own strategy you need to create a class implementing `StrategyHandler` (or `AbstractStrategyHandler`
 which contains some useful methods). Then you need to instruct the builder to use your custom strategy.
@@ -940,7 +917,7 @@ $variant = $unleash->getVariant('nonexistentFeature', fallbackVariant: new Defau
 assert($variant->getPayload()->getValue() === 'somePayload');
 ```
 
-## Client Registration
+## Client registration
 
 By default, the library automatically registers itself as an application in the Unleash server. If you want to prevent
 this, use `withAutomaticRegistrationEnabled(false)` in the builder.
@@ -1009,7 +986,7 @@ sleep(10);
 $unleash->isEnabled('test');
 ```
 
-## Custom Headers via Middleware
+## Custom headers with middleware
 
 While middlewares for http client are not natively supported by this SDK, you can pass your own http client which
 supports them.
@@ -1073,7 +1050,7 @@ $unleash->isEnabled('some-feature');
 
 Constraints are supported by this SDK and will be handled correctly by `Unleash::isEnabled()` if present.
 
-## GitLab Specifics
+## GitLab specifics
 
 - In GitLab you have to use the provided instance id, you cannot create your own.
 - No authorization header is necessary.
@@ -1105,3 +1082,11 @@ $gitlabUnleash = UnleashBuilder::create()
 ```
 
 Check out our guide for more information on how to build and scale [feature flag systems](/guides/feature-flag-best-practices).
+
+## Symfony integration
+
+If you're using Symfony, the [Unleash Symfony Bundle](https://github.com/Unleash/unleash-client-symfony) provides framework-level integration with automatic dependency injection and configuration.
+
+## Migrating to v2
+
+If you're upgrading from v1, read the [v2 migration guide](https://github.com/Unleash/unleash-php-sdk/blob/main/doc/migrating-1.x-2.x.md).

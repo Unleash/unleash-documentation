@@ -7,26 +7,12 @@ keywords: [unleash, ruby, sdk, feature flags, feature toggles]
 max-toc-depth: 3
 ---
 
-This Ruby SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
+<Markdown src="/snippets/sdks/backend-intro.mdx" language="Ruby" />
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=ruby) or [Unleash Open Source](https://github.com/Unleash/unleash).
+## Requirements
 
-<Note>
-**Migrating to v6**
-
-If you use [custom strategies](#custom-strategies) or override built-in ones, read the complete [migration guide](https://github.com/Unleash/unleash-ruby-sdk/blob/main/./v6_MIGRATION_GUIDE.md) before upgrading to v6.
-</Note>
-
-
-## Supported Ruby Interpreters
-
-- MRI 3.4
-- MRI 3.3
-- MRI 3.2
-- MRI 3.1
-- MRI 3.0
-- MRI 2.7
-- jruby 9.4
+- Ruby (MRI) 2.7 or later
+- JRuby 9.4 or later
 
 ## Installation
 
@@ -38,11 +24,15 @@ gem 'unleash', '~> 6.4.1'
 
 And then execute:
 
-    $ bundle
+```bash
+bundle
+```
 
 Or install it yourself as:
 
-    $ gem install unleash
+```bash
+gem install unleash
+```
 
 ## Configuration
 
@@ -70,7 +60,7 @@ or instantiate the client with the valid configuration:
 UNLEASH = Unleash::Client.new(url: '<YOUR_UNLEASH_URL>/api', app_name: 'my_ruby_app', custom_http_headers: {'Authorization': '<YOUR_API_TOKEN>'})
 ```
 
-## Dynamic Custom HTTP Headers
+## Dynamic custom HTTP headers
 
 If you need custom HTTP headers that change during the lifetime of the client, you can pass `custom_http_headers` as a `Proc`.
 
@@ -87,7 +77,7 @@ Unleash.configure do |config|
 end
 ```
 
-#### List of Arguments
+### Configuration options
 
 | Argument              | Description                                                                                                                                                                                                                                                                                                                   | Required? | Type                              | Default value                                  |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | --------------------------------- | ---------------------------------------------- |
@@ -116,7 +106,7 @@ For a more in-depth look, please see `lib/unleash/configuration.rb`.
 | `UNLEASH_BOOTSTRAP_FILE` | File to read bootstrap data from |
 | `UNLEASH_BOOTSTRAP_URL`  | URL to read bootstrap data from  |
 
-## Usage in a Plain Ruby Application
+## Usage in a plain Ruby application
 
 ```ruby
 require 'unleash'
@@ -141,13 +131,13 @@ else
 end
 ```
 
-## Usage in a Rails Application
+## Usage in a Rails application
 
-### 1. Add Initializer
+### Add initializer
 
 The initializer setup varies depending on whether you're using a standard setup, Puma in clustered mode, Phusion Passenger, or Sidekiq.
 
-#### 1.a Initializer for Standard Rails Applications
+#### Standard Rails applications
 
 Put in `config/initializers/unleash.rb`:
 
@@ -179,7 +169,7 @@ Rails.application.console do
 end
 ```
 
-#### 1.b Add Initializer if Using [Puma in Clustered Mode](https://github.com/puma/puma#clustered-mode)
+#### Puma in clustered mode
 
 That is, multiple workers configured in `puma.rb`:
 
@@ -256,7 +246,7 @@ end
 
 Note that we also added shutdown hooks in `on_worker_shutdown`, to ensure a clean shutdown.
 
-#### 1.c Add Initializer if Using [Phusion Passenger](https://github.com/phusion/passenger)
+#### Phusion Passenger
 
 The Unleash client needs to be configured and instantiated inside the `PhusionPassenger.on_event(:starting_worker_process)` code block due to [smart spawning](https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#smart-spawning-caveats):
 
@@ -278,7 +268,7 @@ PhusionPassenger.on_event(:starting_worker_process) do |forked|
 end
 ```
 
-#### 1.d Add Initializer Hooks When Using Within [Sidekiq](https://github.com/mperham/sidekiq)
+#### Sidekiq
 
 Note that in this case, we require that the code block for `Unleash.configure` is set beforehand.
 For example in `config/initializers/unleash.rb`.
@@ -295,7 +285,7 @@ Sidekiq.configure_server do |config|
 end
 ```
 
-### 2. Set Unleash::Context
+### Unleash context
 
 Add the following method and callback in the application controller to have `@unleash_context` set for all requests:
 
@@ -316,7 +306,7 @@ Add in `app/controllers/application_controller.rb`:
 
 Alternatively, you can add this method only to the controllers that use Unleash.
 
-### 3. Sample Usage
+### Example usage
 
 Then wherever in your application that you need a feature toggle, you can use:
 
@@ -405,7 +395,7 @@ end
 
 Note: `if_enabled` (and `if_disabled`) only support `default_value`, but not `fallback_function`.
 
-#### Variations
+### Check variants
 
 If no flag is found in the server, use the fallback variant.
 
@@ -416,7 +406,7 @@ variant = UNLEASH.get_variant "ColorVariants", @unleash_context, fallback_varian
 puts "variant color is: #{variant.payload.fetch('color')}"
 ```
 
-## Bootstrapping
+## Bootstrap
 
 Bootstrap configuration allows the client to be initialized with a predefined set of toggle states.
 Bootstrapping can be configured by providing a bootstrap configuration when initializing the client.
@@ -478,7 +468,7 @@ custom_boostrapper = lambda {
 This example could be easily achieved with a file bootstrapper, this is just to illustrate the usage of custom bootstrapping.
 Be aware that the client initializer will block until bootstrapping is complete.
 
-#### Client Methods
+### Client methods
 
 | Method name    | Description                                                                                                                                                                                     | Return type        |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -494,17 +484,7 @@ Be aware that the client initializer will block until bootstrapping is complete.
 
 For the full method signatures, see [client.rb](https://github.com/Unleash/unleash-ruby-sdk/blob/main/lib/unleash/client.rb).
 
-## Local Test Client
-
-```
-# cli unleash client:
-bundle exec bin/unleash-client --help
-
-# or a simple sample implementation (with values hardcoded):
-bundle exec examples/simple.rb
-```
-
-## Available Strategies
+## Built-in activation strategies
 
 This client comes with all the required strategies out of the box:
 
@@ -518,7 +498,7 @@ This client comes with all the required strategies out of the box:
 - UnknownStrategy
 - UserWithIdStrategy
 
-## Custom Strategies
+## Custom strategies
 
 You can add [custom activation strategies](/concepts/custom-activation-strategies) using configuration.
 In order for the strategy to work correctly it should support two methods `name` and `is_enabled?`.
@@ -539,41 +519,8 @@ Unleash.configure do |config|
 end
 ```
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies.
-Then, run `bundle exec rake spec` to run the tests.
-You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-This SDK is also built against the Unleash Client Specification tests.
-To run the Ruby SDK against this test suite, you'll need to have a copy on your machine, you can clone the repository directly using:
-
-`git clone --branch v$(ruby echo_client_spec_version.rb) https://github.com/Unleash/client-specification.git`
-
-After doing this, `bundle exec rake spec` will also run the client specification tests.
-
-To install this gem onto your local machine, run `bundle exec rake install`.
-
-## Releasing
-
-To release a new version, follow these steps:
-
-1. Update version number:
-     - Increment the version number in the `./lib/unleash/version.rb` file according to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) guidelines.
-2. Update documentation:
-     - If the update includes a major or minor version change, update the [Installation section](#installation) in [README.md](https://github.com/Unleash/unleash-ruby-sdk/blob/main/README.md).
-     - Update [CHANGELOG.md](https://github.com/Unleash/unleash-ruby-sdk/blob/main/CHANGELOG.md) following the format on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-3. Commit changes:
-     - Commit the changes with a message like: `chore: bump version to x.y.z.`
-4. Release the gem:
-   	- On the `main` branch, run `bundle exec rake release` to create a git tag for the new version, push commits and tags to origin, and publish `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/unleash/unleash-ruby-sdk.
-
-Be sure to run both `bundle exec rspec` and `bundle exec rubocop` in your branch before creating a pull request.
-
-Please include tests with any pull requests, to avoid regressions.
-
 Check out our guide for more information on how to build and scale [feature flag systems](/guides/feature-flag-best-practices).
+
+## Migrating to v6
+
+If you use [custom strategies](#custom-strategies) or override built-in ones, read the complete [v6 migration guide](https://github.com/Unleash/unleash-ruby-sdk/blob/main/./v6_MIGRATION_GUIDE.md) before upgrading.
