@@ -7,7 +7,7 @@ og:title: "Feature flag management: Best practices"
 max-toc-depth: 2
 ---
 
-You've probably heard someone say, “A feature flag is just an if statement.” And in simple cases, that's true. But when your organization has thousands of developers managing hundreds of [feature flags]((/what-is-a-feature-flag)—with complex targeting rules, audit trails, and dozens of microservices—those if statements get complicated fast. Especially if you don't [set things up properly from the start](/guides/user-management-access-controls).
+You've probably heard someone say, “A feature flag is just an if statement.” And in simple cases, that's true. But when your organization has thousands of developers managing hundreds of [feature flags](/what-is-a-feature-flag)—with complex targeting rules, audit trails, and dozens of microservices—those if statements get complicated fast. Especially if you don't [set things up properly from the start](/guides/user-management-access-controls).
 
 This guide shares what we've learned from helping teams run some of the largest feature flag deployments in the world, both through [Unleash Open-Source](https://github.com/Unleash/unleash) and [Unleash Enterprise](https://www.getunleash.io/enterprise-feature-management-platform).
 
@@ -59,7 +59,11 @@ Using the same flag in multiple places fragments the control logic and breaks th
   ![Evaluate flags once](/assets/evaluate-flags-in-many-places.jpg)
 </Frame>
 
-Instead, evaluate the flag once—typically at the start of a user request—and pass the result through the system. This keeps behavior predictable and makes the codebase cleaner and easier to manage over time.
+If a feature spans multiple parts of your system, evaluate the flag once, typically at the start of a user request, and pass the result rather than evaluating it separately in each place. This keeps behavior predictable and makes the codebase cleaner and easier to manage over time.
+
+<Note>
+  If you find yourself frequently passing flag results between services, consider whether those services are too tightly coupled. Passing flag values across service boundaries should be the exception, not the norm.
+</Note>
 
 <Frame background="subtle">
   ![Evaluate flags once](/assets/evaluate-flags-only-once.jpg)
@@ -118,7 +122,7 @@ Our advice: Keep it simple. If you use parent-child structures, avoid overlappin
 
 Both feature flags and configuration settings control an application's behavior. However, it's crucial to distinguish between feature flagging systems and configuration management systems and use each for its intended purpose.
 
-[Feature flags are temporary and dynamic]((/what-is-a-feature-flag). They give you [runtime control](/guides/feature-flag-best-practices#1-enable-runtime-control) to enable or disable functionality in a live environment—perfect for things like [short-lived experiments](/guides/feature-flag-best-practices#2-make-flags-short-lived), such as A/B testing or gradual rollouts.
+[Feature flags are temporary and dynamic](/what-is-a-feature-flag). They give you [runtime control](/guides/feature-flag-best-practices#1-enable-runtime-control) to enable or disable functionality in a live environment—perfect for things like [short-lived experiments](/guides/feature-flag-best-practices#2-make-flags-short-lived), such as A/B testing or gradual rollouts.
 
 Configurations, on the other hand, are usually static and long-lived. They often contain sensitive data like API keys or access credentials, which need to be encrypted and carefully managed. Using feature flags for configuration can create security vulnerabilities and operational issues. Most flag systems don't encrypt values the way configuration management tools do.
 

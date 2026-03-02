@@ -170,7 +170,7 @@ Then, implement additional guardrails in your wrapper to validate the payload st
 
 ### Evaluate flags at the right level and time
 
-For a given user request, evaluate a feature flag once at the highest practical level of your application stack. Propagate the result of that evaluation (the true/false value or the feature flag variant) downstream to other components or functions.
+For a given user request, evaluate a feature flag once at the highest practical level of your application stack. If multiple components need to act on the same flag, propagate the result of that evaluation (the true/false value or the feature flag variant) downstream rather than re-evaluating the flag in each place.
 
 This prevents "flag-aware" logic from spreading deep into your application's components, making them simpler and easier to test.
 
@@ -577,7 +577,7 @@ First, centralize flag definitions in a single file to prevent errors and make t
 
 For structuring your conditional logic, a simple if/else is usually the best choice for temporary flags, as it's the easiest to clean up.
 
-Finally, evaluate flags once at the highest reasonable level in your application. This is especially crucial in a microservices architecture, where propagating the result of the evaluation downstream ensures a consistent user experience.
+Finally, evaluate flags once at the highest reasonable level in your application. In the cases where a feature spans multiple components, propagate the result downstream rather than re-evaluating—this is especially crucial in a microservices architecture where it ensures a consistent user experience.
 
 -----
 
@@ -601,7 +601,7 @@ Have a process! Use strict [naming conventions](/concepts/feature-flags#set-a-na
 Once the flag is stable at 100% rollout (or permanently off). The process is: remove the conditional logic and old code, delete the flag definition, and then archive the flag in the Unleash UI.
 
 **Can you use feature flags in microservices?**
-Absolutely! Evaluate the flag once in the first service that gets the request (for example, your API gateway). Then, propagate the result of the evaluation (the true/false result or assigned variant) to all downstream services using OpenTelemetry Baggage or custom HTTP headers. This guarantees consistency.
+Absolutely! Evaluate the flag once in the first service that gets the request (for example, your API gateway). Then, propagate the result of the evaluation (the true/false result or assigned variant) to downstream services that need it using OpenTelemetry Baggage or custom HTTP headers. This guarantees consistency.
 
 **What's the best way to evaluate a feature flag in code?**
-Evaluate it once per request at the highest logical point in your application. Then, pass the boolean result down to the components that need it. This ensures a consistent user experience for that entire interaction.
+Evaluate it once per request at the highest logical point in your application. If the flag affects multiple components, pass the boolean result down to those that need it rather than re-evaluating. This ensures a consistent user experience for that entire interaction.
