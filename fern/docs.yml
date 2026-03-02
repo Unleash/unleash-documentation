@@ -3,8 +3,10 @@
 instances:
   - url: unleash.docs.buildwithfern.com
     custom-domain:
-      - unleash.ferndocs.com
       - docs.getunleash.io
+
+metadata:
+  canonical-host: docs.getunleash.io
 
 title: Unleash Documentation
 
