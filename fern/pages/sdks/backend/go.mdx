@@ -658,7 +658,8 @@ If `WaitForReady()` blocks indefinitely:
 
 If `IsEnabled` always returns `false`:
 
-- Confirm the flag exists and is enabled in the target environment.
+- Confirm the flag exists (check for typos).
+- Confirm the flag is enabled in the target environment.
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 - Verify the SDK completed initial sync (`OnReady` fired, or `WaitForReady()` returned).
 
