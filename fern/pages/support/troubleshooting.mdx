@@ -159,7 +159,7 @@ This means that even if you manually reassign the Admin role to a user in the Un
 
 By creating a [group](/concepts/rbac#user-groups) in Unleash and assigning it an admin role, and then configuring your IdP to push that group and its membership via SCIM, you get fully automated permission management:
 
-1. In the Unleash Admin UI, go to **Admin settins > User config > Groups** and create a new group, for example `Unleash Admins`.
+1. In the Unleash Admin UI, go to **Admin settings > User config > Groups** and create a new group, for example `Unleash Admins`.
 2. Assign the Admin role or your desired [custom-root role](/concepts/rbac#custom-root-roles) to this group.
 3. In your IdP, ensure you have a corresponding group and configure your SCIM integration.
 4. Once configured, any user you add to the `Unleash Admins` group in your IdP will automatically gain admin privileges in Unleash.
