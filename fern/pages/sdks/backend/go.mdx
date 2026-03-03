@@ -339,7 +339,6 @@ func main() {
 	}
 
 	variant := unleash.GetVariant("checkout-experiment", unleash.VariantOptions{
-		VariantFallback: fallbackVariant,
 		VariantFallbackFunc: func(feature string, _ *unleashcontext.Context) *api.Variant {
 			if feature == "checkout-experiment" {
 				return fallbackVariant
@@ -402,9 +401,9 @@ func main() {
 	if enabled {
 		// New behaviour
 	}
-	
+
 	variant := unleash.GetVariant("checkout-experiment", unleash.VariantOptions{Ctx: ctx})
-	
+
 	if variant.flagEnabled {
 		// checking variant name to pick New behaviour
 	}
