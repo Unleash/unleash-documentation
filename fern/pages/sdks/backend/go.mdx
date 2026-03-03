@@ -503,7 +503,6 @@ Your bootstrap payload must match the `/client/features` [response format](api/g
 
 The default storage persists the latest feature payload to `{backupPath}/unleash-repo-schema-v1-{appName}.json`
 
-- `{backupPath}/unleash-repo-schema-v1-{appName}.json`
 
 By default, `backupPath` is `os.TempDir()`. On startup, the SDK loads cached state first, then fetches fresh data from Unleash.
 
