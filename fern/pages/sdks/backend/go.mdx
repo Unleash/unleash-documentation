@@ -576,6 +576,8 @@ unleash.WithStrategies(&EmailStrategy{})
 For unit tests, use an in-memory bootstrap storage and disable metrics. This gives deterministic flag state without depending on a real Unleash instance.
 The Go SDK does not have a direct `disableRefresh` option, so tests typically set a long `WithRefreshInterval(...)`.
 
+The SDK exposes the `NewClient` method so you can create scoped instances for testing purposes, rather than the singleton instance created with `Initialize`.
+
 ```go
 package mypkg_test
 
@@ -606,7 +608,7 @@ func (s testStorage) Load() (*api.FeatureResponse, error) {
 func (s testStorage) Persist(*api.FeatureResponse) error { return nil }
 
 func TestFlags(t *testing.T) {
-	err := unleash.Initialize(
+	client, err := unleash.NewClient(
 		unleash.WithAppName("test-app"),
 		unleash.WithUrl("http://127.0.0.1:4242/api/"),
 		unleash.WithDisableMetrics(true),
@@ -634,13 +636,13 @@ func TestFlags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer unleash.Close()
+	defer client.Close()
 
-	if !unleash.IsEnabled("my-feature", unleash.FeatureOptions{}) {
+	if !client.IsEnabled("my-feature", unleash.FeatureOptions{}) {
 		t.Fatal("expected my-feature to be enabled")
 	}
 
-	variant := unleash.GetVariant("my-feature", unleash.VariantOptions{})
+	variant := client.GetVariant("my-feature", unleash.VariantOptions{})
 	if variant.Name != "blue" {
 		t.Fatalf("expected variant blue, got %s", variant.Name)
 	}
