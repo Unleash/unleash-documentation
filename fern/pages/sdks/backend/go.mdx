@@ -128,7 +128,9 @@ Until the SDK loads flag data, boolean checks return false and variant checks re
 2. **Cached data**: if no bootstrap is available, the SDK attempts to load data from persistent storage synchronously on creation.
 3. **Network fetch**: the SDK fetches flag configuration from Unleash asynchronously on startup. The ready event fires on the first successful response from Unleash.
 
-Use the `WaitForReady` method on the client to block until the SDK has fetched flag configuration from Unleash:
+If bootstrap or cached data is available, the SDK can evaluate flags immediately. There is no need to wait for the network fetch.
+
+Use `WaitForReady` to block until the SDK has completed its first network fetch. This is useful when you need guaranteed fresh data, but it will block even if bootstrap or cached data is already loaded. If the API is unreachable, `WaitForReady` blocks indefinitely.
 
 ```go
 package main
