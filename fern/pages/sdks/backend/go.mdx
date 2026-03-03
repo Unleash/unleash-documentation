@@ -122,7 +122,7 @@ Set `WithCustomHeaders` to include an `Authorization` header with a [backend tok
 
 ### Wait until the SDK is ready
 
-The SDK returns default values ( `false` for `isEnabled`, and a special disabled variant for `gerVariant` ) until it loads flag data from one of these sources, checked in this order:
+Until the SDK loads flag data, boolean checks return false and variant checks return a disabled variant. See [Check flags](#check-flags) for details on evaluation methods and fallback behavior.
 
 1. **Bootstrap data**: if a bootstrap is provided the SDK loads data from it synchronously on creation, if the bootstrap fails to load it will fall back to cached data.
 2. **Cached data**: if no bootstrap is available, the SDK attempts to load data from persistent storage synchronously on creation.
