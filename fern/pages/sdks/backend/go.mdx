@@ -94,11 +94,10 @@ import (
 	"net/http"
 
 	unleash "github.com/Unleash/unleash-go-sdk/v6"
-	unleashcontext "github.com/Unleash/unleash-go-sdk/v6/context"
 )
 
 func main() {
-	client, err := unleash.NewClient(
+	err := unleash.Initialize(
 		unleash.WithAppName("my-go-service"),
 		unleash.WithUrl("https://<your-unleash-instance>/api/"),
 		unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
@@ -108,7 +107,7 @@ func main() {
 		panic(err)
 	}
 
-	defer client.Close()
+	defer unleash.Close()
 }
 ```
 
@@ -139,11 +138,10 @@ import (
 	"net/http"
 
 	unleash "github.com/Unleash/unleash-go-sdk/v6"
-	unleashcontext "github.com/Unleash/unleash-go-sdk/v6/context"
 )
 
 func main() {
-	client, err := unleash.NewClient(
+	err := unleash.Initialize(
 		unleash.WithAppName("my-go-service"),
 		unleash.WithUrl("https://<your-unleash-instance>/api/"),
 		unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
@@ -152,7 +150,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	client.WaitForReady()
+	unleash.WaitForReady()
 }
 ```
 
