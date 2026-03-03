@@ -35,16 +35,16 @@ Pass configuration options to `unleash.Initialize(...)` (global client) or `unle
   Name of your application. Included in registration, metrics, and request headers.
 </ParamField>
 
+<ParamField path="WithCustomHeaders" type="func(http.Header) ConfigOption">
+  Additional headers for all API requests. Use this to add Authorization.
+</ParamField>
+
 <ParamField path="WithEnvironment" type="func(string) ConfigOption" default="default">
   Environment value included in the static Unleash context.
 </ParamField>
 
 <ParamField path="WithInstanceId" type="func(string) ConfigOption">
   Explicit instance ID for this SDK process. If omitted, the SDK generates one.
-</ParamField>
-
-<ParamField path="WithCustomHeaders" type="func(http.Header) ConfigOption">
-  Additional headers for all API requests. Use this to add Authorization.
 </ParamField>
 
 <ParamField path="WithRefreshInterval" type="func(time.Duration) ConfigOption" default="15">
