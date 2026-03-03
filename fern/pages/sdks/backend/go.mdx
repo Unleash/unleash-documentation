@@ -114,7 +114,7 @@ func main() {
 
 ### Connection options
 
-Backend SDKs communicate with Unleash or [Unleash Edge](/unleash-edge) through the [Client API](/api#client-api) and require a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens). Backend SDKs perform flag evaluation locally on the fly.
+Backend SDKs communicate with Unleash or [Unleash Edge](/unleash-edge) through the [Client API](/api#client-api) and require a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens). They fetch flag configuration and evaluate flags locally in your application.
 
 Set `WithUrl` to the base API endpoint of your Unleash or [Unleash Edge](/unleash-edge) instance, typically `https://<your-unleash-instance>/api/`. The URL pattern is the same in both cases. Use [Unleash Edge](/unleash-edge) when you need lower latency or higher availability.
 
