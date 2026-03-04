@@ -1,0 +1,27 @@
+---
+tags: ["Announcement", "Improvement", "Fix"]
+---
+
+# v7.5.0
+
+## User groups with root roles can now be assigned to projects
+
+Previously, [groups](/concepts/rbac#user-groups) with a root role could not be added to projects in the Admin UI. This restriction has been removed. You can now add any group to a project regardless of whether it has a root role. This is especially useful for teams that sync groups from [SSO providers](/concepts/sso), as it removes the need to maintain separate groups for root-level and project-level access.
+
+## API access URLs for Edge
+
+You can now copy the [Edge](/unleash-edge) URLs directly from **Admin settings > Access control > API access**. For hosted customers, this works automatically. If you are self-hosting, you can configure the `EDGE_URL` environment variable on startup to ensure the right endpoints are visible in the UI.
+
+## Fixed scoping for private project data
+
+We fixed how [private projects](/concepts/project-collaboration-mode#private-collaboration-mode) scope visibility within your organization. Previously, users who weren't added to a private project could still see some of its metadata, like segments, in global views. Affected views and endpoints now correctly return 404.
+
+## Announcement: Automated release management and Unleash MCP in beta
+
+Two new capabilities are now available in beta.
+
+[Impact Metrics](/concepts/impact-metrics) are lightweight, application-level time-series metrics you can track and visualize right inside Unleash. Counters, gauges, and histograms for things like error rates, latency, and adoption feed directly into [release templates](/concepts/release-templates), so Unleash can automatically progress a rollout when signals are healthy or pause it when something spikes.
+
+Impact Metrics are currently enabled for select customers. If you'd like to enable it for your organization, reach out to [beta@getunleash.io](mailto:beta@getunleash.io).
+
+We've also launched the [Unleash MCP server](/integrate/mcp) in beta. This gives your AI coding assistants a structured contract for managing feature flags safely. It plugs into tools like Claude Code, Cursor, Windsurf, and Codex, and guides them through evaluating risk, creating flags, wrapping code, and cleaning up after rollout.
