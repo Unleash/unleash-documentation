@@ -551,6 +551,81 @@ func (l *MyListener) OnImpression(event unleash.ImpressionEvent) {}
 
 Use `unleash.DebugListener{}` during development for built-in logging of all event types.
 
+## Impact metrics
+
+Impact metrics are application-level time-series metrics stored and visualized in Unleash. Use them to track outcomes such as request volume, error rates, and latency for feature rollouts.
+
+The SDK automatically adds `appName` and `environment` labels to all impact metrics.
+
+Use `NewClient(...)` and publish metrics through `client.ImpactMetrics()`:
+
+```go
+package main
+
+import (
+	"net/http"
+
+	unleash "github.com/Unleash/unleash-go-sdk/v6"
+)
+
+func main() {
+	client, err := unleash.NewClient(
+		unleash.WithAppName("my-go-service"),
+		unleash.WithEnvironment("production"),
+		unleash.WithUrl("https://<your-unleash-instance>/api/"),
+		unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+
+	metrics := client.ImpactMetrics()
+
+	metrics.DefineCounter("request_count", "Total number of HTTP requests")
+	metrics.IncrementCounter("request_count")
+
+	metrics.DefineGauge("active_users", "Current number of active users")
+	metrics.UpdateGauge("active_users", 42)
+
+	metrics.DefineHistogram(
+		"request_time_ms",
+		"Request processing time in milliseconds",
+		50, 100, 200, 500, 1000,
+	)
+	metrics.ObserveHistogram("request_time_ms", 125)
+}
+```
+
+### Counter
+
+Counters are cumulative values that only increase.
+
+```go
+metrics.DefineCounter("request_count", "Total number of HTTP requests")
+metrics.IncrementCounter("request_count")
+```
+
+### Gauge
+
+Gauges represent values that can go up or down.
+
+```go
+metrics.DefineGauge("active_users", "Current number of active users")
+metrics.UpdateGauge("active_users", 42)
+```
+
+### Histogram
+
+Histograms measure distributions such as latency and payload size.
+
+```go
+metrics.DefineHistogram("request_time_ms", "Request processing time in milliseconds", 50, 100, 200, 500, 1000)
+metrics.ObserveHistogram("request_time_ms", 125)
+```
+
+Impact metrics are batched and sent on the same schedule as standard SDK metrics (`WithMetricsInterval`).
+
 ## Custom strategies
 
 Register custom strategies with `WithStrategies(...)`.
