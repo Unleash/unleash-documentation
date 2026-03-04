@@ -300,6 +300,8 @@ navigation:
                     path: pages/ai-coding-assistants/github-copilot.mdx
                   - page: Claude Code
                     path: pages/ai-coding-assistants/claude-code.mdx
+                  - page: Kiro
+                    path: pages/ai-coding-assistants/kiro.mdx
 
           - page: Developer Toolbar
             path: pages/integrate/toolbar.mdx
