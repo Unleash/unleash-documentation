@@ -119,6 +119,17 @@ Set `WithUrl` to the base API endpoint of your Unleash or [Unleash Edge](/unleas
 
 Set `WithCustomHeaders` to include an `Authorization` header with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens). See [API tokens](/concepts/api-tokens-and-client-keys) for how to generate one.
 
+### Configure an HTTP proxy
+
+The SDK uses Go's standard HTTP proxy environment variables.
+
+Set `HTTPS_PROXY` or `HTTP_PROXY` in the environment where your service runs:
+
+```bash
+export HTTPS_PROXY=http://proxy.internal:8080
+export NO_PROXY=localhost,127.0.0.1,.internal
+```
+
 ### Wait until the SDK is ready
 
 Until the SDK loads flag data, boolean checks return false and variant checks return a disabled variant. See [Check flags](#check-flags) for details on evaluation methods and fallback behavior.
