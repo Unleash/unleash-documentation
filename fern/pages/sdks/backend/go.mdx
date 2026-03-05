@@ -557,7 +557,7 @@ Use `unleash.DebugListener{}` during development for built-in logging of all eve
 
 The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
 
-Use `NewClient(...)` and publish metrics through `client.ImpactMetrics()`.
+Initialize the SDK and publish impact metrics with package-level functions.
 
 ```go
 package main
@@ -569,7 +569,7 @@ import (
 )
 
 func main() {
-	client, err := unleash.NewClient(
+	err := unleash.Initialize(
 		unleash.WithAppName("my-go-service"),
 		unleash.WithEnvironment("production"),
 		unleash.WithUrl("https://<your-unleash-instance>/api/"),
@@ -578,22 +578,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	defer unleash.Close()
 
-	metrics := client.ImpactMetrics()
+	unleash.DefineCounter("request_count", "Total number of HTTP requests")
+	unleash.IncrementCounter("request_count")
 
-	metrics.DefineCounter("request_count", "Total number of HTTP requests")
-	metrics.IncrementCounter("request_count")
+	unleash.DefineGauge("active_users", "Current number of active users")
+	unleash.UpdateGauge("active_users", 42)
 
-	metrics.DefineGauge("active_users", "Current number of active users")
-	metrics.UpdateGauge("active_users", 42)
-
-	metrics.DefineHistogram(
+	unleash.DefineHistogram(
 		"request_time_ms",
 		"Request processing time in milliseconds",
 		50, 100, 200, 500, 1000,
 	)
-	metrics.ObserveHistogram("request_time_ms", 125)
+	unleash.ObserveHistogram("request_time_ms", 125)
 }
 ```
 
@@ -605,8 +603,8 @@ func main() {
 Use counters for cumulative values that only increase, such as the total number of requests or errors.
 
 ```go
-metrics.DefineCounter("request_count", "Total number of HTTP requests")
-metrics.IncrementCounter("request_count")
+unleash.DefineCounter("request_count", "Total number of HTTP requests")
+unleash.IncrementCounter("request_count")
 ```
 
 </Tab>
@@ -615,8 +613,8 @@ metrics.IncrementCounter("request_count")
 Use gauges for values that can go up or down, such as current memory usage or active user count.
 
 ```go
-metrics.DefineGauge("active_users", "Current number of active users")
-metrics.UpdateGauge("active_users", 42)
+unleash.DefineGauge("active_users", "Current number of active users")
+unleash.UpdateGauge("active_users", 42)
 ```
 
 </Tab>
@@ -625,12 +623,12 @@ metrics.UpdateGauge("active_users", 42)
 Histograms measure distributions such as latency and payload size.
 
 ```go
-metrics.DefineHistogram(
+unleash.DefineHistogram(
 	"request_time_ms",
 	"Request processing time in milliseconds",
 	50, 100, 200, 500, 1000,
 )
-metrics.ObserveHistogram("request_time_ms", 125)
+unleash.ObserveHistogram("request_time_ms", 125)
 ```
 
 </Tab>
