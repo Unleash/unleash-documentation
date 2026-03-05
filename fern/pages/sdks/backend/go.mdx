@@ -555,11 +555,9 @@ Use `unleash.DebugListener{}` during development for built-in logging of all eve
 
 [Impact metrics](/concepts/impact-metrics) are lightweight, application-level time-series metrics stored and visualized directly inside Unleash. Use them to connect application data, such as request counts, error rates, or latency, to your feature flags and release plans.
 
-The SDK automatically attaches `appName`, `environment`, and `origin` labels to all impact metrics.
+The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
 
-Impact metrics are available on the client instance returned by `NewClient(...)`. The global client created with `Initialize(...)` does not expose impact metrics.
-
-Publish metrics through `client.ImpactMetrics()`:
+Use `NewClient(...)` and publish metrics through `client.ImpactMetrics()`.
 
 ```go
 package main
@@ -624,7 +622,7 @@ metrics.UpdateGauge("active_users", 42)
 </Tab>
 <Tab title="Histogram">
 
-Use histograms to measure the distribution of values, such as request duration or response size. Unleash automatically calculates percentiles (p50, p95, p99). You can pass custom bucket boundaries as additional arguments to `DefineHistogram`. If omitted, the SDK uses default buckets.
+Histograms measure distributions such as latency and payload size.
 
 ```go
 metrics.DefineHistogram(
