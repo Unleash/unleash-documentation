@@ -190,17 +190,18 @@ final unleash = UnleashClient(
 You can opt out of the Unleash feature flag auto-refresh mechanism and metrics update by settings the `refreshInterval` and/or `metricsInterval` options to `0`.
 In this case, it becomes your responsibility to call `updateToggles` and/or `sendMetrics` methods.
 
-## Experimental: skip fetching toggles on start
+## Skip fetching flags on start
 
-If you start multiple clients sharing the same storage provider (e.g. a default `SharedPreferencesStorageProvider`) you might want to skip fetching toggles on start for all but one of the clients.
-This can be achieved by setting the `togglesStorageTTL` to a non-zero value.
-E.g in the example below, the toggles will be considered valid for 60 seconds and will not be fetched on start if they already exist in storage.
-We recommend to set `togglesStorageTTL` to a value greater than the `refreshInterval`.
+<Note>This is an experimental feature and may change in future releases.</Note>
+
+If you run multiple clients that share the same storage provider (for example, the default `SharedPreferencesStorageProvider`), you can skip fetching flags on start for all but one client. Set `togglesStorageTTL` to a non-zero value to reuse cached flags that are still within the TTL window.
+
+In the following example, flags in storage are considered valid for 60 seconds and are not fetched on start if they already exist. Set `togglesStorageTTL` to a value greater than `refreshInterval`.
 
 ```dart
-    final anotherUnleash = UnleashClient(
-        // ...
-        experimental: const ExperimentalConfig(togglesStorageTTL: 60)
-    );
+final anotherUnleash = UnleashClient(
+    // ...
+    experimental: const ExperimentalConfig(togglesStorageTTL: 60)
+);
 ```
 

@@ -267,37 +267,33 @@ The wrapped client has the same API as the original. Refer to the [Developer Too
 </html>
 ```
 ## Bootstrap
-Now it is possible to bootstrap the SDK with your own feature toggle configuration when you don't want to make an API call.
 
-This is also useful if you require the toggles to be in a certain state immediately after initializing the SDK.
+You can bootstrap the SDK with your own feature flag configuration to make flags available immediately, without waiting for an API call. This is useful when you need flags in a specific state right after initialization.
 
-### Bootstrap configuration
-Add a `bootstrap` attribute when you create a new `UnleashClient`.
-There's also a `bootstrapOverride` attribute which is by default is `true`.
+Pass a `bootstrap` array and an optional `bootstrapOverride` flag when you create the client:
 
 ```js
 import { UnleashClient } from 'unleash-proxy-client';
 
 const unleash = new UnleashClient({
-  url: 'https://app.unleash-hosted.com/demo/api/frontend',
+  url: 'https://<your-unleash-instance>/api/frontend',
   clientKey: '<your-frontend-token>',
-  appName: 'nodejs-proxy',
+  appName: 'my-webapp',
   bootstrap: [{
-	"enabled": true,
-	"name": "demoApp.step4",
-	"variant": {
-		"enabled": true,
-		"name": "blue",
-		"feature_enabled": true,
-	}
+    enabled: true,
+    name: 'demoApp.step4',
+    variant: {
+      enabled: true,
+      name: 'blue',
+      feature_enabled: true,
+    }
   }],
   bootstrapOverride: false
 });
 ```
 
 <Warning>
-If `bootstrapOverride` is `true` (by default), any local cached data will be overridden with the bootstrap specified.
-If `bootstrapOverride` is `false` any local cached data will not be overridden unless the local cache is empty.
+When `bootstrapOverride` is `true` (the default), the bootstrap data replaces any locally cached data. When `bootstrapOverride` is `false`, the bootstrap data is only used if the local cache is empty.
 </Warning>
 
 ## Manage your own refresh mechanism
