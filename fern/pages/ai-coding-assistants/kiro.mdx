@@ -8,7 +8,7 @@ max-toc-depth: 3
 slug: integrate/kiro
 ---
 
-The Unleash MCP server connects Kiro to your Unleash instance, enabling AI-assisted feature flag management.
+The [Unleash MCP server](/integrate/mcp) connects Kiro to your Unleash instance, enabling AI-assisted feature flag management.
 You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from within Kiro's spec-driven development workflow.
 
 Kiro supports MCP across two interfaces:
@@ -69,7 +69,7 @@ source ~/.zshrc  # or ~/.bashrc
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
-| `UNLEASH_PAT` | A Personal Access Token with flag creation permissions. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
 
 Now configure your preferred interface:
@@ -191,9 +191,9 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
 
 </Tabs>
 
-**`autoApprove` and `disabledTools`**
+### Configure`autoApprove` and `disabledTools`**
 
-Kiro supports two unique MCP properties:
+Kiro supports two MCP configuration properties for controlling tool approval:
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -240,7 +240,7 @@ Both are merged; workspace takes precedence on conflict. For team collaboration,
 
 **Requirements:** macOS, Linux, or WSL.
 
-The Kiro CLI is the successor to the Amazon Q Developer CLI, which was deprecated in November 2025.
+The Kiro CLI replaced the Amazon Q Developer CLI in November 2025.
 If you previously used the Q CLI, your MCP configuration, steering files, and subscriptions migrate automatically.
 For details, see [Upgrading from Amazon Q Developer CLI](https://kiro.dev/docs/cli/migrating-from-q/).
 
@@ -439,7 +439,7 @@ Feature flags should be temporary. Regularly clean up flags after successful rol
 
 ## Steering file templates
 
-Steering files encode your team's FeatureOps policies so Kiro considers feature flags automatically.
+Steering files encode your team's [FeatureOps](https://featureops.io/) policies, so Kiro considers feature flags automatically.
 Store them in `.kiro/steering/` and choose the inclusion mode that matches the policy's scope.
 
 For more details on steering files, see the [Kiro steering file documentation](https://kiro.dev/docs/steering/).
@@ -831,7 +831,7 @@ Evaluate whether it needs a feature flag.
 
 ## Enterprise governance
 
-Kiro provides enterprise controls through AWS IAM Identity Center and Okta/Microsoft Entra sign-in.
+Kiro provides enterprise controls through AWS IAM Identity Center (which can federate to external identity providers such as Okta and Microsoft Entra ID).
 
 - **Extension registry governance** — Point the IDE at a curated extension registry to control which extensions are available
 - **Web tools toggle** — Enable or disable web search and fetch per organization policy
