@@ -48,7 +48,7 @@ If using **server-side** (SSR, SSG, API), using `getDefinitions()` and `evaluate
 - `UNLEASH_SERVER_API_URL` of you instance. URL should end with `/api`
 - `UNLEASH_SERVER_API_TOKEN` [Backend API client token](/concepts/api-tokens-and-client-keys#backend-tokens)
 
-### Detailed explanation
+### Variable reference
 
 | Prefixable     | Variable                     | Default                                                   |
 | -------------- | ---------------------------- | --------------------------------------------------------- |
@@ -387,6 +387,8 @@ Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configura
 
 
 ## Server-side flags and metrics
+
+<Button small outlined className="version-button" href="/support/availability">v1.5.0+</Button>
 
 Next.js applications using Server-Side Rendering (SSR) are often deployed in serverless or short-lived environments, such as Vercel. This creates challenges for server-side metrics reporting.
 

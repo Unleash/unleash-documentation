@@ -377,22 +377,15 @@ Impact metrics are batched and sent on the same interval as regular SDK metrics.
 
 ## Bootstrap
 
-<Note>
-Available from v3.11.x
-</Note>
+You can bootstrap the SDK with flag configuration to evaluate flags without waiting for the Unleash API. Provide the bootstrap as inline `data`, a `url` to fetch from, or a `filePath` to load.
 
-The Node.js SDK supports a bootstrap parameter, allowing you to load the initial feature flag
-configuration from somewhere else than the Unleash API. The bootstrap `data` can be provided as an
-argument directly to the SDK, as a `filePath` to load, or as a `url` to fetch the content from.
-Bootstrap is a convenient way to increase resilience, where the SDK can still load fresh flag
-configuration from the bootstrap location, even if the Unleash API should be unavailable at startup.
-
-### Bootstrap with data
+<Tabs>
+<Tab title="Inline data">
 
 ```js
 const client = initialize({
   appName: 'my-application',
-  url: 'https://app.unleash-hosted2.com/demo/api/',
+  url: 'https://<your-unleash-instance>/api/',
   customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
   bootstrap: {
     data: [
@@ -411,12 +404,13 @@ const client = initialize({
 });
 ```
 
-### Bootstrap from URL
+</Tab>
+<Tab title="URL">
 
 ```js
 const client = initialize({
   appName: 'my-application',
-  url: 'https://app.unleash-hosted.com/demo/api/',
+  url: 'https://<your-unleash-instance>/api/',
   customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
   bootstrap: {
     url: 'http://localhost:3000/proxy/client/features',
@@ -427,18 +421,22 @@ const client = initialize({
 });
 ```
 
-### Bootstrap from file
+</Tab>
+<Tab title="File">
 
 ```js
 const client = initialize({
   appName: 'my-application',
-  url: 'https://app.unleash-hosted.com/demo/api/',
+  url: 'https://<your-unleash-instance>/api/',
   customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
   bootstrap: {
     filePath: '/tmp/some-bootstrap.json',
   },
 });
 ```
+
+</Tab>
+</Tabs>
 
 ## Flag definitions
 

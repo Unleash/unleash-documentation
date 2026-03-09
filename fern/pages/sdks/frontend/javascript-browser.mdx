@@ -7,7 +7,13 @@ keywords: JavaScript SDK, browser SDK, feature flags, web development, frontend 
 max-toc-depth: 3
 ---
 
-<Markdown src="/snippets/sdks/frontend-intro.mdx" language="JavaScript" />
+The Unleash JavaScript SDK is a lightweight client with no external dependencies (beyond browser APIs) that lets you evaluate feature flags in any JavaScript application. It is not tied to any framework, so you can use it with React, Vue, Angular, or plain JavaScript.
+
+The SDK stores flag configuration in `localStorage` and synchronizes with Unleash or [Unleash Edge](/unleash-edge) in the background. Because flags are stored in the browser, the SDK can bootstrap itself the next time the user visits the same page.
+
+You can use this SDK with [Unleash Enterprise](https://www.getunleash.io/pricing) or [Unleash Open Source](https://github.com/Unleash/unleash).
+
+For an overview of how Unleash SDKs work, including offline behavior, feature compatibility across SDKs, and default refresh and metrics intervals, refer to the [SDK overview](/sdks).
 
 ## Installation
 
@@ -114,7 +120,7 @@ The Unleash SDK takes the following options:
 | bootstrapOverride | no| `true` | Should the bootstrap automatically override cached data in the local-storage. Will only be used if bootstrap is not an empty array.     |
 | headerName        | no| `Authorization` | Which header the SDK should use to authorize with Unleash / Unleash Edge. The header will be given the `clientKey` as its value. |
 | customHeaders     | no| `{}` | Additional headers to use when making HTTP requests to Unleash. In case of name collisions with the default headers, the `customHeaders` value will be used if it is not `null` or `undefined`. `customHeaders` values that are `null` or `undefined` will be ignored. |
-| impressionDataAll | no| `false` | Allows you to trigger "impression" events for **all** `getToggle` and `getVariant` invocations. This is particularly useful for "disabled" feature toggles that are not visible to frontend SDKs. |
+| impressionDataAll | no| `false` | Allows you to trigger "impression" events for **all** `getToggle` and `getVariant` invocations. This is particularly useful for "disabled" feature flags that are not visible to frontend SDKs. |
 | environment | no | `default` | Sets the `environment` option of the [Unleash context](/concepts/unleash-context). This does **not** affect the SDK's [Unleash environment](/concepts/environments). |
 | usePOSTrequests | no | `false` | Configures the client to use POST requests instead of GET when requesting enabled features. This is helpful when sensitive information (like user email, when used as a user ID) is passed in the context to avoid leaking it in the URL. NOTE: Post requests are not supported by the frontend api built into Unleash. |
 | experimental | no | `{}` | Enabling optional experimentation. `togglesStorageTTL` : How long (Time To Live), in seconds, the toggles in storage are considered valid and should not be fetched on start. If set to 0 will disable expiration checking and will be considered always expired.                 |
@@ -144,7 +150,7 @@ The SDK emits the following events:
 
 ## Session ID
 
-You may provide a custom session id via the "context". If you do not provide a sessionId this SDK will create a random session id, which will also be stored in the provided storage (local storage). By always having a consistent sessionId available ensures that even "anonymous" users will get a consistent experience when feature toggles is evaluated, in combination with a gradual (percentage based) rollout.
+You may provide a custom session id via the "context". If you do not provide a sessionId this SDK will create a random session id, which will also be stored in the provided storage (local storage). By always having a consistent sessionId available ensures that even "anonymous" users will get a consistent experience when feature flags is evaluated, in combination with a gradual (percentage based) rollout.
 
 ## Stop the client
 You can stop the Unleash client by calling the `stop` method. Once the client has been stopped, it will no longer check for updates or send metrics to the server.
@@ -157,7 +163,7 @@ unleash.stop()
 
 ## Custom store
 
-This SDK can work with React Native storage [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/) or [react-native-shared-preferences](https://github.com/sriraman/react-native-shared-preferences) and many more to backup feature toggles locally. This is useful for bootstrapping the SDK the next time the user comes back to your application.
+This SDK can work with React Native storage [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/) or [react-native-shared-preferences](https://github.com/sriraman/react-native-shared-preferences) and many more to backup feature flags locally. This is useful for bootstrapping the SDK the next time the user comes back to your application.
 
 You can provide your own storage implementation.
 

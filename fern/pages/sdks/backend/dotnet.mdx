@@ -81,7 +81,7 @@ var unleashFactory = new UnleashClientFactory();
 
 IUnleash unleash = await unleashFactory.CreateClientAsync(settings, synchronousInitialization: true);
 
-// this `unleash` has successfully fetched feature toggles and written them to its cache.
+// this `unleash` has successfully fetched feature flags and written them to its cache.
 // if network errors or disk permissions prevented this from happening, the above await would have thrown an exception
 
 var awesome = unleash.IsEnabled("SuperAwesomeFeature");
@@ -92,7 +92,7 @@ The `CreateClientAsync` method was introduced in version 1.5.0, making the previ
 
 ### Project-scoped Unleash client
 
-If you're organizing your feature toggles in projects in Unleash Enterprise, you can [scope your API tokens](/concepts/api-tokens-and-client-keys) to include only the specific projects needed for your client. Then use that token when configuring the Unleash client:
+If you're organizing your feature flags in projects in Unleash Enterprise, you can [scope your API tokens](/concepts/api-tokens-and-client-keys) to include only the specific projects needed for your client. Then use that token when configuring the Unleash client:
 
 ```csharp
 
@@ -131,9 +131,7 @@ For instance, `unleash.IsEnabled("SuperAwesomeFeature")` would return `false` if
 unleash.IsEnabled("SuperAwesomeFeature", true)
 ```
 
-### Unleash context
-
-You can also provide an [Unleash context](/concepts/unleash-context) to the `IsEnabled` method:
+You can also pass an [Unleash context](/concepts/unleash-context) to evaluate flags for a specific user. Refer to the [Unleash context](#unleash-context) section for details.
 
 ```csharp
 var context = new UnleashContext
@@ -143,8 +141,6 @@ var context = new UnleashContext
 
 unleash.IsEnabled("someToggle", context);
 ```
-
-Refer to the [Unleash context](#unleash-context) section for more information about using the Unleash context in the .NET SDK.
 
 ## Events
 
@@ -392,7 +388,7 @@ namespace Unleash.Demo.CustomLogging
 
 
 ## Local caching and offline behavior
-By default unleash-client fetches the feature toggles from unleash-server every 20s, and stores the result in temporary .json file which is located in `System.IO.Path.GetTempPath()` directory. This means that if the unleash-server becomes unavailable, the unleash-client will still be able to toggle the features based on the values stored in .json file. As a result of this, the second argument of `IsEnabled` will be returned in two cases:
+By default unleash-client fetches the feature flags from unleash-server every 20s, and stores the result in temporary .json file which is located in `System.IO.Path.GetTempPath()` directory. This means that if the unleash-server becomes unavailable, the unleash-client will still be able to toggle the features based on the values stored in .json file. As a result of this, the second argument of `IsEnabled` will be returned in two cases:
 
 * When .json file does not exists
 * When the named feature toggle does not exist in .json file
@@ -417,54 +413,57 @@ var settings = new UnleashSettings()
 ```
 
 ## Bootstrap
-* Unleash supports bootstrapping from a JSON string.
-* Configure your own custom provider implementing the `IToggleBootstrapProvider` interface's single method `ToggleCollection Read()`.
-  This should return a `String` that represents the API response from `{unleash_url}/api/client/features`
-* Example bootstrap files can be found in the json files located in [tests/Unleash.Tests/App_Data](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/tests/Unleash.Tests/App_Data)
-* Our assumption is this can be use for applications deployed to ephemeral containers or more locked down file systems where Unleash's need to write the backup file is not desirable or possible.
-* Loading with bootstrapping defaults to override feature toggles loaded from Local Backup, this override can be switched off by setting the `UnleashSettings.ToggleOverride` property to `false`
 
-Configuring with the UnleashSettings:
+You can bootstrap the SDK with flag configuration to evaluate flags before connecting to Unleash. This is useful for applications deployed to ephemeral containers or environments where writing a local backup file is not possible.
+
+By default, bootstrap data overrides any locally cached data. Set `ToggleOverride` to `false` to keep cached data when available.
+
+You can implement a custom provider using the `IToggleBootstrapProvider` interface, or use one of the built-in providers from `Unleash.Utilities`. Example bootstrap files are available in [tests/Unleash.Tests/App_Data](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/tests/Unleash.Tests/App_Data).
+
+<Tabs>
+<Tab title="Custom provider">
+
+Implement `IToggleBootstrapProvider` and pass it to `ToggleBootstrapProvider`:
+
 ```csharp
 var settings = new UnleashSettings()
 {
     AppName = "dotnet-test",
-    UnleashApi = new Uri("https://eu.app.unleash-hosted.com/demo/api/"),
+    UnleashApi = new Uri("https://<your-unleash-instance>/api/"),
     CustomHttpHeaders = new Dictionary<string, string>()
     {
-      {"Authorization","API token" }
+        { "Authorization", "<your-backend-token>" }
     },
     ToggleOverride = false, // Defaults to true
-    ToggleBootstrapProvider = new MyToggleBootstrapProvider() // A toggle bootstrap provider implementing IToggleBootstrapProvider here
+    ToggleBootstrapProvider = new MyToggleBootstrapProvider()
 };
 ```
 
-### Provided bootstrappers
-* Two ToggleBootstrapProviders are provided
-* These are found in the `Unleash.Utilities`:
+</Tab>
+<Tab title="File">
 
-#### ToggleBootstrapFileProvider
-* Unleash comes with a `ToggleBootstrapFileProvider` which implements the `IToggleBootstrapProvider` interface.
-* Configure with `UnleashSettings` helper method:
+Use `ToggleBootstrapFileProvider` to load flag configuration from a JSON file:
 
 ```csharp
 settings.UseBootstrapFileProvider("./path/to/file.json");
 ```
 
-#### ToggleBootstrapUrlProvider
-* Unleash also comes with a `ToggleBootstrapUrlProvider` which implements the `IToggleBootstrapProvider` interface.
-* Fetches JSON from a webaddress using `HttpMethod.Get`
+</Tab>
+<Tab title="URL">
 
-* Configure with `UnleashSettings` helper method:
+Use `ToggleBootstrapUrlProvider` to fetch flag configuration from a URL:
 
 ```csharp
 var shouldThrowOnError = true; // Throws for 500, 404, etc
 var customHeaders = new Dictionary<string, string>()
 {
-    { "Authorization", "Bearer ABCdefg123" } // Or whichever set of headers would be required to GET this file
+    { "Authorization", "Bearer ABCdefg123" }
 }; // Defaults to null
-settings.UseBootstrapUrlProvider("://domain.top/path/to/file.json", shouldThrowOnError, customHeaders);
+settings.UseBootstrapUrlProvider("https://domain.top/path/to/file.json", shouldThrowOnError, customHeaders);
 ```
+
+</Tab>
+</Tabs>
 
 ## Unit testing
 You may want to mock the `IUnleash` interface in your unit tests. The SDK comes with a `FakeUnleash` implementation that you can use for this purpose.

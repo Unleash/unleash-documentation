@@ -288,7 +288,7 @@ UnleashConfig config = UnleashConfig.builder()
 This will then start using OkHttp instead of HttpURLConnection to send metrics.
 
 ## Local caching and offline behavior
-By default unleash-client fetches the feature toggles from unleash-server every 10s, and stores the
+By default unleash-client fetches the feature flags from unleash-server every 10s, and stores the
 result in `unleash-repo.json` which is located in the `java.io.tmpdir` directory. This means that if
 the unleash-server becomes unavailable, the unleash-client will still be able to toggle the features
 based on the values stored in `unleash-repo.json`.

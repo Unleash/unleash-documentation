@@ -171,7 +171,7 @@ end
 
 #### Puma in clustered mode
 
-That is, multiple workers configured in `puma.rb`:
+When using [Puma](https://github.com/puma/puma) with multiple workers configured in `puma.rb`:
 
 ```ruby
 workers ENV.fetch("WEB_CONCURRENCY") { 2 }
@@ -248,7 +248,7 @@ Note that we also added shutdown hooks in `on_worker_shutdown`, to ensure a clea
 
 #### Phusion Passenger
 
-The Unleash client needs to be configured and instantiated inside the `PhusionPassenger.on_event(:starting_worker_process)` code block due to [smart spawning](https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#smart-spawning-caveats):
+When using [Phusion Passenger](https://github.com/phusion/passenger), the Unleash client needs to be configured and instantiated inside the `PhusionPassenger.on_event(:starting_worker_process)` code block due to [smart spawning](https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#smart-spawning-caveats):
 
 The initializer in `config/initializers/unleash.rb` should look like:
 
@@ -270,7 +270,7 @@ end
 
 #### Sidekiq
 
-Note that in this case, we require that the code block for `Unleash.configure` is set beforehand.
+When using [Sidekiq](https://github.com/sidekiq/sidekiq), the code block for `Unleash.configure` must be set beforehand.
 For example in `config/initializers/unleash.rb`.
 
 ```ruby

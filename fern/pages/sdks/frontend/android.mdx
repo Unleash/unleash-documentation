@@ -64,7 +64,7 @@ val unleash = DefaultUnleash(
 
 // Create an initial UnleashContext
 // The context can be changed at any time but we recommend you provide sensible defaults at the start
-// This will make sure that the initial state for the feature toggles is correct
+// This will make sure that the initial state for the feature flags is correct
 val initialContext = UnleashContext.newBuilder()
     .userId("However you resolve your userid")
     .sessionId("However you resolve your session id")
@@ -76,14 +76,14 @@ You can pass event listeners either when constructing DefaultUnleash or when cal
 
 
 ## Start Unleash
-From the moment you call `unleash.start()`, it will immediately poll for the latest feature toggles and then continue polling in the background.
+From the moment you call `unleash.start()`, it will immediately poll for the latest feature flags and then continue polling in the background.
 
 Because this call is asynchronous, it will not block the main thread so you may want to check if the initial state is ready before proceeding.
 
 You have a few options:
 1. Wait until Unleash is ready. This will make sure that your app is in sync with the feature toggles.
 2. Provide an initial state. This could make sense in cases where the network is not available and you want to provide a default state.
-3. None of the above. Unleash comes with a default behavior for feature toggles with unknown state.
+3. None of the above. Unleash comes with a default behavior for feature flags with unknown state.
 
 ### Check if the SDK is ready
 
@@ -132,7 +132,7 @@ unleash.start(bootstrapFile = toggles)
 ```
 
 ### Default behavior
-You can just start Unleash and it will use the default behavior for feature toggles with unknown state until it has fetched the latest state from Unleash.
+You can just start Unleash and it will use the default behavior for feature flags with unknown state until it has fetched the latest state from Unleash.
 
 In some situations this could be a valid option. For example, if you don't want the additional complexity of the option above and you are fine with the default behavior.
 
@@ -208,13 +208,13 @@ unleash.addUnleashEventListener(readyListener)
 
 You can add or remove listeners at runtime with `addUnleashEventListener`/`removeUnleashEventListener`.
 
-
-### Example main activity
-In [the sample app](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt). We also configured a few event listeners to display how to use them.
+<Tip>
+For a complete working example, see the [sample app](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) and its [main activity](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt), which demonstrates toggle state display and event listeners.
+</Tip>
 
 
 ## Default behavior
-If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will be disabled by default.
+If you don't provide an initial state, Unleash will use the default behavior for feature flags with unknown state. This means that if a feature toggle is not found in the list of toggles, it will be disabled by default.
 
 ## Unleash context
 
