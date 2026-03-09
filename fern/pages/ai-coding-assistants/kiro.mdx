@@ -80,6 +80,18 @@ Now configure your preferred interface:
 
 **Requirements:** [Kiro IDE](https://kiro.dev) installed.
 
+**Enable MCP support (one-time step):**
+
+MCP is disabled by default. Before configuring any MCP servers, enable it:
+
+1. Open Settings (`Cmd+,` on macOS, `Ctrl+,` on Windows/Linux)
+2. Search for **MCP**
+3. Enable the **Kiro: MCP** setting
+
+<Warning>
+Without this setting enabled, MCP servers will not connect and tools will not appear. This only needs to be done once.
+</Warning>
+
 You can add the Unleash MCP server using the Command Palette or by creating the configuration file manually.
 
 <Tabs>
@@ -108,18 +120,23 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
         "env": {
             "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
             "UNLEASH_PAT": "${UNLEASH_PAT}",
-            "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+            "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
         }
         }
     }
     }
     ```
+
+     When you save this file, Kiro displays a popup listing unapproved environment variables.
+     Click **Allow** to approve `UNLEASH_BASE_URL`, `UNLEASH_PAT`, and `UNLEASH_DEFAULT_PROJECT`.
+     You can also manage approved variables later in Settings under **Mcp Approved Env Vars**.
     </Step>
 
     <Step title="Save and verify">
-    Save the file. Open the **MCP Servers** tab in the Kiro panel to confirm the Unleash server appears with its tools listed.
+    Open the **MCP Servers** tab in the Kiro panel to confirm the Unleash server appears with its tools listed.
 
-    You can also check MCP logs via the **Output** tab by selecting "Kiro - MCP Logs" from the dropdown.
+    To view MCP logs, right-click the Unleash server in the MCP Servers tab and select **Show MCP Logs**.
+    You can also open the **Output** panel and choose **Kiro - MCP Logs** from the dropdown.
     </Step>
 
     </Steps>
@@ -142,14 +159,20 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
         "env": {
             "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
             "UNLEASH_PAT": "${UNLEASH_PAT}",
-            "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+            "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
         }
         }
     }
     }
     ```
 
-    The file contains no credentials, only variable references that expand at runtime. You can safely commit it to version control.
+    The file contains no credentials, only variable references that expand at runtime.
+    You can safely commit it to version control.
+
+
+    When you save this file, Kiro displays a popup listing unapproved environment variables.
+    Click **Allow** to approve `UNLEASH_BASE_URL`, `UNLEASH_PAT`, and `UNLEASH_DEFAULT_PROJECT`.
+    You can also manage approved variables later in Settings under **Mcp Approved Env Vars**.
     </Step>
 
     <Step title="Restart Kiro">
@@ -188,7 +211,7 @@ Example with auto-approval for read-only tools:
       "env": {
         "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
         "UNLEASH_PAT": "${UNLEASH_PAT}",
-        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
       "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change"],
       "disabledTools": []
@@ -662,7 +685,7 @@ match your project's high-risk directories.
       "env": {
         "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
         "UNLEASH_PAT": "${UNLEASH_PAT}",
-        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT:-default}"
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
       "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change"]
     }
@@ -828,7 +851,15 @@ Autopilot mode works well for read-only operations like checking flag state and 
 - Check `.kiro/settings/mcp.json` for syntax errors
 - Verify the file is in the correct location (workspace root under `.kiro/settings/`)
 - Restart Kiro after making changes
-- Check MCP logs via **Output** tab → "Kiro - MCP Logs"
+- Right-click the server in the MCP Servers tab and select **Show MCP Logs**
+</Accordion>
+
+<Accordion title="Unapproved environment variables">
+If you see "Found unapproved environment variables in MCP config," Kiro requires explicit approval before expanding variables.
+
+- When you first save the config, click **Allow** on the popup to approve the listed variables
+- Or open Settings, search for **Mcp Approved Env Vars**, and add `UNLEASH_BASE_URL`, `UNLEASH_PAT`, and `UNLEASH_DEFAULT_PROJECT`
+- After approving, restart Kiro or reload the window
 </Accordion>
 
 <Accordion title="Environment variables not expanding">
@@ -836,6 +867,7 @@ Autopilot mode works well for read-only operations like checking flag state and 
 - Run `source ~/.zshrc` to reload
 - Kiro inherits environment variables from the shell that launched it
 - Verify variables are exported: `echo $UNLEASH_BASE_URL`
+- Verify the variables are approved in Settings → **Mcp Approved Env Vars**
 </Accordion>
 
 <Accordion title="Authentication failed">
