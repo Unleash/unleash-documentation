@@ -17,7 +17,7 @@ These snippets in `fern/snippets/sdks/` contain fixed wording shared across SDKs
 | `backend-intro.mdx` | Full backend intro: description, availability links, overview link. Takes `language` parameter. |
 | `frontend-intro.mdx` | Full frontend intro: description, availability links, overview link. Takes `language` parameter. |
 | `backend-singleton-warning.mdx` | "Create a single client instance..." warning for backend init sections. |
-| `backend-connection.mdx` | `/api` endpoint + client API token instructions. |
+| `backend-connection.mdx` | `/api` endpoint + backend API token instructions. |
 | `frontend-connection.mdx` | `/api/frontend` endpoint + frontend API token instructions. |
 | `impression-data-intro.mdx` | Impression data explanation for the Events section. |
 | `impact-metrics.mdx` | Impact metrics explanation + link. |
@@ -84,6 +84,10 @@ yarn add [package-name]
 
 <Markdown src="/snippets/sdks/backend-connection.mdx" />
 
+[If the SDK supports HTTP proxy configuration, add a ### subsection
+here covering environment variables (HTTPS_PROXY, HTTP_PROXY, NO_PROXY)
+and any SDK-specific proxy options.]
+
 [For frontend SDKs — write one sentence that tells the reader what to do,
 specific to the SDK. For example, React/Vue/Svelte SDKs wrap the app in a
 provider component. Plain JavaScript SDKs create a client instance directly.]
@@ -100,10 +104,13 @@ alternatives as subsections.]
 ### Check if the SDK is ready
 
 Until the SDK has synchronized with Unleash, all flags evaluate to `false`
+and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant),
 unless you have a [bootstrapped configuration](#bootstrap).
 
-[Show how to wait for the SDK to be ready using this SDK's pattern —
-event listener, callback, await, or polling.]
+[Show how to wait for the SDK to be ready. Use the SDK's readiness
+mechanism (event, callback, or await). If the SDK distinguishes between
+loading from cache and fetching from the network, explain the difference.
+Note if listeners must be registered before calling start.]
 
 ```[language]
 [ready/synchronized event or await example]
@@ -130,7 +137,7 @@ Environment variable equivalents are listed in [Environment variables](#environm
 ### Check variants
 
 [Show how to get a variant. Explain what is returned when the flag is disabled
-or has no variants (the disabled variant).]
+or has no variants.]
 
 ```[language]
 [getVariant example]
@@ -263,12 +270,6 @@ Use a table.]
 | Variable | Description |
 |----------|-------------|
 | ... | ... |
-
-## Outbound network proxy
-
-[Backend SDKs only. Document how to route SDK traffic through a corporate
-HTTP proxy. Cover environment variables (HTTP_PROXY, HTTPS_PROXY) and any
-SDK-specific options.]
 
 ## Framework integration
 
