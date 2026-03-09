@@ -59,7 +59,7 @@ unleash.start()
 In the example above we import the UnleashProxyClientSwift and instantiate the client. You need to provide the following parameters:
 
 - `unleashUrl`: The full URL to either the [Unleash Frontend API](/api#frontend-api) or an [Unleash Edge instance](/unleash-edge) [String]
-- `clientKey`: A [frontend API token](/concepts/api-tokens-and-client-keys#front-end-tokens) for authenticating with the Frontend API or Unleash Edge [String]
+- `clientKey`: A [frontend API token](/concepts/api-tokens-and-client-keys#frontend-tokens) for authenticating with the Frontend API or Unleash Edge [String]
 - `refreshInterval`: The polling interval in seconds, set to `0` to only poll once and disable a periodic polling [Int]
 - `appName`: The application name identifier [String]
 - `context`: Initial Unleash context fields (like `userId`, `sessionId`, etc.), excluding `appName` and `environment` which are configured separately. [String: String]

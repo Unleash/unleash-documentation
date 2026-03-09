@@ -197,6 +197,33 @@ the SDK emits, then show a code example.]
 
 <Markdown src="/snippets/sdks/impact-metrics.mdx" />
 
+The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
+
+[Show a complete example that initializes the SDK and publishes impact metrics.]
+
+```[language]
+[initialization + define/publish counter, gauge, histogram example]
+```
+
+### Metric types
+
+[Use `<Tabs>` with one tab per metric type: Counter, Gauge, Histogram.
+Each tab has a one-sentence description and a short code example.]
+
+<Tabs>
+<Tab title="Counter">
+[Counter description and example — cumulative values that only increase.]
+</Tab>
+<Tab title="Gauge">
+[Gauge description and example — values that go up or down.]
+</Tab>
+<Tab title="Histogram">
+[Histogram description and example — distributions like latency.]
+</Tab>
+</Tabs>
+
+[Note about batching interval if applicable.]
+
 ## Bootstrap
 
 [Explain how to provide an initial flag state so the SDK can evaluate flags
