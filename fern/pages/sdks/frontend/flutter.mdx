@@ -19,7 +19,7 @@ flutter pub add unleash_proxy_client_flutter
 
 Configure the client according to your needs. The following example provides only the required options. Refer to [configuration options](#configuration-options) for the full list.
 
-Set `url` to the `/api/frontend` endpoint of your Unleash instance or your [Unleash Edge](/unleash-edge) instance. Set `clientKey` to a [frontend API token](/concepts/api-tokens-and-client-keys#front-end-tokens).
+Set `url` to the `/api/frontend` endpoint of your Unleash instance or your [Unleash Edge](/unleash-edge) instance. Set `clientKey` to a [frontend API token](/concepts/api-tokens-and-client-keys#frontend-tokens).
 
 ```dart
 import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
@@ -47,7 +47,7 @@ unleash.on('ready', (_) {
 });
 ```
 
-The difference between the events is [explained below](#available-events).
+The difference between the events is [explained below](#events).
 
 ## Check flags
 

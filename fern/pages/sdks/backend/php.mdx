@@ -314,7 +314,7 @@ $repository->refreshCache();
 
 By default the SDK uses the backend endpoints on the Unleash API. You can also use Frontend API mode, which is a lightweight mode that uses the Frontend API endpoints. Frontend API mode provides a substantial performance improvement when using a large set of feature toggles (10K+).
 
-To use Frontend API mode, call `withProxy($apiKey)` on the builder. The `$apiKey` needs to be a [frontend token](/concepts/api-tokens-and-client-keys#front-end-tokens). Note that `withProxy($apiKey)` sets the API key directly, so you don't need to set the API key header separately.
+To use Frontend API mode, call `withProxy($apiKey)` on the builder. The `$apiKey` needs to be a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens). Note that `withProxy($apiKey)` sets the API key directly, so you don't need to set the API key header separately.
 
 Example of using the builder to create a Frontend API mode instance:
 
@@ -328,7 +328,7 @@ $builder = UnleashBuilder::create()
 
 $unleash = $builder->build();
 
-$unleash.isEnabled("some-feature");
+$unleash->isEnabled("some-feature");
 ```
 
 As of version 1.12, Frontend API mode requires [Edge](/unleash-edge), so the `appUrl` needs to point to the Edge server.

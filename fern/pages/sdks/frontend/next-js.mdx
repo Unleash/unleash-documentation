@@ -39,7 +39,7 @@ This package will attempt to load configuration from
 When using Unleash **client-side**, with `<FlagProvider />` or `getFrontendFlags()` configure:
 
 - `NEXT_PUBLIC_UNLEASH_FRONTEND_API_URL`. URL should end with `/api/frontend` or `/proxy`
-- `NEXT_PUBLIC_UNLEASH_FRONTEND_API_TOKEN` [client-side API token](/concepts/api-tokens-and-client-keys#front-end-tokens)
+- `NEXT_PUBLIC_UNLEASH_FRONTEND_API_TOKEN` [client-side API token](/concepts/api-tokens-and-client-keys#frontend-tokens)
   if you're using the [Frontend API](/api#frontend-api).
 - Using [Edge](/unleash-edge) is the same as using the frontend API, so you'll need a FRONTEND_API_TOKEN, and your URL should end with `/api/frontend`.
 
@@ -124,7 +124,7 @@ Refer to [`./example/README.md#Middleware`](https://github.com/Unleash/unleash-n
 
 Fastest way to get started is to connect frontend directly to Unleash.
 You can find out more about direct [Frontend API access](/api#frontend-api) in our documentation,
-including a guide on how to [setup a client-side SDK key](/concepts/api-tokens-and-client-keys#front-end-tokens).
+including a guide on how to [setup a client-side SDK key](/concepts/api-tokens-and-client-keys#frontend-tokens).
 
 Important: Hooks and provider are only available in `@unleash/nextjs/client`.
 

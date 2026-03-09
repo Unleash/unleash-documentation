@@ -174,7 +174,7 @@ Once they have been initialized, all Unleash clients continue to function withou
 
 Because the SDKs and the Unleash Edge cache their feature flag states locally and only communicate with the Unleash server or Edge at predetermined intervals, a broken connection only means that they won't get any new updates.
 
-Unless the SDK supports [bootstrapping](#bootstrapping), it needs to connect to Unleash at startup to get its initial feature flag data set. If the SDK doesn't have a feature flag data set available, all flags fall back to evaluating as disabled or as the specified default value.
+Unless the SDK supports [bootstrapping](#bootstrap), it needs to connect to Unleash at startup to get its initial feature flag data set. If the SDK doesn't have a feature flag data set available, all flags fall back to evaluating as disabled or as the specified default value.
 
 ### Bootstrap
 
