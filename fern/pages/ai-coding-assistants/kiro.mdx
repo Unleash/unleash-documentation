@@ -14,7 +14,7 @@ You can evaluate code changes, create flags, generate wrapping code, manage roll
 Kiro supports MCP across two interfaces:
 
 - **Kiro IDE** — The primary interface, built on Code OSS with specs, steering files, hooks, and Powers
-- **Kiro CLI** — Terminal-based workflows and batch operations (successor to Amazon Q Developer CLI)
+- **Kiro CLI** — Interactive terminal-based chat (successor to Amazon Q Developer CLI)
 
 Kiro's structured primitives create a natural pipeline for feature flags: specs surface risk at the requirements stage, steering files encode your team's conventions, hooks automate evaluation on file events, and Powers bundle everything into a shareable package.
 
@@ -244,24 +244,8 @@ If you haven't configured it yet, create the `.kiro/settings/mcp.json` file as s
 
 </Steps>
 
-**Batch operations:**
-
-The CLI's pipe-friendly interface enables batch operations. Combine standard Unix tools with the Kiro CLI to process data that the MCP server cannot access directly.
-
-```bash
-# Evaluate a diff for flag requirements
-git diff main...feature-branch | kiro-cli -p "Analyze this diff. Use evaluate_change to determine which changes need feature flags."
-
-# Generate a flag audit report
-kiro-cli -p "List all feature flags and identify any at 100% rollout for more than 14 days. Use get_flag_state for each and generate a cleanup report." > audit.md
-
-# Find commits that should have been flagged
-git log --oneline -20 | kiro-cli -p "Review these commits. For each, use evaluate_change to determine if it should have been feature flagged. Report gaps."
-```
-
-<Note>
-The Kiro CLI shares credit limits with the IDE.
-</Note>
+Run `kiro-cli` to start an interactive chat session.
+You can use the same Unleash MCP tools as in the IDE: evaluate changes, create flags, check flag state, and run cleanup workflows.
 
 </Tab>
 
@@ -271,6 +255,7 @@ The Kiro CLI shares credit limits with the IDE.
 
 The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
 
+<StickyTable>
 | Tool | Description | When to use |
 |------|-------------|-------------|
 | `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
@@ -282,6 +267,7 @@ The Unleash MCP server exposes nine tools. The following table summarizes each t
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+</StickyTable>
 
 ## Workflows
 
@@ -915,7 +901,7 @@ Write your feature flag guidelines in steering files with appropriate inclusion 
 ## Related resources
 
 - [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
-- [Spec-Driven Feature Flags: How Kiro and Unleash Turn Requirements into Safe Releases](/blog/kiro-unleash-spec-driven-feature-flags)
+- [Spec-Driven Feature Flags: How Kiro and Unleash Turn Requirements into Safe Releases](https://www.getunleash.io/blog/spec-driven-feature-flags-kiro)
 - [Kiro documentation](https://kiro.dev/docs/)
 - [Kiro MCP configuration](https://kiro.dev/docs/mcp/)
 - [Impact Metrics](/concepts/impact-metrics)
