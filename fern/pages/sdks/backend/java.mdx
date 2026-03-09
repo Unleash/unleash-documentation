@@ -92,8 +92,6 @@ You can also **provide an [Unleash context](/concepts/unleash-context)** to the 
 The Java client comes with implementations for the built-in activation strategies provided by Unleash. Read more about the strategies in the [activation strategies reference documentation](/concepts/activation-strategies).
 
 To add a custom strategy, implement the `Strategy` interface and register it when you set up Unleash:
-You may also specify and implement your own strategy. The specification must be registered in the Unleash UI and
-you must register the strategy implementation when you set up Unleash.
 
 ```java
 Strategy s1 = new MyAwesomeStrategy();

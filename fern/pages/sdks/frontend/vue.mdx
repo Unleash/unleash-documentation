@@ -177,7 +177,7 @@ const variant = useVariant('travel.landing')
 
 <template>
   <SomeComponent v-if="variant.enabled && variant.name === 'SomeComponent'" />
-  <AnotherComponent v-else-if="variant.enabled && variant.name === 'AnotherComponent' />
+  <AnotherComponent v-else-if="variant.enabled && variant.name === 'AnotherComponent'" />
   <DefaultComponent v-else />
 </template>
 ```
