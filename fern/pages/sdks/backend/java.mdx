@@ -85,7 +85,7 @@ if(unleash.isEnabled("AwesomeFeature")) {
 
 The `isEnabled` method also accepts a second boolean argument. The SDK uses this as a fallback value if it can't find the feature you're trying to check. For example, if `unleash.isEnabled("non-existing-toggle")` returns `false` when `"non-existing-toggle"` doesn't exist, calling `unleash.isEnabled("non-existing-toggle", true)`, will return `true`.
 
-You can also **provide an [Unleash context](/concepts/unleash-context)** to the `isEnabled` method. Refer to the [Unleash context](#unleash-context) section for more information about using the Unleash context in the Java SDK.
+You can also pass an [Unleash context](/concepts/unleash-context) to evaluate flags for a specific user, session, or other properties required by strategies, constraints, and stickiness. Refer to the [Unleash context](#unleash-context) section for details.
 
 ## Custom strategies
 

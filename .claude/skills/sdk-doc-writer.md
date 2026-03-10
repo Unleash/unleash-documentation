@@ -21,6 +21,7 @@ These snippets in `fern/snippets/sdks/` contain fixed wording shared across SDKs
 | `frontend-connection.mdx` | `/api/frontend` endpoint + frontend API token instructions. |
 | `impression-data-intro.mdx` | Impression data explanation for the Events section. |
 | `impact-metrics.mdx` | Impact metrics explanation + link. |
+| `unleash-context-intro.mdx` | Context intro: what it holds and what it drives (targeting, constraints, stickiness). |
 
 ## SDK page template
 
