@@ -131,7 +131,7 @@ For instance, `unleash.IsEnabled("SuperAwesomeFeature")` would return `false` if
 unleash.IsEnabled("SuperAwesomeFeature", true)
 ```
 
-You can also pass an [Unleash context](/concepts/unleash-context) to evaluate flags for a specific user. Refer to the [Unleash context](#unleash-context) section for details.
+You can also pass an [Unleash context](/concepts/unleash-context) to evaluate flags for a specific user, session or other properties required by constraints or custom strategies. Refer to the [Unleash context](#unleash-context) section for details.
 
 ```csharp
 var context = new UnleashContext
@@ -416,7 +416,7 @@ var settings = new UnleashSettings()
 
 You can bootstrap the SDK with flag configuration to evaluate flags before connecting to Unleash. This is useful for applications deployed to ephemeral containers or environments where writing a local backup file is not possible.
 
-By default, bootstrap data overrides any locally cached data. Set `ToggleOverride` to `false` to keep cached data when available.
+By default, bootstrap data overrides any locally cached data. Set `BootstrapOverride` to `false` to keep cached data when available.
 
 You can implement a custom provider using the `IToggleBootstrapProvider` interface, or use one of the built-in providers from `Unleash.Utilities`. Example bootstrap files are available in [tests/Unleash.Tests/App_Data](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/tests/Unleash.Tests/App_Data).
 
@@ -480,4 +480,4 @@ fakeUnleash.SetVariant("MyVariantFeature", new Variant("MyVariantFeature", new P
 
 ## Migrating to v5
 
-If you use [bootstrapping](#bootstrap), [custom strategies](#custom-strategies), or a custom JSON serializer, read the complete [v5 migration guide](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/./v5_MIGRATION_GUIDE.md) before upgrading.
+If you use [bootstrapping](#bootstrap), [custom strategies](#custom-strategies), or a custom JSON serializer, read the complete [v5 migration guide](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/v5_MIGRATION_GUIDE.md) before upgrading.
