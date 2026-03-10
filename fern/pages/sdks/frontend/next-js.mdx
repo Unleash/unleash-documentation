@@ -7,27 +7,31 @@ keywords: Next.js SDK, React SDK, feature flags, server-side rendering, SSR, SSG
 max-toc-depth: 3
 ---
 
-This [Next.js](https://nextjs.org/) SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
+<Markdown src="/snippets/sdks/frontend-intro.mdx" language="Next.js" />
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=nextjs) or [Unleash Open Source](https://github.com/Unleash/unleash).
+## Installation
 
-## Setup
-
-### Installation
-
-To install, simply run:
-
-```sh
+<Tabs>
+<Tab title="npm">
+```bash
 npm install @unleash/nextjs
-# or
+```
+</Tab>
+<Tab title="yarn">
+```bash
 yarn add @unleash/nextjs
-# or
+```
+</Tab>
+<Tab title="pnpm">
+```bash
 pnpm add @unleash/nextjs
 ```
+</Tab>
+</Tabs>
 
 There is an [`./example`](https://github.com/Unleash/unleash-nextjs-sdk/blob/main/./example) project that you can [deploy to Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FUnleash%2Funleash-nextjs-sdk%2Ftree%2Fmain%2Fexample) or [edit in CodeSandbox](https://codesandbox.io/s/github/Unleash/unleash-nextjs-sdk/tree/main/example).
 
-### Environment Variables
+## Environment variables
 
 This package will attempt to load configuration from
 [Next.js Environment variables](https://nextjs.org/docs/basic-features/environment-variables).
@@ -35,8 +39,8 @@ This package will attempt to load configuration from
 When using Unleash **client-side**, with `<FlagProvider />` or `getFrontendFlags()` configure:
 
 - `NEXT_PUBLIC_UNLEASH_FRONTEND_API_URL`. URL should end with `/api/frontend` or `/proxy`
-- `NEXT_PUBLIC_UNLEASH_FRONTEND_API_TOKEN` [client-side API token](/concepts/api-tokens-and-client-keys#front-end-tokens)
-  if you're using the [front-end API](/api#frontend-api).
+- `NEXT_PUBLIC_UNLEASH_FRONTEND_API_TOKEN` [client-side API token](/concepts/api-tokens-and-client-keys#frontend-tokens)
+  if you're using the [Frontend API](/api#frontend-api).
 - Using [Edge](/unleash-edge) is the same as using the frontend API, so you'll need a FRONTEND_API_TOKEN, and your URL should end with `/api/frontend`.
 
 If using **server-side** (SSR, SSG, API), using `getDefinitions()` and `evaluateFlags()`, set:
@@ -44,7 +48,7 @@ If using **server-side** (SSR, SSG, API), using `getDefinitions()` and `evaluate
 - `UNLEASH_SERVER_API_URL` of you instance. URL should end with `/api`
 - `UNLEASH_SERVER_API_TOKEN` [Backend API client token](/concepts/api-tokens-and-client-keys#backend-tokens)
 
-#### Detailed Explanation
+### Variable reference
 
 | Prefixable     | Variable                     | Default                                                   |
 | -------------- | ---------------------------- | --------------------------------------------------------- |
@@ -63,7 +67,9 @@ You can use both to have different values on client-side and server-side.
 
 ## Usage
 
-### A). App Router
+<Note>When used server-side, this SDK does not support the "Hostname" and "IP" strategies.</Note>
+
+### App router
 
 This package is ready for server-side use with [App Router](https://nextjs.org/docs/app/building-your-application/routing).
 
@@ -108,17 +114,17 @@ export default async function Page() {
 }
 ```
 
-### B). Middleware
+### Middleware
 
 It's possible to run this SDK in Next.js Edge Middleware. This is a great use case for A/B testing, where you can transparently redirect users to different pages based on a feature flag. Target pages can be statically generated, improving performance.
 
 Refer to [`./example/README.md#Middleware`](https://github.com/Unleash/unleash-nextjs-sdk/tree/main/example#middleware) for an implementation example.
 
-### C). Client-side Only - Simple Use Case and for Development Purposes (CSR)
+### Client-side rendering
 
 Fastest way to get started is to connect frontend directly to Unleash.
-You can find out more about direct [Front-end API access](/api#frontend-api) in our documentation,
-including a guide on how to [setup a client-side SDK key](/concepts/api-tokens-and-client-keys#front-end-tokens).
+You can find out more about direct [Frontend API access](/api#frontend-api) in our documentation,
+including a guide on how to [setup a client-side SDK key](/concepts/api-tokens-and-client-keys#frontend-tokens).
 
 Important: Hooks and provider are only available in `@unleash/nextjs/client`.
 
@@ -164,7 +170,7 @@ Optionally, you can configure `FlagProvider` with the `config` prop. It will tak
 
 If you only plan to use [Unleash client-side React SDK](https://github.com/Unleash/proxy-client-react) now also works with Next.js. Check documentation there for more examples.
 
-### D). Static Site Generation, Optimized Performance (SSG)
+### Static site generation
 
 With same access as in the client-side example above you can resolve Unleash feature flags when building static pages.
 
@@ -197,7 +203,7 @@ export const getStaticProps: GetStaticProps<Data> = async (_ctx) => {
   const context = {}; // optional, see https://docs.getunleash.io/concepts/unleash-context
   const { toggles } = evaluateFlags(definitions, context);
 
-  /* Or with the proxy/front-end API */
+  /* Or with the Frontend API */
   // const { toggles } = await getFrontendFlags({ context });
 
   const flags = flagsClient(toggles);
@@ -217,7 +223,7 @@ The same approach will work for [ISR (Incremental Static Regeneration)](https://
 
 Both `getDefinitions()` and `getFrontendFlags()` can take arguments overriding URL, token and other request parameters.
 
-### E). Server Side Rendering (SSR)
+### Server-side rendering
 
 ```tsx
 import {
@@ -262,7 +268,7 @@ export const getServerSideProps: GetServerSideProps<Data> = async (ctx) => {
 export default ExamplePage;
 ```
 
-### F). Bootstrapping / Rehydration
+### Bootstrap
 
 You can bootstrap Unleash React SDK to have values loaded from the start.
 Initial value can be customized server-side.
@@ -315,7 +321,7 @@ CustomApp.getInitialProps = async (ctx: AppContext) => {
 ```
 
 
-## Developer Toolbar
+## Developer toolbar
 
 The [Developer Toolbar](/integrate/toolbar) provides runtime flag and context overrides during development. It supports both client components and server-side rendering through cookie-based state sync.
 
@@ -352,7 +358,7 @@ export default function RootLayout({ children }) {
 }
 ```
 
-### Server components (SSR)
+### Server components
 
 The toolbar syncs state to cookies, which server components can read using `applyToolbarOverrides`:
 
@@ -380,7 +386,9 @@ export default async function ServerPage() {
 Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configuration options and the [complete Next.js example on GitHub](https://github.com/Unleash/toolbar/tree/main/examples/nextjs).
 
 
-## Server-side Flags and Metrics (New in v1.5.0)
+## Server-side flags and metrics
+
+<Button small outlined className="version-button" href="/support/availability">v1.5.0+</Button>
 
 Next.js applications using Server-Side Rendering (SSR) are often deployed in serverless or short-lived environments, such as Vercel. This creates challenges for server-side metrics reporting.
 
@@ -398,11 +406,11 @@ const enabled = flags.isEnabled("nextjs-example");
 await flags.sendMetrics();
 ```
 
-### No `setInterval` Support (e.g. Vercel)
+### Serverless environments
 
 If your runtime does not allow `setInterval` calls then you can report metrics on each request as shown below. Consider using Unleash Edge in this scenario.
 
-#### Next.js 15 and Newer
+#### Next.js 15 and newer
 
 Latest versions of Next.js allow to run code after the response is sent, with [`after` function](https://nextjs.org/docs/app/api-reference/functions/after).
 
@@ -425,9 +433,9 @@ export default async function Page() {
 }
 ```
 
-### Next.js 14 and Older
+### Next.js 14 and older
 
-#### App Router
+#### App router
 
 ```tsx
 import {evaluateFlags, flagsClient, getDefinitions,} from "@unleash/nextjs";
@@ -451,7 +459,7 @@ export default async function Page() {
 }
 ```
 
-#### Page Router
+#### Page router
 ```tsx
 import { evaluateFlags, flagsClient, getDefinitions } from "@unleash/nextjs";
 import type { GetServerSideProps, NextPage } from "next";
@@ -484,7 +492,7 @@ export default ExamplePage;
 ```
 
 
-## Next.js Middleware
+## Next.js middleware
 
 In `middleware.ts` you can use [`event.waitUntil()`](https://nextjs.org/docs/app/building-your-application/routing/middleware#waituntil-and-nextfetchevent) to reliably send metrics without delaying the response.
 
@@ -500,13 +508,13 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
 }
 ```
 
-## `setInterval` Support (e.g. Long-running Node Process or AWS Lambda)
+## Long-running environments
 
 If your Next application resolves flags only in SSR mode and `setInterval` is supported then you may also consider using [Node.js SDK](https://github.com/Unleash/unleash-client-node) instead, which is less taxing on metrics reporting.
 Check [this blog post](/guides/implement-feature-flags-in-aws-lambda) for more information on short-running lambdas that still support `setInterval`.
 
 
-## CLI (Experimental)
+## CLI
 
 You can use `unleash [action] [options]` in your `package.json` `scripts` section, or with:
 
@@ -539,7 +547,3 @@ UNLEASH_SERVER_API_URL=https://app.unleash-hosted.com/demo/api \
 UNLEASH_SERVER_API_TOKEN=test-server:default.8a090f30679be7254af997864d66b86e44dcfc5291916adff72a0fb5 \
 npx @unleash/nextjs generate-types ./unleash.ts
 ```
-
-## Known Limitation
-
-- When used server-side, this SDK does not support the "Hostname" and "IP" strategies. Use custom context fields and constraints instead.

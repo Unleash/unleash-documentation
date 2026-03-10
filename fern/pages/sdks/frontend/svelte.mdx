@@ -7,28 +7,29 @@ keywords: Svelte SDK, feature flags, web development, frontend SDK, reactive fra
 max-toc-depth: 3
 ---
 
-This Svelte SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
-
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=svelte) or [Unleash Open Source](https://github.com/Unleash/unleash).
+<Markdown src="/snippets/sdks/frontend-intro.mdx" language="Svelte" />
 
 ## Installation
 
+<Tabs>
+<Tab title="npm">
 ```bash
 npm install @unleash/proxy-client-svelte
-# or
+```
+</Tab>
+<Tab title="yarn">
+```bash
 yarn add @unleash/proxy-client-svelte
 ```
+</Tab>
+</Tabs>
 
-## How to Use
+## Initialization
 
-## Initialize the Client
+To use this SDK, you need:
 
-Depending on your needs and specific use-case, prepare one of:
-
-- [Front-end API](/api#frontend-api)
-- [Unleash Edge](/unleash-edge)
-
-And a respective frontend token (or, if you're using the Unleash Proxy, one of your proxy's designated client keys, previously known as proxy secrets).
+- A connection to the [Frontend API](/api#frontend-api) or [Unleash Edge](/unleash-edge)
+- A [frontend API token](/concepts/api-tokens-and-client-keys#frontend-tokens)
 
 Import the provider like this in your entrypoint file (typically index.svelte):
 
@@ -37,9 +38,9 @@ Import the provider like this in your entrypoint file (typically index.svelte):
 	import { FlagProvider } from '@unleash/proxy-client-svelte';
 
 	const config = {
-		url: '<unleash-url>/api/frontend', // Your Front-end API, Unleash Edge or Unleash Proxy URL
-		clientKey: '<your-token>', // Front-end API token (or proxy client key)
-		refreshInterval: 15, // How often (in seconds) the client should poll the proxy for updates
+		url: '<unleash-url>/api/frontend', // Your Frontend API or Unleash Edge URL
+		clientKey: '<your-token>', // Frontend API token
+		refreshInterval: 15, // How often (in seconds) the client should poll for updates
 		appName: 'your-app-name' // The name of your application. It's only used for identifying your application
 	};
 </script>
@@ -49,13 +50,11 @@ Import the provider like this in your entrypoint file (typically index.svelte):
 </FlagProvider>
 ```
 
-### Connection Options
+### Connection options
 
-To connect this SDK to your Unleash instance's [front-end API](/api#frontend-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance.  Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information.
+Set `url` to the `/api/frontend` endpoint of your Unleash instance or your [Unleash Edge](/unleash-edge) instance. Set `clientKey` to a [frontend API token](/concepts/api-tokens-and-client-keys#frontend-tokens).
 
-To connect this SDK to the [Unleash Edge](/unleash-edge), use the URL to your Unleash Edge instance as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash Edge instance. Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information. Ensure that your Unleash Edge instance is correctly configured to have access to the feature toggles your `FRONTEND` token is requesting.
-
-## Check Feature Toggle Status
+## Check flags
 
 To check if a feature is enabled:
 
@@ -73,7 +72,7 @@ To check if a feature is enabled:
 {/if}
 ```
 
-## Check Variants
+## Check variants
 
 To check variants:
 
@@ -93,7 +92,7 @@ To check variants:
 {/if}
 ```
 
-## Defer Rendering Until Flags Fetched
+## Defer rendering until flags fetched
 
 useFlagsStatus retrieves the ready state and error events.
 Follow the following steps in order to delay rendering until the flags have been fetched.
@@ -112,7 +111,7 @@ Follow the following steps in order to delay rendering until the flags have been
 {/if}
 ```
 
-## Updating Context
+## Unleash context
 
 Initial context can be specified on a `FlagProvider` `config.context` property.
 
@@ -146,9 +145,7 @@ This code sample shows you how to update the unleash context dynamically:
 </script>
 ```
 
-## Advanced Use Cases
-
-### Deferring Client Start
+## Deferring client start
 
 By default, the Unleash client will start polling for toggles immediately when the `FlagProvider` component renders. You can prevent it by setting `startClient` prop to `false`. This is useful when you'd like to for example bootstrap the client and work offline.
 
@@ -173,7 +170,7 @@ To start the client, use the client's `start` method. The below snippet of pseud
 </FlagProvider>
 ```
 
-### Use Unleash Client Directly
+## Use Unleash client directly
 
 ```svelte
 <script lang="ts">

@@ -50,7 +50,7 @@ Unleash offers the following frontend SDKs:
 -   [Svelte SDK](/sdks/svelte)
 -   [Vue SDK](/sdks/vue)
 
-### Feature Compatibility in Backend SDKs
+### Feature compatibility in backend SDKs
 
 The following tables show which features are supported by each backend SDK. Some features are only applicable to specific SDKs, depending on the programming language or how the client is implemented.
 
@@ -68,13 +68,13 @@ The following tables show which features are supported by each backend SDK. Some
 | Flag Query: `namePrefix`, `tags` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Flag Query: `project_name` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | ⭕ |
 
-#### Custom Headers
+#### Custom headers
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | static | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
 | function | ✅ | ✅ | ⭕ | ✅ | ✅ (4.3) | ✅ | ✅ | ⭕ |
 
-#### Built-in Strategies
+#### Built-in strategies
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Gradual rollout](/concepts/activation-strategies) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -82,10 +82,10 @@ The following tables show which features are supported by each backend SDK. Some
 | [IP](/concepts/activation-strategies#ips), [hostname](/concepts/activation-strategies#hosts) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | [IP](/concepts/activation-strategies#ips) with CIDR syntax | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ | ✅ | ✅ |
 
-#### Custom Strategies
+#### Custom strategies
 All backend SDKs have basic support.
 
-#### Strategy Constraints
+#### Strategy constraints
 All backend SDKs have support for the basic operators (`IN`, `NOT_IN`).
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
@@ -93,29 +93,29 @@ All backend SDKs have support for the basic operators (`IN`, `NOT_IN`).
 | [Advanced operators](/concepts/activation-strategies#advanced-operators) | ✅ (5.1) | ✅ (3.12) | ✅ (3.3) | ✅ (5.1) | ✅ (4.2) | ✅ (2.1) | ✅ (1.3.1) | ⭕ |
 
 
-#### Unleash Context
+#### Unleash context
 
 Static fields (`environment`, `appName`), defined fields, and custom properties are supported in all backend SDKs.
 
-#### `isEnabled` Implementation
+#### `isEnabled` implementation
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Can take context and override fallback value | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Fallback function | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ | ⭕ | ⭕ |
 
-#### Strategy Variants
+#### Strategy variants
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Strategy variants](/concepts/strategy-variants) and [custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
 
 
-#### Local Backup
+#### Local backup
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | File-based local backup | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
 
-#### Metrics and Impression Data
+#### Metrics and impression data
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Usage metrics | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -127,7 +127,7 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Bootstrap from file or custom implementation | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
 
-### Default Refresh and Metrics Intervals
+### Default refresh and metrics intervals
 
 #### Backend SDKs
 
@@ -161,22 +161,22 @@ If you need a language or framework not covered officially, explore our communit
 
 -   Solid ([nunogois/proxy-client-solid](https://github.com/nunogois/proxy-client-solid))
 
-### Implement Your Own SDK
+### Implement your own SDK
 
 If you can't find an SDK that fits your requirements, you can also develop your own SDK. To make implementation easier, check out these resources:
 
 -   [Unleash Client Specifications](https://github.com/Unleash/client-specification) - Used by all official SDKs to make sure they behave correctly across different language implementations. This lets us verify that a gradual rollout to 10% of the users would affect the same users regardless of which SDK you're using.
 -   [Client Specification](https://github.com/Unleash/unleash/blob/main/contributing/client-specification.md) - A brief guide of the _Unleash Architecture_ and important aspects of the SDK role in it all.
 
-## Offline Behavior
+## Offline behavior
 
 Once they have been initialized, all Unleash clients continue to function without an internet connection or in the event that the Unleash server has an outage.
 
 Because the SDKs and the Unleash Edge cache their feature flag states locally and only communicate with the Unleash server or Edge at predetermined intervals, a broken connection only means that they won't get any new updates.
 
-Unless the SDK supports [bootstrapping](#bootstrapping), it needs to connect to Unleash at startup to get its initial feature flag data set. If the SDK doesn't have a feature flag data set available, all flags fall back to evaluating as disabled or as the specified default value.
+Unless the SDK supports [bootstrapping](#bootstrap), it needs to connect to Unleash at startup to get its initial feature flag data set. If the SDK doesn't have a feature flag data set available, all flags fall back to evaluating as disabled or as the specified default value.
 
-### Bootstrapping
+### Bootstrap
 
 By default, all SDKs reach out to the Unleash server at startup to fetch their flag configuration. Additionally, most of the [backend SDKs](#backend-sdks) and Unleash Edge support bootstrapping, which allows them to get their flag configuration from a file, the environment, or other local resources. These SDKs can function without any network connection.
 
@@ -190,7 +190,7 @@ Bootstrapping is also supported by the following frontend SDKs:
 -   [Vue SDK](/sdks/vue)
 
 
-### SDK Identification Headers
+### SDK identification headers
 
 To identify which SDK instances are connected to Unleash, the following headers must be attached to all requests made by the SDK to the server (`/api/client` for backend SDKs and `/api/frontend` for frontend SDKs):
 

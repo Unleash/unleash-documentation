@@ -7,30 +7,33 @@ keywords: React SDK, feature flags, React hooks, web development, frontend SDK
 max-toc-depth: 3
 ---
 
-This React SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
-
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=react) or [Unleash Open Source](https://github.com/Unleash/unleash).
+<Markdown src="/snippets/sdks/frontend-intro.mdx" language="React" />
 
 ## Installation
 
+<Tabs>
+<Tab title="npm">
 ```bash
 npm install @unleash/proxy-client-react unleash-proxy-client
-# or
+```
+</Tab>
+<Tab title="yarn">
+```bash
 yarn add @unleash/proxy-client-react unleash-proxy-client
 ```
+</Tab>
+</Tabs>
 
-## Example Application
+## Example application
 
 To see the SDK in action, explore the [`examples/basic-app`](https://github.com/Unleash/proxy-client-react/blob/main/examples/basic-app/README.md) directory.
 It contains a minimal Vite + React setup that connects to Unleash, evaluates a feature toggle,
 and updates the evaluation context dynamically at runtime. The README in that folder includes step-by-step instructions
 for running the example.
 
-## How to Use
-
 This library uses the core [unleash-js-sdk](https://github.com/Unleash/unleash-js-sdk) client as a base.
 
-### Initialize the Client
+## Initialization
 You can use the [Frontend API](/api#frontend-api) or [unleash-edge](/unleash-edge).
 
 For the following step you will need a [frontend API Token](/api#frontend-api) or [unleash-edge pretrusted token](/unleash-edge#pretrusted-tokens).
@@ -42,7 +45,7 @@ import { createRoot } from 'react-dom/client';
 import { FlagProvider } from '@unleash/proxy-client-react';
 
 const config = {
-  url: '<unleash-url>/api/frontend', // Your front-end API URL or the Unleash edge URL
+  url: '<unleash-url>/api/frontend', // Your Frontend API URL or the Unleash Edge URL
   clientKey: '<your-token>', // A frontend token OR one of your unleash-edge pretrusted token
   refreshInterval: 15, // How often (in seconds) the client should poll the proxy for updates
   appName: 'your-app-name', // The name of your application. It's only used for identifying your application
@@ -63,13 +66,13 @@ root.render(
 **Testing feature flags locally?** The [Developer Toolbar](#developer-toolbar) provides a drop-in replacement for `FlagProvider` that lets you override flag values and context at runtime. Use `UnleashToolbarProvider` from `@unleash/toolbar/react` during development.
 </Tip>
 
-### Connection Options
+### Connection options
 
-To connect this SDK to your Unleash instance's [front-end API](/api#frontend-api), use the URL to your Unleash instance's front-end API (`<unleash-url>/api/frontend`) as the `url` parameter. For the `clientKey` parameter, use a `FRONTEND` token generated from your Unleash instance.  Refer to the [API tokens documentation](/concepts/api-tokens-and-client-keys) for more information.
+Set `url` to the `/api/frontend` endpoint of your Unleash instance or your [Unleash Edge](/unleash-edge) instance. Set `clientKey` to a [frontend API token](/concepts/api-tokens-and-client-keys#frontend-tokens).
 
 To connect this SDK to unleash-edge, follow the documentation provided in the [unleash-edge repository](https://github.com/unleash/unleash-edge).
 
-### Check Feature Toggle Status
+## Check flags
 
 To check if a feature is enabled:
 
@@ -88,7 +91,7 @@ const TestComponent = () => {
 export default TestComponent;
 ```
 
-### Check Variants
+## Check variants
 
 To check variants:
 
@@ -109,7 +112,7 @@ const TestComponent = () => {
 export default TestComponent;
 ```
 
-### Defer Rendering Until Flags Fetched
+### Defer rendering until flags fetched
 
 useFlagsStatus retrieves the ready state and error events.
 Follow the following steps in order to delay rendering until the flags have been fetched.
@@ -127,7 +130,7 @@ const MyApp = () => {
 };
 ```
 
-### Updating Context
+### Unleash context
 
 Initial context can be specified on a `FlagProvider` `config.context` property.
 
@@ -159,7 +162,7 @@ const MyComponent = ({ userId }) => {
 };
 ```
 
-### Listening to Events
+### Events
 
 The core JavaScript client emits various types of events depending on internal activities. You can listen to these events by using a hook to access the client and then directly attaching event listeners. Alternatively, if you're using the FlagProvider with a client, you can directly use this client to listen to the events. [See the full list of events here.](https://github.com/Unleash/unleash-proxy-client-js?tab=readme-ov-file#available-events)
 
@@ -189,9 +192,7 @@ const MyComponent = ({ userId }) => {
 };
 ```
 
-## Advanced Use Cases
-
-### Deferring Client Start
+## Deferring client start
 
 By default, the Unleash client will start polling the Proxy for toggles immediately when the `FlagProvider` component renders. You can prevent it by setting `startClient` prop to `false`. This is useful when you'd like to for example bootstrap the client and work offline.
 
@@ -222,7 +223,7 @@ const MyAppComponent = () => {
 };
 ```
 
-## Use Unleash Client Directly
+## Use Unleash client directly
 
 ```jsx
 import { useUnleashContext, useUnleashClient } from '@unleash/proxy-client-react'
@@ -234,16 +235,16 @@ const MyComponent = ({ userId }) => {
     // login user
     if (client.isEnabled("new-onboarding")) {
       // Send user to new onboarding flow
-    } else (
+    } else {
       // send user to old onboarding flow
-    )
+    }
   }
 
   return <LoginForm login={login}/>
 }
 ```
 
-## Usage With Class Components
+## Usage with class components
 
 Since this library uses hooks you have to implement a wrapper to use with class components. Beneath you can find an example of how to use this library with class components, using a custom wrapper:
 
@@ -318,7 +319,7 @@ Wrap your components like so:
 />
 ```
 
-## Developer Toolbar
+## Developer toolbar
 
 The [Developer Toolbar](/integrate/toolbar) provides runtime flag and context overrides during development. It wraps the standard React SDK with override capabilities while maintaining the same hook API.
 
@@ -406,29 +407,20 @@ Refer to the [Developer Toolbar documentation](/integrate/toolbar) for configura
 
 For React Native and Expo applications, use the dedicated [React Native SDK](/sdks/react-native). It wraps this SDK and handles `AsyncStorage` and `startTransition` configuration automatically.
 
-## Migration Guide
+## Migrating to v5
 
-### Upgrade Path From v1 -> v2
-
-If you were previously using the built in Async storage used in the unleash-proxy-client-js, this no longer comes bundled with the library. You will need to install the storage adapter for your preferred storage solution. Otherwise there are no breaking changes.
-
-### Upgrade Path From v2 -> v3
-Previously the unleash client was bundled as dependency directly in this library. It's now changed to a peer dependency and listed as an external.
-
-In v2 there was only one distribution based on the fact that webpack polyfilled the necessary features in v4. This is no longer the case in webpack v5. We now provide two distribution builds, one for the server and one for the client - and use the browser field in the npm package to hint module builders about which version to use. The default `dist/index.js` file points to the node version, while the web build is located at `dist/index.browser.js`
-
-Upgrading should be as easy as running yarn again with the new version, but we made the made bump regardless to be safe. Note: If you are not able to resolve the peer dependency on `unleash-proxy-client` you might need to run `npm install unleash-proxy-client`
-
-### Upgrade Path From v3 -> v4
-
-`startClient` option has been simplified. Now it will also work if you don't pass custom client with it. It defaults to `true`.
-
-#### Note on v4.0.0:
-The major release is driven by Node14 end of life and represents no other changes.  From this version onwards we do not guarantee that this library will work server side with Node 14.
-
-### Upgrade Path From v4 -> v5
+### From v4
 
 [FlagContext public interface changed](https://github.com/Unleash/unleash-react-sdk/commit/b783ef4016dbb881ac3d878cffaf5241b047cc35#diff-825c82ad66c3934257e0ee3e0511d9223db22e7ddf5de9cbdf6485206e3e02cfL20-R20). If you used FlagContext directly you may have to adjust your code slightly to accommodate the new type changes.
 
-## Design Philosophy
-This feature flag SDK is designed according to our design philosophy. You can [read more about that here](/guides/feature-flag-best-practices).
+### From v3
+
+The `startClient` option has been simplified. It now also works if you don't pass a custom client with it. It defaults to `true`. The v4 major bump was driven by Node 14 end of life — no other breaking changes.
+
+### From v2
+
+The unleash client is now a peer dependency instead of a bundled dependency. Two distribution builds are provided: one for the server (`dist/index.js`) and one for the browser (`dist/index.browser.js`). If you can't resolve the peer dependency, run `npm install unleash-proxy-client`.
+
+### From v1
+
+The built-in async storage is no longer bundled. Install a storage adapter for your preferred storage solution. No other breaking changes.

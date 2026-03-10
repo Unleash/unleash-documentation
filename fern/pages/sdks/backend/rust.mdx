@@ -7,11 +7,9 @@ keywords: [unleash, rust, sdk, feature flags, feature toggles]
 max-toc-depth: 3
 ---
 
-This Rust SDK is designed to help you integrate with Unleash and evaluate feature flags in Rust programs.
+<Markdown src="/snippets/sdks/backend-intro.mdx" language="Rust" />
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=rust) or [Unleash Open Source](https://github.com/Unleash/unleash).
-
-## Client Overview
+## Client overview
 
 The client is written using async rust. For communicating with the Unleash API
 surf or reqwest support is built in, or any async HTTP client can be provided by
@@ -84,36 +82,3 @@ Unimplemented Unleash specified features:
 
 * local serialised copy of toggles to survive restarts without network traffic.
 
-## Code of Conduct
-
-Please note that this project is released with a Contributor Code of Conduct. By
-participating in this project you agree to abide by its terms.
-
-## Contributing
-
-PR's on Github as normal please. Cargo test to run the test suite, rustfmt code
-before submitting. To run the functional test suite you need an Unleash API to
-execute against.
-
-For instance, one way:
-
-```shell
-docker-compose up -d
-```
-
-Visit `http://localhost:4242/` and log in with admin + unleash4all, then create
-a new Backend API token at `http://localhost:4242/admin/api/create-token` for user
-admin, type Client.
-
-Then run the test suite:
-
-```shell
-UNLEASH_API_URL=http://127.0.0.1:4242/api \
-  UNLEASH_APP_NAME=fred UNLEASH_INSTANCE_ID=test \
-  UNLEASH_CLIENT_SECRET="<tokenvalue>" \
-  cargo test --features functional  -- --nocapture
-```
-
-or similar. The functional test suite looks for a manually setup set of
-features. E.g. log into the Unleash UI on port 4242 and create a feature called
-`default`.

@@ -7,26 +7,15 @@ keywords: [unleash, python, sdk, feature flags, feature toggles]
 max-toc-depth: 3
 ---
 
-This server-side Python SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
+<Markdown src="/snippets/sdks/backend-intro.mdx" language="Python" />
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=python) or [Unleash Open Source](https://github.com/Unleash/unleash).
-
-<Note>
-**Migrating to v6**
-
-If you use custom strategies or access the `features` property on the Unleash Client, read the complete [migration guide](https://github.com/Unleash/unleash-python-sdk/blob/main/./v6_MIGRATION_GUIDE.md) before upgrading to v6.
-</Note>
-
-
-## Getting Started
-
-### Install the Unleash Client in Your Project
+## Installation
 
 ```bash
 pip install UnleashClient
 ```
 
-### Initialization
+## Initialization
 
 You must initialize the SDK before you use it. Note that until the SDK has synchronized with the API, all features will evaluate to `false` unless
 you have a [bootstrapped configuration](#bootstrap) or you use [fallbacks](#fallback-function).
@@ -42,7 +31,7 @@ client = UnleashClient(
 client.initialize_client()
 ```
 
-### Check Features
+## Check flags
 
 Once the SDK is initialized, you can evaluate toggles using the `is_enabled` or `get_variant` methods.
 
@@ -64,7 +53,7 @@ print(variant)
 
 ```
 
-### Shutdown
+## Stop the client
 
 If your program no longer needs the SDK, you can call `destroy()`, which shuts down the SDK and flushes any pending metrics to Unleash.
 
@@ -72,9 +61,7 @@ If your program no longer needs the SDK, you can call `destroy()`, which shuts d
 client.destroy()
 ```
 
-## Usage
-
-### Context
+## Unleash context
 
 Both the `is_enabled` and `get_variant` functions support [Unleash contexts](/concepts/unleash-context) as the second parameter.
 
@@ -102,7 +89,7 @@ The context values can be any type that has a `__str__` implementation. Types th
 Gradual rollout strategies require you to pass either a `userId` or a `sessionId` for [stickiness](/concepts/stickiness) to work correctly.
 </Note>
 
-### Fallback Function
+## Fallback function
 
 You can specify a fallback function for cases where the client doesn't recognize the toggle by using the `fallback_function` keyword argument:
 
@@ -117,7 +104,7 @@ The fallback function **must** accept the feature name and context as positional
 
 The client will evaluate the fallback function if the feature flag is not found or an exception occurs when calling the `is_enabled()` method.
 
-### Configuration Options
+## Configuration options
 
 The UnleashClient constructor supports the following configuration options:
 
@@ -146,7 +133,7 @@ The UnleashClient constructor supports the following configuration options:
 | multiple_instance_mode    | How to handle multiple client instances (BLOCK, WARN, SILENTLY_ALLOW).                                                                        | WARN                      |
 | event_callback            | Function to handle impression events. See [impression data](#impression-data) for more information.                                           | None                      |
 
-### Bootstrap
+## Bootstrap
 
 By default, the Python SDK fetches your feature flags from the Unleash API at startup. If you want to make your SDK more resilient (e.g., during network outages), you can bootstrap the client with a local or remote toggle config.
 
@@ -160,13 +147,12 @@ How it works:
 
 The default FileCache has built-in methods for bootstrapping from a dictionary, file, or URL.
 
-#### Bootstrap From Dict
-
+<Tabs>
+<Tab title="Dictionary">
 ```python
 from UnleashClient.cache import FileCache
 from UnleashClient import UnleashClient
 
-# Create and seed the cache
 cache = FileCache("MY_CACHE")
 cache.bootstrap_from_dict({
     "version": 2,
@@ -184,11 +170,9 @@ client = UnleashClient(
     app_name="my-python-app",
     cache=cache
 )
-
 ```
-
-#### Bootstrap From File
-
+</Tab>
+<Tab title="File">
 ```python
 from pathlib import Path
 from UnleashClient.cache import FileCache
@@ -202,9 +186,8 @@ client = UnleashClient(
     cache=cache
 )
 ```
-
-#### Bootstrap From URL
-
+</Tab>
+<Tab title="URL">
 ```python
 from UnleashClient.cache import FileCache
 
@@ -216,10 +199,11 @@ client = UnleashClient(
     app_name="my-python-app",
     cache=cache
 )
-
 ```
+</Tab>
+</Tabs>
 
-### Custom Strategies
+## Custom strategies
 
 The Python SDK lets you define [custom activation strategies](/concepts/custom-activation-strategies) if the built-in ones don't cover your needs. This gives you more fine grained control over how your features evaluate.
 
@@ -252,54 +236,20 @@ client = UnleashClient(
 
 ```
 
-### Events and Impression Data
+## Events
 
-The Python SDK lets you tap into its behavior through [impression data](/concepts/impression-data) and lifecycle events.
+The Python SDK lets you tap into its behavior through [impression data](/concepts/impression-data) and lifecycle events. Provide an `event_callback` function when you initialize the client.
 
 <Note>
-The SDK does not include a built-in event bus — you'll need to provide your own. The example below shows how to use [Blinker](https://pypi.org/project/blinker/) to send signals.
+The SDK does not include a built-in event bus — you'll need to provide your own. The examples below use [Blinker](https://pypi.org/project/blinker/) to send signals.
 </Note>
 
-#### Impression Events
-
-To use impression data:
-- Enable impression data on your feature flags in the Unleash UI.
-- Provide an event_callback function when you initialize the client.
-
-Your callback must accept a single UnleashEvent. You can log it, store it, or send it to another system.
-
-```python
-from blinker import signal
-from UnleashClient import UnleashClient
-from UnleashClient.events import UnleashEvent
-
-send_data = signal('send-data')
-
-@send_data.connect
-def receive_data(sender, **kw):
-    print("Caught signal from %r, data %r" % (sender, kw))
-
-def example_callback(event: UnleashEvent):
-    send_data.send('anonymous', data=event)
-
-client = UnleashClient(
-    url="https://YOUR-API-URL",
-    app_name="my-python-app",
-    custom_headers={'Authorization': '<API token>'},
-    event_callback=example_callback
-)
-client.initialize_client()
-client.is_enabled("testFlag")
-
-```
+The callback receives a single `UnleashEvent`. The SDK emits the following event types:
+- **Impression events**: emitted when `is_enabled()` or `get_variant()` is called for a flag with [impression data](/concepts/impression-data) enabled.
+- **READY**: triggered once when the SDK first loads feature flags from the Unleash server or a local backup.
+- **FETCHED**: triggered when a new version of feature flags is pulled from the server (not on 304 Not Modified). Includes a `features` property with all flags returned by that fetch.
 
 Impression callbacks run in-process — keep them fast to avoid blocking your app.
-
-#### Lifecycle Events
-
-The same event_callback also delivers lifecycle events:
-- FETCHED: triggered when a new version of feature flags is pulled from the Unleash server. (Does not trigger on 304 Not Modified). The FETCHED event includes a features property containing all the feature flags returned by that fetch.
-- READY: triggered once when the SDK first loads feature flags from the Unleash server or a local backup.
 
 ```python
 from blinker import signal
@@ -313,7 +263,6 @@ def receive_data(sender, **kw):
     if kw["data"].event_type == UnleashEventType.READY:
         print("SDK is ready: toggles loaded from Unleash or backup")
     elif kw["data"].event_type == UnleashEventType.FETCHED:
-        # Only FETCHED events have a 'features' property
         print("Fetched new feature flags:", kw["data"].features)
 
 def example_callback(event: UnleashEvent):
@@ -327,10 +276,9 @@ client = UnleashClient(
 )
 client.initialize_client()
 client.is_enabled("testFlag")
-
 ```
 
-### Custom Cache
+## Custom cache
 
 By default, the Python SDK stores feature flags in an on-disk cache using fcache. If you need a different storage backend, for example, Redis, memory-only, or a custom database, you can provide your own cache implementation.
 
@@ -373,7 +321,7 @@ client = UnleashClient(
 )
 ```
 
-## Running in Multi-Process Setups
+## Running in multi-process setups
 
 The Python SDK runs a background thread to keep feature flags in sync with the Unleash server. Some runtime environments, like WSGI servers and Celery workers, need extra setup to make sure the SDK works correctly.
 
@@ -407,12 +355,6 @@ def configure_workers(sender=None, conf=None, **kwargs):
     client.initialize_client()
 ```
 
-## Contributing and Development
+## Migrating to v6
 
-We love community input! If you'd like to report a bug, propose a feature, or improve the SDK, please read our [contribution guide](https://github.com/Unleash/unleash-python-sdk/blob/main/CONTRIBUTING.md) for how to get started.
-
-For instructions on setting up your development environment, running tests, and publishing, see our [development documentation](https://github.com/Unleash/unleash-python-sdk/blob/main/DEVELOPMENT.md).
-
-## License
-
-This project is [MIT licensed](https://opensource.org/licenses/MIT).
+If you use custom strategies or access the `features` property on the Unleash Client, read the complete [v6 migration guide](https://github.com/Unleash/unleash-python-sdk/blob/main/./v6_MIGRATION_GUIDE.md) before upgrading.

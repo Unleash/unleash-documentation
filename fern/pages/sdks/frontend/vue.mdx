@@ -7,27 +7,26 @@ keywords: Vue SDK, Vue.js SDK, feature flags, web development, frontend SDK
 max-toc-depth: 3
 ---
 
-This Frontend Vue SDK is designed to help you integrate with Unleash and evaluate feature flags inside your application.
-
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=vue) or [Unleash Open Source](https://github.com/Unleash/unleash).
-
-## Usage Note
-
-This library is meant to be used with [Unleash Edge](https://github.com/Unleash/unleash-edge/) or the [Unleash front-end API](/api#frontend-api).
-
-It is **not** compatible with the Unleash client API.
+<Markdown src="/snippets/sdks/frontend-intro.mdx" language="Vue" />
 
 ## Installation
 
+<Tabs>
+<Tab title="npm">
 ```bash
 npm install @unleash/proxy-client-vue
-# or
+```
+</Tab>
+<Tab title="yarn">
+```bash
 yarn add @unleash/proxy-client-vue
 ```
+</Tab>
+</Tabs>
 
 ## Initialization
 
-### Using Config:
+### Using config
 
 ```jsx
 import { createApp } from 'vue'
@@ -66,7 +65,7 @@ const config = {
 </template>
 ```
 
-### Initializing Your Own Client
+### Initializing your own client
 
 ```jsx
 import { createApp } from 'vue'
@@ -109,7 +108,7 @@ const client = new UnleashClient(config)
 </template>
 ```
 
-### Deferring Client Start
+### Deferring client start
 
 By default, the Unleash client will start polling for toggles immediately when the `FlagProvider` component renders. You can delay the polling by:
 
@@ -148,9 +147,7 @@ onMounted(() => {
 </template>
 ```
 
-## Usage
-
-### Check Feature Toggle Status
+## Check flags
 
 To check if a feature is enabled:
 
@@ -167,7 +164,7 @@ const enabled = useFlag('travel.landing')
 </template>
 ```
 
-### Check Variants
+## Check variants
 
 To check variants:
 
@@ -180,12 +177,12 @@ const variant = useVariant('travel.landing')
 
 <template>
   <SomeComponent v-if="variant.enabled && variant.name === 'SomeComponent'" />
-  <AnotherComponent v-else-if="variant.enabled && variant.name === 'AnotherComponent" />
+  <AnotherComponent v-else-if="variant.enabled && variant.name === 'AnotherComponent'" />
   <DefaultComponent v-else />
 </template>
 ```
 
-### Defer Rendering Until Flags Fetched
+## Defer rendering until flags fetched
 
 useFlagsStatus retrieves the ready state and error events.
 Follow the following steps in order to delay rendering until the flags have been fetched.
@@ -199,7 +196,7 @@ const { flagsReady, flagsError } = useFlagsStatus()
 <MyComponent v-else error={flagsError} />
 ```
 
-### Updating Context
+## Unleash context
 
 Follow the following steps in order to update the unleash context:
 
@@ -227,7 +224,7 @@ watch(userId, () => {
 })
 ```
 
-## Developer Toolbar
+## Developer toolbar
 
 The [Developer Toolbar](/integrate/toolbar) provides runtime flag overrides during development.
 
