@@ -10,7 +10,7 @@ Unleash offers both an open-source (OSS) version and an Enterprise version.
 
 [Unleash OSS](https://github.com/Unleash/unleash) is a great way to explore Unleash and experiment with feature flags. It gives you the core of Unleash, including feature flags, [activation strategies](/concepts/activation-strategies), and [SDK](/sdks) support, but is designed for small-scale deployments with a limited number of server instances and direct SDK connections.
 
-For production workloads, we recommend [Unleash Enterprise](https://www.getunleash.io/pricing). Enterprise adds higher resource limits, advanced governance, automation, observability, integrations for identity and compliance, and access to [Unleash Edge](/unleash-edge) for scalable SDK traffic.
+For production workloads, we recommend [Unleash Enterprise](https://www.getunleash.io/pricing). With our Enterprise plans, you have access to the full feature set, including higher resource limits, advanced governance, automation, observability, integrations for identity and compliance, and access to [Unleash Edge](/unleash-edge) for scalable SDK traffic.
 
 Unleash Enterprise is suitable regardless of your team size, from small teams just getting started to large organizations running feature flags across thousands of services. It is designed to scale with you so you only pay for what you need, with flexible plan options from monthly pay-as-you-go to annual contracts, and flexible deployment options from [self-hosted](/guides/scaling-unleash#self-hosting-unleash-designing-for-high-availability) to [hybrid](/guides/scaling-unleash#choosing-the-right-deployment-option) to fully managed cloud.
 
@@ -18,6 +18,7 @@ This page highlights the key differences between Unleash OSS and Unleash Enterpr
 
 ## Core feature management
 
+<StickyTable>
 | Capability | OSS | Enterprise |
 |-------------|-----|-------------|
 | [Feature flags](/concepts/feature-flags) | ✅ | ✅ |
@@ -31,9 +32,11 @@ This page highlights the key differences between Unleash OSS and Unleash Enterpr
 | [Playground](/concepts/playground) | ✅ | ✅ |
 | [Release templates](/concepts/release-templates) | ❌ | ✅ |
 | [Automated release progression with safeguards](/concepts/release-management-overview) | ❌ | ✅ |
+</StickyTable>
 
 ## Governance and security
 
+<StickyTable>
 | Capability | OSS | Enterprise |
 |-------------|-----|-------------|
 | [Role-based access control](/concepts/rbac) | Basic roles | Project roles, custom roles, user groups |
@@ -47,10 +50,11 @@ This page highlights the key differences between Unleash OSS and Unleash Enterpr
 | [Private or protected projects](/concepts/project-collaboration-mode) | ❌ | ✅ |
 | [Signals](/concepts/signals) and [actions](/concepts/actions) | ❌ | ✅ |
 | [Banners](/concepts/banners) | ❌ | ✅ |
-
+</StickyTable>
 
 ## Observability and analytics
 
+<StickyTable>
 | Capability | OSS | Enterprise |
 |-------------|-----|-------------|
 | [Analytics](/concepts/insights) | ❌ | ✅ |
@@ -59,10 +63,11 @@ This page highlights the key differences between Unleash OSS and Unleash Enterpr
 | [Edge observability](/concepts/network-view#connected-edges) | ❌ | ✅ |
 | Access logs | ❌ | Available as an add-on |
 | IP-based restrictions | ❌ | Available as an add-on |
-
+</StickyTable>
 
 ## Integrations, automation, and scaling
 
+<StickyTable>
 | Capability | OSS | Enterprise |
 |-------------|-----|-------------|
 | [Export / import](/concepts/import-export) | ✅ | ✅ |
@@ -72,13 +77,14 @@ This page highlights the key differences between Unleash OSS and Unleash Enterpr
 | [Real-time streaming via Edge](/unleash-edge#real-time-updates-with-streaming) | ❌ | ✅ |
 | Server topology | Suited for 1-4 instances | Designed for large-scale, multi-instance deployments |
 | Connected SDK clients | Limited by direct API and database load | Scales to thousands of connected SDKs with [Unleash Edge](/unleash-edge) |
-
-
+</StickyTable>
 
 ## Hosting and support
 
+<StickyTable>
 | Capability | OSS | Enterprise |
 |-------------|-----|-------------|
 | [Self-hosting](/guides/scaling-unleash#self-hosting-unleash-designing-for-high-availability) | ✅ | ✅ |
 | [Unleash Cloud](/guides/scaling-unleash#choosing-the-right-deployment-option) (fully managed SaaS solution) | ❌ | ✅ |
 | Support and SLAs | Community only | Standard and Premium Support and uptime commitment |
+</StickyTable>
