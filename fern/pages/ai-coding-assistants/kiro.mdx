@@ -113,17 +113,17 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
 
     ```json title=".kiro/settings/mcp.json"
     {
-    "mcpServers": {
+      "mcpServers": {
         "unleash": {
-        "command": "npx",
-        "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
-        "env": {
+          "command": "npx",
+          "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+          "env": {
             "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
             "UNLEASH_PAT": "${UNLEASH_PAT}",
             "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
+          }
         }
-        }
-    }
+      }
     }
     ```
 
@@ -152,17 +152,17 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
 
     ```json title=".kiro/settings/mcp.json"
     {
-    "mcpServers": {
+      "mcpServers": {
         "unleash": {
-        "command": "npx",
-        "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
-        "env": {
+          "command": "npx",
+          "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+          "env": {
             "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
             "UNLEASH_PAT": "${UNLEASH_PAT}",
             "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
+          }
         }
-        }
-    }
+      }
     }
     ```
 
