@@ -100,7 +100,7 @@ Complete this checklist before changing versions:
 ### Validation for this stage
 
 - `GET /internal-backstage/health` returns `200`.
-- `GET /internal-backstage/ready` returns `READY`.
+- `GET /internal-backstage/ready` returns `200`.
 - Frontend and client API responses match expected flag behavior.
 
 ## Rollout runbook (UAT then production)
@@ -111,7 +111,7 @@ Complete this checklist before changing versions:
 4. Roll out gradually in production (canary or phased).
 5. Re-run validation checks in production.
 
-## Troubleshooting: 19.7.0 -> 20.1.10 token failures
+## Troubleshooting: v19.7.0 -> v20.1.10 token failures
 
 This section covers a common upgrade pattern where teams observe authorization failures after moving from `v19.7.0` to `v20.1.10`.
 
