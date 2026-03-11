@@ -62,13 +62,18 @@ Complete this checklist before changing versions:
 
 ### What changed
 
+- v19 introduced two edge behaviors: `strict` and `dynamic`.
+- **Strict mode** means Edge serves only tokens that are within startup token scope (`TOKENS`) and rejects out-of-scope tokens.
+- **Dynamic mode** (legacy) allowed Edge to accept previously unseen valid tokens, validate them upstream, and expand token coverage at runtime.
+- During v19, strict became the recommended operating model, and in later v19 builds strict became the default while dynamic was treated as legacy behavior.
 - Token handling and token-related behavior were tightened across v19.
-- `v19.10.0` introduced pretrusted token support for specific migration scenarios.
+- `v19.10.0` introduced pretrusted token support, primarily to support migrations from Unleash Proxy to Edge.
 
 ### Required actions
 
 - Keep `TOKENS` aligned to real usage scope.
-- If you need compatibility with legacy-style frontend token secrets during migration, evaluate `PRETRUSTED_TOKENS`.
+- If you are still using dynamic behavior in v19, migrate to strict behavior before upgrading to v20.
+- Use `PRETRUSTED_TOKENS` mainly when migrating from Unleash Proxy and you need temporary compatibility with legacy-style frontend token secrets.
 - Validate that all expected SDK requests are covered by startup scope.
 
 ### Validation for this stage
@@ -82,11 +87,13 @@ Complete this checklist before changing versions:
 ### What changed
 
 - v20 is a major release and should be treated as a full regression checkpoint.
+- Dynamic mode was removed; edge-mode token behavior is strict-only.
 - Startup token scope remains central to successful feature delivery.
 
 ### Required actions
 
 - Keep explicit `TOKENS` configuration; verify coverage before rollout.
+- Remove legacy `DYNAMIC`/`STRICT` behavior toggles from your runtime configuration if present.
 - Validate readiness and feature responses in UAT before production rollout.
 - Apply the same validation checklist per environment.
 
