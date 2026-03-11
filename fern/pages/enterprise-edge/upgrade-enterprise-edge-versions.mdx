@@ -1,6 +1,6 @@
 ---
 title: Upgrade Enterprise Edge versions
-description: Upgrade Enterprise Edge self-hosted from v17 to the latest release with a staged, low-risk path and token-focused validation steps.
+description: Upgrade Enterprise Edge self-hosted with stage-specific migration guides for v17 to v18, v18 to v19, and v19 to v20.
 keywords: enterprise edge, upgrade, migration, v17, v18, v19, v20, tokens, troubleshooting
 og:site_name: Unleash
 og:title: Upgrade Enterprise Edge versions
@@ -9,25 +9,21 @@ max-toc-depth: 3
 
 <Button small outlined className="version-button" href="/support/availability">Edge v17+</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
-This guide helps you upgrade **Enterprise Edge self-hosted** from version 17 and newer to the latest release.
+This guide helps you upgrade **Enterprise Edge self-hosted** from version 17 and newer.
 
-The recommended approach is to upgrade in **stages by major version**:
+We recommend upgrading in **stages by major version**:
 
 `v17 -> v18 -> latest v19 -> latest v20`
 
-This reduces risk, makes troubleshooting easier, and gives you a clear rollback point after each major transition.
+You can still jump directly to the migration section you need based on your current version.
 
-## Who this guide is for
+## Choose your migration stage
 
-Use this guide if you:
+- [Migrate from v17 to v18](#migrate-from-v17-to-v18)
+- [Migrate from v18 to v19](#migrate-from-v18-to-v19)
+- [Migrate from v19 to v20](#migrate-from-v19-to-v20)
 
-- Run Enterprise Edge in your own infrastructure.
-- Plan to move from `v17.x`, `v18.x`, or `v19.x` to a newer major version.
-- Need a repeatable runbook for UAT and production rollouts.
-
-If you are using hosted Enterprise Edge, version rollouts are managed for you.
-
-## Before you upgrade
+## Before any upgrade
 
 Complete this checklist before changing versions:
 
@@ -44,59 +40,69 @@ Complete this checklist before changing versions:
    - Persistence snapshot/backup available.
    - Clear owner and window for rollback if validation fails.
 
-## Recommended upgrade path
+## Migrate from v17 to v18
 
-### Step 1: Upgrade v17 -> v18
-
-Key migration point:
+### What changed
 
 - Service-account-driven token creation support was removed in v18.
 
-What to do:
+### Required actions
 
 - Start Edge with explicit, valid startup tokens in `TOKENS`.
 - Ensure startup tokens cover the environments/projects your clients require.
 - Do not rely on Edge creating missing client tokens at runtime.
 
-### Step 2: Upgrade v18 -> latest v19
+### Validation for this stage
 
-Key migration points in v19:
+- Edge starts and reaches `READY`.
+- Frontend and client API calls succeed for expected tokens.
+- No unexpected unauthorized/forbidden errors after cutover.
+
+## Migrate from v18 to v19
+
+### What changed
 
 - Token handling and token-related behavior were tightened across v19.
 - `v19.10.0` introduced pretrusted token support for specific migration scenarios.
 
-What to do:
+### Required actions
 
 - Keep `TOKENS` aligned to real usage scope.
 - If you need compatibility with legacy-style frontend token secrets during migration, evaluate `PRETRUSTED_TOKENS`.
 - Validate that all expected SDK requests are covered by startup scope.
 
-### Step 3: Upgrade latest v19 -> latest v20
+### Validation for this stage
 
-Key migration points in v20:
+- Requests across all required environments/projects are served correctly.
+- Token coverage is complete for known clients.
+- Internal state endpoints show expected token/feature hydration.
+
+## Migrate from v19 to v20
+
+### What changed
 
 - v20 is a major release and should be treated as a full regression checkpoint.
 - Startup token scope remains central to successful feature delivery.
 
-What to do:
+### Required actions
 
 - Keep explicit `TOKENS` configuration; verify coverage before rollout.
 - Validate readiness and feature responses in UAT before production rollout.
 - Apply the same validation checklist per environment.
 
-## Upgrade runbook (UAT then production)
+### Validation for this stage
 
-1. Deploy target version in UAT with the intended production configuration.
-2. Validate startup and readiness:
-   - `GET /internal-backstage/health` returns `200`.
-   - `GET /internal-backstage/ready` returns `READY`.
-3. Validate token and feature behavior:
-   - Frontend API calls return expected toggles.
-   - Client API calls return expected toggles.
-   - No unexpected unauthorized/forbidden spikes.
-4. Validate business-path behavior in at least one real application flow.
-5. Roll out to production gradually (canary or phased).
-6. Repeat health/readiness and feature validation checks in production.
+- `GET /internal-backstage/health` returns `200`.
+- `GET /internal-backstage/ready` returns `READY`.
+- Frontend and client API responses match expected flag behavior.
+
+## Rollout runbook (UAT then production)
+
+1. Deploy target version in UAT with intended production configuration.
+2. Validate health/readiness and token coverage.
+3. Validate business-critical application flows.
+4. Roll out gradually in production (canary or phased).
+5. Re-run validation checks in production.
 
 ## Troubleshooting: 19.7.0 -> 20.1.10 token failures
 
