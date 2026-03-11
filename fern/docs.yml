@@ -759,6 +759,9 @@ navigation:
           - page: Migrate from Unleash Proxy
             path: pages/enterprise-edge/migrate-from-proxy.mdx
             slug: migrate-from-proxy
+          - page: Upgrade Enterprise Edge versions
+            path: pages/enterprise-edge/upgrade-enterprise-edge-versions.mdx
+            slug: upgrade-enterprise-edge-versions
             
   - tab: guides
     layout:
