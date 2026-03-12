@@ -48,14 +48,14 @@ Complete this checklist before changing versions:
 
 ### Required actions
 
-- Start Edge with explicit, valid startup tokens in `TOKENS`.
-- Ensure startup tokens cover the environments/projects your clients require.
-- Do not rely on Edge creating missing client tokens at runtime.
+- Start Edge with explicit, valid client tokens in `TOKENS`.
+- Ensure startup tokens cover the environments/projects that your frontend SDKs require.
+- Do not rely on Edge creating missing frontend tokens at runtime.
 
 ### Validation for this stage
 
 - Edge starts and reaches `READY`.
-- Frontend and client API calls succeed for expected tokens.
+- Frontend API calls succeed for expected tokens.
 - No unexpected unauthorized/forbidden errors after cutover.
 
 ## Migrate from v18 to v19
@@ -63,7 +63,7 @@ Complete this checklist before changing versions:
 ### What changed
 
 - v19 introduced two edge behaviors: `strict` and `dynamic`.
-- **Strict mode** means Edge serves only tokens that are within startup token scope (`TOKENS`) and rejects out-of-scope tokens.
+- **Strict mode** means Edge validates incoming tokens with Unleash and only accepts tokens whose project and environment scope matches, or is a subset of, the startup tokens configured in TOKENS.
 - **Dynamic mode** (legacy) allowed Edge to accept previously unseen valid tokens, validate them upstream, and expand token coverage at runtime.
 - During v19, strict became the recommended operating model, and in later v19 builds strict became the default while dynamic was treated as legacy behavior.
 - Token handling and token-related behavior were tightened across v19.
@@ -89,13 +89,15 @@ Complete this checklist before changing versions:
 - v20 is a major release and should be treated as a full regression checkpoint.
 - Dynamic mode was removed; edge-mode token behavior is strict-only.
 - Startup token scope remains central to successful feature delivery.
+- During v20, Edge no longer accepted service account tokens or personal access tokens as part of startup tokens
 
 ### Required actions
 
-- Keep explicit `TOKENS` configuration; verify coverage before rollout.
+- If migrating away from dynamic mode in v19, keep explicit `TOKENS` configuration; verify coverage before rollout.
 - Remove legacy `DYNAMIC`/`STRICT` behavior toggles from your runtime configuration if present.
 - Validate readiness and feature responses in UAT before production rollout.
 - Apply the same validation checklist per environment.
+- Replace any service account or personal access tokens in the `TOKENS` configuration with a client token scoped to all projects and the development environment
 
 ### Validation for this stage
 
