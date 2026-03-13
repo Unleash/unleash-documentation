@@ -1,0 +1,233 @@
+---
+title: Upgrade Enterprise Edge versions
+description: Upgrade Enterprise Edge self-hosted with stage-specific migration guides for v17 to v18, v18 to v19, and v19 to v20.
+keywords: enterprise edge, upgrade, migration, v17, v18, v19, v20, tokens, troubleshooting
+og:site_name: Unleash
+og:title: Upgrade Enterprise Edge versions
+max-toc-depth: 3
+---
+
+<Button small outlined className="version-button" href="/support/availability">Edge v17+</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+This guide walks you through upgrading [Enterprise Edge self-hosted](/unleash-edge#enterprise-edge-self-hosted) from version 17 onward.
+
+Follow each major version upgrade in order: <Button small outlined href="#migrate-from-v17-to-v18">v17 to v18</Button> <Button small outlined href="#migrate-from-v18-to-v19">v18 to v19</Button> <Button small outlined href="#migrate-from-v19-to-v20">v19 to v20</Button>
+
+Go to the section that matches your current version to get started.
+
+<CardGroup cols={3}>
+  <Card title="Migrate from v17 to v18" href="#migrate-from-v17-to-v18">
+    Service account token creation removed. Start Edge with explicit backend tokens.
+  </Card>
+  <Card title="Migrate from v18 to v19" href="#migrate-from-v18-to-v19">
+    Strict and dynamic token-validation modes introduced. Strict mode becomes the default.
+  </Card>
+  <Card title="Migrate from v19 to v20" href="#migrate-from-v19-to-v20">
+    Dynamic mode removed. Service account and personal access tokens no longer accepted.
+  </Card>
+</CardGroup>
+
+## Before you upgrade
+
+Complete this checklist before you upgrade your version:
+
+<Steps>
+  <Step title="Record your current runtime details">
+    Document the following for your current deployment:
+
+    - Edge image tag and chart version.
+    - [Environment variables and startup arguments](/unleash-edge/configure).
+    - [Persistence configuration](/unleash-edge/deploy#persistence-options) (`REDIS_URL`, `S3_BUCKET_NAME`, `BACKUP_FOLDER`), if any.
+  </Step>
+  <Step title="Inventory your tokens">
+    For each token, record the following:
+
+    - Startup tokens configured in `TOKENS`.
+    - The [environments](/concepts/environments) and [projects](/concepts/projects) each token covers.
+    - The SDKs and client applications that depend on each token.
+  </Step>
+  <Step title="Review the release notes">
+    Review the [release notes](https://github.com/Unleash/unleash-edge/releases) for your target version.
+  </Step>
+  <Step title="Confirm rollback readiness">
+    Verify that you have the following in place:
+
+    - Previous image or chart version is available.
+    - Persistence snapshot or backup exists.
+    - You have a clear owner and maintenance window for rollback if validation fails.
+  </Step>
+</Steps>
+
+## Migrate from v17 to v18
+
+### What changed
+
+v18 removed service-account-driven token creation. Edge no longer creates missing [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) at runtime.
+
+### Required actions
+
+Complete the following steps before you upgrade:
+
+<Steps>
+  <Step>
+    Start Edge with explicit, valid [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) in `TOKENS`.
+  </Step>
+  <Step>
+    Verify that your startup tokens cover the environments and projects your frontend SDKs require.
+  </Step>
+</Steps>
+
+### Validate the upgrade
+
+After you upgrade, verify that:
+
+- Edge starts and reaches `READY`.
+- Frontend API calls succeed for all expected tokens.
+- No unexpected `401` or `403` errors after cutover.
+
+## Migrate from v18 to v19
+
+### What changed
+
+v19 introduced two [edge mode](/unleash-edge/deploy#edge-mode) token-validation behaviors:
+
+- **Strict mode** validates incoming tokens against Unleash and only accepts tokens whose project and environment scope matches, or is a subset of, the startup tokens in `TOKENS`. Strict mode became the default in later v19 builds.
+- **Dynamic mode** (legacy) allowed Edge to accept previously unseen tokens, validate them upstream, and expand its token coverage at runtime. Dynamic mode is deprecated in v20.
+
+`v19.10.0` also added [pretrusted token](/unleash-edge/deploy#pre-trusted-tokens) support for teams migrating from the [Unleash Proxy](/unleash-edge/migrate-from-proxy).
+
+### Required actions
+
+Complete the following steps before you upgrade:
+
+<Steps>
+  <Step>
+    Keep `TOKENS` aligned to your actual usage scope.
+  </Step>
+  <Step>
+    If you still use dynamic mode, migrate to strict mode before you upgrade to v20. To determine your full token scope:
+
+    - If you use a [persistent backup](/unleash-edge/deploy#persistence-options) (Redis, S3, or local file), check it to see which tokens Edge previously accepted. This gives a definitive view of the scope dynamic mode was allowing.
+    - Monitor your frontend and backend SDK requests along with Edge logs to confirm no expected requests are being rejected.
+  </Step>
+  <Step>
+    Use `PRETRUSTED_TOKENS` only when you need temporary compatibility with legacy frontend token secrets during a [Proxy migration](/unleash-edge/migrate-from-proxy).
+  </Step>
+  <Step>
+    Verify that all SDK requests are covered by the startup token scope.
+  </Step>
+</Steps>
+
+### Validate the upgrade
+
+After you upgrade, verify that:
+
+- Requests across all required environments and projects return correct responses.
+- Token coverage is complete for all known clients.
+- Internal state endpoints (`/internal-backstage/tokens`, `/internal-backstage/features`) show expected data.
+
+## Migrate from v19 to v20
+
+### What changed
+
+v20 enforces the deprecations introduced in v19. Run a full end-to-end validation, not just the items listed below.
+
+- Dynamic mode was removed. Token validation is strict mode only.
+- Edge no longer accepts [service account](/concepts/service-accounts) tokens or [personal access tokens](/concepts/api-tokens-and-client-keys#personal-access-tokens) as startup tokens in `TOKENS`.
+
+### Required actions
+
+Complete the following steps before you upgrade:
+
+<Steps>
+  <Step>
+    Replace any service account or personal access tokens in `TOKENS` with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) that covers the required projects and environments.
+  </Step>
+  <Step>
+    Remove any `DYNAMIC` or `STRICT` behavior toggles from your runtime configuration.
+  </Step>
+  <Step>
+    Verify that your explicit `TOKENS` configuration covers all required projects and environments.
+  </Step>
+  <Step>
+    Validate readiness and feature responses in a staging or UAT environment before you roll out to production.
+  </Step>
+</Steps>
+
+### Validate the upgrade
+
+After you upgrade, verify that:
+
+- `GET /internal-backstage/health` returns `200`.
+- `GET /internal-backstage/ready` returns `200`.
+- Frontend and backend API responses match expected flag behavior.
+
+## Rollout runbook
+
+Follow these steps for each environment, starting with UAT or staging:
+
+<Steps>
+  <Step>
+    Deploy the Edge target version with your intended production configuration.
+  </Step>
+  <Step>
+    Validate health, readiness, and token coverage.
+  </Step>
+  <Step>
+    Test business-critical application flows.
+  </Step>
+  <Step>
+    Roll out gradually in production (canary or phased).
+  </Step>
+  <Step>
+    Re-run validation checks in production.
+  </Step>
+</Steps>
+
+## Rollback criteria
+
+Roll back to the previous version if any of these remain unresolved after remediation:
+
+- Edge does not consistently reach `READY`.
+- Critical SDK paths return `401` or `403` unexpectedly.
+- Feature evaluation results are inconsistent for the same token and context.
+
+After rollback, complete a token-scope and persistence analysis before you retry the upgrade.
+
+## Troubleshooting
+
+Most upgrade issues stem from removed features that previously masked token-configuration gaps. The following covers the most common failures and how to resolve them.
+
+<AccordionGroup>
+<Accordion title="Frontend SDKs return unauthorized responses">
+[Frontend SDKs](/sdks#frontend-sdks) start returning unauthorized responses that previously succeeded.
+
+This happens when Edge was relying on a service account token to create frontend tokens at runtime. After the upgrade, Edge no longer does this.
+
+**Fix:** Verify that the [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) in `TOKENS` cover all [environments](/concepts/environments) and [projects](/concepts/projects) that your frontend SDKs require.
+</Accordion>
+
+<Accordion title="Intermittent unauthorized responses on both frontend and backend SDKs">
+After upgrading, some requests succeed while others fail unpredictably across both [frontend](/sdks#frontend-sdks) and [backend SDKs](/sdks#backend-sdks).
+
+This typically occurs when Edge runs behind a load balancer with a persistence backup configured. In dynamic mode, Edge accepted previously unseen tokens and expanded its scope at runtime. In strict mode, each Edge instance only serves tokens that fall within the startup token scope. If your backup contains stale state from dynamic mode, different instances behind a load balancer can have different views of which tokens are valid, causing intermittent failures depending on which instance handles the request.
+
+**Fix:** Verify that the [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) in `TOKENS` cover all environments and projects that your backend SDKs require. If you want to preserve your backup cache, start a single Edge node first with a correct token set and run it for 5 minutes. This forces the backup to a known good state before you scale back up.
+</Accordion>
+
+<Accordion title="Edge fails to start with an invalid token error">
+Edge does not start and reports that the provided token is not valid.
+
+This happens when `TOKENS` contains a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account](/concepts/service-accounts) token instead of a backend token. v20 rejects these token types at startup.
+
+**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to the projects and environments your SDKs require.
+</Accordion>
+
+<Accordion title="SDKs receive unauthorized errors despite Edge starting successfully">
+Edge starts successfully, but downstream SDKs receive unauthorized errors when accessing specific environments.
+
+This is the same root cause as above: `TOKENS` contains a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account](/concepts/service-accounts) token. In some cases Edge starts but the token does not have the correct scope to serve data for the requested environment.
+
+**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to the projects and environments your SDKs require.
+</Accordion>
+</AccordionGroup>
