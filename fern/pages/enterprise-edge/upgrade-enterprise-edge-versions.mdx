@@ -83,7 +83,7 @@ Complete the following steps before you upgrade:
 
 1. Keep `TOKENS` aligned to your actual usage scope.
 2. If you still use dynamic mode, migrate to strict mode before you upgrade to v20. To determine your full token scope:
-   - Check your persistent backup (Redis, S3, or local file) to see which tokens Edge previously accepted. This gives a definitive view of the scope dynamic mode was allowing.
+   - If you use a [persistent backup](/unleash-edge/deploy#persistence-options) (Redis, S3, or local file), check it to see which tokens Edge previously accepted. This gives a definitive view of the scope dynamic mode was allowing.
    - Monitor your frontend and backend SDK requests along with Edge logs to confirm no expected requests are being rejected.
 3. Use `PRETRUSTED_TOKENS` only when you need temporary compatibility with legacy frontend token secrets during a [Proxy migration](/unleash-edge/migrate-from-proxy).
 4. Verify that all SDK requests are covered by the startup token scope.
