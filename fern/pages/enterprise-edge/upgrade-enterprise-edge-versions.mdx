@@ -31,19 +31,32 @@ Go to the section that matches your current version to get started.
 
 Complete this checklist before you upgrade your version:
 
-1. Record your current runtime details:
-   - Edge image tag and chart version.
-   - [Environment variables and startup arguments](/unleash-edge/configure).
-   - [Persistence configuration](/unleash-edge/deploy#persistence-options) (`REDIS_URL`, `S3_BUCKET_NAME`, `BACKUP_FOLDER`), if any.
-2. Inventory your tokens:
-   - Startup tokens configured in `TOKENS`.
-   - The [environments](/concepts/environments) and [projects](/concepts/projects) each token covers.
-   - The SDKs and client applications that depend on each token.
-3. Review the [release notes](https://github.com/Unleash/unleash-edge/releases) for your target version.
-4. Confirm rollback readiness:
-   - Previous image or chart version is available.
-   - Persistence snapshot or backup exists.
-   - You have a clear owner and maintenance window for rollback if validation fails.
+<Steps>
+  <Step title="Record your current runtime details">
+    Document the following for your current deployment:
+
+    - Edge image tag and chart version.
+    - [Environment variables and startup arguments](/unleash-edge/configure).
+    - [Persistence configuration](/unleash-edge/deploy#persistence-options) (`REDIS_URL`, `S3_BUCKET_NAME`, `BACKUP_FOLDER`), if any.
+  </Step>
+  <Step title="Inventory your tokens">
+    For each token, record the following:
+
+    - Startup tokens configured in `TOKENS`.
+    - The [environments](/concepts/environments) and [projects](/concepts/projects) each token covers.
+    - The SDKs and client applications that depend on each token.
+  </Step>
+  <Step title="Review the release notes">
+    Review the [release notes](https://github.com/Unleash/unleash-edge/releases) for your target version.
+  </Step>
+  <Step title="Confirm rollback readiness">
+    Verify that you have the following in place:
+
+    - Previous image or chart version is available.
+    - Persistence snapshot or backup exists.
+    - You have a clear owner and maintenance window for rollback if validation fails.
+  </Step>
+</Steps>
 
 ## Migrate from v17 to v18
 
@@ -55,8 +68,14 @@ v18 removed service-account-driven token creation. Edge no longer creates missin
 
 Complete the following steps before you upgrade:
 
-1. Start Edge with explicit, valid [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) in `TOKENS`.
-2. Verify that your startup tokens cover the environments and projects your frontend SDKs require.
+<Steps>
+  <Step>
+    Start Edge with explicit, valid [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) in `TOKENS`.
+  </Step>
+  <Step>
+    Verify that your startup tokens cover the environments and projects your frontend SDKs require.
+  </Step>
+</Steps>
 
 ### Validate the upgrade
 
@@ -81,12 +100,23 @@ v19 introduced two [edge mode](/unleash-edge/deploy#edge-mode) token-validation 
 
 Complete the following steps before you upgrade:
 
-1. Keep `TOKENS` aligned to your actual usage scope.
-2. If you still use dynamic mode, migrate to strict mode before you upgrade to v20. To determine your full token scope:
-   - If you use a [persistent backup](/unleash-edge/deploy#persistence-options) (Redis, S3, or local file), check it to see which tokens Edge previously accepted. This gives a definitive view of the scope dynamic mode was allowing.
-   - Monitor your frontend and backend SDK requests along with Edge logs to confirm no expected requests are being rejected.
-3. Use `PRETRUSTED_TOKENS` only when you need temporary compatibility with legacy frontend token secrets during a [Proxy migration](/unleash-edge/migrate-from-proxy).
-4. Verify that all SDK requests are covered by the startup token scope.
+<Steps>
+  <Step>
+    Keep `TOKENS` aligned to your actual usage scope.
+  </Step>
+  <Step>
+    If you still use dynamic mode, migrate to strict mode before you upgrade to v20. To determine your full token scope:
+
+    - If you use a [persistent backup](/unleash-edge/deploy#persistence-options) (Redis, S3, or local file), check it to see which tokens Edge previously accepted. This gives a definitive view of the scope dynamic mode was allowing.
+    - Monitor your frontend and backend SDK requests along with Edge logs to confirm no expected requests are being rejected.
+  </Step>
+  <Step>
+    Use `PRETRUSTED_TOKENS` only when you need temporary compatibility with legacy frontend token secrets during a [Proxy migration](/unleash-edge/migrate-from-proxy).
+  </Step>
+  <Step>
+    Verify that all SDK requests are covered by the startup token scope.
+  </Step>
+</Steps>
 
 ### Validate the upgrade
 
@@ -109,10 +139,20 @@ v20 enforces the deprecations introduced in v19. Run a full end-to-end validatio
 
 Complete the following steps before you upgrade:
 
-1. Replace any service account or personal access tokens in `TOKENS` with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) that covers the required projects and environments.
-2. Remove any `DYNAMIC` or `STRICT` behavior toggles from your runtime configuration.
-3. Verify that your explicit `TOKENS` configuration covers all required projects and environments.
-4. Validate readiness and feature responses in a staging or UAT environment before you roll out to production.
+<Steps>
+  <Step>
+    Replace any service account or personal access tokens in `TOKENS` with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) that covers the required projects and environments.
+  </Step>
+  <Step>
+    Remove any `DYNAMIC` or `STRICT` behavior toggles from your runtime configuration.
+  </Step>
+  <Step>
+    Verify that your explicit `TOKENS` configuration covers all required projects and environments.
+  </Step>
+  <Step>
+    Validate readiness and feature responses in a staging or UAT environment before you roll out to production.
+  </Step>
+</Steps>
 
 ### Validate the upgrade
 
@@ -126,11 +166,23 @@ After you upgrade, verify that:
 
 Follow these steps for each environment, starting with UAT or staging:
 
-1. Deploy the Edge target version with your intended production configuration.
-2. Validate health, readiness, and token coverage.
-3. Test business-critical application flows.
-4. Roll out gradually in production (canary or phased).
-5. Re-run validation checks in production.
+<Steps>
+  <Step>
+    Deploy the Edge target version with your intended production configuration.
+  </Step>
+  <Step>
+    Validate health, readiness, and token coverage.
+  </Step>
+  <Step>
+    Test business-critical application flows.
+  </Step>
+  <Step>
+    Roll out gradually in production (canary or phased).
+  </Step>
+  <Step>
+    Re-run validation checks in production.
+  </Step>
+</Steps>
 
 ## Rollback criteria
 
