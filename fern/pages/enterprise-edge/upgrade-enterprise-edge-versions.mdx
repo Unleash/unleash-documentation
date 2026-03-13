@@ -11,11 +11,21 @@ max-toc-depth: 3
 
 This guide walks you through upgrading [Enterprise Edge self-hosted](/unleash-edge#enterprise-edge-self-hosted) from version 17 onward.
 
-Follow each major version upgrade in order: v17 to v18, v18 to v19, and v19 to v20. Go to the section that matches your current version to get started:
+Follow each major version upgrade in order: <Button small outlined href="#migrate-from-v17-to-v18">v17 to v18</Button> <Button small outlined href="#migrate-from-v18-to-v19">v18 to v19</Button> <Button small outlined href="#migrate-from-v19-to-v20">v19 to v20</Button>
 
-- [Migrate from v17 to v18](#migrate-from-v17-to-v18)
-- [Migrate from v18 to v19](#migrate-from-v18-to-v19)
-- [Migrate from v19 to v20](#migrate-from-v19-to-v20)
+Go to the section that matches your current version to get started.
+
+<CardGroup cols={3}>
+  <Card title="Migrate from v17 to v18" href="#migrate-from-v17-to-v18">
+    Service account token creation removed. Start Edge with explicit backend tokens.
+  </Card>
+  <Card title="Migrate from v18 to v19" href="#migrate-from-v18-to-v19">
+    Strict and dynamic token-validation modes introduced. Strict mode becomes the default.
+  </Card>
+  <Card title="Migrate from v19 to v20" href="#migrate-from-v19-to-v20">
+    Dynamic mode removed. Service account and personal access tokens no longer accepted.
+  </Card>
+</CardGroup>
 
 ## Before you upgrade
 
@@ -122,6 +132,16 @@ Follow these steps for each environment, starting with UAT or staging:
 4. Roll out gradually in production (canary or phased).
 5. Re-run validation checks in production.
 
+## Rollback criteria
+
+Roll back to the previous version if any of these remain unresolved after remediation:
+
+- Edge does not consistently reach `READY`.
+- Critical SDK paths return `401` or `403` unexpectedly.
+- Feature evaluation results are inconsistent for the same token and context.
+
+After rollback, complete a token-scope and persistence analysis before you retry the upgrade.
+
 ## Troubleshooting
 
 Most upgrade issues stem from removed features that previously masked token-configuration gaps. The following covers the most common failures and how to resolve them.
@@ -159,13 +179,3 @@ This is the same root cause as above: `TOKENS` contains a [personal access token
 **Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to all projects and the development environment.
 </Accordion>
 </AccordionGroup>
-
-## Rollback criteria
-
-Roll back to the previous version if any of these remain unresolved after remediation:
-
-- Edge does not consistently reach `READY`.
-- Critical SDK paths return `401` or `403` unexpectedly.
-- Feature evaluation results are inconsistent for the same token and context.
-
-After rollback, complete a token-scope and persistence analysis before you retry the upgrade.
