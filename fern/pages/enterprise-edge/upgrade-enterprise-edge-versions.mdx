@@ -168,14 +168,14 @@ Edge does not start and reports that the provided token is not valid.
 
 This happens when `TOKENS` contains a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account](/concepts/service-accounts) token instead of a backend token. v20 rejects these token types at startup.
 
-**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to all projects and the development environment.
+**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to the projects and environments your SDKs require.
 </Accordion>
 
-<Accordion title="SDKs receive unauthorized errors on the development environment">
-Edge starts successfully, but downstream SDKs receive unauthorized errors when accessing the development environment.
+<Accordion title="SDKs receive unauthorized errors despite Edge starting successfully">
+Edge starts successfully, but downstream SDKs receive unauthorized errors when accessing specific environments.
 
-This is the same root cause as above: `TOKENS` contains a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account](/concepts/service-accounts) token. In some cases Edge starts but the token does not have the correct scope to serve development environment data.
+This is the same root cause as above: `TOKENS` contains a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account](/concepts/service-accounts) token. In some cases Edge starts but the token does not have the correct scope to serve data for the requested environment.
 
-**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to all projects and the development environment.
+**Fix:** Replace the personal access token or service account token with a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) scoped to the projects and environments your SDKs require.
 </Accordion>
 </AccordionGroup>
