@@ -21,6 +21,9 @@ jobs:
       - name: Fetch OpenAPI spec
         run: node scripts/fetch-openapi.mjs
 
+      - name: Update GitHub stars
+        run: node scripts/update-github-stars.mjs
+
       - name: Install Fern CLI tool
         run: npm install -g fern-api
 

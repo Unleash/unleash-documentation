@@ -361,15 +361,30 @@ body:has(.landing-page) .fern-card div {
     border-radius: 12px;
 }
 
-/* Navbar links styling (exclude GitHub button which keeps Fern defaults) */
-#fern-header .fern-button.minimal:not([href*="github"]) {
+/* Navbar links styling */
+#fern-header .fern-button.minimal {
     font-weight: 600;
     color: var(--nav-text-color);
     border: none;
 }
 
-#fern-header .fern-button.minimal:not([href*="github"]):hover {
+#fern-header .fern-button.minimal:hover {
     color: var(--accent-color);
+}
+
+/* Compact GitHub star button */
+#fern-header .fern-button.outlined[href*="github"] {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    gap: 0.3rem;
+    color: var(--nav-text-color);
+    border-color: var(--nav-text-color);
+}
+
+#fern-header .fern-button.outlined[href*="github"]:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 /* Safety net: ensure header tabs panel stacks above main.
