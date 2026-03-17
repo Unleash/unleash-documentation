@@ -8,7 +8,7 @@
     --accent-color: #817afe;
     --button-bg-color: #244049;
     --button-text-color: #FFF;
-    --button-hover-bg-color: #635DC5;
+    --button-hover-bg-color: #817afe;
     --card-hover-bg-color: #f5f6fa;
     --card-stripe-color: #6c64e5;
 }
@@ -22,7 +22,7 @@
     --accent-color: #BBB9FF;
     --button-bg-color: #E3E3E3;
     --button-text-color: var(--sidebar-nav-bg-color);
-    --button-hover-bg-color: #BBB9FF;
+    --button-hover-bg-color: #817afe;
     --card-hover-bg-color: #23233a;
 }
 
@@ -412,6 +412,20 @@ body:has(.landing-page) .fern-card div {
 
 #fern-header .fern-button.filled:hover {
     background-color: var(--button-hover-bg-color);
+}
+
+/* Start free trial — bright purple CTA */
+#fern-header .fern-button.filled[href*="enterprise-payg"] {
+    background-color: #817afe;
+    color: #ffffff;
+}
+
+.dark #fern-header .fern-button.filled[href*="enterprise-payg"] {
+    color: var(--button-text-color);
+}
+
+#fern-header .fern-button.filled[href*="enterprise-payg"]:hover {
+    background-color: var(--button-bg-color);
 }
 
 /* CTA button styling (for inline buttons matching header style)

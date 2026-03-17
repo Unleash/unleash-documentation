@@ -955,7 +955,7 @@ navbar-links:
     text: Product
     url: https://www.getunleash.io/enterprise-feature-management-platform
   - type: minimal
-    text: Plans
+    text: Pricing
     url: https://www.getunleash.io/pricing
   - type: minimal
     text: Sign in
@@ -963,6 +963,9 @@ navbar-links:
   - type: filled
     text: Start free trial
     url: https://www.getunleash.io/plans/enterprise-payg
+  - type: filled
+    text: Book a demo
+    url: https://www.getunleash.io/plans/enterprise
       
 colors:
   accent-primary:
