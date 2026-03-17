@@ -461,6 +461,40 @@ body:has(.landing-page) .fern-card div {
 }
 
 /* =====================================
+   CHANGELOG / RELEASE NOTES
+   ===================================== */
+
+/* Force stacked layout: date/labels always above entry content, never beside it */
+.fern-changelog-label {
+    flex-direction: row !important;
+}
+
+.fern-changelog-entry {
+    flex-direction: column !important;
+}
+
+/* Force the entry to stack vertically — no aside column */
+article.fern-changelog-content {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+article.fern-changelog-content > aside {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Purple date badge */
+.fern-changelog-label > a.fern-docs-badge.fern-docs-badge.large.grayscale.subtle {
+    background-color: #817afe !important;
+    color: #fff !important;
+    border-color: #817afe !important;
+    filter: none !important;
+    --tw-grayscale: none !important;
+}
+
+/* =====================================
    ACADEMY SECTION
    ===================================== */
 
