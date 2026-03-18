@@ -949,13 +949,15 @@ navigation:
   - tab: release-notes
 
 navbar-links:
-  - type: github
-    value: https://github.com/Unleash/unleash
+  - type: outlined
+    text: 13.3k
+    icon: fa-brands fa-github
+    url: https://github.com/Unleash/unleash
   - type: minimal
     text: Product
     url: https://www.getunleash.io/enterprise-feature-management-platform
   - type: minimal
-    text: Plans
+    text: Pricing
     url: https://www.getunleash.io/pricing
   - type: minimal
     text: Sign in
@@ -963,6 +965,9 @@ navbar-links:
   - type: filled
     text: Start free trial
     url: https://www.getunleash.io/plans/enterprise-payg
+  - type: filled
+    text: Book a demo
+    url: https://www.getunleash.io/plans/enterprise
       
 colors:
   accent-primary:
