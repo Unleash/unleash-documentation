@@ -25,14 +25,14 @@ Unleash Enterprise is designed to operate within FedRAMP-authorized environments
 </Accordion>
 
 <Accordion title="Does Unleash use FIPS 140-2/140-3 validated cryptography?">
-For self-hosted deployments, cryptographic protection is managed at the infrastructure layer. TLS termination and encryption happen at the level of infrastructure components such as load balancers, reverse proxies, and database connections rather than implementing custom cryptographic primitives. Customers achieve FIPS compliance by:
+For self-hosted deployments, cryptographic protection is managed at the infrastructure layer. Unleash delegates all cryptographic operations to the runtime and infrastructure: TLS termination happens at load balancers and reverse proxies, and all application-level cryptographic calls (such as hashing) are executed by the runtime's OpenSSL modules. Customers achieve FIPS compliance by:
 
 - Terminating TLS at infrastructure components that use FIPS-validated modules (load balancers, reverse proxies)
 - Deploying on FIPS-enabled OS distributions (for example, RHEL in FIPS mode)
 - Building container images using FIPS-enabled base images
 - Using FIPS-validated encryption for the PostgreSQL database and disk-level storage
 
-Unleash integrates cleanly into FIPS-compliant infrastructure stacks.
+Unleash uses FIPS-approved algorithms (for example, SHA-256 for hashing) that are executed by the runtime's validated cryptographic modules. Unleash integrates cleanly into FIPS-compliant infrastructure stacks.
 </Accordion>
 
 <Accordion title="Can I run Unleash in an air-gapped environment?">
