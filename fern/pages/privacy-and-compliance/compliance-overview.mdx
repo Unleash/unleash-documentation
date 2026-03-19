@@ -1,7 +1,7 @@
 ---
 title: Compliance for feature flags
 description: Secure and compliant feature flags at scale with Unleash.
-keywords: [compliance, FedRAMP, SOC 2, ISO 27001, security, feature flags, Unleash Enterprise]
+keywords: [compliance, FedRAMP, SOC 2, ISO 27001, FIPS, GDPR, air-gapped, PII, security, feature flags, Unleash Enterprise]
 og:site_name: Unleash
 og:title: Compliance for feature flags
 max-toc-depth: 2
@@ -9,12 +9,47 @@ max-toc-depth: 2
 
 ## Overview
 
-Unleash is designed to help organizations meet strict compliance requirements, supporting frameworks like [FedRAMP](https://www.fedramp.gov), [SOC 2](https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2), [ISO 27001](https://en.wikipedia.org/wiki/ISO/IEC_27001), and more. Features such as [audit logs](/concepts/events#event-log), [role-based access control](/concepts/rbac) (RBAC), and [change request](/concepts/change-requests) workflows enable secure feature management at scale.
+Unleash holds [SOC 2](https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2) Type II certification and provides the application-level controls that organizations need to operate within environments governed by frameworks like [FedRAMP](https://www.fedramp.gov) and [ISO 27001](https://en.wikipedia.org/wiki/ISO/IEC_27001). Features such as [audit logs](/concepts/events#event-log), [role-based access control](/concepts/rbac) (RBAC), and [change request](/concepts/change-requests) workflows enable secure feature management at scale. Self-hosted customers deploy Unleash within their own authorization boundary, maintaining full control over infrastructure, encryption, and network security.
 
 For a detailed overview of how [Unleash Enterprise](https://www.getunleash.io/pricing) can help you with your compliance requirements, refer to our guides:
 - [FedRAMP](/privacy-and-compliance/fedramp)
 - [SOC 2 Type II](/privacy-and-compliance/soc2)
 - [ISO 27001](/privacy-and-compliance/iso27001)
 
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is Unleash FedRAMP authorized?">
+Unleash Enterprise is designed to operate within FedRAMP-authorized environments. Many Unleash customers successfully operate in FedRAMP Moderate and FedRAMP High environments today by self-hosting Unleash within their own authorization boundary, where they control infrastructure, encryption, and network security. Unleash provides the application-level controls that map directly to FedRAMP control requirements: RBAC, audit logs, change requests, SSO (with MFA enforced through your identity provider), local flag evaluation, and more. For organizations that require a FedRAMP-authorized SaaS offering listed on the FedRAMP Marketplace, Unleash does not currently hold that authorization. However, many organizations in highly regulated environments prefer self-hosting precisely because it keeps all data entirely within their own infrastructure, including feature flag evaluation context, with no dependency on a third-party SaaS provider's compliance posture.
+</Accordion>
+
+<Accordion title="Does Unleash use FIPS 140-2/140-3 validated cryptography?">
+For self-hosted deployments, cryptographic protection is managed at the infrastructure layer. Unleash delegates all cryptographic operations to the runtime and infrastructure: TLS termination happens at load balancers and reverse proxies, and all application-level cryptographic calls (such as hashing) are executed by the runtime's OpenSSL modules. Customers achieve FIPS compliance by:
+
+- Terminating TLS at infrastructure components that use FIPS-validated modules (load balancers, reverse proxies)
+- Deploying on FIPS-enabled OS distributions (for example, RHEL in FIPS mode)
+- Building container images using FIPS-enabled base images
+- Using FIPS-validated encryption for the PostgreSQL database and disk-level storage
+
+Unleash uses FIPS-approved algorithms (for example, SHA-256 for hashing) that are executed by the runtime's validated cryptographic modules. Unleash integrates cleanly into FIPS-compliant infrastructure stacks.
+</Accordion>
+
+<Accordion title="Can I run Unleash in an air-gapped environment?">
+Yes. Unleash Enterprise supports fully air-gapped deployments. Unleash Edge provides continued flag evaluation even when disconnected from the core Unleash instance, using local caching. No external network connectivity is required for flag evaluation at runtime.
+</Accordion>
+
+<Accordion title="Does Unleash process or store end-user PII?">
+Unleash's architecture is designed so that you can evaluate feature flags locally within your applications using [SDKs](/sdks) or [Unleash Edge](/unleash-edge). No end-user data needs to be sent to the Unleash server. This privacy-by-design architecture simplifies compliance with data protection requirements across FedRAMP, SOC 2, ISO 27001, GDPR, and other frameworks. For more details, refer to [Data collection and privacy](/privacy-and-compliance/data-privacy).
+</Accordion>
+
+<Accordion title="What certifications does Unleash hold?">
+Unleash maintains SOC 2 Type II certification, with annual penetration testing performed by external auditors. Results and the SOC 2 report are available through the Trust Center upon request. For FedRAMP and ISO 27001, Unleash provides detailed control mappings showing how Enterprise features align with framework requirements. See the individual guides: [FedRAMP](/privacy-and-compliance/fedramp), [SOC 2 Type II](/privacy-and-compliance/soc2), [ISO 27001](/privacy-and-compliance/iso27001).
+</Accordion>
+
+<Accordion title="What is the difference between Unleash being certified vs. supporting my compliance?">
+When a vendor holds a certification (for example, a FedRAMP ATO), their hosted service has been independently assessed and authorized. This matters when the vendor's infrastructure is within your authorization boundary. When you self-host Unleash, your infrastructure is the authorization boundary. Unleash provides the application-level security controls you need to satisfy framework requirements: access management, audit trails, change approval workflows, and local evaluation. You manage infrastructure-level controls such as encryption, network security, and key management within your own certified environment. This is why many organizations in FedRAMP High and other highly regulated environments choose self-hosted Unleash; it gives them full control over the compliance boundary while providing enterprise-grade feature management controls.
+</Accordion>
+</AccordionGroup>
 
 For information regarding any other frameworks, [reach out to us](mailto:license@getunleash.io).
