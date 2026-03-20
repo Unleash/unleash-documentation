@@ -270,9 +270,9 @@ To ensure a good developer experience, you should provide the following:
 
 ---
 
-## From principles to FeatureOps
+## From feature flag best practices to FeatureOps
 
-The 11 principles above define how to architect a feature flag system. FeatureOps is the discipline that puts them into practice, combining runtime control, progressive delivery, observability, and governance into a unified approach to managing software behavior in production. To learn more about FeatureOps and its four pillars, see [Feature flags and FeatureOps](/get-started/what-is-a-feature-flag#feature-flags-and-featureops).
+The 11 principles above define how to architect a feature flag system. [FeatureOps](https://featureops.io/) is the discipline that puts them into practice. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. It combines runtime control, progressive delivery, observability, and governance into a unified approach to managing software behavior in production. Feature flags are the core mechanism, but FeatureOps encompasses broader practices including autonomous releases, full-stack experimentation, and zero-trust governance. To learn more about the four pillars of FeatureOps, see [Feature flags and FeatureOps](/get-started/what-is-a-feature-flag#feature-flags-and-featureops).
 
 ### Autonomous release workflows
 
@@ -362,6 +362,3 @@ Unleash provides a robust [Go SDK](/sdks/go) for implementing feature flags. Oth
 Complexity comes from keeping too many flags active at once and spreading evaluations throughout the code. The best way to manage this is to keep flags short-lived with clear ownership and a planned end date, then remove them once the rollout is complete. Evaluate each flag once at the highest practical level and, if needed, pass the result down so behavior stays consistent. In a microservices setup, perform the evaluation at the edge and propagate the result through the request. Centralize flag names and use a wrapper service around the SDK to handle logging, defaults, and consistency. Finally, archive flags after removal to maintain history without adding clutter.
 
 See [Managing feature flags in code](/guides/manage-feature-flags-in-code) for more recommendations.
-
-#### What is FeatureOps?
-[FeatureOps](https://featureops.io/) is the discipline of controlling software behavior at runtime. It extends DevOps into the layer where features reach users, combining runtime control, progressive delivery, observability, and governance. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. Feature flags are the core mechanism, but FeatureOps encompasses broader practices including autonomous releases, full-stack experimentation, and zero-trust governance.

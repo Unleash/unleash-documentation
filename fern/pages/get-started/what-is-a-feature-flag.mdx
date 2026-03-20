@@ -162,7 +162,7 @@ Contrary to the short-lived nature of most feature flags, kill switches are inhe
 - **Benefits**: Thorough validation of changes in a live environment without disrupting the user experience.
 - **Lifespan**: Short-lived; a few days to a couple of weeks.
 
-[Operational flags](#operational-flags) manage a system's technical aspects that do not directly influence user-visible features but are crucial for the application's underlying stability and performance. For example, during a library version upgrade, operational flags can toggle between the old and new implementations to ensure the update does not adversely affect the system. By enabling real-time switching between different operational states or configurations, these flags allow for thorough validation of changes in a live environment without disrupting the user experience.
+Operational flags manage a system's technical aspects that do not directly influence user-visible features but are crucial for the application's underlying stability and performance. For example, during a library version upgrade, operational flags can toggle between the old and new implementations to ensure the update does not adversely affect the system. By enabling real-time switching between different operational states or configurations, these flags allow for thorough validation of changes in a live environment without disrupting the user experience.
 
 Operational flags should be short-lived, existing only long enough to confirm that a change, such as a library update, is stable and does not introduce regressions. Once the new state is validated, the flag should be promptly retired to avoid accumulating technical debt. Avoid using operational flags as a solution for long-term configuration management; see our [Best practices for building and scaling feature flags](/guides/feature-flag-best-practices) guide to learn more.
 
@@ -173,7 +173,7 @@ Operational flags should be short-lived, existing only long enough to confirm th
 - **Benefits**: Getting early feedback from select user groups or delivering enhanced functionality to premium users.
 - **Lifespan**: Varies from short-lived to permanent.
 
-[Permission flags](#permission-flags) allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
+Permission flags allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
 
 ## Use cases for feature flags
 
