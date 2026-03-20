@@ -1,17 +1,26 @@
 ---
-title: 11 principles for building and scaling feature flag systems
+title: 11 best practices for building and scaling feature flag systems
 description: Build a scalable, secure feature flag system with 11 key principles. Improve DevOps metrics, ensure reliability, and enhance developer experience.
 keywords: principles, building, scaling, feature flags, unleash
 og:site_name: "Unleash Documentation"
-og:title: "11 principles for building and scaling feature flag systems"
+og:title: "11 best practices for building and scaling feature flag systems"
 max-toc-depth: 2
 ---
 
-Feature flags, [sometimes called feature toggles or feature switches](/get-started/what-is-a-feature-flag), are a powerful software development technique that allows engineering teams to decouple the release of new functionality from software deployments. 
+[Feature flags](/get-started/what-is-a-feature-flag), sometimes called feature toggles or feature switches, are a powerful software development technique that allows engineering teams to decouple the release of new functionality from software deployments. 
 
-With feature flags, developers can turn [specific features or code segments on or off at runtime](https://www.getunleash.io/feature-flag-use-cases-software-kill-switches) without needing a code deployment or rollback. Organizations that adopt feature flags see improvements in key [DevOps metrics](https://www.getunleash.io/blog/dora-metrics-in-2023-5-ways-to-measure-devops-performance) like lead time to changes, mean time to recovery, deployment frequency, and change failure rate.
+With feature flags, developers can turn [specific features or code segments on or off at runtime](https://www.getunleash.io/feature-flag-use-cases-software-kill-switches) without needing a code deployment or rollback. Organizations that adopt feature flags see improvements in key DevOps metrics like lead time to changes, mean time to recovery, deployment frequency, and change failure rate.
 
 At Unleash, we've defined 11 principles for building a large-scale feature flag system. These principles have their roots in distributed systems design and focus on security, privacy, and scalability—critical needs for enterprise systems. By following these principles, you can create a feature flag system that's reliable, easy to maintain, and capable of handling heavy loads.
+
+## TL;DR
+
+- Feature flags decouple releases from deployments for safer runtime control.
+- Keep feature flags short-lived and archive often.
+- Prioritize availability over strict consistency in design.
+- Enforce unique naming conventions for all flags.
+- Evaluate sensitive flags server-side to protect PII.
+- Ensure a consistent experience by evaluating flags close to the user.
 
 These principles are:
 
