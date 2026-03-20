@@ -291,7 +291,7 @@ This workflow directly applies runtime control ([Principle 1](#1-enable-runtime-
 
 Beyond architecture, FeatureOps requires operational defaults that align with the principles above:
 
-- **Every non-trivial change is reversible.** If you can't disable it instantly, reconsider enabling it. This is the practical application of [runtime control](#1-enable-runtime-control) and [kill switches](#2-make-flags-short-lived).
+- **Every non-trivial change is reversible.** If you can't disable it instantly, reconsider enabling it. This is the practical application of [runtime control](#1-enable-runtime-control) and [kill switches](https://www.getunleash.io/blog/kill-switches-best-practice).
 - **Small batches beat big-bang releases.** Release to a small percentage of users and watch metrics before expanding exposure. Progressive rollouts limit blast radius and provide real feedback before full commitment.
 - **Flags have lifecycles.** Every flag needs an owner, a purpose, and either an expiration date or an explicit decision to keep it as a long-lived control. Stale flags become [technical debt](/concepts/technical-debt) that obscures what code is actually running in production.
 - **Observability is required.** Runtime control without visibility is blind control. Every flag-protected feature needs monitoring for error rates, latency, adoption, and business metrics. This feeds directly into [autonomous release workflows](#autonomous-release-workflows).
