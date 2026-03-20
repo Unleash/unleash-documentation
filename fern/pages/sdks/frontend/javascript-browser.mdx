@@ -145,6 +145,7 @@ The SDK emits the following events:
 - **update** - emitted every time Unleash returns a new feature toggle configuration. The SDK will emit this event as part of the initial fetch from the SDK.
 - **recovered** - emitted when the SDK has recovered from an error. This event will only be emitted if the SDK has previously emitted an error.
 - **sent** - emitted when the SDK has successfully sent metrics to Unleash.
+- **warn** - emitted when the SDK encounters a non-fatal issue, such as invalid metric definitions.
 
 <Note>Please remember that you should always register your event listeners before your call `unleash.start()`. If you register them after you have started the SDK you risk losing important events.</Note>
 
