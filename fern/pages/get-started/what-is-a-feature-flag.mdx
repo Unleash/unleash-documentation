@@ -17,7 +17,7 @@ In this guide, we'll introduce you to the basics of feature flags and why so man
 - They decouple code deployment from feature release, giving teams control over what users see and when.
 - Developers use them to reduce risk, run production experiments, and speed up release cycles.
 - Release, experiment, kill switch, operational, and permission flags each address a different stage or need in the feature lifecycle.
-- [FeatureOps](https://featureops.io/) is the discipline that extends feature flags into autonomous, production-driven release workflows.
+- [FeatureOps](https://featureops.io/) is the discipline that extends feature flags into autonomous release workflows guided by real production signals.
 
 ## What is a feature flag?
 
@@ -151,7 +151,7 @@ Experiment flags are dynamic and transient. Their lifespan is inherently limited
 - **Lifespan**: Long-term or even permanent.
 
 
-[Kill switches](https://www.getunleash.io/blog/kill-switches-best-practice) act as emergency levers that can quickly turn off certain functionalities or features in response to critical issues like severe performance degradations or security vulnerabilities. Unlike other [operational flags](/get-started/what-is-a-feature-flag), kill switches are designed for rapid, decisive action in crisis situations. They often impact user-facing features to preserve overall system stability or security. By preemptively implementing these switches, teams can ensure they have a fail-safe mechanism to maintain control over the system's operational integrity, even under adverse conditions.
+[Kill switches](https://www.getunleash.io/blog/kill-switches-best-practice) act as emergency levers that can quickly turn off certain functionalities or features in response to critical issues like severe performance degradations or security vulnerabilities. Unlike other [operational flags](#operational-flags), kill switches are designed for rapid, decisive action in crisis situations. They often impact user-facing features to preserve overall system stability or security. By preemptively implementing these switches, teams can ensure they have a fail-safe mechanism to maintain control over the system's operational integrity, even under adverse conditions.
 
 Contrary to the short-lived nature of most feature flags, kill switches are inherently long-term or even permanent tools within a system's architecture. Their enduring presence allows for ongoing protection against unforeseen critical events. However, these switches must be regularly reviewed and tested to ensure they remain functional and relevant, adapting to the evolving system and operational requirements.
 
@@ -162,7 +162,7 @@ Contrary to the short-lived nature of most feature flags, kill switches are inhe
 - **Benefits**: Thorough validation of changes in a live environment without disrupting the user experience.
 - **Lifespan**: Short-lived; a few days to a couple of weeks.
 
-[Operational flags](/get-started/what-is-a-feature-flag) manage a system's technical aspects that do not directly influence user-visible features but are crucial for the application's underlying stability and performance. For example, during a library version upgrade, operational flags can toggle between the old and new implementations to ensure the update does not adversely affect the system. By enabling real-time switching between different operational states or configurations, these flags allow for thorough validation of changes in a live environment without disrupting the user experience.
+[Operational flags](#operational-flags) manage a system's technical aspects that do not directly influence user-visible features but are crucial for the application's underlying stability and performance. For example, during a library version upgrade, operational flags can toggle between the old and new implementations to ensure the update does not adversely affect the system. By enabling real-time switching between different operational states or configurations, these flags allow for thorough validation of changes in a live environment without disrupting the user experience.
 
 Operational flags should be short-lived, existing only long enough to confirm that a change, such as a library update, is stable and does not introduce regressions. Once the new state is validated, the flag should be promptly retired to avoid accumulating technical debt. Avoid using operational flags as a solution for long-term configuration management; see our [Best practices for building and scaling feature flags](/guides/feature-flag-best-practices) guide to learn more.
 
@@ -173,7 +173,7 @@ Operational flags should be short-lived, existing only long enough to confirm th
 - **Benefits**: Getting early feedback from select user groups or delivering enhanced functionality to premium users.
 - **Lifespan**: Varies from short-lived to permanent.
 
-[Permission flags](/get-started/what-is-a-feature-flag) allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
+[Permission flags](#permission-flags) allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
 
 ## Use cases for feature flags
 
@@ -225,7 +225,7 @@ Feature flags can be managed in environments that require strict compliance with
 
 Feature flags are a technique. [FeatureOps](https://featureops.io/) is the discipline of controlling software behavior at runtime, built around feature flags and the practices that make them effective at scale.
 
-DevOps transformed how teams build, deploy, and operate software. CI/CD pipelines, container orchestration, and infrastructure as code made it possible to ship code reliably at scale. But deploying code to production says nothing about who sees it, when they see it, or whether it actually works for them. Your pipeline can pass every check and your infrastructure can report healthy, while users still hit a broken feature caused by a configuration change or an edge case that never surfaced in staging. FeatureOps closes that gap by extending DevOps into the runtime layer where features actually reach users.
+DevOps focuses on getting code to production reliably. FeatureOps extends that focus into what happens after deployment: which users see which features, when they see them, and how to respond when something goes wrong. Deploying code and releasing a feature are separate concerns, and FeatureOps provides the practices and tooling to manage that distinction at scale.
 
 The discipline rests on four pillars:
 
@@ -236,11 +236,9 @@ The discipline rests on four pillars:
 
 ### Autonomous releases
 
-As AI coding tools accelerate the volume of code changes, manual [release management](/concepts/release-management-overview) becomes a bottleneck. Autonomous releases let production data drive rollout decisions instead.
+With autonomous [release management](/concepts/release-management-overview), releases, experiments, kill switches, and other production changes happen based on real production data you define, so teams stay in control without sacrificing speed.
 
-In an autonomous release workflow, a feature is wrapped in a flag and rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout progresses automatically to the next stage. If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are detected and cleaned up. The entire lifecycle operates within guardrails you define, without requiring manual toggling or constant monitoring.
-
-This approach is especially critical as AI-assisted development increases the rate of production changes. The same runtime controls that protect against a developer's late-night deployment also protect against regressions introduced by AI-generated code.
+In an autonomous release workflow, a feature is wrapped in a flag and rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout [progresses automatically](/concepts/release-management-overview) to the next stage. If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are detected and cleaned up. The entire lifecycle operates within guardrails you define, without requiring manual toggling or constant monitoring.
 
 ## Applying feature flag best practices with Unleash
 
@@ -282,6 +280,6 @@ FeatureOps is the discipline of controlling software behavior at runtime. It ext
 </Accordion>
 
 <Accordion title="What are autonomous releases?">
-Autonomous releases are self-regulating rollout workflows driven by production data rather than manual intervention. A feature rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout progresses automatically. If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are cleaned up. This approach is especially valuable as AI coding tools increase the volume and velocity of code changes.
+Autonomous releases are self-regulating rollout workflows driven by production data rather than manual intervention. A feature rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout [progresses automatically](/concepts/release-management-overview). If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are cleaned up. This approach is especially valuable as AI coding tools increase the volume and velocity of code changes.
 </Accordion>
 </AccordionGroup>
