@@ -1,7 +1,7 @@
 ---
 title: 11 best practices for building and scaling feature flag systems
 description: Build a scalable, secure feature flag system with 11 key principles. Improve DevOps metrics, ensure reliability, and enhance developer experience.
-keywords: principles, building, scaling, feature flags, unleash
+keywords: principles, building, scaling, feature flags, unleash, featureops
 og:site_name: "Unleash Documentation"
 og:title: "11 best practices for building and scaling feature flag systems"
 max-toc-depth: 2
@@ -11,7 +11,7 @@ max-toc-depth: 2
 
 With feature flags, developers can turn [specific features or code segments on or off at runtime](https://www.getunleash.io/feature-flag-use-cases-software-kill-switches) without needing a code deployment or rollback. Organizations that adopt feature flags see improvements in key DevOps metrics like lead time to changes, mean time to recovery, deployment frequency, and change failure rate.
 
-At Unleash, we've defined 11 principles for building a large-scale feature flag system. These principles have their roots in distributed systems design and focus on security, privacy, and scalability—critical needs for enterprise systems. By following these principles, you can create a feature flag system that's reliable, easy to maintain, and capable of handling heavy loads.
+At Unleash, we've defined 11 principles for building a large-scale feature flag system. These principles have their roots in distributed systems design and focus on security, privacy, and scalability—critical needs for enterprise systems. Together, they form the foundation of [FeatureOps](https://featureops.io/)—the discipline of controlling software behavior at runtime. By following these principles, you can create a feature flag system that's reliable, easy to maintain, and capable of handling heavy loads.
 
 ## TL;DR
 
@@ -21,6 +21,7 @@ At Unleash, we've defined 11 principles for building a large-scale feature flag 
 - Enforce unique naming conventions for all flags.
 - Evaluate sensitive flags server-side to protect PII.
 - Ensure a consistent experience by evaluating flags close to the user.
+- These principles form the foundation of [FeatureOps](https://featureops.io/) and autonomous release workflows.
 
 These principles are:
 
@@ -269,6 +270,35 @@ To ensure a good developer experience, you should provide the following:
 
 ---
 
+## From principles to FeatureOps
+
+The 11 principles above define how to architect a feature flag system. FeatureOps is the discipline that puts them into practice, combining runtime control, progressive delivery, observability, and governance into a unified approach to managing software behavior in production. To learn more about FeatureOps and its four pillars, see [Feature flags and FeatureOps](/get-started/what-is-a-feature-flag#feature-flags-and-featureops).
+
+### Autonomous release workflows
+
+As code velocity increases—especially with AI coding tools generating more changes at higher frequency—manual release management becomes unsustainable. Autonomous releases apply these principles to create self-regulating rollout pipelines driven by production data:
+
+1. A feature is wrapped in a flag and deployed to production.
+2. The flag enables the feature for a small percentage of users.
+3. Production signals (error rates, latency, adoption) are monitored against defined thresholds.
+4. If metrics stay healthy, the rollout progresses automatically to the next stage.
+5. If any signal crosses a threshold, the rollout pauses or rolls back instantly.
+6. After full rollout, the flag is detected as stale and cleaned up.
+
+This workflow directly applies runtime control ([Principle 1](#1-enable-runtime-control)), short-lived flags ([Principle 2](#2-make-flags-short-lived)), availability over consistency ([Principle 3](#3-prioritize-availability-over-consistency)), and consistent user experience ([Principle 10](#10-prioritize-consistent-user-experience)).
+
+### FeatureOps cultural practices
+
+Beyond architecture, FeatureOps requires operational defaults that align with the principles above:
+
+- **Every non-trivial change is reversible.** If you can't disable it instantly, reconsider enabling it. This is the practical application of [runtime control](#1-enable-runtime-control) and [kill switches](#2-make-flags-short-lived).
+- **Small batches beat big-bang releases.** Release to a small percentage of users and watch metrics before expanding exposure. Progressive rollouts limit blast radius and provide real feedback before full commitment.
+- **Flags have lifecycles.** Every flag needs an owner, a purpose, and either an expiration date or an explicit decision to keep it as a long-lived control. Stale flags become [technical debt](/concepts/technical-debt) that obscures what code is actually running in production.
+- **Observability is required.** Runtime control without visibility is blind control. Every flag-protected feature needs monitoring for error rates, latency, adoption, and business metrics. This feeds directly into [autonomous release workflows](#autonomous-release-workflows).
+- **Resilience is designed, not improvised.** Graceful degradation, fallback paths, and kill switches are planned during development, not invented during incidents. This is the operational expression of [prioritizing availability over consistency](#3-prioritize-availability-over-consistency).
+
+---
+
 ## Additional resources
 
 Thank you for reading. Our motivation for writing these principles is to share what we've learned building a [large-scale feature flag solution](https://www.getunleash.io/enterprise-feature-management-platform) with other architects and engineers solving similar challenges. [Unleash is open-source](https://www.getunleash.io/open-source), and so are these principles.
@@ -332,3 +362,6 @@ Unleash provides a robust [Go SDK](/sdks/go) for implementing feature flags. Oth
 Complexity comes from keeping too many flags active at once and spreading evaluations throughout the code. The best way to manage this is to keep flags short-lived with clear ownership and a planned end date, then remove them once the rollout is complete. Evaluate each flag once at the highest practical level and, if needed, pass the result down so behavior stays consistent. In a microservices setup, perform the evaluation at the edge and propagate the result through the request. Centralize flag names and use a wrapper service around the SDK to handle logging, defaults, and consistency. Finally, archive flags after removal to maintain history without adding clutter.
 
 See [Managing feature flags in code](/guides/manage-feature-flags-in-code) for more recommendations.
+
+#### What is FeatureOps?
+[FeatureOps](https://featureops.io/) is the discipline of controlling software behavior at runtime. It extends DevOps into the layer where features reach users, combining runtime control, progressive delivery, observability, and governance. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. Feature flags are the core mechanism, but FeatureOps encompasses broader practices including autonomous releases, full-stack experimentation, and zero-trust governance.

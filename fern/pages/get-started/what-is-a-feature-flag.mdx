@@ -1,7 +1,7 @@
 ---
 title: What is a feature flag and why are feature flags used?
 description: Feature flags let you release, test, and manage features without touching source code. Here's what they are, why teams use them, and how they work.
-keywords: feature flags, feature toggles, progressive rollouts, trunk-based development, a/b testing, kill switches
+keywords: feature flags, feature toggles, progressive rollouts, trunk-based development, a/b testing, kill switches, featureops
 og:site_name: Unleash Documentation
 og:title: What is a Feature Flag? Complete Guide to Feature Flags
 max-toc-depth: 2
@@ -13,14 +13,17 @@ In this guide, we'll introduce you to the basics of feature flags and why so man
 
 ## TL;DR
 
-- Feature flags turn features on or off at runtime without touching source code or redeploying.
+- Feature flags let you turn features on or off at runtime without changing source code or redeploying.
 - They decouple code deployment from feature release, giving teams control over what users see and when.
 - Developers use them to reduce risk, run production experiments, and speed up release cycles.
 - Release, experiment, kill switch, operational, and permission flags each address a different stage or need in the feature lifecycle.
+- [FeatureOps](https://featureops.io/) is the discipline that extends feature flags into autonomous, production-driven release workflows.
 
 ## What is a feature flag?
 
 A [feature flag](/concepts/feature-flags) is a software engineering technique that turns features or functionality on or off without modifying the source code or requiring a redeploy. It's also referred to as feature toggles, switches, flippers, or bits.
+
+At their core, feature flags decouple code deployment from feature release. Code reaches production on your deployment schedule, but features become visible to users only when you enable them at runtime. This distinction—deployment is not release—is fundamental to modern software delivery.
 
 Feature flags enable you to release and test new features by making them available to a specific group of users, or no users at all, with the power to immediately turn them off without any risk to the rest of your application.
 
@@ -218,11 +221,32 @@ Additionally, feature flags can be implemented in a secure and scalable manner t
 Feature flags can be managed in environments that require strict compliance with standards such as [FedRAMP](/privacy-and-compliance/fedramp), [SOC 2](/privacy-and-compliance/soc2), [ISO27001](/privacy-and-compliance/iso27001), and air-gap configurations. By ensuring that feature flagging systems meet these regulatory requirements, organizations can maintain compliance while benefiting from agile feature management.
 
 
+## Feature flags and FeatureOps
+
+Feature flags are a technique. [FeatureOps](https://featureops.io/) is the discipline of controlling software behavior at runtime, built around feature flags and the practices that make them effective at scale.
+
+DevOps transformed how teams build, deploy, and operate software. CI/CD pipelines, container orchestration, and infrastructure as code made it possible to ship code reliably at scale. But deploying code to production says nothing about who sees it, when they see it, or whether it actually works for them. Your pipeline can pass every check and your infrastructure can report healthy, while users still hit a broken feature caused by a configuration change or an edge case that never surfaced in staging. FeatureOps closes that gap by extending DevOps into the runtime layer where features actually reach users.
+
+The discipline rests on four pillars:
+
+- **Controlled release**: Separate code deployment from feature exposure. Code reaches production on your deployment schedule, but features become visible to users through [gradual rollouts](/concepts/activation-strategies#gradual-rollout) rather than all-or-nothing launches.
+- **Full-stack experimentation**: Treat every release as an opportunity to measure impact across the entire stack—performance, stability, infrastructure costs, and business metrics—not just surface-level UI changes.
+- **Surgical rollback**: When something breaks, disable the problematic feature in seconds with a [kill switch](https://www.getunleash.io/blog/kill-switches-best-practice) rather than redeploying the entire application. With the right observability in place, rollbacks can trigger automatically when error rates or latency cross defined thresholds.
+- **Zero-trust governance**: Apply the same rigor to runtime changes that DevOps brought to deployment. Role-based access controls, [approval workflows](/concepts/change-requests), and [audit logs](/concepts/events) ensure that speed and governance coexist.
+
+### Autonomous releases
+
+As AI coding tools accelerate the volume of code changes, manual [release management](/concepts/release-management-overview) becomes a bottleneck. Autonomous releases let production data drive rollout decisions instead.
+
+In an autonomous release workflow, a feature is wrapped in a flag and rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout progresses automatically to the next stage. If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are detected and cleaned up. The entire lifecycle operates within guardrails you define, without requiring manual toggling or constant monitoring.
+
+This approach is especially critical as AI-assisted development increases the rate of production changes. The same runtime controls that protect against a developer's late-night deployment also protect against regressions introduced by AI-generated code.
+
 ## Applying feature flag best practices with Unleash
 
-The risk and cost of building software the old way are too high. When developers are forced to use tools and processes they hate, like infrequent high-stakes releases based on complex branching strategies, innovation is [reduced by 50%](https://www.microsoft.com/en-us/research/publication/devex-in-action-a-study-of-its-tangible-impacts/). Additionally, when code is deployed and released in this manner, rolling back after discovering an issue can be difficult and time-consuming. On average, application downtime costs organizations [$400,000 per hour](https://www.ibm.com/downloads/cas/L57KW7ND), and more than half of organizations face unexpected downtime every two months.
+High-stakes releases, complex branching strategies, and slow rollback paths were tolerable when change was infrequent. Today, they actively constrain velocity and amplify risk. When developers are forced to work this way, innovation is [reduced by 50%](https://www.microsoft.com/en-us/research/publication/devex-in-action-a-study-of-its-tangible-impacts/). On average, application downtime costs organizations [$400,000 per hour](https://www.ibm.com/downloads/cas/L57KW7ND), and more than half of organizations face unexpected downtime every two months.
 
-Unleash is on a mission to make developers' lives easier. Individual developers love Unleash because it removes the pain of testing and deploying new features so they have more time and energy to innovate. Unleash is trusted by thousands of companies in production including Visa, Wayfair, Lloyd's Banking Group, and Samsung. While we serve the needs of some of the world's largest and most security-conscious organizations, we are also rated the *Easiest to Use in Feature Management software* by G2.
+Unleash is the FeatureOps platform that gives teams real-time control over how software behaves in production, enabling controlled releases, full-stack experimentation, and surgical rollbacks at scale. Built on an open-source foundation with thousands of production deployments worldwide, Unleash is trusted by enterprises including Visa, Wayfair, Lloyd's Banking Group, and Samsung. Governance, access controls, auditability, and data residency are built into the platform, so teams can move fast without compromising control.
 
 If you want to learn more about how to implement feature flags at scale, check out the following resources:
 - [Feature Flag Tutorials](/guides/gradual-rollout)
@@ -251,5 +275,13 @@ The primary risk associated with [feature flags](/concepts/feature-flags) is the
 
 <Accordion title="Who is responsible for managing feature flags?">
 While developers typically implement the initial code for a flag, the management of the flag often shifts depending on its type and lifecycle stage. Engineering teams usually control operational flags and kill switches, for example, while product managers often control release and experiment flags. Collaborative feature management platforms allow both technical and non-technical stakeholders to control these settings safely.
+</Accordion>
+
+<Accordion title="What is FeatureOps?">
+FeatureOps is the discipline of controlling software behavior at runtime. It extends DevOps into the layer where features reach users, combining runtime control, progressive delivery, observability, and governance. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. Feature flags are the core mechanism, but FeatureOps encompasses broader practices including autonomous releases, full-stack experimentation, and zero-trust governance.
+</Accordion>
+
+<Accordion title="What are autonomous releases?">
+Autonomous releases are self-regulating rollout workflows driven by production data rather than manual intervention. A feature rolls out gradually while production signals like error rates, latency, and adoption are monitored against defined thresholds. If metrics stay healthy, the rollout progresses automatically. If any signal crosses a safety threshold, the rollout pauses or rolls back instantly. After full rollout, stale flags are cleaned up. This approach is especially valuable as AI coding tools increase the volume and velocity of code changes.
 </Accordion>
 </AccordionGroup>
