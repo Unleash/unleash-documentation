@@ -270,6 +270,7 @@ Yes. [Feature flags](/concepts/feature-flags) are an essential tool for conducti
 <Accordion title="What are the risks of using feature flags?">
 The primary risk associated with [feature flags](/concepts/feature-flags) is the accumulation of [technical debt](/concepts/technical-debt) if flags are not removed after they have served their purpose. Old or stale flags can clutter the codebase, making it harder to maintain and test, potentially leading to unexpected behaviors if configurations interact poorly. To mitigate this, teams should establish a strict lifecycle management process to retire flags once a feature is fully released or an experiment concludes.
 A common practice is automating flag clean-up using coding assistants or the [Unleash MCP server](/integrate/mcp).
+</Accordion>
 
 <Accordion title="Who is responsible for managing feature flags?">
 While developers typically implement the initial code for a flag, the management of the flag often shifts depending on its type and lifecycle stage. Engineering teams usually control operational flags and kill switches, for example, while product managers often control release and experiment flags. Collaborative feature management platforms allow both technical and non-technical stakeholders to control flag configuration safely.
