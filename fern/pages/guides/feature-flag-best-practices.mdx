@@ -21,7 +21,6 @@ At Unleash, we've defined 11 principles for building a large-scale feature flag 
 - Enforce unique naming conventions for all flags.
 - Evaluate sensitive flags server-side to protect PII.
 - Ensure a consistent experience by evaluating flags close to the user.
-- These principles form the foundation of [FeatureOps](https://featureops.io/) and autonomous release workflows.
 
 These principles are:
 
@@ -272,11 +271,11 @@ To ensure a good developer experience, you should provide the following:
 
 ## From feature flag best practices to FeatureOps
 
-The 11 principles above define how to architect a feature flag system. [FeatureOps](https://featureops.io/) is the discipline that puts them into practice. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. It combines runtime control, progressive delivery, observability, and governance into a unified approach to managing software behavior in production. Feature flags are the core mechanism, but FeatureOps encompasses broader practices including autonomous releases, full-stack experimentation, and zero-trust governance. To learn more about the four pillars of FeatureOps, see [Feature flags and FeatureOps](/get-started/what-is-a-feature-flag#feature-flags-and-featureops).
+The 11 principles above define how to architect a feature flag system. [FeatureOps](https://featureops.io/) is the discipline that puts them into practice. Where DevOps focuses on getting code to production, FeatureOps focuses on controlling what happens after code is deployed—who sees which features, when, and with what safeguards in place. It combines runtime control, progressive delivery, observability, and governance into a unified approach to managing software behavior in production. Feature flags are the core mechanism, but FeatureOps encompasses broader practices, including autonomous releases, full-stack experimentation, and zero-trust governance.
 
 ### Autonomous release workflows
 
-As code velocity increases—especially with AI coding tools generating more changes at higher frequency—manual release management becomes unsustainable. Autonomous releases apply these principles to create self-regulating rollout pipelines driven by production data:
+As code velocity increases, especially with AI coding tools generating more changes at a higher frequency, manual release management becomes unsustainable. Autonomous releases apply these principles to create self-regulating rollout pipelines driven by production data:
 
 1. A feature is wrapped in a flag and deployed to production.
 2. The flag enables the feature for a small percentage of users.
@@ -285,7 +284,6 @@ As code velocity increases—especially with AI coding tools generating more cha
 5. If any signal crosses a threshold, the rollout pauses or rolls back instantly.
 6. After full rollout, the flag is detected as stale and cleaned up.
 
-This workflow directly applies runtime control ([Principle 1](#1-enable-runtime-control)), short-lived flags ([Principle 2](#2-make-flags-short-lived)), availability over consistency ([Principle 3](#3-prioritize-availability-over-consistency)), and consistent user experience ([Principle 10](#10-prioritize-consistent-user-experience)).
 
 ### FeatureOps cultural practices
 
