@@ -149,6 +149,75 @@ The SDK emits the following events:
 
 <Note>Please remember that you should always register your event listeners before your call `unleash.start()`. If you register them after you have started the SDK you risk losing important events.</Note>
 
+## Impact metrics 
+
+<Markdown src="/snippets/sdks/impact-metrics.mdx" />
+
+The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
+
+Initialize the SDK to start publishing impact metrics.
+
+```js
+const unleash = new UnleashClient({
+    url: 'https://<your-unleash-instance>/api/frontend',
+    clientKey: '<your-frontend-token>',
+    appName: 'my-webapp',
+});
+
+unleash.start();
+
+unleash.impactMetrics.defineCounter(
+  'request_count',
+  'Total number of HTTP requests processed'
+);
+
+unleash.impactMetrics.incrementCounter('request_count');
+
+unleash.impactMetrics.defineHistogram(
+  'request_time_ms',
+  'Time taken to process a request in milliseconds',
+  [50, 100, 200, 500, 1000]
+);
+
+unleash.impactMetrics.observeHistogram('request_time_ms', 125);
+```
+
+### Metric types
+
+<Tabs>
+<Tab title="Counter">
+
+Use counters for cumulative values that only increase, such as the total number of requests or errors.
+
+```js
+unleash.impactMetrics.defineCounter(
+  'request_count',
+  'Total number of HTTP requests processed'
+);
+
+unleash.impactMetrics.incrementCounter('request_count');
+```
+
+</Tab>
+<Tab title="Histogram">
+
+Histograms measure distributions such as latency and payload size.
+
+```js
+unleash.impactMetrics.defineHistogram(
+  'request_time_ms',
+  'Time taken to process a request in milliseconds',
+  [50, 100, 200, 500, 1000]
+);
+
+unleash.impactMetrics.observeHistogram('request_time_ms', 125);
+```
+
+</Tab>
+</Tabs>
+
+Impact metrics are batched and sent on the same interval as regular SDK metrics. They are ingested via the regular metrics endpoint.
+
 ## Session ID
 
 You may provide a custom session id via the "context". If you do not provide a sessionId this SDK will create a random session id, which will also be stored in the provided storage (local storage). By always having a consistent sessionId available ensures that even "anonymous" users will get a consistent experience when feature flags are evaluated, in combination with a gradual (percentage based) rollout.
