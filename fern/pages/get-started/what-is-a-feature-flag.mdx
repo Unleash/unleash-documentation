@@ -110,20 +110,14 @@ The code for the feature is already deployed. A feature flag controls where it e
 
 ## Types of feature flags
 
-Let's take a look at the different types of feature flags, including their purpose and benefits:
-
-- [Release flags](#release-flags)
-- [Experiment flags](#experiment-flags)
-- [Kill switches](#kill-switches)
-- [Operational flags](#operational-flags)
-- [Permission flags](#permission-flags)
+Let's take a look at the different types of feature flags, including their purpose and benefits.
 
 <Frame background="subtle">
   ![Pete Hodgson's taxonomy of feature flag types. Source: https://martinfowler.com/articles/feature-toggles.html](/assets/feature-flag-lifecycle-chart.png)
 </Frame>
 
-### Release flags
-
+<Tabs>
+<Tab title="Release flags">
 - **Purpose**: Manage the deployment of new or incomplete features.
 - **Benefits**: Risk mitigation, incremental development and testing of new features.
 - **Lifespan**: Short-lived; a few weeks or months depending on the feature's scope.
@@ -131,10 +125,9 @@ Let's take a look at the different types of feature flags, including their purpo
 Release flags enable teams to integrate code into the mainline without immediately exposing it to all users. This practice supports continuous integration and delivery by always keeping the main branch deployable. They allow for incremental development and testing of features in production without impacting the entire user base, thereby enhancing stability and reliability.
 
 While release flags are invaluable, they should be short-lived to prevent codebase complexity and [technical debt](/concepts/technical-debt) accumulation. Once the feature is complete and tested, the flag should be removed to streamline the code.
+</Tab>
 
-
-### Experiment flags
-
+<Tab title="Experiment flags">
 - **Purpose**: A/B and multivariate testing.
 - **Benefits**: Informed, evidence-based decisions on feature implementations.
 - **Lifespan**: Limited to the duration of the experiment; a few days to a few weeks.
@@ -142,22 +135,19 @@ While release flags are invaluable, they should be short-lived to prevent codeba
 Experiment flags allow for evaluating different user experiences to determine the most effective iterations. They segment users into cohorts, providing data-driven user preferences and behavior insights. They empower teams to optimize the user experience based on actual usage data and feedback, thereby maximizing product value and user satisfaction.
 
 Experiment flags are dynamic and transient. Their lifespan is inherently limited to the duration of the experiment—enough to gather significant data but not so long as to risk polluting the findings with unrelated changes or prolonging the exposure of potentially suboptimal features.
+</Tab>
 
-
-### Kill switches
-
+<Tab title="Kill switches">
 - **Purpose**: Quickly disable certain functionalities or features.
 - **Benefits**: Immediate remediation in the face of unexpected, critical incidents.
 - **Lifespan**: Long-term or even permanent.
 
-
-[Kill switches](https://www.getunleash.io/blog/kill-switches-best-practice) act as emergency levers that can quickly turn off certain functionalities or features in response to critical issues like severe performance degradations or security vulnerabilities. Unlike other [operational flags](#operational-flags), kill switches are designed for rapid, decisive action in crisis situations. They often impact user-facing features to preserve overall system stability or security. By preemptively implementing these switches, teams can ensure they have a fail-safe mechanism to maintain control over the system's operational integrity, even under adverse conditions.
+[Kill switches](https://www.getunleash.io/blog/kill-switches-best-practice) act as emergency levers that can quickly turn off certain functionalities or features in response to critical issues like severe performance degradations or security vulnerabilities. Unlike other operational flags, kill switches are designed for rapid, decisive action in crisis situations. They often impact user-facing features to preserve overall system stability or security. By preemptively implementing these switches, teams can ensure they have a fail-safe mechanism to maintain control over the system's operational integrity, even under adverse conditions.
 
 Contrary to the short-lived nature of most feature flags, kill switches are inherently long-term or even permanent tools within a system's architecture. Their enduring presence allows for ongoing protection against unforeseen critical events. However, these switches must be regularly reviewed and tested to ensure they remain functional and relevant, adapting to the evolving system and operational requirements.
+</Tab>
 
-
-### Operational flags
-
+<Tab title="Operational flags">
 - **Purpose**: Transition between technical implementations with minimal risk.
 - **Benefits**: Thorough validation of changes in a live environment without disrupting the user experience.
 - **Lifespan**: Short-lived; a few days to a couple of weeks.
@@ -165,60 +155,60 @@ Contrary to the short-lived nature of most feature flags, kill switches are inhe
 Operational flags manage a system's technical aspects that do not directly influence user-visible features but are crucial for the application's underlying stability and performance. For example, during a library version upgrade, operational flags can toggle between the old and new implementations to ensure the update does not adversely affect the system. By enabling real-time switching between different operational states or configurations, these flags allow for thorough validation of changes in a live environment without disrupting the user experience.
 
 Operational flags should be short-lived, existing only long enough to confirm that a change, such as a library update, is stable and does not introduce regressions. Once the new state is validated, the flag should be promptly retired to avoid accumulating technical debt. Avoid using operational flags as a solution for long-term configuration management; see our [Best practices for building and scaling feature flags](/guides/feature-flag-best-practices) guide to learn more.
+</Tab>
 
-
-### Permission flags
-
+<Tab title="Permission flags">
 - **Purpose**: Control feature access based on user roles or entitlements.
 - **Benefits**: Getting early feedback from select user groups or delivering enhanced functionality to premium users.
 - **Lifespan**: Varies from short-lived to permanent.
 
 Permission flags allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
+</Tab>
+</Tabs>
 
 ## Use cases for feature flags
 
 Next, let's look at some of the common use cases for feature flags, such as [progressive rollouts](https://www.getunleash.io/feature-flag-use-cases-progressive-or-gradual-rollouts), [A/B testing](https://www.getunleash.io/blog/ab-testing-feature-flags-how-to), kill switches, and more.
 
-### Progressive rollouts
-
+<AccordionGroup>
+<Accordion title="Progressive rollouts">
 [Progressive rollouts](https://www.getunleash.io/feature-flag-use-cases-progressive-or-gradual-rollouts) of features—where new functionality is gradually exposed to a broader audience based on successful interim outcomes—are much better than all-or-nothing releases. This phased approach allows for collecting valuable user feedback and performance data at each stage, enabling fine-tuning or course corrections as needed.
 
 For example, a cloud storage service might initially introduce a new file-sharing interface to a small percentage of users, expanding the rollout as confidence in the feature's stability and usability grows. The alternative is super long testing cycles that might still miss some bugs. It is much better to ship code quickly and start with a small audience that you can validate before rolling out more broadly.
+</Accordion>
 
-### A/B testing​
-
+<Accordion title="A/B testing">
 Feature flags facilitate [A/B testing](https://www.getunleash.io/blog/ab-testing-feature-flags-how-to) by allowing different user segments to experience an app without a particular feature, or different variants of a feature. By directing different user segments to experience variant features, data can be gathered to inform which version effectively achieves the desired objectives.
 
 An online bookstore, for instance, could test two different landing page designs to identify which one yields a higher engagement rate or increases sales, thereby making data-driven decisions to enhance user experience and business outcomes.
+</Accordion>
 
-### Kill switches
-
+<Accordion title="Kill switches">
 Feature flags can be used to [quickly disable a feature as needed](https://www.getunleash.io/feature-flag-use-cases-software-kill-switches), minimizing the impact on both users and the organization deploying the feature.
 
 To implement [kill switches](https://www.getunleash.io/blog/kill-switches-best-practice), a good general practice is to wrap your flaky feature in an inverted feature flag. Your application should assume that the feature is working as expected as long as the feature flag is disabled. When you disable a flag by default, your application will still have the feature enabled. This is in case it can't fetch the latest version of the feature flag. If you detect any problems with the integration, you can then easily turn on the kill switch, which will then turn off the feature.
+</Accordion>
 
-### Rollbacks
-
+<Accordion title="Rollbacks">
 Feature flags enable rapid [rollbacks](https://www.getunleash.io/feature-flag-use-cases-rollbacks) of features that are causing issues or not performing as expected. Instead of redeploying the entire application, teams can simply disable the problematic feature, reducing downtime and mitigating risk. Imagine a scenario where a new image compression algorithm is causing longer page load times; a feature flag can quickly disable this algorithm, reverting to the previous state while the issue is investigated.
+</Accordion>
 
-
-### Trunk-based development​
-
+<Accordion title="Trunk-based development">
 [Trunk-based development](https://www.getunleash.io/blog/how-to-implement-trunk-based-development-a-practical-guide) is a software development strategy where all developers commit code changes to a single shared branch, known as the "trunk" or "mainline," rather than working in separate branches for extended periods. Feature flags support trunk-based development by allowing features to be integrated into the main codebase without being immediately visible to users. This encourages continuous integration and reduces the complexity associated with long-lived feature branches.
 
 Developers have shifted towards trunk-based development for several reasons, primarily driven by the need for faster, more efficient, and more reliable software delivery processes. Feature flags allow teams to merge code for incomplete features into the trunk without exposing these features to all users. This way, you can continue developing and testing in production-like environments without affecting end-user experience.
+</Accordion>
 
-
-### Feature management​
-
+<Accordion title="Feature management">
 [Feature management](https://www.getunleash.io/blog/feature-management) involves the strategic use of feature flags to control the lifecycle and rollout of features. This includes scheduling feature releases, managing access based on user roles, and monitoring feature performance and usage. Effective feature management ensures that new features are released in a controlled and measured manner, reducing risks and improving overall product stability.
 
 Additionally, feature flags can be implemented in a secure and scalable manner to support enterprise-level requirements. By using robust feature flagging systems, organizations can ensure that their feature management processes comply with security standards and can scale to handle large user bases without compromising performance.
+</Accordion>
 
-
-### Compliance with FedRAMP, SOC 2, ISO27001, Air-gap, and others
-
+<Accordion title="Compliance with FedRAMP, SOC 2, ISO27001, Air-gap, and others">
 Feature flags can be managed in environments that require strict compliance with standards such as [FedRAMP](/privacy-and-compliance/fedramp), [SOC 2](/privacy-and-compliance/soc2), [ISO27001](/privacy-and-compliance/iso27001), and air-gap configurations. By ensuring that feature flagging systems meet these regulatory requirements, organizations can maintain compliance while benefiting from agile feature management.
+</Accordion>
+</AccordionGroup>
 
 
 ## Feature flags and FeatureOps
