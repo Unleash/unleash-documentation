@@ -20,38 +20,87 @@ A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP)
 
 ## Overview
 
-This MCP server provides tools that integrate with the [Unleash Admin API](/get-started/unleash-overview#admin-api), allowing AI coding assistants to:
+This MCP server provides tools that integrate with the [Unleash Admin API](/get-started/unleash-overview#admin-api). It evaluates code changes to decide when a feature flag is needed, creates flags with proper validation and typing, and detects existing flags to prevent duplicates or encourage reuse. The server streams progress for visibility during operations, handles errors gracefully with helpful hints, and follows [best practices](/guides/feature-flag-best-practices) from the Unleash documentation.
 
-- **Create feature flags** with proper validation and typing.
-- **Detect existing flags** to prevent duplicates or encourage reuse.
-- **Evaluate changes** to decide when a feature flag is needed.
-- **Stream progress** for visibility during operations.
-- **Handle errors** gracefully with helpful hints.
-- **Follow best practices** from the [Unleash documentation](/guides/feature-flag-best-practices).
+Every tool falls into one of three use cases:
 
-### Available tools
+| Use case | Tools | What it does |
+|----------|-------|--------------|
+| **Evaluate and wrap code in feature flags** | `evaluate_change`, `detect_flag`, `create_flag`, `wrap_change` | Assess whether a code change needs a flag, create one if it does, and generate the wrapping code. |
+| **Manage rollouts** | `get_flag_state`, `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy` | Check flag state, configure rollout strategies, and enable or disable flags across environments. |
+| **Clean up after rollout** | `cleanup_flag` | Generate instructions for safely removing a flag from your codebase after rollout. |
 
-The MCP server exposes the following tools:
+See the [Tool reference](#tool-reference) section for detailed parameters and output for each tool.
 
-- `create_flag`: Creates a feature flag in Unleash.
-- `evaluate_change`: Scores risk and recommends feature flag usage.
-- `detect_flag`: Discovers existing feature flags to avoid duplicates.
-- `wrap_change`: Provides guidance on how to wrap a change in a feature flag.
-- `set_flag_rollout`: Configures rollout strategies for a feature flag (does not enable the flag).
-- `get_flag_state`: Surfaces a feature flag's metadata and its activation strategies.
-- `toggle_flag_environment`: Enables or disables a feature flag in an environment.
-- `remove_flag_strategy`: Deletes a feature flag's strategy from an environment.
-- `cleanup_flag`: Generates instructions for safely removing flagged code paths.
+### Workflows
 
-### Core workflow
+The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
 
-The core workflow for an AI assistant is designed to be:
-1. `evaluate_change`: First, assess a code change to see if a flag is needed.
-2. `detect_flag`: This is often called automatically by `evaluate_change` to prevent creating duplicate flags.
-3. `create_flag`: If a new flag is required, this tool creates it in Unleash.
-4. `wrap_change`: Finally, this tool provides the language-specific code to implement the new flag.
+<Tabs>
+<Tab title="Evaluate and wrap code in feature flags">
 
-See more information on the core workflow tools in the [Tool reference](#tool-reference) section.
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+<Step title="Evaluate the change">
+The assistant calls `evaluate_change` to assess the code change, score its risk, and recommend whether a feature flag is needed.
+</Step>
+
+<Step title="Check for duplicates">
+`detect_flag` runs automatically as part of evaluation to search for existing flags. If a suitable flag exists, the assistant suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists, `create_flag` creates one in Unleash with the appropriate name, type, and description. The flag is created disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+`wrap_change` generates framework-specific guard code for the new flag. The assistant applies the wrapping pattern to your code.
+</Step>
+</Steps>
+
+</Tab>
+
+<Tab title="Manage rollouts">
+
+Use this workflow to control how a flag behaves across environments, such as enabling in staging for testing while keeping it disabled in production.
+
+<Steps>
+<Step title="Check flag state">
+The assistant calls `get_flag_state` to return the flag's metadata, enabled environments, and active strategies.
+</Step>
+
+<Step title="Configure rollout or toggle">
+Depending on your goal, the assistant calls `set_flag_rollout` to configure a gradual rollout strategy or `toggle_flag_environment` to enable or disable the flag in a specific environment.
+</Step>
+</Steps>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See [Protect production environments](#protect-production-environments) for details.
+</Warning>
+
+</Tab>
+
+<Tab title="Clean up after rollout">
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+<Steps>
+<Step title="Generate cleanup instructions">
+The assistant calls `cleanup_flag` and returns all files and line numbers where the flag is used, which code path to preserve (the "enabled" branch), and suggestions for tests to run after removal.
+</Step>
+
+<Step title="Remove the flag">
+Review the results, remove the conditional branches from your code, and archive or delete the flag from Unleash.
+</Step>
+</Steps>
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
+</Tip>
+
+</Tab>
+</Tabs>
 
 ## Prerequisites
 
@@ -588,6 +637,12 @@ This section provides a quick reference for all configuration options.
 - `--dry-run`: Simulate operations without making actual API calls.
 - `--log-level`: Set logging verbosity (debug, info, warn, error).
 
+## Protect production environments
+
+AI assistants can make mistakes and toggle the wrong flag. When [change requests](/concepts/change-requests) are enabled for an environment, the MCP server submits a change request instead of applying the change directly. A human must approve the request before it takes effect, preventing accidental changes whether made manually or by an AI assistant.
+
+Enable change requests on any environment where unreviewed changes pose a risk, especially production. For configuration steps, see [change requests](/concepts/change-requests).
+
 ## Best practices
 
 This server encourages Unleash best practices from the [official documentation](/guides/feature-flag-best-practices):
@@ -650,7 +705,7 @@ MIT
 
 This is a purpose-driven project with a focused scope. Contributions should:
 
-- Align with the three core capabilities (create, evaluate, wrap).
+- Align with the three core use cases (evaluate and wrap code in feature flags, manage rollouts, clean up after rollout).
 - Maintain the thin, purpose-driven architecture.
 - Follow Unleash best practices.
 - Include clear documentation.
