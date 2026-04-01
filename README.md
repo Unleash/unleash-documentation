@@ -53,6 +53,10 @@ CI automatically fetches the latest OpenAPI spec from the hosted Unleash instanc
 
 You only need to run `node scripts/fetch-openapi.mjs` locally if you're working on API reference content and need a spec that's newer than the last CI run.
 
+## How last-updated dates work
+
+A GitHub Action (`.github/workflows/update-last-updated.yml`) runs on every pull request and automatically adds or updates a `last-updated` field in the YAML frontmatter of any changed MDX file. You don't need to set this manually.
+
 ## Architecture
 
 - **Engine**: [Fern](https://buildwithfern.com/)

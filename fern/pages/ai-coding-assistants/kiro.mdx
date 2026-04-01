@@ -6,6 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: kiro, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/kiro
+last-updated: March 31, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects Kiro to your Unleash instance, enabling AI-assisted feature flag management.
@@ -294,9 +295,9 @@ The Unleash MCP server exposes nine tools. The following table summarizes each t
 
 ## Workflows
 
-This section describes common workflows for using the Unleash MCP server with Kiro.
+The Unleash MCP server supports three use cases: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
 
-### Evaluate and wrap a risky change
+### Evaluate and wrap code in feature flags
 
 Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
 
@@ -416,6 +417,10 @@ Kiro calls `toggle_flag_environment` to enable the flag in staging while keeping
 </Tab>
 
 </Tabs>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
+</Warning>
 
 ### Clean up after rollout
 
