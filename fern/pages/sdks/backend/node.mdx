@@ -1,15 +1,21 @@
 ---
-title: Node
+title: Node.js SDK
+description: Integrate feature flags in your Node.js applications using the Unleash Node.js SDK
 og:site_name: Unleash
-og:title: Node SDK
-description: Node.js SDK for integrating with Unleash feature management platform
-keywords: [unleash, node, nodejs, sdk, feature flags, feature toggles, javascript]
+og:title: Node.js SDK
+keywords: Node.js SDK, feature flags, backend, javascript, unleash
 max-toc-depth: 3
 ---
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="Node.js" />
 
+## Requirements
+
+- Node.js 20 or later
+
 ## Installation
+
+Install the SDK package:
 
 <Tabs>
 <Tab title="npm">
@@ -26,56 +32,21 @@ yarn add unleash-client
 
 ## Initialization
 
-Once installed, you must initialize the SDK in your application. By default, Unleash initialization
-is asynchronous, but if you need it to be synchronous, you can
-[block until the SDK has synchronized with the server](#synchronous-initialization).
+<Markdown src="/snippets/sdks/backend-singleton-warning.mdx" />
 
-Note that until the SDK has synchronized with the API, all features will evaluate to `false` unless
-you have a [bootstrapped configuration](#bootstrap).
-
-<Tip>
-All code samples in this section will initialize the SDK and try to connect to the
-Unleash instance you point it to. You will need an Unleash instance and a
-[backend token](/concepts/api-tokens-and-client-keys#backend-tokens)
-for the connection to be successful.
-</Tip>
-
-We recommend that you initialize the Unleash client SDK **as early as possible** in your
-application. The SDK will set up an in-memory repository and poll for updates from the Unleash
-server at regular intervals.
+<Markdown src="/snippets/sdks/backend-connection.mdx" />
 
 ```js
 import { initialize } from 'unleash-client';
 
 const unleash = initialize({
-  url: 'https://YOUR-API-URL',
+  url: 'https://<your-unleash-instance>/api/',
   appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
 });
 ```
 
-The `initialize` function will configure a **global** Unleash instance. If you call this method
-multiple times, the global instance will be changed. You will **not** create multiple instances.
-
-### Check if the SDK is ready
-
-Because the SDK talks to the server in the background, it can be difficult to know
-exactly when it has connected and is ready to evaluate flags. If you want to run some code when
-the SDK becomes ready, you can listen for the `'synchronized'` event:
-
-```js
-unleash.on('synchronized', () => {
-  // the SDK has synchronized with the server
-  // and is ready to serve
-});
-```
-
-Refer to the [events reference](#events) later in this document for more information on events and
-an exhaustive list of all the events the SDK can emit.
-
-The `initialize` function will configure and create a _global_ Unleash instance. When a global
-instance exists, calling this method has no effect. Call the `destroy` function to remove the
-globally configured instance.
+The `initialize` function configures a **global** Unleash instance. If a global instance already exists with the same configuration, `initialize` returns it. If the configuration differs, it throws an error. Call `destroy` to remove the global instance before reinitializing with a different configuration.
 
 ### Constructing the Unleash client directly
 
@@ -90,9 +61,9 @@ Unleash API.
 import { Unleash } from 'unleash-client';
 
 const unleash = new Unleash({
-  url: 'https://YOUR-API-URL',
+  url: 'https://<your-unleash-instance>/api/',
   appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
 });
 
 unleash.on('ready', console.log.bind(console, 'ready'));
@@ -101,76 +72,174 @@ unleash.on('ready', console.log.bind(console, 'ready'));
 unleash.on('error', console.error);
 ```
 
-### Synchronous initialization
+### Configure an HTTP proxy
 
-You can also use the `startUnleash` function and `await` to wait for the SDK to have fully
-synchronized with the Unleash API. This guarantees that the SDK is not operating on local and
-potentially stale feature flag configuration.
+The SDK uses the standard HTTP proxy environment variables.
+
+Set `HTTPS_PROXY` or `HTTP_PROXY` in the environment where your service runs:
+
+```bash
+export HTTPS_PROXY=http://proxy.internal:8080
+export NO_PROXY=localhost,127.0.0.1,.internal
+```
+
+### Wait until the SDK is ready
+
+Until the SDK has synchronized with Unleash, all flags evaluate to `false` and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant), unless you have a [bootstrapped configuration](#bootstrap).
+
+Listen for the `'synchronized'` event to know when the SDK has fresh data from the Unleash API:
+
+```js
+unleash.on('synchronized', () => {
+  // the SDK has synchronized with the server
+  // and is ready to serve
+});
+```
+
+Alternatively, use the `startUnleash` function to `await` synchronization:
 
 ```js
 import { startUnleash } from 'unleash-client';
 
 const unleash = await startUnleash({
-  url: 'https://YOUR-API-URL',
+  url: 'https://<your-unleash-instance>/api/',
   appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
 });
 
-// The Unleash SDK now has a fresh state from the Unleash API
-const isEnabled = unleash.isEnabled('Demo');
+// The SDK has a fresh state from the Unleash API
+const isEnabled = unleash.isEnabled('my-feature');
 ```
+
+## Configuration options
+
+Pass these options to `initialize`, `startUnleash`, or the `Unleash` constructor.
+
+<ParamField path="url" type="string" required={true}>
+  Base URL to your Unleash or Edge API, for example: `https://<your-unleash-instance>/api/`.
+</ParamField>
+
+<ParamField path="appName" type="string" required={true}>
+  Name of your application. Included in registration, metrics, and request headers.
+</ParamField>
+
+<ParamField path="customHeaders" type="Record<string, string>">
+  Custom headers for all API requests. Use this to set the `Authorization` header with your backend token.
+</ParamField>
+
+<ParamField path="customHeadersFunction" type="() => Promise<Record<string, string>>">
+  Async function that returns custom headers. When set, takes precedence over `customHeaders`.
+</ParamField>
+
+<ParamField path="environment" type="string" default="default">
+  Environment value included in the Unleash context. This does **not** set the SDK's [Unleash environment](/concepts/environments).
+</ParamField>
+
+<ParamField path="instanceId" type="string">
+  A unique identifier for this SDK instance. If omitted, the SDK generates one.
+</ParamField>
+
+<ParamField path="refreshInterval" type="number" default="15000">
+  How often (in milliseconds) the SDK polls for updated flag configuration.
+</ParamField>
+
+<ParamField path="metricsInterval" type="number" default="60000">
+  How often (in milliseconds) the SDK sends usage metrics to Unleash.
+</ParamField>
+
+<ParamField path="metricsJitter" type="number" default="0">
+  Maximum jitter (in milliseconds) added to the metrics interval.
+</ParamField>
+
+<ParamField path="disableMetrics" type="boolean" default="false">
+  Disables client registration and metrics posting when set to `true`.
+</ParamField>
+
+<ParamField path="strategies" type="Strategy[]">
+  Custom activation strategies. See [custom strategies](#custom-strategies).
+</ParamField>
+
+<ParamField path="namePrefix" type="string">
+  Only fetch feature flags whose names start with this prefix.
+</ParamField>
+
+<ParamField path="tags" type="Array<{name: string, value: string}>">
+  Only fetch feature flags tagged with the provided tags, for example: `[{name: 'simple', value: 'proxy'}]`.
+</ParamField>
+
+<ParamField path="projectName" type="string">
+  Restricts flag fetches to a single project. Prefer using a [project scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
+</ParamField>
+
+<ParamField path="timeout" type="number" default="10000">
+  Timeout in milliseconds for outgoing HTTP requests.
+</ParamField>
+
+<ParamField path="backupPath" type="string" default="os.tmpdir()">
+  Directory used for persisting SDK state to disk.
+</ParamField>
+
+<ParamField path="repository" type="RepositoryInterface">
+  Custom repository implementation to manage the underlying data layer.
+</ParamField>
+
+<ParamField path="storageProvider" type="StorageProvider">
+  Custom storage provider for local persistence. See [local caching and offline behavior](#local-caching-and-offline-behavior).
+</ParamField>
+
+<ParamField path="bootstrap" type="BootstrapOptions">
+  Bootstrap configuration for initial flag data. See [bootstrap](#bootstrap).
+</ParamField>
+
+<ParamField path="bootstrapOverride" type="boolean" default="true">
+  When `true`, bootstrap data takes precedence over cached data. When `false`, cached data is preferred if available.
+</ParamField>
+
+<ParamField path="httpOptions" type="HttpOptions">
+  Custom HTTP options such as `rejectUnauthorized` and a custom `agent` function. Use caution as these may affect application security.
+</ParamField>
+
+<ParamField path="disableAutoStart" type="boolean" default="false">
+  When `true`, the SDK does not start polling or sending metrics until you manually call `start()`.
+</ParamField>
+
+<ParamField path="skipInstanceCountWarning" type="boolean" default="false">
+  Suppresses the warning emitted when more than 10 SDK instances are created.
+</ParamField>
 
 ## Check flags
 
-With the SDK initialized, you can use it to check the states of your feature flags in your
-application.
+### Check if a flag is enabled
 
-The primary way to check feature flag status is to use the `isEnabled` method on the SDK. It takes
-the name of the feature and returns `true` or `false` based on whether the feature is enabled or
-not.
+Use `isEnabled` to evaluate a flag:
 
-```javascript
-setInterval(() => {
-  if (unleash.isEnabled('DemoToggle')) {
-    console.log('Toggle enabled');
-  } else {
-    console.log('Toggle disabled');
-  }
-}, 1000);
+```js
+const enabled = unleash.isEnabled('my-feature');
+
+if (enabled) {
+  // new behavior
+}
 ```
-
-<Note>
-In this example, we've wrapped the `isEnabled` call inside a `setInterval` function. In
-the event that all your app does is start the SDK and check a feature status, this setup ensures
-that the node app keeps running until the SDK has synchronized with the Unleash API. It is **not**
-required in normal apps.
-</Note>
 
 ### Check variants
 
-You can use the `getVariant` method to retrieve the variant of a feature flag. If the flag is
-disabled or doesn't have any variants, the method returns the
-[disabled variant](/concepts/feature-flag-variants#the-disabled-variant).
+Use `getVariant` to retrieve a flag's variant. If the flag is disabled or has no variants, the method returns the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant).
 
 ```js
-const variant = unleash.getVariant('demo-variant');
+const variant = unleash.getVariant('checkout-experiment');
 
 if (variant.name === 'blue') {
-  // do something with the blue variant...
+  // blue variant behavior
+} else if (variant.name === 'green') {
+  // green variant behavior
 }
 ```
 
 ## Unleash context
 
-Calling the `isEnabled` method with just a feature name will work in simple use cases, but in many
-cases you'll also want to provide an
-[Unleash context](/concepts/unleash-context). The SDK uses the Unleash
-context to evaluate any
-[activation strategy](/concepts/activation-strategies) with
-[strategy constraints](/concepts/activation-strategies#constraints), and also to
-evaluate some of the built-in strategies.
+Use the [Unleash context](/concepts/unleash-context) to drive [strategy](/concepts/activation-strategies) and [constraint](/concepts/activation-strategies#constraints) evaluation for both `isEnabled` and `getVariant`.
 
-The `isEnabled` accepts an Unleash context object as a second argument:
+Pass the context as the second argument:
 
 ```js
 const unleashContext = {
@@ -182,71 +251,24 @@ const unleashContext = {
   },
 };
 
-const enabled = unleash.isEnabled('someToggle', unleashContext);
+const enabled = unleash.isEnabled('my-feature', unleashContext);
+const variant = unleash.getVariant('checkout-experiment', unleashContext);
 ```
+
+For stable gradual rollout and stickiness, include at least `userId` or `sessionId`.
 
 ## Stop the client
 
-To shut down the client (turn off the polling) you can simply call the `destroy` method. This is
-typically not required.
+Call `destroy` to shut down the client and stop polling. A destroyed client cannot be restarted.
 
 ```js
 import { destroy } from 'unleash-client';
 destroy();
 ```
 
-## TypeScript: custom feature flag names
-
-You can use TypeScript module augmentation to provide type safety for your feature flag names.
-This ensures that only specific feature names can be used with `isEnabled` and related methods,
-catching typos at compile time.
-
-```typescript
-import { initialize } from 'unleash-client';
-
-declare module 'unleash-client' {
-  interface UnleashTypes {
-    flagNames: 'aaa' | 'bbb';
-  }
-}
-
-const client = initialize({});
-
-client.isEnabled('aaa');
-client.isEnabled('bbb');
-client.isEnabled('ccc'); // Error
-```
-
-## Configuration options
-
-The `initialize` method takes the following arguments:
-
-- **url** - The url to fetch flags from (required).
-- **appName** - The application name / codebase name (required).
-- **environment** - The value to put in the Unleash context's `environment` property. Automatically
-  populated in the Unleash Context (optional). This does **not** set the SDK's
-  [Unleash environment](/concepts/environments).
-- **instanceId** - A unique identifier, should/could be somewhat unique.
-- **refreshInterval** - The poll interval to check for updates. Defaults to 15000ms.
-- **metricsInterval** - How often the client should send metrics to Unleash API. Defaults to
-  60000ms.
-- **strategies** - Custom activation strategies to be used.
-- **disableMetrics** - Disable metrics.
-- **customHeaders** - Provide a map(object) of custom headers to be sent to the unleash-server.
-- **customHeadersFunction** - Provide a function that returns a Promise resolving as custom headers
-  to be sent to unleash-server. When options are set, this will take precedence over `customHeaders`
-  option.
-- **timeout** - Specify a timeout in milliseconds for outgoing HTTP requests. Defaults to 10000ms.
-- **repository** - Provide a custom repository implementation to manage the underlying data.
-- **httpOptions** - Provide custom HTTP options such as `rejectUnauthorized` - be careful with these
-  options as they may compromise your application security.
-- **namePrefix** - Only fetch feature flags with the provided name prefix.
-- **tags** - Only fetch feature flags tagged with the list of tags, such as:
-  `[{type: 'simple', value: 'proxy'}]`.
-
 ## Custom strategies
 
-The client supports all [built-in activation strategies](/concepts/activation-strategies) provided by Unleash. To add a custom strategy, implement a `Strategy` subclass and pass it to the `strategies` option:
+The SDK supports all [built-in activation strategies](/concepts/activation-strategies). To add a custom strategy, implement a `Strategy` subclass and pass it in the `strategies` option:
 
 ```js
 import { initialize, Strategy } from 'unleash-client';
@@ -261,121 +283,151 @@ class ActiveForUserWithEmailStrategy extends Strategy {
   }
 }
 
-initialize({
-  url: 'http://unleash.herokuapp.com',
-  customHeaders: {
-    Authorization: 'API token',
-  },
+const unleash = initialize({
+  url: 'https://<your-unleash-instance>/api/',
+  appName: 'my-node-name',
+  customHeaders: { Authorization: '<your-backend-token>' },
   strategies: [new ActiveForUserWithEmailStrategy()],
 });
 ```
 
 ## Events
 
-The unleash instance object implements the EventEmitter class and **emits** the following events:
+The Unleash client implements the EventEmitter interface and emits the following events:
 
-| event        | payload                          | description                                                                                                                                                                                                                                  |
-| ------------ | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ready        | -                                | is emitted once the fs-cache is ready. if no cache file exists it will still be emitted. The client is ready to use, but might not have synchronized with the Unleash API yet. This means the SDK still can operate on stale configurations. |
-| synchronized | -                                | is emitted when the SDK has successfully synchronized with the Unleash API, or when it has been bootstrapped, and has all the latest feature flag configuration available.                                                                 |
-| registered   | -                                | is emitted after the app has been registered at the API server                                                                                                                                                                               |
-| sent         | `object` data                    | key/value pair of delivered metrics                                                                                                                                                                                                          |
-| count        | `string` name, `boolean` enabled | is emitted when a feature is evaluated                                                                                                                                                                                                       |
-| warn         | `string` msg                     | is emitted on a warning                                                                                                                                                                                                                      |
-| error        | `Error` err                      | is emitted on an error                                                                                                                                                                                                                       |
-| unchanged    | -                                | is emitted each time the client gets new flag state from server, but nothing has changed                                                                                                                                                   |
-| changed      | `object` data                    | is emitted each time the client gets new flag state from server and changes have been made                                                                                                                                                 |
-| impression   | `object` data                    | is emitted for every user impression (isEnabled / getVariant)                                                                                                                                                                                |
-
-Example usage:
+| Event | Payload | Description |
+|---|---|---|
+| `ready` | - | The local cache is ready. The SDK may not have synchronized with the API yet. |
+| `synchronized` | - | The SDK has successfully synchronized with the Unleash API or been bootstrapped. |
+| `registered` | - | The SDK has registered with the Unleash API. |
+| `sent` | `object` data | Metrics payload was sent to Unleash. |
+| `count` | `string` name, `boolean` enabled | A flag evaluation was counted for metrics. |
+| `warn` | `string` msg | The SDK emitted a warning. |
+| `error` | `Error` err | The SDK encountered an error. |
+| `unchanged` | - | New flag state was fetched but nothing changed. |
+| `changed` | `object` data | New flag state was fetched and changes were detected. |
+| `impression` | `object` data | A flag was evaluated with [impression data](/concepts/impression-data) enabled. |
 
 ```js
 import { initialize } from 'unleash-client';
 
 const unleash = initialize({
   appName: 'my-app-name',
-  url: 'http://unleash.herokuapp.com/api/',
-  customHeaders: {
-    Authorization: 'API token',
-  },
+  url: 'https://<your-unleash-instance>/api/',
+  customHeaders: { Authorization: '<your-backend-token>' },
 });
 
-// Some useful life-cycle events
 unleash.on('ready', console.log);
 unleash.on('synchronized', console.log);
 unleash.on('error', console.error);
 unleash.on('warn', console.warn);
 
 unleash.once('registered', () => {
-  // Do something after the client has registered with the server API.
-  // Note: it might not have received updated feature flags yet.
+  // The SDK has registered with the server API.
 });
 
 unleash.once('changed', () => {
-  console.log(`Demo is enabled: ${unleash.isEnabled('Demo')}`);
+  console.log(`my-feature is enabled: ${unleash.isEnabled('my-feature')}`);
 });
 
 unleash.on('count', (name, enabled) => console.log(`isEnabled(${name})`));
+```
+
+### Impression data
+
+<Markdown src="/snippets/sdks/impression-data-intro.mdx" />
+
+```js
+unleash.on('impression', (event) => {
+  // forward to your analytics tool
+  console.log(event);
+});
 ```
 
 ## Impact metrics
 
 <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
-Impact metrics are lightweight, application-level time-series metrics stored and visualized directly inside Unleash. They allow you to connect specific application data, such as request counts, error rates, or memory usage, to your feature flags and release plans.
+<Markdown src="/snippets/sdks/impact-metrics.mdx" />
 
-Use impact metrics to validate feature impact and automate your release process. For example, you can monitor usage patterns or performance to see if a feature is meeting its goals. By combining impact metrics with release templates, you can reduce manual release operations and automate milestone progression based on metric thresholds.
+The SDK automatically attaches `appName` and `environment` labels to all impact metrics.
 
-The SDK automatically attaches the following context labels to your metrics: `appName`, `environment`, and `origin` (for example, `origin=sdk` or `origin=Edge`).
-
-### Counters
-
-Use counters for cumulative values that only increase, such as the total number of requests or errors.
+Initialize the SDK and publish impact metrics:
 
 ```js
+import { initialize } from 'unleash-client';
+
 const unleash = initialize({
-  url: 'https://YOUR-API-URL',
+  url: 'https://<your-unleash-instance>/api/',
   appName: 'my-node-name',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  environment: 'production',
+  customHeaders: { Authorization: '<your-backend-token>' },
 });
 
 unleash.impactMetrics.defineCounter(
   'request_count',
-  'Total number of HTTP requests processed'
+  'Total number of HTTP requests processed',
 );
+unleash.impactMetrics.incrementCounter('request_count');
 
+unleash.impactMetrics.defineGauge(
+  'active_users',
+  'Current number of active users',
+);
+unleash.impactMetrics.updateGauge('active_users', 42);
+
+unleash.impactMetrics.defineHistogram(
+  'request_time_ms',
+  'Request processing time in milliseconds',
+);
+unleash.impactMetrics.observeHistogram('request_time_ms', 125);
+```
+
+### Metric types
+
+<Tabs>
+<Tab title="Counter">
+
+Use counters for cumulative values that only increase, such as the total number of requests or errors.
+
+```js
+unleash.impactMetrics.defineCounter(
+  'request_count',
+  'Total number of HTTP requests processed',
+);
 unleash.impactMetrics.incrementCounter('request_count');
 ```
 
-### Gauges
+</Tab>
+<Tab title="Gauge">
 
-Use gauges for values that can go up and down, such as current memory usage or active thread count.
+Use gauges for values that can go up or down, such as current memory usage or active user count.
 
 ```js
 unleash.impactMetrics.defineGauge(
-  'heap_memory_total',
-  'Current heap memory usage in bytes'
+  'active_users',
+  'Current number of active users',
 );
-
-const currentHeap = process.memoryUsage().heapUsed;
-unleash.impactMetrics.updateGauge('heap_memory_total', currentHeap);
+unleash.impactMetrics.updateGauge('active_users', 42);
 ```
 
-### Histograms
+</Tab>
+<Tab title="Histogram">
 
-Use histograms to measure the distribution of values, such as request duration or response size. Unleash automatically calculates percentiles (p50, p95, p99).
+Histograms measure distributions such as latency and payload size.
 
 ```js
 unleash.impactMetrics.defineHistogram(
   'request_time_ms',
-  'Time taken to process a request in milliseconds'
+  'Request processing time in milliseconds',
 );
-
-const duration = 125;
-unleash.impactMetrics.observeHistogram('request_time_ms', duration);
+unleash.impactMetrics.observeHistogram('request_time_ms', 125);
 ```
 
-Impact metrics are batched and sent on the same interval as regular SDK metrics. They are ingested via the regular metrics endpoint.
+</Tab>
+</Tabs>
+
+Impact metrics are batched and sent on the same interval as standard SDK metrics (`metricsInterval`).
 
 ## Bootstrap
 
@@ -385,10 +437,10 @@ You can bootstrap the SDK with flag configuration to evaluate flags without wait
 <Tab title="Inline data">
 
 ```js
-const client = initialize({
+const unleash = initialize({
   appName: 'my-application',
   url: 'https://<your-unleash-instance>/api/',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
   bootstrap: {
     data: [
       {
@@ -410,10 +462,10 @@ const client = initialize({
 <Tab title="URL">
 
 ```js
-const client = initialize({
+const unleash = initialize({
   appName: 'my-application',
   url: 'https://<your-unleash-instance>/api/',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
   bootstrap: {
     url: 'http://localhost:3000/proxy/client/features',
     urlHeaders: {
@@ -427,10 +479,10 @@ const client = initialize({
 <Tab title="File">
 
 ```js
-const client = initialize({
+const unleash = initialize({
   appName: 'my-application',
   url: 'https://<your-unleash-instance>/api/',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  customHeaders: { Authorization: '<your-backend-token>' },
   bootstrap: {
     filePath: '/tmp/some-bootstrap.json',
   },
@@ -440,58 +492,37 @@ const client = initialize({
 </Tab>
 </Tabs>
 
-## Flag definitions
+## Local caching and offline behavior
 
-Sometimes you might be interested in the raw feature flag definitions.
+By default, the SDK writes a backup of the flag configuration to a file on disk each time it receives an update from the Unleash API. On startup, the SDK loads cached state first, then fetches fresh data.
 
-```js
-import {
-  initialize,
-  getFeatureToggleDefinition,
-  getFeatureToggleDefinitions,
-} from 'unleash-client';
+If Unleash is temporarily unreachable:
 
-initialize({
-  url: 'http://unleash.herokuapp.com/api/',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
-  appName: 'my-app-name',
-  instanceId: 'my-unique-instance-id',
-});
+- The SDK continues serving cached or bootstrapped values.
+- Polling continues on `refreshInterval`.
+- Flag evaluations return `false` when no data exists.
 
-const featureToggleX = getFeatureToggleDefinition('app.ToggleX');
-const featureToggles = getFeatureToggleDefinitions();
-```
+### Custom storage providers
 
-## Custom store provider
-
-(Available from v3.11.x)
-
-By default, this SDK will use a store provider that writes a backup of the feature flag
-configuration to a **file on disk**. This happens every time it receives updated configuration from
-the Unleash API. You can swap out the store provider with either the provided in-memory store
-provider or a custom store provider implemented by you.
-
-### Use `InMemStorageProvider`
+Swap the default file-backed storage with the built-in in-memory provider or your own implementation:
 
 ```js
 import { initialize, InMemStorageProvider } from 'unleash-client';
 
-const client = initialize({
+const unleash = initialize({
   appName: 'my-application',
-  url: 'http://localhost:3000/api/',
-  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+  url: 'https://<your-unleash-instance>/api/',
+  customHeaders: { Authorization: '<your-backend-token>' },
   storageProvider: new InMemStorageProvider(),
 });
 ```
 
-### Custom store provider backed by Redis
+A custom provider must implement `set(key, data)` and `get(key)` methods. For example, a Redis-backed store:
 
 ```js
-import { initialize, InMemStorageProvider } from 'unleash-client';
-
 import { createClient } from 'redis';
 
-class CustomRedisStore {
+class RedisStorageProvider {
   async set(key, data) {
     const client = createClient();
     await client.connect();
@@ -505,26 +536,59 @@ class CustomRedisStore {
   }
 }
 
-const client = initialize({
+const unleash = initialize({
   appName: 'my-application',
-  url: 'http://localhost:3000/api/',
-  customHeaders: {
-    Authorization: 'my-key',
-  },
-  storageProvider: new CustomRedisStore(),
+  url: 'https://<your-unleash-instance>/api/',
+  customHeaders: { Authorization: '<your-backend-token>' },
+  storageProvider: new RedisStorageProvider(),
 });
 ```
 
-## Custom repository
+## TypeScript: custom feature flag names
 
-You can manage the underlying data layer yourself if you want to. This enables you to use Unleash
-offline, from a browser environment, or by implement your own caching layer. See
-[example](https://github.com/Unleash/unleash-node-sdk/blob/main/examples/custom_repository.js).
+You can use TypeScript module augmentation to provide type safety for your feature flag names. This catches flag name typos at compile time.
 
-Unleash depends on a `ready` event of the repository you pass in. Be sure that you emit the event
-**after** you've initialized Unleash.
+```typescript
+import { initialize } from 'unleash-client';
 
-## Outbound network proxy
+declare module 'unleash-client' {
+  interface UnleashTypes {
+    flagNames: 'my-feature' | 'checkout-experiment';
+  }
+}
 
-You can connect to the Unleash API through the corporate proxy by setting one of the environment
-variables: `HTTP_PROXY` or `HTTPS_PROXY`.
+const unleash = initialize({
+  url: 'https://<your-unleash-instance>/api/',
+  appName: 'my-node-name',
+  customHeaders: { Authorization: '<your-backend-token>' },
+});
+
+unleash.isEnabled('my-feature'); // OK
+unleash.isEnabled('checkout-experiment'); // OK
+unleash.isEnabled('typo-flag'); // Compile error
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="SDK does not become ready">
+
+If `startUnleash` hangs or the `synchronized` event never fires:
+
+- Verify `url` points to your Unleash API base URL (for example, `https://<your-instance>/api/`).
+- Verify `customHeaders` includes a valid backend API token in `Authorization`.
+- Confirm network connectivity from your service to the Unleash instance.
+- Listen for `error` events to inspect failures: `unleash.on('error', console.error)`.
+
+</Accordion>
+<Accordion title="All flags evaluate to false">
+
+If `isEnabled` always returns `false`:
+
+- Confirm the flag exists (check for typos).
+- Confirm the flag is enabled in the target environment.
+- Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
+- Verify the SDK completed initial sync (`synchronized` event fired or `startUnleash` resolved).
+
+</Accordion>
+</AccordionGroup>
