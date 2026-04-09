@@ -49,14 +49,9 @@ const unleash = initialize({
 
 The `initialize` function configures a **global** Unleash instance. If a global instance already exists with the same configuration, `initialize` returns it. If the configuration differs, it throws an error. Call `destroy` to remove the global instance before reinitializing with a different configuration.
 
-### Constructing the Unleash client directly
+### Construct the client directly
 
-You can also construct the Unleash instance yourself instead of via the `initialize` method.
-
-When using the Unleash client directly, you **should not create new Unleash instances on every
-request**. Most applications are expected to only have a single Unleash instance (singleton). Each
-Unleash instance will maintain a connection to the Unleash API, which may result in flooding the
-Unleash API.
+You can construct a client instance yourself instead of using the global `initialize` function. When using the constructor, attach an error listener to surface errors, since they are not logged automatically.
 
 ```js
 import { Unleash } from 'unleash-client';
@@ -67,9 +62,6 @@ const unleash = new Unleash({
   customHeaders: { Authorization: '<your-backend-token>' },
 });
 
-unleash.on('ready', console.log.bind(console, 'ready'));
-
-// optional error handling when using unleash directly
 unleash.on('error', console.error);
 ```
 
@@ -84,11 +76,11 @@ export HTTPS_PROXY=http://proxy.internal:8080
 export NO_PROXY=localhost,127.0.0.1,.internal
 ```
 
-### Wait until the SDK is ready
+### Check if the SDK is ready
 
 Until the SDK has synchronized with Unleash, all flags evaluate to `false` and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant), unless you have a [bootstrapped configuration](#bootstrap).
 
-Listen for the `'synchronized'` event to know when the SDK has fresh data from the Unleash API:
+Listen for the `synchronized` event to know when the SDK has fresh data from the Unleash API:
 
 ```js
 unleash.on('synchronized', () => {
@@ -222,9 +214,29 @@ if (enabled) {
 }
 ```
 
-### Check variants
+`isEnabled` accepts an optional context and fallback:
 
-Use `getVariant` to retrieve a flag's variant. If the flag is disabled or has no variants, the method returns the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant).
+```js
+unleash.isEnabled(name, context?, fallback?);
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `string` | The feature flag name. |
+| `context` | `Context` | Optional [Unleash context](#unleash-context) for this evaluation. |
+| `fallback` | `boolean` or `(name, context) => boolean` | Value or function used when the flag cannot be resolved. Defaults to `false`. |
+
+The fallback applies when the SDK cannot resolve the flag — for example, before initial synchronization or when the flag does not exist. Pass a boolean for a static default, or a function for per-call logic:
+
+```js
+const enabled = unleash.isEnabled('my-feature', { userId: '123' }, (name, ctx) => {
+  return ctx.userId === 'admin';
+});
+```
+
+### Check a flag's variant
+
+Use `getVariant` to retrieve a flag's variant:
 
 ```js
 const variant = unleash.getVariant('checkout-experiment');
@@ -236,11 +248,46 @@ if (variant.name === 'blue') {
 }
 ```
 
+`getVariant` accepts an optional context and fallback variant:
+
+```js
+unleash.getVariant(name, context?, fallbackVariant?);
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `string` | The feature flag name. |
+| `context` | `Context` | Optional [Unleash context](#unleash-context) for this evaluation. |
+| `fallbackVariant` | `Variant` | Variant returned when no variant can be resolved. Defaults to the SDK's [disabled variant](/concepts/feature-flag-variants#the-disabled-variant). |
+
+The SDK can return two forms of the disabled variant:
+
+- Feature disabled or not found: `{ name: 'disabled', enabled: false, feature_enabled: false }`
+- Feature enabled but no variant resolved (for example, no variants configured): `{ name: 'disabled', enabled: false, feature_enabled: true }`
+
+In both cases, `name` is `'disabled'` and `enabled` is `false`. Use `feature_enabled` to distinguish the two. The returned object also includes a deprecated `featureEnabled` field for backwards compatibility — prefer `feature_enabled` in new code.
+
+Example with a fallback variant:
+
+```js
+const fallbackVariant = {
+  name: 'fallback',
+  enabled: true,
+  payload: { type: 'string', value: 'default' },
+};
+
+const variant = unleash.getVariant('checkout-experiment', {}, fallbackVariant);
+
+if (variant.enabled) {
+  // use variant.name and variant.payload
+}
+```
+
 ## Unleash context
 
-Use the [Unleash context](/concepts/unleash-context) to drive [strategy](/concepts/activation-strategies) and [constraint](/concepts/activation-strategies#constraints) evaluation for both `isEnabled` and `getVariant`.
+<Markdown src="/snippets/sdks/unleash-context-intro.mdx" />
 
-Pass the context as the second argument:
+Pass the context as the second argument to `isEnabled` or `getVariant`:
 
 ```js
 const unleashContext = {
@@ -590,6 +637,49 @@ unleash.isEnabled('my-feature'); // OK
 unleash.isEnabled('checkout-experiment'); // OK
 unleash.isEnabled('typo-flag'); // Compile error
 ```
+
+## Unit testing
+
+For unit tests, construct a scoped `Unleash` instance with bootstrapped flag data, disabled metrics, and in-memory storage. This gives deterministic flag state without depending on a real Unleash instance.
+
+Use the `Unleash` constructor instead of `initialize` so each test gets its own client rather than sharing the global singleton.
+
+```js
+import { Unleash, InMemStorageProvider } from 'unleash-client';
+
+function createTestClient() {
+  const unleash = new Unleash({
+    appName: 'test-app',
+    url: 'http://unleash.test/api/',
+    disableMetrics: true,
+    refreshInterval: 24 * 60 * 60 * 1000,
+    storageProvider: new InMemStorageProvider(),
+    bootstrap: {
+      data: [
+        {
+          name: 'my-feature',
+          enabled: true,
+          strategies: [{ name: 'default' }],
+        },
+      ],
+    },
+  });
+
+  unleash.on('error', () => {}); // suppress network errors during tests
+  return unleash;
+}
+
+test('my-feature is enabled', async () => {
+  const unleash = createTestClient();
+  await new Promise((resolve) => unleash.on('synchronized', resolve));
+
+  expect(unleash.isEnabled('my-feature')).toBe(true);
+
+  unleash.destroy();
+});
+```
+
+Mock HTTP requests with [nock](https://github.com/nock/nock) to fully isolate tests from the network.
 
 ## Troubleshooting
 
