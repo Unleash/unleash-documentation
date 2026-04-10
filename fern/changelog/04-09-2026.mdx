@@ -1,0 +1,13 @@
+---
+tags: ["Improvement"]
+---
+
+# v7.6.0
+
+## Project-level context fields
+
+[Context fields](/concepts/unleash-context) can now be defined at a per-project level. To create one, open a project and go to **Settings > Context fields**. Once you define project-level context fields, they are available in [strategy configuration](/concepts/activation-strategies) and the [playground](/concepts/playground) for users with access to that project, but are not included in the global context fields overview.
+
+## Edit strategies in applied release plans
+
+You can now edit [activation strategies](/concepts/activation-strategies) in a [release plan](/concepts/release-templates) after the release template is applied to a feature flag. You can edit the configuration, [constraints](/concepts/activation-strategies#constraints), [variants](/concepts/strategy-variants), [rollout percentage](/concepts/activation-strategies#rollout-percentage), or set the status to **Inactive**, just as you would with any standalone strategy.

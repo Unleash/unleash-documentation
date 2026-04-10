@@ -5,6 +5,7 @@ keywords: unleash context, context fields, custom context fields, static fields,
 og:site_name: Unleash Documentation
 og:title: Unleash Context for Feature Flag Evaluation
 max-toc-depth: 3
+last-updated: April 9, 2026
 ---
 
 The **Unleash context** contains information related to the current feature flag request. Unleash uses this context to evaluate [activation strategies](activation-strategies) and [strategy constraints](/concepts/activation-strategies#constraints) and to calculate [flag stickiness](/concepts/stickiness). The Unleash Context is an important feature of all the [Unleash client SDKs](/sdks).
@@ -51,13 +52,34 @@ When interacting with custom context fields in code, they must be accessed via t
 
 ### Add a custom context field
 
-To add a custom context field in the Admin UI, do the following:
+You can add context fields at the global or project level. Global context fields are available across all projects. Project-level context fields are only available in [strategy configuration](/concepts/activation-strategies) and the [playground](/concepts/playground) for users with access to that project, and are not included in the global context fields overview.
+
+<Tabs>
+<Tab title="Global context field">
+
+To add a global context field in the Admin UI, do the following:
 
 1. Go to **Configure** > **Context fields** and click **New context field**.
 2. Enter a context name.
 3. In **Legal value**, enter a value you want the field to support and click **Add**. You can add additional values if needed.
 4. Optionally, enable [custom stickiness](/concepts/stickiness#custom-stickiness) if you'd like to use this field to group users for a gradual rollout strategy.
 5. Click **Create context**.
+
+</Tab>
+<Tab title="Project-level context field">
+
+<Button small outlined className="version-button" href="/support/availability">v7.6</Button>
+
+To add a project-level context field in the Admin UI, do the following:
+
+1. Open the project and go to **Settings** > **Context fields**, then click **New context field**.
+2. Enter a context name.
+3. In **Legal value**, enter a value you want the field to support and click **Add**. You can add additional values if needed.
+4. Optionally, enable [custom stickiness](/concepts/stickiness#custom-stickiness) if you'd like to use this field to group users for a gradual rollout strategy.
+5. Click **Create context**.
+
+</Tab>
+</Tabs>
 
 Once created, you can modify any aspect of a field's definition—except its name. You can create as many custom context fields as you need.
 
