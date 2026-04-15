@@ -222,6 +222,8 @@ External metrics do not go through the Unleash ingestion flow. SDKs do not send 
 
 The URL must be reachable from the Unleash server over the network. Internal metrics continue to work in parallel and remain the default source.
 
+The two sources are isolated. If the external instance is unreachable or returns errors, only charts and safeguards configured against the external source are affected — internal impact metrics continue to work normally.
+
 Internal and external metrics are kept in separate namespaces, identified by their source. A metric with the same name can exist in both sources without conflict — each chart or safeguard is tied to the specific source it was configured with, and the metric selector shows them as distinct entries.
 
 ### Correlate external metrics with Unleash environments
