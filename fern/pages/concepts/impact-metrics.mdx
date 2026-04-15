@@ -206,7 +206,7 @@ If an Edge instance accumulates a large batch of metrics (e.g., due to a tempora
 
 <AccordionGroup>
 <Accordion title="External Impact Metrics is a beta feature">
-Connecting an external Prometheus instance is currently in beta. Functionality may change. Share feedback in the Unleash community Slack or email beta@getunleash.io.
+Connecting an external Prometheus or VictoriaMetrics instance is currently in beta. Functionality may change. Share feedback in the Unleash community Slack or email beta@getunleash.io.
 </Accordion>
 </AccordionGroup>
 
@@ -235,11 +235,11 @@ Because Unleash queries your external instance at read time, enabling this featu
 
 Unleash issues standard Prometheus HTTP API requests:
 
-- `GET /api/v1/label/__name__/values` — to list available metric names in the source selector.
+- `GET /api/v1/label/__name__/values` — to list available metric names in the metric selector.
 - `GET /api/v1/labels` and `GET /api/v1/label/<name>/values` — to populate label and label-value filters in the UI.
-- `GET /api/v1/query_range` — to render chart time series and to evaluate safeguard thresholds over their configured time window.
+- `GET /api/v1/query_range` — to render chart time series and to evaluate safeguard thresholds.
 
-Metadata requests run when users open the chart or safeguard configuration UI. Range queries run when charts are viewed and on the regular interval at which safeguards are evaluated.
+Metadata requests run when users open the chart or safeguard configuration UI. Range queries run when charts are viewed and each time a safeguard is evaluated.
 
 ### Filtering system metrics
 
