@@ -218,11 +218,18 @@ External metrics do not go through the Unleash ingestion flow. SDKs do not send 
 ### Enable external metrics
 
 - **Unleash Hosted**: contact [beta@getunleash.io](mailto:beta@getunleash.io) and we will configure the external URL for your instance.
-- **Self-hosted**: set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported.
+- **Self-hosted**: set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported. The environment variable is read at startup, so Unleash must be restarted for changes to take effect.
 
-The URL must be reachable from the Unleash server over the network. Internal metrics continue to work in parallel and remain the default source.
+The URL is the base that Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to. Do not include `/api/v1` yourself. A trailing slash is accepted and ignored. Examples:
 
-Internal and external metrics are kept in separate namespaces, identified by their source. A metric with the same name can exist in both sources without conflict — each chart or safeguard is tied to the specific source it was configured with, and the metric selector shows them as distinct entries.
+- Plain Prometheus: `https://prometheus.example.com`
+- VictoriaMetrics cluster / multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
+
+HTTP Basic auth is supported by embedding credentials in the URL, for example `https://user:password@prometheus.example.com`.
+
+The URL must be reachable from the Unleash server over the network. Each request to the backend has a 20-second timeout. Internal metrics continue to work in parallel and remain the default source.
+
+Internal and external metrics are kept separate in Unleash. A metric with the same name can exist in both sources without conflict — each chart or safeguard is tied to the specific source it was configured with, and the metric selector lists them as distinct entries labeled with their source.
 
 The two sources are isolated. If the external instance is unreachable or returns errors, only charts and safeguards configured against the external source are affected — internal impact metrics continue to work normally.
 
@@ -230,7 +237,7 @@ The two sources are isolated. If the external instance is unreachable or returns
 
 Safeguards can be configured against external metrics the same way as against internal ones. Two behaviors are specific to external sources:
 
-- **Environment correlation**: to scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the Unleash environment name (for example, `environment="production"`). Safeguards in that environment will then only evaluate the matching time series. If the `environment` label is missing, the same metric is available for safeguards in every environment, with no per-environment filtering.
+- **Environment correlation**: to scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the Unleash environment name (for example, `environment="production"`). A safeguard in the `production` environment will then only evaluate time series where `environment="production"`. If the `environment` label is missing, the same metric is available for safeguards in every environment, with no per-environment filtering.
 - **Missing external configuration**: if the external URL is not configured on an Unleash server (for example, the environment variable is unset), safeguards previously configured against the external source are skipped during evaluation rather than failing the release. Reconfiguring the URL restores them.
 - **No custom label filtering**: safeguards configured against external metrics do not support filtering by custom labels. The safeguard evaluates the metric across all its time series (optionally scoped by `environment` as described above). If you need a narrower scope, expose a dedicated metric in your Prometheus or VictoriaMetrics instance with the scope already applied.
 
@@ -246,13 +253,11 @@ Unleash issues standard Prometheus HTTP API requests:
 
 Metadata requests run when users open the chart or safeguard configuration UI. Range queries run when charts are viewed and each time a safeguard is evaluated.
 
-### Filtering system metrics
+### What's shown in the metric selector
 
-Prometheus and VictoriaMetrics typically expose many infrastructure and runtime metrics (Go runtime stats, scrape health, Kubernetes, and similar) that are not meaningful as application impact metrics. Unleash applies heuristics to hide these from the metric selector so you only see your application-defined metrics.
+Prometheus and VictoriaMetrics typically expose many metrics and labels that are not meaningful as application impact metrics. Unleash filters both on the way into the UI so the selector stays focused on your application-defined metrics.
 
-### Custom labels
+**Metrics.** Excluded names include the reserved `up`, `ALERTS`, and `ALERTS_FOR_STATE`, and any metric whose name starts with a well-known infrastructure prefix such as `go_`, `process_`, `prometheus_`, `promhttp_`, `scrape_`, `vm_`, `vmagent_`, `vminsert_`, `vmselect_`, `container_`, `kube_`, or similar tooling prefixes. If one of your own metrics happens to collide with an excluded prefix, rename it to make it visible.
 
-External metrics can carry custom labels you define in Prometheus or VictoriaMetrics, and they are available as filters when you configure charts. Safeguards against external metrics do not support custom-label filtering (see [Safeguards with external metrics](#safeguards-with-external-metrics)). Unleash hides a small set of infrastructure-oriented labels that are rarely useful for feature analysis — Prometheus reserved labels (those starting with `__`) and common scraper/Kubernetes labels such as `instance`, `job`, `namespace`, `pod`, `container`, `node`, and `app_kubernetes_io_*`. All other labels are exposed.
-
-To keep metadata lookups bounded and avoid overloading your metrics backend when listing label values, Unleash surfaces at most 10 labels per metric in the UI. If a metric has more, the remaining labels are not shown as filter options.
+**Labels.** External metrics can carry custom labels, and in charts these appear as filters in the configuration UI. Safeguards do not support custom-label filtering — see [Safeguards with external metrics](#safeguards-with-external-metrics). Unleash hides a small set of infrastructure-oriented labels — Prometheus reserved labels (those starting with `__`) and common scraper/Kubernetes labels such as `instance`, `job`, `namespace`, `pod`, `container`, `node`, and `app_kubernetes_io_*`. All other labels are exposed, up to the first 10 labels per metric; any beyond that are not surfaced as filter options, to keep metadata lookups from overloading your metrics backend.
 
