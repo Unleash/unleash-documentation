@@ -220,7 +220,7 @@ External metrics do not go through the Unleash ingestion flow. SDKs do not send 
 - **Unleash Hosted**: contact [beta@getunleash.io](mailto:beta@getunleash.io) and we will configure the external URL for your instance.
 - **Self-hosted**: set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported. The environment variable is read at startup, so Unleash must be restarted for changes to take effect.
 
-The URL is the base that Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to. Do not include `/api/v1` yourself. A trailing slash is accepted and ignored. Examples:
+Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to this base URL, so do not include `/api/v1` yourself. A trailing slash is accepted and ignored. Examples:
 
 - Plain Prometheus: `https://prometheus.example.com`
 - VictoriaMetrics cluster / multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
@@ -235,11 +235,11 @@ The two sources are isolated. If the external instance is unreachable or returns
 
 ### Safeguards with external metrics
 
-Safeguards can be configured against external metrics the same way as against internal ones. Two behaviors are specific to external sources:
+Safeguards can be configured against external metrics the same way as against internal ones, with the following differences:
 
 - **Environment correlation**: to scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the Unleash environment name (for example, `environment="production"`). A safeguard in the `production` environment will then only evaluate time series where `environment="production"`. If the `environment` label is missing, the same metric is available for safeguards in every environment, with no per-environment filtering.
+- **No other custom-label filtering**: aside from the automatic `environment` scoping above, safeguards against external metrics do not let you filter by custom labels. The safeguard evaluates the metric across all its time series. If you need a narrower scope, expose a dedicated metric in your Prometheus or VictoriaMetrics instance with the scope already applied.
 - **Missing external configuration**: if the external URL is not configured on an Unleash server (for example, the environment variable is unset), safeguards previously configured against the external source are skipped during evaluation rather than failing the release. Reconfiguring the URL restores them.
-- **No custom label filtering**: safeguards configured against external metrics do not support filtering by custom labels. The safeguard evaluates the metric across all its time series (optionally scoped by `environment` as described above). If you need a narrower scope, expose a dedicated metric in your Prometheus or VictoriaMetrics instance with the scope already applied.
 
 ### Load on your metrics backend
 
