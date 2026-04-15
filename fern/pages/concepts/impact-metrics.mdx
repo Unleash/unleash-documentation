@@ -227,7 +227,7 @@ The URL is the base that Unleash appends the standard Prometheus HTTP API paths 
 
 HTTP Basic auth is supported by embedding credentials in the URL, for example `https://user:password@prometheus.example.com`.
 
-The URL must be reachable from the Unleash server over the network. Each request to the backend has a 20-second timeout. Internal metrics continue to work in parallel and remain the default source.
+The URL must be reachable from the Unleash server over the network. Each request Unleash makes to your Prometheus or VictoriaMetrics instance has a 20-second timeout. Internal metrics continue to work in parallel and remain the default source.
 
 Internal and external metrics are kept separate in Unleash. A metric with the same name can exist in both sources without conflict — each chart or safeguard is tied to the specific source it was configured with, and the metric selector lists them as distinct entries labeled with their source.
 
