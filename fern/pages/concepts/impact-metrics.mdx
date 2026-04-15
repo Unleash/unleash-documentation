@@ -222,15 +222,17 @@ External metrics do not go through the Unleash ingestion flow. SDKs do not send 
 
 The URL must be reachable from the Unleash server over the network. Internal metrics continue to work in parallel and remain the default source.
 
-The two sources are isolated. If the external instance is unreachable or returns errors, only charts and safeguards configured against the external source are affected — internal impact metrics continue to work normally.
-
 Internal and external metrics are kept in separate namespaces, identified by their source. A metric with the same name can exist in both sources without conflict — each chart or safeguard is tied to the specific source it was configured with, and the metric selector shows them as distinct entries.
 
-### Correlate external metrics with Unleash environments
+The two sources are isolated. If the external instance is unreachable or returns errors, only charts and safeguards configured against the external source are affected — internal impact metrics continue to work normally.
 
-To scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the Unleash environment name (for example, `environment="production"`). Safeguards in that environment will then only evaluate the matching time series.
+### Safeguards with external metrics
 
-If the `environment` label is missing, the same external metric is available for safeguards in every environment, with no per-environment filtering.
+Safeguards can be configured against external metrics the same way as against internal ones. Two behaviors are specific to external sources:
+
+- **Environment correlation**: to scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the Unleash environment name (for example, `environment="production"`). Safeguards in that environment will then only evaluate the matching time series. If the `environment` label is missing, the same metric is available for safeguards in every environment, with no per-environment filtering.
+- **Missing external configuration**: if the external URL is not configured on an Unleash server (for example, the environment variable is unset), safeguards previously configured against the external source are skipped during evaluation rather than failing the release. Reconfiguring the URL restores them.
+- **No custom label filtering**: safeguards configured against external metrics do not support filtering by custom labels. The safeguard evaluates the metric across all its time series (optionally scoped by `environment` as described above). If you need a narrower scope, expose a dedicated metric in your Prometheus or VictoriaMetrics instance with the scope already applied.
 
 ### Load on your metrics backend
 
