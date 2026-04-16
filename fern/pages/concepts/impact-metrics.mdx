@@ -57,13 +57,16 @@ Impact metrics support three data types:
 ## Record internal metrics
 
 <Note>
+
 [Internal metrics](#internal-metrics) are currently supported in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
+
 </Note>
 
 To use [internal metrics](#internal-metrics), define a metric in the SDK and then record values for it. The SDK automatically attaches the following context labels: `appName`, `environment`, and `origin` (for example, `origin=sdk` or `origin=Edge`). These labels are available as filters when you [create charts](#create-charts).
 
 <Tabs>
 <Tab title="Counters">
+
 ```javascript
 // 1. Define the counter
 unleash.impactMetrics.defineCounter(
@@ -74,8 +77,10 @@ unleash.impactMetrics.defineCounter(
 // 2. Increment the counter
 unleash.impactMetrics.incrementCounter('request_count');
 ```
+
 </Tab>
 <Tab title="Gauges">
+
 ```javascript
 // 1. Define the gauge
 unleash.impactMetrics.defineGauge(
@@ -87,8 +92,10 @@ unleash.impactMetrics.defineGauge(
 const currentHeap = process.memoryUsage().heapUsed;
 unleash.impactMetrics.updateGauge('heap_memory_total', currentHeap);
 ```
+
 </Tab>
 <Tab title="Histograms">
+
 ```javascript
 // 1. Define the histogram
 unleash.impactMetrics.defineHistogram(
@@ -100,6 +107,7 @@ unleash.impactMetrics.defineHistogram(
 const duration = 125;
 unleash.impactMetrics.observeHistogram('request_time_ms', duration);
 ```
+
 </Tab>
 </Tabs>
 
@@ -125,10 +133,14 @@ If you already collect metrics in Prometheus or VictoriaMetrics, you can connect
 
 <Tabs>
 <Tab title="Unleash Hosted">
+
 Contact [beta@getunleash.io](mailto:beta@getunleash.io) to configure the external URL for your instance.
+
 </Tab>
 <Tab title="Self-hosted">
+
 Set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported. Unleash must be restarted for changes to take effect.
+
 </Tab>
 </Tabs>
 
@@ -138,7 +150,9 @@ Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to this b
 - VictoriaMetrics cluster / multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
 
 <Warning>
+
 HTTP Basic Auth is supported by embedding credentials in the URL (for example, `https://user:password@prometheus.example.com`). Credentials in URLs can appear in server logs and environment variable listings. Use a secrets manager or other secure mechanism to manage the environment variable value.
+
 </Warning>
 
 The URL must be reachable from the Unleash server over the network. Each request has a 20-second timeout.
@@ -149,10 +163,14 @@ Prometheus and VictoriaMetrics typically expose many infrastructure metrics that
 
 <Tabs>
 <Tab title="Excluded metrics">
+
 Unleash excludes the reserved names `up`, `ALERTS`, and `ALERTS_FOR_STATE`, and any metric whose name starts with a well-known infrastructure prefix: `go_`, `process_`, `prometheus_`, `promhttp_`, `scrape_`, `vm_`, `vmagent_`, `vminsert_`, `vmselect_`, `container_`, `kube_`, or similar tooling prefixes. If one of your own metrics collides with an excluded prefix, rename it to make it visible.
+
 </Tab>
 <Tab title="Excluded labels">
+
 Unleash hides Prometheus reserved labels (those starting with `__`) and common infrastructure labels such as `instance`, `job`, `namespace`, `pod`, `container`, `node`, and `app_kubernetes_io_*`. All other labels are exposed as filter options, up to 10 per metric.
+
 </Tab>
 </Tabs>
 
@@ -227,7 +245,7 @@ Unleash issues the following Prometheus HTTP API requests:
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /api/v1/label/__name__/values` | Lists available metric names in the selector |
-| `GET /api/v1/labels` and `GET /api/v1/label/<name>/values` | Populates label filters in the UI |
+| `GET /api/v1/labels` and `GET /api/v1/label/:name/values` | Populates label filters in the UI |
 | `GET /api/v1/query_range` | Renders chart time series and evaluates safeguard thresholds |
 
 Metadata requests run when you open the chart or safeguard configuration UI. Range queries run when charts are viewed and each time a safeguard is evaluated.
