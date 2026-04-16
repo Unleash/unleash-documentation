@@ -2,85 +2,70 @@
 title: Impact metrics
 og:site_name: Unleash Documentation
 og:title: Impact metrics - Track application-level time-series metrics in Unleash
-description: Impact metrics are lightweight, application-level time-series metrics stored and visualized directly inside Unleash. They allow you to connect specific application data to your feature flags and release plans.
-keywords: impact metrics, release automation, safeguards, counters, gauges, histograms
+description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
+keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
+last-updated: April 16, 2026
 ---
-
-<AccordionGroup>
-<Accordion title="Impact metrics is an early access feature">
-Impact metrics and automated release progression are early access features. Functionality may change. We are actively looking for feedback. Share your experience in the Unleash community Slack or email beta@getunleash.io.
-
-During this early access period, Impact Metrics are available for Unleash Hosted customers.
-</Accordion>
-</AccordionGroup>
-
 
 ## Overview
 
-Impact metrics are lightweight, application-level time-series metrics stored and visualized directly inside Unleash.
-They allow you to connect specific application data, such as request counts, error rates, or memory usage, to your feature flags and release plans.
+Impact metrics connect application data, such as request counts, error rates, or memory usage, to your feature flags and release plans.
 
-Use impact metrics to validate feature impact and automate your release process. For example, you can monitor usage patterns or performance to see if a feature is meeting its goals.
+You can use impact metrics in two areas:
 
-By combining impact metrics with [release templates](/concepts/release-templates), you can reduce manual release operations.
-Unleash can monitor your rollout and automatically progress to the next milestone or trigger safeguards that pause the release based on the health of your metrics.
+- **[Charts](#create-charts)**: Visualize data in the Impact Metrics section of the Admin UI.
+- **[Release management](#automate-release-progression)**: Automate milestone progression or trigger [safeguards](#configure-safeguards) to pause a rollout.
+
+By combining impact metrics with [release templates](/concepts/release-templates), you can automate milestone progression and pause rollouts when metrics exceed defined thresholds. For example:
+
+- Progress from 25% to 50% only if error rates stay below a threshold.
+- Pause automatically when request latency increases during a rollout.
 
 <Frame background="subtle">
 ![Example of impact metrics displaying](/assets/impact-metrics.png)
 </Frame>
 
-Impact metrics support three types of data:
-- **Counters**: Cumulative values that only increase. These are suitable for request counts, error counts, or event counters.
+For more use cases and how impact metrics fit into the broader release workflow, see [Release management overview](/concepts/release-management-overview).
+
+## Metric sources
+
+Unleash supports two metric sources: [internal](#internal-metrics) and [external](#external-metrics). Both support the same [metric types](#metric-types) and can be used in [charts](#create-charts) and [safeguards](#configure-safeguards).
+
+### Internal metrics
+
+Internal metrics are defined and recorded in your application using an [Unleash SDK](/sdks#metrics-and-impression-data). The SDK sends metrics to Unleash, where they are stored and queried. See [Record internal metrics](#record-internal-metrics) for setup instructions.
+
+### External metrics
+
+External metrics are queried at read time from your existing [Prometheus](https://prometheus.io/) or [VictoriaMetrics](https://victoriametrics.com/) instance. The data stays in your system. Unleash does not ingest or store it. See [Connect external metrics](#connect-external-metrics) for setup instructions.
+
+### Source isolation
+
+Internal and external metrics are completely separate in Unleash. Each chart or safeguard is configured against a specific source, and the metric selector labels entries by their source. A metric with the same name can exist in both sources without conflict.
+
+If the external instance is unreachable or returns errors, only charts and safeguards configured against the [external](#external-metrics) source are affected. [Internal metrics](#internal-metrics) continue to work normally.
+
+## Metric types
+
+Impact metrics support three data types:
+
+- **Counters**: Cumulative values that only increase, such as request counts, error counts, or event totals.
 - **Gauges**: Values that fluctuate up or down, such as memory usage or the number of active users.
-- **Histograms**: Distribution of values, useful for measuring things like request duration or response size. Supports percentiles (p50, p95, p99).
+- **Histograms**: Distributions of values, such as request duration or response size. Unleash calculates percentiles (p50, p95, p99).
 
-You can use these metrics in two primary areas:
-- **Charts**: Visualize data in the Impact Metrics section of the Admin UI.
-- **Release management**: Drive automatic milestone progression or trigger safeguards to stop a rollout.
-
-## Key use cases
-
-Impact metrics provide real-time data about your features. This enables two primary workflows: [automated releases with safeguards](#automated-releases-with-safeguards) and [feature impact validation](#validate-feature-impact-and-improve-iteratively).
-
-### Automated releases with safeguards
-
-Impact metrics integrate directly with release templates so Unleash can automatically progress milestones or pause a rollout when metrics fall outside your defined thresholds. This reduces the manual effort required during releases, especially when teams are shipping more frequently or outside working hours.
-
-Instead of tracking dashboards or waiting for alerts, you can use counters, gauges, or histograms to define what "healthy" looks like and let Unleash manage the rollout based on objective data.
-
-Examples:
-
-- Progress from 25% → 50% only if error rates remain below a threshold.
-- Automatically pause when request latency increases during a rollout.
-
-See [Automate release progression](#automate-release-progression) and [Configure safeguards](#configure-safeguards) for more information.
-
-### Validate feature impact and improve iteratively
-
-Beyond automation, impact metrics help you understand whether the features you build are actually solving the right problems. You can track usage patterns, performance trends, or flag-correlated outcomes over time to evaluate whether a feature is meeting expectations. This supports both short-term decisions during a rollout and longer-term decisions about iteration, refinement, or deprecation.
-
-Examples:
-
-- Track whether a new feature is being used as expected after rollout.
-- Monitor error counts, traffic patterns, or operational health for a feature or its variants.
-- Identify features that need follow-up work, optimisation, or removal.
-
-See [Create impact metrics charts](#create-impact-metrics-charts) for more information.
-
-## Define and record metrics in the SDK
+## Record internal metrics
 
 <Note>
-Impact metrics are currently supported in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, please contact [beta@getunleash.io](mailto:beta@getunleash.io).
+
+[Internal metrics](#internal-metrics) are currently supported in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
+
 </Note>
 
-To visualize a metric in Unleash, you must first define the metric in the SDK and then count or record values for it.
+To use [internal metrics](#internal-metrics), define a metric in the SDK and then record values for it. The SDK automatically attaches the following context labels: `appName`, `environment`, and `origin` (for example, `origin=sdk` or `origin=Edge`). These labels are available as filters when you [create charts](#create-charts).
 
-The SDK automatically attaches the following context labels to your metrics to ensure they are queryable in the UI: `appName`, `environment`, `origin` (for example, `origin=sdk` or `origin=Edge`).
-
-### Counters
-
-Use counters for cumulative values that only increase, such as the total number of requests or errors.
+<Tabs>
+<Tab title="Counters">
 
 ```javascript
 // 1. Define the counter
@@ -93,9 +78,8 @@ unleash.impactMetrics.defineCounter(
 unleash.impactMetrics.incrementCounter('request_count');
 ```
 
-### Gauges
-
-Use gauges for values that can go up and down, such as current memory usage or active thread count.
+</Tab>
+<Tab title="Gauges">
 
 ```javascript
 // 1. Define the gauge
@@ -109,9 +93,8 @@ const currentHeap = process.memoryUsage().heapUsed;
 unleash.impactMetrics.updateGauge('heap_memory_total', currentHeap);
 ```
 
-### Histograms
-
-Use histograms to measure the distribution of values, such as request duration or response size. Unleash automatically calculates percentiles (p50, p95, p99).
+</Tab>
+<Tab title="Histograms">
 
 ```javascript
 // 1. Define the histogram
@@ -125,39 +108,97 @@ const duration = 125;
 unleash.impactMetrics.observeHistogram('request_time_ms', duration);
 ```
 
-## Create impact metrics charts
+</Tab>
+</Tabs>
 
-You can visualize your defined metrics in the Unleash Admin UI.
+For language-specific examples, refer to your [SDK documentation](/sdks#metrics-and-impression-data).
+
+### Ingestion and batching
+
+[Internal metrics](#internal-metrics) are batched and sent on the same interval as [regular SDK metrics](/concepts/impression-data). They are ingested through the regular metrics endpoint.
+
+### Unleash Edge behavior
+
+Unleash Edge forwards [internal metrics](#internal-metrics) received from SDKs to the Unleash API. The origin label appears as `origin=Edge`. Daisy-chaining Edge instances is not supported.
+
+If an Edge instance accumulates a large batch of metrics due to a temporary network disconnect, it sends them as a single bulk request upon reconnection. This appears as a spike in your counter graphs rather than a smooth distribution over time. This is expected behavior.
+
+## Connect external metrics
+
+If you already collect metrics in Prometheus or VictoriaMetrics, you can connect your instance to Unleash and use those metrics in [charts](#create-charts) and [safeguards](#configure-safeguards) without re-instrumenting your application through the SDK.
+
+[External metrics](#external-metrics) are not stored in Unleash. Unleash queries your instance at read time when a chart is viewed or a safeguard is evaluated.
+
+### Enable external metrics
+
+<Tabs>
+<Tab title="Unleash Hosted">
+
+Contact [beta@getunleash.io](mailto:beta@getunleash.io) to configure the external URL for your instance.
+
+</Tab>
+<Tab title="Self-hosted">
+
+Set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported. Unleash must be restarted for changes to take effect.
+
+</Tab>
+</Tabs>
+
+Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to this base URL, so do not include `/api/v1` yourself. A trailing slash is accepted and ignored. Examples:
+
+- Plain Prometheus: `https://prometheus.example.com`
+- VictoriaMetrics cluster / multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
+
+<Warning>
+
+HTTP Basic Auth is supported by embedding credentials in the URL (for example, `https://user:password@prometheus.example.com`). Credentials in URLs can appear in server logs and environment variable listings. Use a secrets manager or other secure mechanism to manage the environment variable value.
+
+</Warning>
+
+The URL must be reachable from the Unleash server over the network. Each request has a 20-second timeout.
+
+### Metric selector filtering
+
+Prometheus and VictoriaMetrics typically expose many infrastructure metrics that are not relevant as impact metrics. Unleash filters these out of the metric selector.
+
+<Tabs>
+<Tab title="Excluded metrics">
+
+Unleash excludes the reserved names `up`, `ALERTS`, and `ALERTS_FOR_STATE`, and any metric whose name starts with a well-known infrastructure prefix: `go_`, `process_`, `prometheus_`, `promhttp_`, `scrape_`, `vm_`, `vmagent_`, `vminsert_`, `vmselect_`, `container_`, `kube_`, or similar tooling prefixes. If one of your own metrics collides with an excluded prefix, rename it to make it visible.
+
+</Tab>
+<Tab title="Excluded labels">
+
+Unleash hides Prometheus reserved labels (those starting with `__`) and common infrastructure labels such as `instance`, `job`, `namespace`, `pod`, `container`, `node`, and `app_kubernetes_io_*`. All other labels are exposed as filter options, up to 10 per metric.
+
+</Tab>
+</Tabs>
+
+## Create charts
+
+You can visualize both [internal](#internal-metrics) and [external](#external-metrics) metrics in the Unleash Admin UI.
 
 1. Go to **Impact Metrics** in the sidebar.
 2. Click **New Chart**.
 3. In the **Add New Chart** dialog, configure the following:
-   - Data series: Select your counter or gauge (for example, `request_count`).
+   - Data series: Select a metric. The selector labels each metric with its source ([internal](#internal-metrics) or [external](#external-metrics)).
    - Time: Select a window (for example, Last 24 hours).
    - Mode (aggregation type): Choose how to display the data.
-     - For Counters:
-       - Rate per second
-       - Count
-     - For Gauges:
-       - Sum
-       - Average
-     - For Histograms:
-       - p50
-       - p95
-       - p99
-   - Filters: Optionally filter by `appName`, `environment`, `origin`.
-
+     - For counters: Rate per second, Count
+     - For gauges: Sum, Average
+     - For histograms: p50, p95, p99
+   - Filters: For [internal metrics](#internal-metrics), filter by `appName`, `environment`, or `origin`. For [external metrics](#external-metrics), filter by any custom labels exposed by your Prometheus or VictoriaMetrics instance.
 4. Click **Add chart**.
 
 <Frame background="subtle">
 ![Creating a new impact metrics chart in the Admin UI](/assets/add-new-impact-metrics-chart.png)
 </Frame>
 
-The chart will display the data based on your configuration. Note that there is a 1–2 minute delay between data generation and visualization due to the scrape and ingestion cycle.
+There is a 1-2 minute delay between data generation and visualization for [internal metrics](#internal-metrics) due to the ingestion cycle. [External metrics](#external-metrics) reflect whatever data is currently available in your Prometheus or VictoriaMetrics instance.
 
 ## Automate release progression
 
-Impact metrics integrate with [release templates](/concepts/release-templates) to automate the rollout process. Instead of manually updating milestones (for example, moving from 10% to 50%), Unleash can handle this for you.
+Impact metrics integrate with [release templates](/concepts/release-templates) to automate the rollout process. Instead of manually advancing milestones, Unleash can progress automatically when time conditions are met.
 
 To configure automatic progression:
 
@@ -167,37 +208,44 @@ To configure automatic progression:
    - Time: The minimum duration the milestone must run. For example, proceed after 24 hours.
 4. Click **Save**.
 
-When the time conditions are satisfied, Unleash automatically advances the release to the next milestone.
+When the time conditions are satisfied, Unleash advances the release to the next milestone.
 
 ## Configure safeguards
 
-Safeguards act as a safety net for your releases. They can automatically pause a rollout if metrics indicate system instability.
+Safeguards automatically pause a rollout when metrics indicate a problem. You can configure safeguards against both [internal](#internal-metrics) and [external](#external-metrics) metrics.
 
-With metrics flowing into Unleash, you can [create a safeguard](/concepts/impact-metrics#configure-safeguards) that pauses the automated progression when something goes wrong.
+First, verify your metric is available by selecting **Add safeguard** and checking the dropdown. For [internal metrics](#internal-metrics), it may take up to 60 seconds for a new metric to appear because the SDK sends metrics on a default 60-second interval.
 
-First, verify your metric is available by selecting **Add safeguard** and checking that your impact metric exists in the dropdown list. It may take some time for the impact metric to appear after starting your process, because it is sent to Unleash when the client reports metrics, which happens by default on a 60s interval.
-
-Then, add a safeguard to your release plan:
+To add a safeguard:
 
 1. Select **Add safeguard** on your release plan.
-2. Select your impact metric from the dropdown.
+2. Select your impact metric from the dropdown. The selector labels each metric with its source.
 3. Configure the threshold. For example:
    - Metric: `analyze_feature_error`
    - Aggregated by: Count
    - Condition: More than 10 in the last 15 minutes
 4. Click **Save**.
 
-When the metric exceeds the threshold, Unleash will pause the automated progression.
+When the metric exceeds the threshold, Unleash pauses the automated progression.
 
+### External metrics safeguard behavior
 
-## Technical implementation details
+Safeguards work the same way for both [internal](#internal-metrics) and [external](#external-metrics) metrics, with the following differences for external metrics:
 
-### Ingestion and batching
+- **Environment scoping**: To scope an external metric to a specific Unleash environment, add an `environment` label to the metric whose value matches the environment name (for example, `environment="production"`). The safeguard then only evaluates time series with that label. If the `environment` label is missing, the metric is available in every environment with no per-environment filtering.
+- **No custom-label filtering**: Safeguards against [external metrics](#external-metrics) evaluate the metric across all time series. You cannot filter by custom labels. If you need a narrower scope, expose a dedicated metric in your Prometheus or VictoriaMetrics instance with the scope already applied.
+- **Missing configuration**: If the external URL is not configured (for example, the environment variable is unset), safeguards configured against the [external](#external-metrics) source are skipped rather than failing the release. Reconfiguring the URL restores them.
 
-Impact metrics are batched and sent on the same interval as [regular SDK metrics](/concepts/impression-data). They are ingested via the regular metrics endpoint.
+## Load on your external metrics backend
 
-### Unleash Edge behavior
+Connecting an external instance adds read load to your Prometheus or VictoriaMetrics, similar to Grafana or other query-time tools. Plan capacity accordingly as the number of charts and active safeguards grows.
 
-Unleash Edge forwards impact metrics received from SDKs to the Unleash API. The origin of the label appears as `origin=Edge`. Daisy-chaining Edge instances is not supported.
+Unleash issues the following Prometheus HTTP API requests:
 
-If an Edge instance accumulates a large batch of metrics (e.g., due to a temporary network disconnect), it will send them as a single bulk send upon reconnection. This will appear as a large, sudden spike in your counter graphs, rather than a smooth distribution over time. This is expected behavior.
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/v1/label/__name__/values` | Lists available metric names in the selector |
+| `GET /api/v1/labels` and `GET /api/v1/label/:name/values` | Populates label filters in the UI |
+| `GET /api/v1/query_range` | Renders chart time series and evaluates safeguard thresholds |
+
+Metadata requests run when you open the chart or safeguard configuration UI. Range queries run when charts are viewed and each time a safeguard is evaluated.
