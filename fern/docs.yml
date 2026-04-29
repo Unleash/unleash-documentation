@@ -1011,6 +1011,8 @@ redirects:
     destination: "/guides/:slug*"
   - source: "/reference/sdks/:slug*"
     destination: "/sdks/:slug*"
+  - source: "/reference/sdks"
+    destination: "/sdks"
   - source: "/reference/api/unleash/:slug*"
     destination: "/api/:slug*"
   - source: "/reference/api/unleash"
@@ -1085,5 +1087,3 @@ redirects:
     destination: "/get-started/quickstart"
   - source: "/deploy"
     destination: "/deploy/getting-started"
-settings:
-  hide-404-page: true
