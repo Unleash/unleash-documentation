@@ -290,18 +290,20 @@ navigation:
                 path: pages/integrate/webhook.mdx
                 slug: integrate/webhook
 
-              - section: AI coding assistants
-                skip-slug: true
-                contents:
-                  - page: MCP server
-                    availability: beta
-                    path: pages/ai-coding-assistants/mcp.mdx
-                  - page: GitHub Copilot
-                    path: pages/ai-coding-assistants/github-copilot.mdx
-                  - page: Claude Code
-                    path: pages/ai-coding-assistants/claude-code.mdx
-                  - page: Kiro
-                    path: pages/ai-coding-assistants/kiro.mdx
+          - section: AI coding assistants
+            skip-slug: true
+            contents:
+              - page: MCP server
+                availability: beta
+                path: pages/ai-coding-assistants/mcp.mdx
+              - page: GitHub Copilot
+                path: pages/ai-coding-assistants/github-copilot.mdx
+              - page: Claude Code
+                path: pages/ai-coding-assistants/claude-code.mdx
+              - page: Kiro
+                path: pages/ai-coding-assistants/kiro.mdx
+              - page: Cursor
+                path: pages/ai-coding-assistants/cursor.mdx
 
           - page: Developer Toolbar
             path: pages/integrate/toolbar.mdx

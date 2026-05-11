@@ -6,7 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: claude code, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/claude-code
-last-updated: March 31, 2026
+last-updated: May 11, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects [Claude Code](https://claude.com/product/claude-code) to your Unleash instance, enabling AI-assisted feature flag management. You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from your terminal or IDE.
@@ -743,7 +743,7 @@ While the MCP server can automate flag creation, high-risk changes should involv
 Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in your CLAUDE.md file.
 </Card>
 
-<Card title="Prevent duplication" icon="copy-slash">
+<Card title="Prevent duplication" icon="clone">
 Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
 </Card>
 

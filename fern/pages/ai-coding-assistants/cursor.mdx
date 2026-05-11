@@ -1,0 +1,848 @@
+---
+title: Integrate Unleash with Cursor
+og:site_name: Unleash Documentation
+og:title: Integrate Unleash with Cursor for AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in Cursor IDE and CLI.
+keywords: cursor, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
+max-toc-depth: 3
+slug: integrate/cursor
+last-updated: May 11, 2026
+---
+
+The [Unleash MCP server](/integrate/mcp) connects Cursor to your Unleash instance, enabling AI-assisted feature flag management.
+You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from within Cursor's AI-first development environment.
+
+Cursor supports MCP across two interfaces:
+
+- **Cursor IDE** — The primary interface, an AI-first code editor with Agent mode, Rules, Hooks, Skills, and Plugins
+- **Cursor CLI** — Terminal-based agent access via the `agent` command
+
+Cursor's IDE-native primitives create a layered automation system for feature flags: Rules encode your team's conventions, Hooks validate MCP operations before they execute, Skills orchestrate multi-step workflows, and Plugins bundle everything for team distribution.
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: The MCP server is distributed as an npm package
+- Cursor: [IDE or CLI](https://cursor.com/download) installed
+- An Unleash instance: Cloud or self-hosted, with API access enabled
+- A [personal access token](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT): With permissions to create and manage feature flags
+
+## Install the MCP server
+
+The Unleash MCP server runs as a local stdio process. Configuration differs between the IDE and CLI, but both use the same npm package and credentials.
+
+First, create a credentials file:
+
+```bash
+mkdir -p ~/.unleash
+cat > ~/.unleash/mcp.env << 'EOF'
+UNLEASH_BASE_URL=https://your-instance.getunleash.io/api
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+EOF
+chmod 600 ~/.unleash/mcp.env
+```
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+Now configure your preferred interface:
+
+<Tabs>
+
+<Tab title="Cursor IDE">
+
+**Requirements:** [Cursor](https://cursor.com) installed.
+
+You can add the Unleash MCP server with a one-click install from cursor.directory or by creating the configuration file manually.
+
+<Tabs>
+
+<Tab title="One-click install">
+
+The Unleash MCP server is listed on [cursor.directory](https://cursor.directory/plugins/mcp-unleash).
+
+Click **Add to Cursor** on the listing page, or [open this link](https://cursor.com/en/install-mcp?name=unleash&config=eyJjb21tYW5kIjoibnB4IC15IEB1bmxlYXNoL21jcEBsYXRlc3QiLCJlbnYiOnsiVU5MRUFTSF9CQVNFX1VSTCI6IiIsIlVOTEVBU0hfUEFUIjoiIn19
+) directly.
+
+Cursor opens and pre-fills the MCP server configuration. The installer prompts you for your `UNLEASH_BASE_URL` and `UNLEASH_PAT` values.
+
+<Warning>
+The one-click flow writes credentials directly into `.cursor/mcp.json`. This is fine for personal use, but for team projects you should replace the inline values with an `envFile` reference so the configuration file is safe to commit. See the "Create file manually" tab for details.
+</Warning>
+
+</Tab>
+
+<Tab title="Create file manually">
+
+<Steps>
+
+<Step title="Create the configuration file">
+
+Create `.cursor/mcp.json` at your project root:
+
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "envFile": "~/.unleash/mcp.env"
+    }
+  }
+}
+```
+
+This file contains no credentials, only a reference to the `envFile` you created earlier. You can safely commit it to version control.
+
+<Tip>
+Cursor also supports `${env:NAME}` variable interpolation as an alternative to `envFile`. Source your credentials in your shell profile and reference them with `"env": { "UNLEASH_BASE_URL": "${env:UNLEASH_BASE_URL}" }`. This is useful if you need per-variable control or want to mix environment sources.
+</Tip>
+</Step>
+
+<Step title="Verify the installation">
+Open Cursor Settings, navigate to **Tools & MCPs**. The Unleash server should appear in the list of **Installed MCP Servers**.
+
+Within an Agent session, ask: "What Unleash MCP tools are available?" The agent lists all nine tools.
+
+To view MCP logs, open the Output panel (`Cmd+Shift+U`) and select **MCP Logs** from the dropdown.
+</Step>
+
+</Steps>
+
+</Tab>
+
+</Tabs>
+
+**Configuration scopes:**
+
+| Location | Scope | Use case |
+|----------|-------|----------|
+| `.cursor/mcp.json` (project root) | Project | Team-shared, version controlled |
+| `~/.cursor/mcp.json` | Global | Personal settings across all projects |
+
+Both are merged; project takes precedence on conflict. For team collaboration, use the project-level file.
+
+<Note>
+Cursor uses its own `.cursor/mcp.json` location with the `"mcpServers"` root key. This differs from VS Code's `.vscode/mcp.json` with a `"servers"` root key. If you are migrating from VS Code, update the file location and root key.
+</Note>
+
+</Tab>
+
+<Tab title="Cursor CLI">
+
+**Requirements:** macOS, Linux, or WSL.
+
+<Steps>
+
+<Step title="Install the Cursor CLI">
+```bash
+curl https://cursor.com/install -fsS | bash
+```
+</Step>
+
+<Step title="Verify the installation">
+```bash
+agent --version
+```
+</Step>
+
+<Step title="Confirm MCP configuration">
+The CLI shares the same `.cursor/mcp.json` configuration as the IDE, following project > global > nested precedence.
+If you already configured the MCP server for the IDE, the CLI picks it up automatically.
+
+If you haven't configured it yet, create the `.cursor/mcp.json` file as shown in the Cursor IDE tab.
+</Step>
+
+</Steps>
+
+Run `agent` to start an interactive session. You can use the same Unleash MCP tools as in the IDE.
+
+The CLI supports three modes:
+- **Agent** (default) — Full autonomy with tool access
+- **Plan** — Design approach before implementation
+- **Ask** — Read-only exploration
+
+For non-interactive execution:
+
+```bash
+agent -p "Check if any feature flags should be cleaned up" --output-format text
+```
+
+Use the `--approve-mcps` flag to auto-approve MCP servers without interactive prompts:
+
+```bash
+agent --approve-mcps "Evaluate this change for feature flagging"
+```
+
+**Cloud handoff:** Pass `-c` or prepend `&` to a message to hand off a session to a Cloud Agent:
+
+```bash
+agent -c "Add feature flags to all payment endpoints and open a PR"
+```
+
+**CLI MCP management commands:**
+
+```bash
+agent mcp list               # View configured servers and their status
+agent mcp enable unleash     # Enable a server
+agent mcp disable unleash    # Disable a server
+```
+
+<Note>
+`agent mcp list` may show "not loaded (needs approval)" before your first interactive session. This is normal. MCP servers are loaded when an agent session starts. Run `agent --approve-mcps` to start a session that auto-approves the server, or approve it interactively when prompted.
+</Note>
+
+</Tab>
+
+</Tabs>
+
+## Tool reference
+
+The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+
+<StickyTable>
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+</StickyTable>
+
+## Workflows
+
+The Unleash MCP server supports three core workflows: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout). Cursor adds a fourth workflow unique to its architecture: [Rules-guided flag evaluation](#rules-guided-flag-evaluation).
+
+### Evaluate and wrap code in feature flags
+
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+
+<Step title="Evaluate the change">
+Tell the agent what you are working on:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+The agent calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+The agent automatically calls `detect_flag` to search for existing flags.
+If a suitable flag exists, the agent suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+The agent calls `create_flag` with the appropriate name, type, and description.
+The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+The agent calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js"
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+
+</Steps>
+
+### Rules-guided flag evaluation
+
+Use this workflow to automate flag evaluation based on encoded policies. When a glob-scoped Rule targets a high-risk directory, the agent evaluates risk without the developer explicitly asking.
+
+<Steps>
+
+<Step title="Create a Rule">
+Create a glob-scoped Rule targeting your high-risk domain (see [Rule templates](#rule-templates) below for a complete example):
+
+```text
+All changes in the payments domain require feature flags. No exceptions.
+Evaluate risk with evaluate_change before writing implementation code.
+```
+
+Save as `.cursor/rules/payments-flags.mdc` with a glob pattern like `src/payments/**/*.ts`.
+</Step>
+
+<Step title="The Rule triggers automatically">
+When the agent works with files matching the glob pattern, the Rule loads into context.
+Following the Rule's instructions, the agent calls `evaluate_change` with the change description.
+</Step>
+
+<Step title="Create and wrap in one flow">
+If a flag is needed, the agent calls `detect_flag`, `create_flag`, and `wrap_change` as part of the same implementation.
+The flag is in place before the task is complete.
+</Step>
+
+</Steps>
+
+<Tip>
+Rules-guided evaluation catches risk during implementation rather than during code review. The flag becomes part of the development flow, not an afterthought.
+</Tip>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+The agent calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+The agent calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
+</Tab>
+
+<Tab title="Configure rollout">
+```text
+Set up a gradual rollout for stripe-payment-integration:
+10% for 24 hours, then 50% for 48 hours, then 100%.
+```
+
+The agent calls `set_flag_rollout` to configure the rollout strategy.
+</Tab>
+</Tabs>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
+</Warning>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+The agent calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent [technical debt](/concepts/technical-debt).
+</Tip>
+
+## Rule templates
+
+Cursor Rules encode your team's [FeatureOps](https://featureops.io/) policies, so the agent considers feature flags automatically.
+Store them in `.cursor/rules/` as `.mdc` files with YAML frontmatter.
+
+For more details on Rules, see the [Cursor Rules documentation](https://cursor.com/docs/context/rules).
+
+### Always Apply: universal conventions
+
+This Rule loads into every agent session. Use it for organization-wide flag standards.
+
+```markdown title=".cursor/rules/feature-flags.mdc"
+---
+description: "Feature flag conventions for all code changes"
+alwaysApply: true
+---
+
+# Feature Flag Conventions
+
+When making changes to this codebase, follow these feature flag practices:
+
+1. **Always evaluate risk**: Before implementing high-risk changes (payments,
+   authentication, data migrations, external integrations), use the Unleash MCP
+   server to evaluate whether a feature flag is needed.
+
+2. **Naming conventions**: Use the format `{domain}-{feature}-{variant}`.
+   Examples: `checkout-stripe-integration`, `auth-sso-google`, `api-rate-limiting`.
+
+3. **Flag types**:
+   - `release`: For gradual feature rollouts
+   - `experiment`: For A/B tests and experiments
+   - `operational`: For system behavior toggles
+   - `kill-switch`: For emergency shutdowns
+   - `permission`: For role-based access
+
+4. **Prefer reuse**: Before creating a new flag, check if a similar flag already
+   exists using the detect_flag tool.
+
+5. **Clean up after rollout**: Once a feature is fully released (100% rollout for
+   2+ weeks), use cleanup_flag to remove dead code.
+
+## Unleash MCP Server
+
+This project uses the Unleash MCP server for feature flag management. Configuration
+is in `.cursor/mcp.json`. Credentials are sourced from environment variables.
+
+Available tools: evaluate_change, detect_flag, create_flag, wrap_change,
+get_flag_state, set_flag_rollout, toggle_flag_environment, remove_flag_strategy,
+cleanup_flag.
+```
+
+### Glob-scoped: domain-specific policies
+
+This Rule loads only when the agent works with files matching the glob pattern.
+Use it for high-risk domains that always require flags.
+
+```markdown title=".cursor/rules/payments-flags.mdc"
+---
+description: "Payment domain requires feature flags for all changes"
+alwaysApply: false
+globs: ["src/payments/**/*.ts", "src/payments/**/*.tsx"]
+---
+
+# Payments Domain — Feature Flag Policy
+
+All changes in the payments domain require feature flags. No exceptions.
+
+- Use `kill-switch` type for external payment provider integrations
+  (Stripe, PayPal, etc.)
+- Use `release` type for internal payment logic changes
+- Naming: `payments-{feature}-{variant}`
+  (e.g., `payments-stripe-checkout`, `payments-refund-v2`)
+- Always include a fallback path for external provider calls
+- Evaluate risk with evaluate_change before writing implementation code
+```
+
+### Apply Intelligently: rollout guidance
+
+This Rule loads automatically when the agent detects the conversation is about rollout strategies.
+
+```markdown title=".cursor/rules/rollout-guidance.mdc"
+---
+description: "Guidance for configuring feature flag rollout strategies. Use when
+  setting up rollouts, configuring milestones, or discussing gradual releases."
+alwaysApply: false
+---
+
+# Rollout Strategy Defaults
+
+When setting up rollouts with set_flag_rollout, use these defaults unless
+specified otherwise:
+
+- Start at 10% rollout
+- Wait 24 hours before advancing
+- Pause if error rate exceeds 1% or p95 latency increases by more than 20%
+
+## Standard milestones
+
+| Milestone | Percentage | Hold period | Advance condition |
+|-----------|-----------|-------------|-------------------|
+| Canary | 10% | 24 hours | Error rate < 1%, latency stable |
+| Beta | 50% | 48 hours | Error rate < 0.5%, no regressions |
+| GA | 100% | — | All metrics healthy for 48 hours |
+
+## Cleanup cadence
+
+Run cleanup_flag weekly for flags that have been at 100% for more than 14 days.
+```
+
+## Hook examples
+
+Hooks automate validation and auditing of MCP operations.
+Store them in `.cursor/hooks.json` at your project root.
+
+For more details on hooks, see the [Cursor Hooks documentation](https://cursor.com/docs/hooks).
+
+### Validate flag naming before creation
+
+This hook fires before any Unleash MCP tool call. If the tool is `create_flag`, it checks the flag name against your naming convention and blocks requests that violate it.
+
+```json title=".cursor/hooks.json"
+{
+  "version": 1,
+  "hooks": {
+    "beforeMCPExecution": [
+      {
+        "command": ".cursor/hooks/validate-flag-name.sh",
+        "matcher": "MCP:unleash",
+        "timeout": 10,
+        "failClosed": true
+      }
+    ]
+  }
+}
+```
+
+```bash title=".cursor/hooks/validate-flag-name.sh"
+#!/bin/bash
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name // empty')
+
+if [[ "$tool_name" == "create_flag" ]]; then
+  flag_name=$(echo "$input" | jq -r '.tool_input' | jq -r '.name // empty')
+  # Check naming convention: {domain}-{feature}-{variant}
+  if [[ ! "$flag_name" =~ ^[a-z]+-[a-z]+-[a-z]+$ ]]; then
+    cat << EOF
+{
+  "permission": "deny",
+  "agent_message": "Flag name '$flag_name' does not follow the naming convention {domain}-{feature}-{variant}. Please use lowercase with hyphens."
+}
+EOF
+    exit 0
+  fi
+fi
+
+echo '{"permission": "allow"}'
+```
+
+<Info>
+Hooks can return `allow`, `deny`, or `ask` to control flow. They default to fail-open but can be configured with `failClosed: true` for strict enforcement. Enterprise teams can distribute hooks via the web dashboard; they sync to all team members automatically.
+</Info>
+
+
+### Audit all MCP operations
+
+This hook fires after every Unleash MCP tool call and logs the operation for audit purposes.
+
+```json title=".cursor/hooks.json (add to afterMCPExecution)"
+{
+  "version": 1,
+  "hooks": {
+    "afterMCPExecution": [
+      {
+        "command": ".cursor/hooks/audit-mcp.sh",
+        "matcher": "MCP:unleash"
+      }
+    ]
+  }
+}
+```
+
+```bash title=".cursor/hooks/audit-mcp.sh"
+#!/bin/bash
+input=$(cat)
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+mkdir -p .cursor/hooks/logs
+echo "[$timestamp] $(echo "$input" | jq -c '{tool: .tool_name, duration: .duration}')" >> .cursor/hooks/logs/mcp-audit.log
+exit 0
+```
+
+
+## Unleash plugin
+
+A [plugin](https://cursor.com/docs/plugins) bundles MCP tools, Rules, Skills, and Hooks into a single installable package.
+The Unleash plugin is the recommended way to distribute the integration across teams and projects.
+
+### Directory structure
+
+```
+unleash-featureops/
+├── .cursor-plugin/
+│   └── plugin.json
+├── rules/
+│   ├── feature-flag-conventions.mdc
+│   ├── payments-flags.mdc
+│   └── rollout-guidance.mdc
+├── skills/
+│   └── evaluate-and-flag/
+│       └── SKILL.md
+├── hooks.json
+└── mcp.json
+```
+
+### plugin.json
+
+```json title=".cursor-plugin/plugin.json"
+{
+  "name": "unleash-featureops",
+  "description": "Automate feature flag management with Unleash. Evaluate code changes for risk, create flags with consistent naming, generate SDK wrapping code, manage rollouts, and clean up stale flags.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Unleash"
+  }
+}
+```
+
+### SKILL.md
+
+Skills are invoked with `/skill-name` in chat or discovered automatically by the agent when the context is relevant.
+
+```markdown title="skills/evaluate-and-flag/SKILL.md"
+# Evaluate and Flag
+
+Evaluate whether current changes need a feature flag, then create and wrap it.
+
+## Steps
+
+1. Use `evaluate_change` to assess the risk of the current changes
+2. If a flag is needed, use `detect_flag` to check for existing similar flags
+3. If no suitable flag exists, use `create_flag` with the recommended name and type
+4. Use `wrap_change` to generate framework-specific guard code
+5. Suggest a rollout strategy based on the change's risk level
+```
+
+### mcp.json
+
+```json title="mcp.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "envFile": "~/.unleash/mcp.env"
+    }
+  }
+}
+```
+
+### Install the plugin
+
+- **From Team Marketplace:** Admin imports the GitHub repository via Dashboard > Settings > Plugins. Set as required for automatic installation across the team.
+- **Local testing:** Symlink to `~/.cursor/plugins/local/unleash-featureops`:
+
+```bash
+ln -s /path/to/unleash-featureops ~/.cursor/plugins/local/unleash-featureops
+```
+
+For more details on creating and distributing plugins, see the [Cursor Plugins documentation](https://cursor.com/docs/plugins).
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** The agent calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** The agent calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** The agent calls `toggle_flag_environment` or `get_flag_state`.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** The agent calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+<Accordion title="Rules-triggered automatic evaluation">
+**Intent:** Automatically evaluate code changes based on encoded policies.
+
+**Trigger:** A glob-scoped Rule (e.g., targeting `src/payments/**`) loads when the agent works with matching files.
+
+**Expected behavior:** The Rule instructs the agent to call `evaluate_change` whenever it modifies files in the target domain. If a flag is needed, the agent notifies you and offers to create it.
+</Accordion>
+
+<Accordion title="Skill-orchestrated workflow">
+**Intent:** Run a multi-step FeatureOps workflow using a skill.
+
+**Prompt:**
+```text
+/evaluate-and-flag
+```
+
+**Expected behavior:** The skill orchestrates the full workflow: evaluate the current changes, check for duplicates, create the flag if needed, wrap the code, and suggest a rollout strategy. Each step calls the appropriate MCP tool.
+</Accordion>
+
+<Accordion title="CLI-based evaluation">
+**Intent:** Evaluate and flag changes from the terminal.
+
+**Prompts:**
+```bash
+# Interactive
+agent "Evaluate whether the Stripe integration should be behind a feature flag"
+
+# Non-interactive
+agent -p "Check if any changes in this branch should be feature flagged" --output-format text
+
+# Cloud handoff
+agent -c "Add feature flags to all payment endpoints and open a PR"
+```
+
+**Expected behavior:** The CLI agent uses the same MCP tools as the IDE. In non-interactive mode (`-p`), the agent outputs results and exits.
+</Accordion>
+
+## Enterprise governance
+
+Cursor provides enterprise controls relevant to MCP server deployment.
+
+- **MCP server trust management** — Enterprise admins can whitelist or blocklist specific MCP servers at the organization level. Ensure the Unleash MCP server is on the whitelist.
+- **Privacy mode** — Enforces zero data retention with AI providers. Enabled by default for team members. Does not affect MCP server communication, which goes directly to your Unleash instance.
+- **Team Rules** — Organization-wide Rules with enforcement toggles. Prevent developers from disabling mandatory FeatureOps policies.
+- **Team hooks** — Enterprise-distributed hooks that sync to team members every 30 minutes via the web dashboard. Use these for MCP validation and audit logging.
+- **Agent sandbox** — Enforceable org-wide on Enterprise plans. Controls what the agent can execute autonomously.
+- **Audit logs** — Track administrative actions including MCP-related operations.
+- **SSO/SCIM** — SAML/OIDC authentication and automated user provisioning.
+
+For MCP server governance, commit `.cursor/mcp.json` and `.cursor/hooks.json` to version control. This ensures all team members use the same MCP servers with the same validation rules.
+
+<Tip>
+Use tool approval prompts for write operations like `create_flag` and `toggle_flag_environment`.
+Auto-run is appropriate for read-only operations like `get_flag_state`, `detect_flag`, and `evaluate_change`.
+</Tip>
+
+## Troubleshooting
+
+<Accordion title="MCP server not appearing in Cursor">
+- Check `.cursor/mcp.json` for syntax errors
+- Verify the file is at the project root under `.cursor/`
+- Open Settings > Features > Model Context Protocol and toggle the server on
+- Restart Cursor after making changes
+- Check MCP logs via Output panel > "MCP Logs"
+</Accordion>
+
+<Accordion title="Environment variables not expanding">
+- Cursor uses `${env:NAME}` syntax (not `${NAME}` or `${VAR}`)
+- Restart your terminal and IDE after modifying your shell profile
+- Verify variables are exported: `echo $UNLEASH_BASE_URL`
+- If using `envFile`, verify the file path is correct and the file exists
+</Accordion>
+
+<Accordion title="Authentication failed">
+- Confirm your Unleash PAT is valid and has not expired
+- Check that the PAT has permissions to create and manage feature flags
+- Verify that `UNLEASH_BASE_URL` includes `/api` at the end
+- Test directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/admin/projects"`
+</Accordion>
+
+<Accordion title="Hook not firing">
+- Verify `.cursor/hooks.json` exists and contains valid JSON
+- Check that the `matcher` pattern matches the expected tool (e.g., `MCP:unleash`)
+- Ensure hook scripts are executable: `chmod +x .cursor/hooks/validate-flag-name.sh`
+- View hook output in the Hooks output channel
+</Accordion>
+
+<Accordion title="Node.js not found">
+Local servers using npx require Node.js 18+. Verify with `node --version`. If Node.js is installed but not found by Cursor, check that the IDE inherits your shell PATH.
+</Accordion>
+
+<Accordion title="Tool approval prompts">
+By default, the agent requests approval before executing MCP tools. Configure auto-run in Settings or use `~/.cursor/permissions.json` for granular control. In the CLI, use `--approve-mcps`.
+</Accordion>
+
+<Accordion title="CLI shows 'not loaded (needs approval)'">
+`agent mcp list` may show "not loaded (needs approval)" even after running `agent mcp enable`. This is expected. MCP servers are lazy-loaded and only start when an agent session begins. Start an interactive session with `agent --approve-mcps` to auto-approve, or approve the server when prompted during your first session. Once approved, subsequent sessions load the server automatically.
+</Accordion>
+
+<Accordion title="Cloud Agent MCP access">
+Cloud Agents access MCP servers configured for the team. Ensure the Unleash MCP server is configured at the team level and credentials are set in the Cloud Agent Secrets tab.
+</Accordion>
+
+<Accordion title="envFile vs env interpolation">
+Use `envFile` for simplicity. Use `${env:NAME}` interpolation if you need per-variable control or mixing environment sources. Don't use both for the same variable.
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with Cursor.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check">
+While the MCP server can automate flag creation, high-risk changes should involve human review. Use tool approval prompts for flag creation, rollout plans, and cleanup decisions.
+</Card>
+
+<Card title="Define naming conventions" icon="tag">
+Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in Rules so the agent applies them automatically.
+</Card>
+
+<Card title="Prevent duplication" icon="clone">
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock">
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+
+<Card title="Use project scope for teams" icon="users">
+Configure MCP servers at project scope (`.cursor/mcp.json`) and commit to version control. All team members get the same configuration.
+</Card>
+
+<Card title="Encode policies in Rules" icon="file-code">
+Write your feature flag guidelines in Rules with appropriate application modes. The agent reads these Rules and applies the guidance automatically based on context.
+</Card>
+</CardGroup>
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Unleash MCP on cursor.directory](https://cursor.directory/plugins/mcp-unleash) (one-click install)
+- [Cursor and Unleash: Feature Flags Built into Your AI-First IDE](https://www.getunleash.io/blog/cursor-feature-flags-ai-first-ide)
+- [Cursor documentation](https://cursor.com/docs)
+- [Cursor MCP configuration](https://cursor.com/docs/mcp)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
