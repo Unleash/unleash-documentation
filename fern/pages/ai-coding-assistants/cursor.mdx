@@ -32,15 +32,8 @@ Before you begin, make sure you have the following:
 
 The Unleash MCP server runs as a local stdio process. Configuration differs between the IDE and CLI, but both use the same npm package and credentials.
 
-Cursor supports two approaches for credential management: `envFile` (simpler) and environment variable interpolation (more flexible). Choose one.
+First, create a credentials file:
 
-<Tabs>
-
-<Tab title="envFile (recommended)">
-
-<Steps>
-
-<Step title="Create credentials file">
 ```bash
 mkdir -p ~/.unleash
 cat > ~/.unleash/mcp.env << 'EOF'
@@ -50,50 +43,6 @@ UNLEASH_DEFAULT_PROJECT=default
 EOF
 chmod 600 ~/.unleash/mcp.env
 ```
-</Step>
-
-</Steps>
-
-</Tab>
-
-<Tab title="Environment variable interpolation">
-
-<Steps>
-
-<Step title="Create credentials file">
-```bash
-mkdir -p ~/.unleash
-cat > ~/.unleash/mcp.env << 'EOF'
-UNLEASH_BASE_URL=https://your-instance.getunleash.io/api
-UNLEASH_PAT=your-personal-access-token
-UNLEASH_DEFAULT_PROJECT=default
-EOF
-chmod 600 ~/.unleash/mcp.env
-```
-</Step>
-
-<Step title="Source in shell profile">
-Add to your `~/.zshrc` or `~/.bashrc`:
-
-```bash
-if [ -f ~/.unleash/mcp.env ]; then
-  source ~/.unleash/mcp.env
-  export UNLEASH_BASE_URL UNLEASH_PAT UNLEASH_DEFAULT_PROJECT
-fi
-```
-</Step>
-
-<Step title="Reload your shell">
-```bash
-source ~/.zshrc  # or ~/.bashrc
-```
-</Step>
-
-</Steps>
-
-</Tab>
-
-</Tabs>
 
 | Variable | Description | Required |
 |----------|-------------|----------|
@@ -123,7 +72,7 @@ Click **Add to Cursor** on the listing page, or [open this link](https://cursor.
 Cursor opens and pre-fills the MCP server configuration. The installer prompts you for your `UNLEASH_BASE_URL` and `UNLEASH_PAT` values.
 
 <Warning>
-The one-click flow writes credentials directly into `.cursor/mcp.json`. This is fine for personal use, but for team projects you should replace the inline values with an `envFile` reference or `${env:NAME}` variables so the configuration file is safe to commit. See the "Create file manually" tab for details.
+The one-click flow writes credentials directly into `.cursor/mcp.json`. This is fine for personal use, but for team projects you should replace the inline values with an `envFile` reference so the configuration file is safe to commit. See the "Create file manually" tab for details.
 </Warning>
 
 </Tab>
@@ -134,11 +83,8 @@ The one-click flow writes credentials directly into `.cursor/mcp.json`. This is 
 
 <Step title="Create the configuration file">
 
-Create `.cursor/mcp.json` at your project root. The configuration depends on which credential approach you chose above.
+Create `.cursor/mcp.json` at your project root:
 
-<Tabs>
-
-<Tab title="envFile">
 ```json title=".cursor/mcp.json"
 {
   "mcpServers": {
@@ -150,29 +96,12 @@ Create `.cursor/mcp.json` at your project root. The configuration depends on whi
   }
 }
 ```
-</Tab>
 
-<Tab title="Environment variables">
-```json title=".cursor/mcp.json"
-{
-  "mcpServers": {
-    "unleash": {
-      "command": "npx",
-      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
-      "env": {
-        "UNLEASH_BASE_URL": "${env:UNLEASH_BASE_URL}",
-        "UNLEASH_PAT": "${env:UNLEASH_PAT}",
-        "UNLEASH_DEFAULT_PROJECT": "${env:UNLEASH_DEFAULT_PROJECT}"
-      }
-    }
-  }
-}
-```
-</Tab>
+This file contains no credentials, only a reference to the `envFile` you created earlier. You can safely commit it to version control.
 
-</Tabs>
-
-The file contains no credentials, only variable references that expand at runtime. You can safely commit it to version control.
+<Tip>
+Cursor also supports `${env:NAME}` variable interpolation as an alternative to `envFile`. Source your credentials in your shell profile and reference them with `"env": { "UNLEASH_BASE_URL": "${env:UNLEASH_BASE_URL}" }`. This is useful if you need per-variable control or want to mix environment sources.
+</Tip>
 </Step>
 
 <Step title="Verify the installation">
