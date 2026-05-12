@@ -201,7 +201,7 @@ func main() {
 }
 ```
 
-If the streaming connection becomes unavailable or repeatedly fails, the SDK automatically falls back to normal polling using the same base URL. Existing cached state remains active during failover, so flag evaluations continue using the most recently known configuration.
+If the streaming connection becomes unavailable or repeatedly fails, the SDK automatically falls back to polling using the same base URL. Existing cached state remains active during failover, so flag evaluations continue using the most recently known configuration.
 
 When failover occurs, the SDK emits a warning [event](#events) through `OnWarning(...)` and continues refreshing flags using the configured polling interval.
 
