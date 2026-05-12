@@ -5,7 +5,7 @@ og:site_name: Unleash
 og:title: Go SDK
 keywords: Go SDK, feature flags, backend, golang, unleash
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: May 12, 2026
 ---
 
 The [Unleash Go SDK](https://github.com/Unleash/unleash-go-sdk) lets you evaluate feature flags in your Go services and applications.
@@ -165,6 +165,44 @@ func main() {
 	unleash.WaitForReady()
 }
 ```
+
+### Streaming
+
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+By default, the SDK polls Unleash at a fixed interval. Streaming mode receives flag updates in real time using server-sent events (SSE), reducing the delay between a change in Unleash and the SDK applying updated configuration.
+
+
+Streaming requires [Unleash Enterprise Edge](/unleash-edge). To enable streaming, configure `WithUrl(...)` to point at your Enterprise Edge instance, provide a valid client token, and set `WithExperimentalMode(...)` to "streaming".
+
+```go
+package main
+
+import (
+	"net/http"
+
+	unleash "github.com/Unleash/unleash-go-sdk/v6"
+)
+
+func main() {
+	err := unleash.Initialize(
+		unleash.WithAppName("my-go-service"),
+		unleash.WithUrl("https://<your-edge-instance>/api"),
+		unleash.WithExperimentalMode(map[string]string{"type": "streaming"}),
+		unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer unleash.Close()
+}
+```
+
+If the streaming connection becomes unavailable or repeatedly fails, the SDK automatically falls back to polling using the same base URL. Existing cached state remains active during failover, so flag evaluations continue using the most recently known configuration.
+
+When failover occurs, the SDK emits a warning [event](#events) through `OnWarning(...)` and continues refreshing flags using the configured polling interval.
 
 ## Check flags
 
