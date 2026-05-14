@@ -48,7 +48,7 @@ Edge also aggregates usage metrics from connected SDKs and sends them upstream t
 
 ### Real-time updates with streaming
 
-By default, Edge keeps its cache in sync with Unleash by polling the upstream API at a fixed interval. With streaming enabled, Edge opens a persistent connection to Unleash and receives feature flag changes as they happen. This reduces replication lag between Unleash and Edge from the polling interval down to milliseconds.
+By default, Edge keeps its cache in sync with Unleash by polling the upstream API at a fixed interval. With streaming enabled, Edge opens a persistent connection to Unleash and receives feature flag changes as they happen. This reduces replication lag between Unleash and Edge from the polling interval to near real time.
 
 When streaming is enabled, Edge bootstraps its cache from the upstream `GET /api/client/delta` endpoint and then subscribes to `GET /api/client/streaming` for live updates. If the connection drops, Edge reconnects and resumes from the last event it received. While the connection is recovering, Edge continues to serve its last known state to connected SDKs, so SDK traffic is not interrupted.
 
