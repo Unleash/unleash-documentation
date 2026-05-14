@@ -5,6 +5,7 @@ og:title: Feature flags - Release, test, and manage features without changing co
 description: Feature flags are a core concept of Unleash. They allow you to release, test, and manage features and functionality across your application without changing the source code.
 keywords: feature flags, activation strategies, environments, lifecycle, dependencies
 max-toc-depth: 3
+last-updated: May 14, 2026
 ---
 
 ## Overview
@@ -121,6 +122,15 @@ Too much time in the completed stage can indicate delays in decommissioning the 
 
 Unleash hasn't detected any production usage metrics for at least two days. It's likely that it is safe to archive this flag.
 If an archived feature is revived, it starts a new lifecycle with a new [Define](#define) stage.
+
+### Flag status
+
+The **Status** column in **Flags overview** summarizes each flag's rollout state based on its [lifecycle stage](#lifecycle-stages) and current environment configuration. It helps you spot flags that need attention without opening each one.
+
+The status message depends on the lifecycle stage. In the **Define** stage, the status shows why the flag hasn't received metrics yet. For example, **No strategies** or **No enabled strategies** indicate missing [activation strategies](/concepts/activation-strategies) or strategies that aren't enabled.
+Similarly, in the **Develop** stage, the status shows whether any environment is enabled.
+
+In the **Production** and **Cleanup** stages, the status reflects the production rollout: how many production environments the flag is enabled in, whether production environments or strategies are configured, and the current milestone for flags using [release templates](/concepts/release-templates).
 
 ## Feature flag dependencies
 
