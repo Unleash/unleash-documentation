@@ -122,6 +122,18 @@ Too much time in the completed stage can indicate delays in decommissioning the 
 Unleash hasn't detected any production usage metrics for at least two days. It's likely that it is safe to archive this flag.
 If an archived feature is revived, it starts a new lifecycle with a new [Define](#define) stage.
 
+### Flag status
+
+The **Status** column in **Flags overview** summarizes each flag's rollout state based on its [lifecycle stage](#lifecycle-stages) and current environment configuration. It helps you spot flags that need attention without opening each one.
+
+The status message depends on the lifecycle stage:
+
+- In the **Define** stage, the status reflects whether non-production environments have traffic, [activation strategies](/concepts/activation-strategies), or enabled strategies.
+- In the **Develop** stage, the status shows whether any environment is enabled.
+- In the **Production** and **Cleanup** stages, the status reflects the production rollout: how many production environments the flag is enabled in, whether production environments or strategies are configured, and the current milestone for flags using [release templates](/concepts/release-templates).
+
+Common values include **No traffic**, **No strategies**, **No enabled strategies**, **Paused**, **In X out of Y production environments**, **No production environments**, and **Milestone: \<milestone-name\>**. If no condition applies, the column is empty.
+
 ## Feature flag dependencies
 
 <Button small outlined className="version-button" href="/support/availability">v5.7</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
