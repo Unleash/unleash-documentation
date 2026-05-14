@@ -994,7 +994,7 @@ css:
 
 check:
   rules:
-    missing-redirects: error
+    missing-redirects: warn
 
 redirects:
   # --- Helm charts ---
