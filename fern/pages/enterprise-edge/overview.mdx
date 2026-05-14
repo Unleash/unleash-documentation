@@ -47,7 +47,13 @@ Edge also aggregates usage metrics from connected SDKs and sends them upstream t
 
 ### Real-time updates with streaming
 
-Enterprise Edge supports streaming mode, which pushes configuration changes from Unleash to Edge with millisecond latency. Enable streaming for near-instant flag updates across your infrastructure.
+By default, Edge keeps its cache in sync with Unleash by polling the upstream API at a fixed interval. With streaming enabled, Edge opens a persistent connection to Unleash and receives feature flag changes as they happen. This reduces replication lag between Unleash and Edge from the polling interval down to milliseconds.
+
+When streaming is enabled, Edge bootstraps its cache from the upstream `GET /api/client/delta` endpoint and then subscribes to `GET /api/client/streaming` for live updates. If the connection drops, Edge reconnects and resumes from the last event it received. While the connection is recovering, Edge continues to serve its last known state to connected SDKs, so SDK traffic is not interrupted.
+
+Enabling streaming changes how Edge receives updates from Unleash, but it does not change how SDKs connect to Edge. SDKs continue to use the existing client and frontend endpoints.
+
+Streaming is available on the Enterprise Edge build with an Unleash Enterprise instance. For self-hosted Unleash, your license must include Edge streaming. For setup, monitoring, and troubleshooting, see [Configure streaming](/unleash-edge/configure-streaming).
 
 ## Enterprise Edge hosted
 
