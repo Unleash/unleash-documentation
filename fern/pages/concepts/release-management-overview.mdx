@@ -5,6 +5,7 @@ og:title: Release Management Overview - Unleash Documentation
 description: Release management helps you standardize, automate and safeguard your feature rollouts with release templates, impact metrics, automated progressions and safeguards.
 keywords: release management, release templates, impact metrics, safeguards, automated rollouts, feature flags, milestones
 max-toc-depth: 3
+last-updated: May 14, 2026
 ---
 
 Release management in Unleash helps you standardize, automate and safeguard your feature rollouts. Instead of manually controlling each stage of a release, you can define a reusable, structured rollout process that progresses automatically while monitoring application health to prevent issues from affecting users.
@@ -39,7 +40,7 @@ The following concepts work together to enable release management:
 | [Release plan](/concepts/release-templates#release-plan) | An instance of a release template applied to a feature flag | Created from release templates |
 | [Impact metric](/concepts/impact-metrics) | Application-level time-series data | Used by safeguards |
 | [Automated release progression](/concepts/impact-metrics#automate-release-progression) | Time-based milestone advancement | Configured per milestone |
-| [Safeguard](/concepts/impact-metrics#configure-safeguards) | Metric-based condition that pauses releases | Uses impact metrics |
+| [Safeguard](/concepts/impact-metrics#configure-safeguards) | Metric-based condition that disables an environment or pauses release plan automation | Uses impact metrics |
 
 ## How release management works
 
@@ -101,11 +102,14 @@ Impact metrics support three types:
 - **Gauges**: Fluctuating values like memory usage or active connections.
 - **Histograms**: Value distributions like request duration (with percentiles).
 
-Safeguards use impact metrics to protect your release. You define thresholds for your metrics, and Unleash pauses the automated progression when a metric exceeds the threshold.
+Safeguards use impact metrics to protect your release. You attach a safeguard to a flag's environment, set a threshold on a metric, and choose what should happen when the threshold is crossed:
 
-For example, you might configure a safeguard to pause the rollout if error counts exceed 10 in a 15-minute window.
+- **Disable environment**: Turns the flag off in that environment immediately. Useful as a kill switch.
+- **Pause release plan automation**: Stops automatic milestone progression. The current milestone keeps serving traffic while you investigate.
 
-When a safeguard triggers, the current milestone continues to run, but no further progressions occur. You can investigate the issue, deploy a fix, and manually resume the release when ready.
+For example, you might configure a safeguard to pause the rollout if error counts exceed 10 in a 15-minute window, or to disable the environment entirely if latency spikes past a critical level.
+
+See [Configure safeguards](/concepts/impact-metrics#configure-safeguards) for setup details.
 
 ## Why use release management
 
