@@ -8,7 +8,7 @@ max-toc-depth: 3
 last-updated: May 14, 2026
 ---
 
-<Button small outlined className="version-button" href="/support/availability">Edge v21</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+<Button small outlined className="version-button" href="/support/availability">Edge v21</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
 [Streaming](/unleash-edge#real-time-updates-with-streaming) mode replaces Edge's default polling loop with a persistent connection to upstream Unleash. Feature flag changes are pushed to Edge as they happen, reducing replication lag from the polling interval to near real time.
 
@@ -133,9 +133,12 @@ Recommended settings:
 
 ## Validate streaming
 
-To confirm that streaming is working, keep an SSE connection open while you make a controlled feature flag change in Unleash.
+To confirm that streaming is working, keep an SSE connection open against Edge while you make a controlled feature flag change in Unleash.
 
-Open a streaming connection:
+<Steps>
+<Step title="Open a streaming connection">
+
+Run the following against the Edge node you want to validate:
 
 ```shell
 curl -N \
@@ -146,7 +149,22 @@ curl -N \
 
 The initial response contains an `unleash-connected` event with a hydration payload. The SSE envelope includes an `id` that matches the latest revision in the payload.
 
-To test reconnection from a known revision, note an event ID and reconnect:
+</Step>
+<Step title="Make a controlled feature change in Unleash">
+
+Toggle a flag or update a strategy in the environment and project that your token covers.
+
+</Step>
+<Step title="Confirm Edge receives the update">
+
+Edge should emit an `unleash-updated` event on the open connection, with an `id` matching the new revision. If you do not see the event within a few seconds, follow [Troubleshooting](#troubleshooting).
+
+</Step>
+</Steps>
+
+### Test reconnection from a known revision
+
+To verify that Edge replays correctly when an SDK reconnects, note an event ID from the previous step and reconnect with `Last-Event-ID`:
 
 ```shell
 curl -N \
@@ -158,7 +176,9 @@ curl -N \
 
 If the Edge node still has the requested revision in memory, it replays later events. If not, it sends a fresh hydration payload. In both cases, the SDK reaches the same effective feature state.
 
-For multi-node validation, run the same command against each Edge node or load-balanced endpoint and compare the event type, the SSE envelope `id`, and the final feature state across nodes.
+### Compare nodes in a multi-node deployment
+
+Run the validation against each Edge node or load-balanced endpoint and compare the event type, the SSE envelope `id`, and the final feature state across nodes.
 
 You can also compare regular client API responses across nodes:
 
