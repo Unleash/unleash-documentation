@@ -128,7 +128,7 @@ The **Status** column in **Flags overview** summarizes each flag's rollout state
 
 The status message depends on the lifecycle stage:
 
-- In the **Define** stage, the status reflects whether non-production environments have traffic, [activation strategies](/concepts/activation-strategies), or enabled strategies.
+- In the **Define** stage, the status indicates what's preventing the flag from receiving metrics. For example, non-production environments may have no [activation strategies](/concepts/activation-strategies), no enabled strategies, or no traffic to an enabled environment.
 - In the **Develop** stage, the status shows whether any environment is enabled.
 - In the **Production** and **Cleanup** stages, the status reflects the production rollout: how many production environments the flag is enabled in, whether production environments or strategies are configured, and the current milestone for flags using [release templates](/concepts/release-templates).
 
