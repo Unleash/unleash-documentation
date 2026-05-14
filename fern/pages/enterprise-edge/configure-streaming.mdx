@@ -8,7 +8,7 @@ max-toc-depth: 3
 last-updated: May 14, 2026
 ---
 
-<Button small outlined className="version-button" href="/support/availability">Edge v21</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+<Button small outlined className="version-button" href="/support/availability">Edge v21</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
 [Streaming](/unleash-edge#real-time-updates-with-streaming) mode replaces Edge's default polling loop with a persistent connection to upstream Unleash. Feature flag changes are pushed to Edge as they happen, reducing replication lag from the polling interval to near real time.
 
@@ -18,10 +18,10 @@ This page covers how to enable streaming, monitor the health of streaming Edge i
 
 To run Edge in streaming mode, you need:
 
-- The Enterprise Edge build.
-- An Unleash Enterprise instance.
-- A license that includes Edge streaming.
-- One configured Edge token per environment.
+- The Enterprise Edge build
+- An Unleash Enterprise instance
+- A license that includes Edge streaming
+- One configured Edge token per environment
 
 ## Enable streaming
 
@@ -48,8 +48,8 @@ Polling is the default mode, so you do not need to explicitly set `STREAMING=fal
 
 When streaming is enabled, Edge uses the following upstream endpoints. Make sure both are reachable from Edge:
 
-- `GET /api/client/delta` for initial cache hydration on startup.
-- `GET /api/client/streaming` for receiving live updates.
+- `GET /api/client/delta` for initial cache hydration on startup
+- `GET /api/client/streaming` for receiving live updates
 
 <Note>
 Edge can also expose `GET /api/client/streaming` to connected SDKs. SDK-to-Edge streaming is in beta, is not available in all SDKs, and is not yet recommended for production environments.
@@ -76,10 +76,10 @@ In the Unleash Admin UI, go to **Admin settings > Enterprise Edge**.
 
 The page lists each registered Edge instance, the tokens it serves, and the revision ID each token has observed. Use this view to answer questions like:
 
-- Which Edge instances are connected.
-- Which token scopes each instance serves.
-- Whether one instance is behind the others.
-- Whether a specific environment or project scope is stale.
+- Which Edge instances are connected
+- Which token scopes each instance serves
+- Whether one instance is behind the others
+- Whether a specific environment or project scope is stale
 
 If one instance reports an older revision than the rest of the fleet for the same token scope, that instance is probably not receiving updates from upstream Unleash.
 
@@ -126,12 +126,16 @@ count_values by (environment, projects) (
 
 Recommended settings:
 
-- Evaluate every minute.
-- Require the condition to hold for at least five minutes.
-- Include the affected `environment` and `projects` labels in the notification.
-- Link the notification to the Enterprise Edge dashboard.
+- Evaluate every minute
+- Require the condition to hold for at least five minutes
+- Include the affected `environment` and `projects` labels in the notification
+- Link the notification to the Enterprise Edge dashboard
 
 ## Validate streaming
+
+This section covers three validation activities you can run against a streaming Edge instance: confirming that a flag change reaches Edge, testing reconnection behavior, and comparing nodes in a multi-node deployment.
+
+### Confirm a flag change reaches Edge
 
 To confirm that streaming is working, keep an SSE connection open against Edge while you make a controlled feature flag change in Unleash.
 
@@ -200,10 +204,10 @@ When a streaming Edge instance falls behind, the symptom is usually a revision t
 Streaming mode depends on `GET /api/client/delta` for initial hydration. If that endpoint is unavailable, misconfigured, or blocked by a network policy, Edge may fail its readiness check or start without usable feature data.
 
 Check:
-- Edge logs for delta fetch failures.
-- Network connectivity from Edge to upstream Unleash.
-- That the token is valid and has the expected environment and project scope.
-- That upstream Unleash supports the delta endpoint.
+- Edge logs for delta fetch failures
+- Network connectivity from Edge to upstream Unleash
+- That the token is valid and has the expected environment and project scope
+- That upstream Unleash supports the delta endpoint
 
 </Accordion>
 
@@ -220,11 +224,11 @@ Alerting on revision drift detects this case as soon as at least one other Edge 
 If upstream Unleash returns `401` or `403` for the streaming connection, Edge stops that stream task. Edge does not automatically fall back to polling for that token scope.
 
 Verify:
-- That you are connected to an Unleash Enterprise instance.
-- That your license includes Edge streaming.
-- That the token still exists in Unleash and has not been revoked.
-- That the token still has access to the expected environment and projects.
-- That all Edge instances have been restarted or reconfigured with the same token set.
+- That you are connected to an Unleash Enterprise instance
+- That your license includes Edge streaming
+- That the token still exists in Unleash and has not been revoked
+- That the token still has access to the expected environment and projects
+- That all Edge instances have been restarted or reconfigured with the same token set
 
 </Accordion>
 
@@ -233,10 +237,10 @@ Verify:
 Revision drift alerts work by comparing Edge instances against each other. If every Edge instance is disconnected from upstream, they can all report the same old revision and the drift alert will not fire. This case cannot be detected reliably from `delta_revision_id` alone, because a quiet Unleash instance may legitimately have no feature changes for a long time.
 
 To investigate:
-- Check Edge logs for upstream errors.
-- Verify that upstream Unleash is reachable and healthy.
-- Confirm that the token is still valid.
-- Make a controlled feature change in Unleash and check whether `delta_revision_id` advances on at least one Edge instance.
+- Check Edge logs for upstream errors
+- Verify that upstream Unleash is reachable and healthy
+- Confirm that the token is still valid
+- Make a controlled feature change in Unleash and check whether `delta_revision_id` advances on at least one Edge instance
 
 </Accordion>
 
@@ -266,11 +270,11 @@ The revision ID confirms that two nodes have observed the same upstream revision
 
 Collect the following and reach out to our support team:
 
-- The `delta_revision_id` labels and value for each node.
-- The request URL, token scope, and query parameters used.
-- The `ETag` header from each node.
-- The response body from each node, if it is safe to share.
-- The Edge logs around the revision where the state diverged.
+- The `delta_revision_id` labels and value for each node
+- The request URL, token scope, and query parameters used
+- The `ETag` header from each node
+- The response body from each node, if it is safe to share
+- The Edge logs around the revision where the state diverged
 
 </Accordion>
 
