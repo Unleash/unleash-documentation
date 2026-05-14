@@ -127,13 +127,10 @@ If an archived feature is revived, it starts a new lifecycle with a new [Define]
 
 The **Status** column in **Flags overview** summarizes each flag's rollout state based on its [lifecycle stage](#lifecycle-stages) and current environment configuration. It helps you spot flags that need attention without opening each one.
 
-The status message depends on the lifecycle stage:
+The status message depends on the lifecycle stage. In the **Define** stage, the status shows why the flag hasn't received metrics yet. For example, **No strategies** or **No enabled strategies** indicate missing [activation strategies](/concepts/activation-strategies) or have strategies that aren't enabled.
+Similarly, in the **Develop** stage, the status shows whether any environment is enabled.
 
-- In the **Define** stage, the status indicates what's preventing the flag from receiving metrics. For example, non-production environments may have no [activation strategies](/concepts/activation-strategies), no enabled strategies, or no traffic to an enabled environment.
-- In the **Develop** stage, the status shows whether any environment is enabled.
-- In the **Production** and **Cleanup** stages, the status reflects the production rollout: how many production environments the flag is enabled in, whether production environments or strategies are configured, and the current milestone for flags using [release templates](/concepts/release-templates).
-
-Common values include **No traffic**, **No strategies**, **No enabled strategies**, **Paused**, **In X out of Y production environments**, **No production environments**, and **Milestone: \<milestone-name\>**. If no condition applies, the column is empty.
+In the **Production** and **Cleanup** stages, the status reflects the production rollout: how many production environments the flag is enabled in, whether production environments or strategies are configured, and the current milestone for flags using [release templates](/concepts/release-templates).
 
 ## Feature flag dependencies
 
