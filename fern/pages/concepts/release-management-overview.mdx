@@ -104,7 +104,7 @@ Impact metrics support three types:
 
 Safeguards use impact metrics to protect your release. You attach a safeguard to a flag's environment, set a threshold on a metric, and choose what should happen when the threshold is crossed:
 
-- **Disable environment**: Turns the flag off in that environment immediately. Useful as a kill switch.
+- **Disable environment**: Turns the flag off in that environment in Unleash. Connected SDKs and the Frontend API pick up the change on their next refresh interval.
 - **Pause release plan automation**: Stops automatic milestone progression. The current milestone keeps serving traffic while you investigate.
 
 For example, you might configure a safeguard to pause the rollout if error counts exceed 10 in a 15-minute window, or to disable the environment entirely if latency spikes past a critical level.

@@ -15,12 +15,13 @@ Impact metrics connect application data, such as request counts, error rates, or
 You can use impact metrics in two areas:
 
 - **[Charts](#create-charts)**: Visualize data in the Impact Metrics section of the Admin UI.
-- **[Release management](#automate-release-progression)**: Automate milestone progression or trigger [safeguards](#configure-safeguards) to pause a rollout.
+- **[Release management](#automate-release-progression)**: Automate milestone progression or trigger [safeguards](#configure-safeguards) that pause rollouts or disable environments when metrics cross a threshold.
 
-By combining impact metrics with [release templates](/concepts/release-templates), you can automate milestone progression and pause rollouts when metrics exceed defined thresholds. For example:
+By combining impact metrics with [release templates](/concepts/release-templates), you can automate milestone progression and react automatically when metrics cross defined thresholds. For example:
 
 - Progress from 25% to 50% only if error rates stay below a threshold.
 - Pause automatically when request latency increases during a rollout.
+- Disable the environment if error counts spike past a critical level.
 
 <Frame background="subtle">
 ![Example of impact metrics displaying](/assets/impact-metrics.png)
@@ -219,7 +220,7 @@ Safeguards are attached to a feature flag's environment, so you can react differ
 
 When you add a safeguard, you choose an action that runs if the metric crosses the threshold:
 
-- **Disable environment**: Turns the flag off in this environment. Existing users stop seeing the flag immediately. Use this action as a kill switch for flags that should be paused entirely when health degrades.
+- **Disable environment**: Turns the flag off in this environment in Unleash. Connected SDKs and the Frontend API pick up the change on their next refresh interval, so it is not an instant client-side cut-off.
 - **Pause release plan automation**: Stops automatic milestone progression. The current milestone keeps serving traffic, and you can investigate before manually resuming. This action only applies if the flag has an active release plan in the environment.
 
 ### Add a safeguard

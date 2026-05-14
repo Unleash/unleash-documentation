@@ -35,7 +35,7 @@ See the [Tool reference](#tool-reference) section for detailed parameters and ou
 
 ### Workflows
 
-The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
+The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for [Claude Code](/integrate/claude-code), [Cursor](/integrate/cursor), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
 
 <Tabs>
 <Tab title="Evaluate and wrap code in feature flags">
@@ -145,7 +145,11 @@ codex mcp add unleash \
     -- npx -y @unleash/mcp@latest --log-level error
 ```
 
-For GitHub Copilot in VS Code or the Copilot CLI, check out the dedicated [Copilot integration guide](/integrate/github-copilot).
+For other agents, see the dedicated integration guides:
+
+- [Cursor](/integrate/cursor)
+- [GitHub Copilot](/integrate/github-copilot) (VS Code and Copilot CLI)
+- [Kiro](/integrate/kiro)
 
 ### Quickstart with npx
 
@@ -258,7 +262,7 @@ To enable the remote MCP server on your instance:
 3. Save the configuration.
 
 <Warning>
-Only enable the remote MCP server if your organization allows the OAuth 2.0 Dynamic Client Registration authorization workflow. Enabling it allows MCP clients to self-register with your instance. See [Authentication](#authentication) for details.
+Only enable the remote MCP server if your organization allows the [OAuth 2.0 Dynamic Client Registration](https://datatracker.ietf.org/doc/html/rfc7591) (DCR) authorization workflow. DCR lets MCP clients self-register with your instance without prior administrator approval, which is required to support clients such as Claude Code that do not pre-register OAuth clients. Review your organization's policy before enabling this.
 </Warning>
 
 ### Authentication
