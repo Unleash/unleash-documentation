@@ -992,6 +992,10 @@ footer: ./components/CustomFooter.tsx
 css:
   - styles.css
 
+check:
+  rules:
+    missing-redirects: warn
+
 redirects:
   # --- Helm charts ---
   - source: "/helm-charts/index.yaml"
@@ -1053,6 +1057,8 @@ redirects:
     destination: "/unleash-edge/migrate-from-proxy"
   - source: "/reference/strategy-constraints"
     destination: "/concepts/activation-strategies"
+  - source: "/reference/release-plans"
+    destination: "/concepts/release-templates"
   - source: "/reference/:slug*"
     destination: "/concepts/:slug*"
   - source: "/topics/feature-flags/best-practices-using-feature-flags-at-scale"
@@ -1115,3 +1121,47 @@ redirects:
     destination: "/get-started/quickstart"
   - source: "/understanding-unleash/unleash-overview"
     destination: "/get-started/unleash-overview"
+  # --- Legacy /addons ---
+  - source: "/addons/slack"
+    destination: "/integrate/slack-app"
+  - source: "/addons/:slug*"
+    destination: "/integrate/:slug*"
+  - source: "/addons"
+    destination: "/integrate"
+  # --- API ---
+  - source: "/api-overview"
+    destination: "/api"
+  - source: "/api/events"
+    destination: "/concepts/events"
+  # --- Availability ---
+  - source: "/availability"
+    destination: "/support/availability"
+  # --- Concepts (stale slugs) ---
+  - source: "/concepts/api-tokens"
+    destination: "/concepts/api-tokens-and-client-keys"
+  - source: "/concepts/notifications"
+    destination: "/api/get-notifications"
+  - source: "/concepts/public-signup-tokens"
+    destination: "/concepts/public-signup"
+  - source: "/concepts/terraform"
+    destination: "/integrate/terraform"
+  # --- Contributing (bare; /:slug variant exists above) ---
+  - source: "/contributing"
+    destination: "/contribute"
+  # --- Deploy ---
+  - source: "/deploy/migration_guide"
+    destination: "/deploy/upgrading-unleash"
+  # --- Feature flag tutorials ---
+  - source: "/feature-flag-tutorials/flutter/a-b-testing"
+    destination: "/guides/implement-ab-test-in-flutter"
+  # --- Guides ---
+  - source: "/guides/how-to-set-up-group-sso-sync"
+    destination: "/single-sign-on/how-to-set-up-group-sso-sync"
+  # --- SDKs (legacy proxy SDKs) ---
+  - source: "/sdks/android-proxy"
+    destination: "/sdks/android"
+  - source: "/sdks/ios-proxy"
+    destination: "/sdks/ios"
+  # --- Topics ---
+  - source: "/topics/data-collection"
+    destination: "/privacy-and-compliance/data-privacy"
