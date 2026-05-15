@@ -6,7 +6,7 @@ description: A Model Context Protocol (MCP) server that enables LLM-powered codi
 keywords: mcp, model context protocol, ai, llm, coding assistants, claude, feature flags, automation
 max-toc-depth: 3
 slug: integrate/mcp
-last-updated: March 31, 2026
+last-updated: May 14, 2026
 ---
 
 <AccordionGroup>
@@ -35,7 +35,7 @@ See the [Tool reference](#tool-reference) section for detailed parameters and ou
 
 ### Workflows
 
-The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
+The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for [Claude Code](/integrate/claude-code), [Cursor](/integrate/cursor), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
 
 <Tabs>
 <Tab title="Evaluate and wrap code in feature flags">
@@ -103,17 +103,24 @@ Feature flags should be temporary. Regularly clean up flags after successful rol
 </Tab>
 </Tabs>
 
-## Prerequisites
+## Get started
 
-Before you can run the server, you need the following:
+You have two ways to run the Unleash MCP server:
+
+- **Local MCP server**: Runs inside your LLM client on your machine. Use this setup if your organization allows installing MCP servers on developer laptops. See [Run the MCP server locally](#run-the-mcp-server-locally).
+- **[Remote MCP server](#remote-mcp-server)**: Hosted by your Unleash instance. Use this setup if developers cannot install local MCP servers, or if you want a single, managed entry point for all clients.
+
+## Run the MCP server locally
+
+This section covers the different ways to install and run the Unleash MCP server locally. You can either follow a setup for [agents](#agent-setup) (such as Claude Code and Codex), run the MCP as a [standalone process](#quickstart-with-npx) using npx, or use a [local development](#local-development-setup) setup.
+
+### Prerequisites
+
+Before you can run the server locally, you need the following:
 - Node.js 18 or higher
 - Yarn package manager or npm
 - An Unleash instance (hosted or self-hosted)
 - A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) with permissions to create feature flags
-
-## Get started
-
-This section covers the different ways to install and run the Unleash MCP server. You can either follow a setup for [agents](#agent-setup) (such as Claude Code and Codex), run the MCP as a [standalone process](#quickstart-with-npx) using npx, or use a [local development](#local-development-setup) setup.
 
 ### Agent setup
 
@@ -138,7 +145,11 @@ codex mcp add unleash \
     -- npx -y @unleash/mcp@latest --log-level error
 ```
 
-For GitHub Copilot in VS Code or the Copilot CLI, check out the dedicated [Copilot integration guide](/integrate/github-copilot).
+For other agents, see the dedicated integration guides:
+
+- [Cursor](/integrate/cursor)
+- [GitHub Copilot](/integrate/github-copilot) (VS Code and Copilot CLI)
+- [Kiro](/integrate/kiro)
 
 ### Quickstart with npx
 
@@ -229,6 +240,38 @@ node dist/index.js --log-level debug
 # Combine flags
 node dist/index.js --dry-run --log-level debug
 ```
+
+## Remote MCP server
+
+The remote MCP server lets LLM clients connect to a Streamable HTTP MCP server hosted by your Unleash instance, without installing anything locally. This is useful when developers cannot run MCP servers on their laptops, or when you want to manage MCP access centrally.
+
+When enabled, your Unleash instance exposes an MCP endpoint at:
+
+```text
+https://<your-instance-url>/api/admin/mcp
+```
+
+The remote MCP server exposes the same [tools](#tool-reference) as the local server.
+
+### Enable the remote MCP server
+
+To enable the remote MCP server on your instance:
+
+1. In the Admin UI, go to **Admin settings > Remote MCP server**.
+2. Toggle **Enable Remote MCP Server for this instance** to **Enabled**.
+3. Save the configuration.
+
+<Warning>
+Only enable the remote MCP server if your organization allows the [OAuth 2.0 Dynamic Client Registration](https://datatracker.ietf.org/doc/html/rfc7591) (DCR) authorization workflow. DCR lets MCP clients self-register with your instance without prior administrator approval, which is required to support clients such as Claude Code that do not pre-register OAuth clients. Review your organization's policy before enabling this.
+</Warning>
+
+### Authentication
+
+The remote MCP server authenticates requests using standard Unleash [personal access tokens](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PATs). Once the remote MCP server is enabled, users can exchange their current login session for a PAT that is valid for 24 hours, and the MCP client uses that token to call the endpoint.
+
+### Connect a client
+
+Once the remote MCP server is enabled, point your MCP client at the endpoint shown in **Admin settings > Remote MCP server** and complete the authentication flow in your browser to issue a PAT for the client.
 
 ## Tool reference
 

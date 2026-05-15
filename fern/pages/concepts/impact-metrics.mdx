@@ -5,7 +5,7 @@ og:title: Impact metrics - Track application-level time-series metrics in Unleas
 description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
 keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
-last-updated: April 16, 2026
+last-updated: May 14, 2026
 ---
 
 ## Overview
@@ -15,12 +15,13 @@ Impact metrics connect application data, such as request counts, error rates, or
 You can use impact metrics in two areas:
 
 - **[Charts](#create-charts)**: Visualize data in the Impact Metrics section of the Admin UI.
-- **[Release management](#automate-release-progression)**: Automate milestone progression or trigger [safeguards](#configure-safeguards) to pause a rollout.
+- **[Release management](#automate-release-progression)**: Automate milestone progression or trigger [safeguards](#configure-safeguards) that pause rollouts or disable environments when metrics cross a threshold.
 
-By combining impact metrics with [release templates](/concepts/release-templates), you can automate milestone progression and pause rollouts when metrics exceed defined thresholds. For example:
+By combining impact metrics with [release templates](/concepts/release-templates), you can automate milestone progression and react automatically when metrics cross defined thresholds. For example:
 
 - Progress from 25% to 50% only if error rates stay below a threshold.
 - Pause automatically when request latency increases during a rollout.
+- Disable the environment if error counts spike past a critical level.
 
 <Frame background="subtle">
 ![Example of impact metrics displaying](/assets/impact-metrics.png)
@@ -131,31 +132,30 @@ If you already collect metrics in Prometheus or VictoriaMetrics, you can connect
 
 ### Enable external metrics
 
-<Tabs>
-<Tab title="Unleash Hosted">
+You can configure external metrics from the Admin UI on both [Unleash Hosted](/deploy/hosting-options) and self-hosted instances.
 
-Contact [beta@getunleash.io](mailto:beta@getunleash.io) to configure the external URL for your instance.
-
-</Tab>
-<Tab title="Self-hosted">
-
-Set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Any endpoint that speaks the Prometheus HTTP query API is supported. Unleash must be restarted for changes to take effect.
-
-</Tab>
-</Tabs>
+1. In the Admin UI, go to **Admin settings > Impact Metrics**.
+2. Toggle **Enable external metrics** to **Enabled**.
+3. In **Metrics source URL**, enter the base URL of your Prometheus or VictoriaMetrics instance.
+4. Click **Test integration** to verify that Unleash can reach the endpoint.
+5. Click **Save**.
 
 Unleash appends the standard Prometheus HTTP API paths (`/api/v1/...`) to this base URL, so do not include `/api/v1` yourself. A trailing slash is accepted and ignored. Examples:
 
 - Plain Prometheus: `https://prometheus.example.com`
-- VictoriaMetrics cluster / multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
+- VictoriaMetrics cluster or multi-tenant: `https://victoria.example.com/select/<tenantId>/prometheus`
+
+The URL must be reachable from the Unleash server over the network. Each request has a 20-second timeout.
 
 <Warning>
 
-HTTP Basic Auth is supported by embedding credentials in the URL (for example, `https://user:password@prometheus.example.com`). Credentials in URLs can appear in server logs and environment variable listings. Use a secrets manager or other secure mechanism to manage the environment variable value.
+HTTP Basic Auth is supported by embedding credentials in the URL (for example, `https://user:password@prometheus.example.com`). Credentials in URLs can appear in server logs. Use a secrets manager or other secure mechanism if you provision the URL through configuration rather than the Admin UI.
 
 </Warning>
 
-The URL must be reachable from the Unleash server over the network. Each request has a 20-second timeout.
+#### Configure with an environment variable
+
+If you prefer to manage configuration outside the Admin UI on a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Unleash must be restarted for changes to take effect.
 
 ### Metric selector filtering
 
@@ -212,21 +212,33 @@ When the time conditions are satisfied, Unleash advances the release to the next
 
 ## Configure safeguards
 
-Safeguards automatically pause a rollout when metrics indicate a problem. You can configure safeguards against both [internal](#internal-metrics) and [external](#external-metrics) metrics.
+Safeguards automatically react when an impact metric crosses a threshold. You can configure safeguards against both [internal](#internal-metrics) and [external](#external-metrics) metrics.
 
-First, verify your metric is available by selecting **Add safeguard** and checking the dropdown. For [internal metrics](#internal-metrics), it may take up to 60 seconds for a new metric to appear because the SDK sends metrics on a default 60-second interval.
+Safeguards are attached to a feature flag's environment, so you can react differently in development, staging, and production using the same metric.
 
-To add a safeguard:
+### Safeguard actions
 
-1. Select **Add safeguard** on your release plan.
-2. Select your impact metric from the dropdown. The selector labels each metric with its source.
-3. Configure the threshold. For example:
+When you add a safeguard, you choose an action that runs if the metric crosses the threshold:
+
+- **Disable environment**: Turns the flag off in this environment in Unleash. Connected SDKs and the Frontend API pick up the change on their next refresh interval, so it is not an instant client-side cut-off.
+- **Pause release plan automation**: Stops automatic milestone progression. The current milestone keeps serving traffic, and you can investigate before manually resuming. This action only applies if the flag has an active release plan in the environment.
+
+### Add a safeguard
+
+Before you start, verify that your metric is available by selecting **Add safeguard** and checking the dropdown. For [internal metrics](#internal-metrics), it may take up to 60 seconds for a new metric to appear because the SDK sends metrics on a default 60-second interval.
+
+To add a safeguard to an environment:
+
+1. Open the feature flag and locate the environment you want to protect.
+2. Click **Add safeguard** and select the action: **Disable environment** or **Pause release plan automation**.
+3. Select your impact metric from the dropdown. The selector labels each metric with its source.
+4. Configure the threshold. For example:
    - Metric: `analyze_feature_error`
    - Aggregated by: Count
    - Condition: More than 10 in the last 15 minutes
-4. Click **Save**.
+5. Click **Save**.
 
-When the metric exceeds the threshold, Unleash pauses the automated progression.
+When the metric crosses the threshold, Unleash runs the configured action for that environment.
 
 ### External metrics safeguard behavior
 
