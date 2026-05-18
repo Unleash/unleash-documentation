@@ -1,4 +1,5 @@
 ---
+description: Review Unleash v7.1.0 release notes, including lifecycle cleanup updates, technical debt insights, SDK naming changes, and grouped Event Log events.
 tags: ["Improvement"]
 ---
 
@@ -12,7 +13,7 @@ We also renamed Health to **Technical debt** to align with common engineering te
 
 ### Renamed SDKs and token types
 
-We've introduced a more consistent naming pattern for our [SDKs](/concepts/sdks) and [API tokens](/concepts/api-tokens-and-client-keys). Server-side SDKs are now **backend SDK**s, and **client-side SDKs** are frontend SDKs. Backend SDKs use **backend tokens** and frontend SDKs use **frontend tokens**.
+We've introduced a more consistent naming pattern for our [SDKs](/sdks) and [API tokens](/concepts/api-tokens-and-client-keys). Server-side SDKs are now **backend SDK**s, and **client-side SDKs** are frontend SDKs. Backend SDKs use **backend tokens** and frontend SDKs use **frontend tokens**.
 
 You’ll find the new naming across our documentation and in the Admin UI, such as when creating API tokens or working with permissions. We also standardized SDK repository and registration names to follow the `unleash-{language/framework}-sdk` pattern. For example, `unleash-client-python` has been renamed to `unleash-python-sdk`. Note that SDK artifact names remain unchanged to avoid requiring changes to your codebase.
 
@@ -22,7 +23,7 @@ You’ll find the new naming across our documentation and in the Admin UI, such 
 
 For example, when a [change request](/concepts/change-requests) is approved and applied, all resulting events, such as strategy or flag config changes, appear under the same Group ID. Similarly, if enabling a flag in an environment automatically adds the default strategy, both events share the same Group ID to reflect that they came from the same action.
 
-In addition, we've made the date filter optional and added filtering by ID on the [Events API](/concepts/api/unleash/get-events).
+In addition, we've made the date filter optional and added filtering by ID on the [Events API](/api/search-events).
 
 ### View connected frontend applications
 
