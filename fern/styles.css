@@ -116,12 +116,16 @@ main {
     }
 }
 
-.landing-page.landing-page {
+.landing-page.landing-page,
+body:has(.landing-page) .fern-page-heading {
     max-width: 1300px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 4rem;
     padding-right: 4rem;
+}
+
+.landing-page.landing-page {
     padding-bottom: 4rem;
 }
 
@@ -139,14 +143,14 @@ body:has(.landing-page) .fern-page-actions {
     padding-bottom: 2.5rem;
 }
 
-.hero h1 {
+body:has(.landing-page) .fern-page-heading {
     white-space: nowrap;
     margin-bottom: 1.75rem;
     color: var(--nav-text-color);
 }
 
-/* Dark mode - keep hero h1 white */
-.dark .hero h1 {
+/* Dark mode - keep homepage h1 white */
+.dark body:has(.landing-page) .fern-page-heading {
     color: #ffffff;
 }
 
@@ -192,7 +196,8 @@ body:has(.landing-page) .fern-page-actions {
 
 /* Mobile - hide video, ensure text is readable */
 @media (max-width: 768px) {
-    .landing-page.landing-page {
+    .landing-page.landing-page,
+    body:has(.landing-page) .fern-page-heading {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
@@ -201,7 +206,7 @@ body:has(.landing-page) .fern-page-actions {
         gap: 1.5rem;
     }
 
-    .hero h1 {
+    body:has(.landing-page) .fern-page-heading {
         white-space: normal;
         font-size: 2rem;
     }
@@ -223,12 +228,13 @@ body:has(.landing-page) .fern-page-actions {
 
 /* Small mobile */
 @media (max-width: 480px) {
-    .landing-page.landing-page {
+    .landing-page.landing-page,
+    body:has(.landing-page) .fern-page-heading {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 
-    .hero h1 {
+    body:has(.landing-page) .fern-page-heading {
         font-size: 1.75rem;
     }
 
