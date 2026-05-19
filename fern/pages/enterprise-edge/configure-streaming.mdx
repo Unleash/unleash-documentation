@@ -57,7 +57,7 @@ In streaming mode, Edge also enables SDK-to-Edge streaming which is in beta stat
 
 ## Runtime behavior
 
-Once streaming is enabled, Edge keeps using the delta and streaming endpoints until you disable streaming and restart Edge. There is no automatic fallback to polling.
+Once Edge is started with streaming enabled, it stays in that stage as long as the process is running. There is no automatic fallback to polling.
 
 If the upstream connection drops, errors out, or becomes idle, Edge reconnects and resumes from the last event ID it received. While the connection is recovering, Edge keeps serving its last known state to connected SDKs. Temporary network issues recover without operator action.
 
