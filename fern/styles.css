@@ -144,6 +144,7 @@ body:has(.landing-page) .fern-page-actions {
 }
 
 body:has(.landing-page) .fern-page-heading {
+    display: block;
     white-space: nowrap;
     margin-bottom: 1.75rem;
     color: var(--nav-text-color);
@@ -152,6 +153,17 @@ body:has(.landing-page) .fern-page-heading {
 /* Dark mode - keep homepage h1 white */
 .dark body:has(.landing-page) .fern-page-heading {
     color: #ffffff;
+}
+
+/* Fern wraps the page heading in nested flex containers that shrink-wrap to
+   the h1's content width, breaking max-width + margin auto. Neutralize those
+   wrappers on the homepage so the heading can center like .landing-page.
+   display: block stops them from acting as flex containers themselves;
+   flex: 1 makes them fill the outer flex parent (the .justify-between row). */
+body:has(.landing-page) div:has(> .fern-page-heading),
+body:has(.landing-page) div:has(> div > .fern-page-heading) {
+    display: block;
+    flex: 1;
 }
 
 .hero-row {
