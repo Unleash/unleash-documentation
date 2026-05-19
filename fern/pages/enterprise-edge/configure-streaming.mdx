@@ -61,7 +61,7 @@ Once streaming is enabled, Edge keeps using the delta and streaming endpoints un
 
 If the upstream connection drops, errors out, or becomes idle, Edge reconnects and resumes from the last event ID it received. While the connection is recovering, Edge keeps serving its last known state to connected SDKs. Temporary network issues recover without operator action.
 
-If upstream rejects the streaming connection with `401` or `403`, Edge stops trying to reconnect for that token. Edge continues to serve the last state it has, but it does not receive new upstream changes for that token scope until the rejection is resolved and Edge is restarted. The usual causes are an invalid or revoked token, a token that no longer has access to the requested environment or projects, or a missing license for Edge streaming.
+If upstream rejects the streaming connection with `401` or `403`, Edge stops trying to reconnect for that token. Edge continues to serve the last state it has, but it does not receive new upstream changes for that token scope until the rejection is resolved and Edge is restarted. The usual causes are an invalid or revoked token, or a missing license for Edge.
 
 ## Monitor streaming health
 
