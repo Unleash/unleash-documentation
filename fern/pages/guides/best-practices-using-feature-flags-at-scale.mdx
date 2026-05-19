@@ -5,6 +5,7 @@ keywords: feature, flag, management, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Feature flag management: Best practices"
 max-toc-depth: 2
+last-updated: May 19, 2026
 ---
 
 You've probably heard someone say, “A feature flag is just an if statement.” And in simple cases, that's true. But when your organization has thousands of developers managing hundreds of [feature flags](/what-is-a-feature-flag)—with complex targeting rules, audit trails, and dozens of microservices—those if statements get complicated fast. Especially if you don't [set things up properly from the start](/guides/user-management-access-controls).
@@ -308,7 +309,7 @@ Depending on the industry and legal framework you're operating in, you'll need v
   ![Change request process](/assets/change-request-flow.png)
 </Frame>
 
-In regulated industries, peer review is often required before changes reach production—commonly known as the [four-eyes principle](https://www.unido.org/overview-member-states-change-management-faq/what-four-eyes-principle). Think of it like a pull request: users should be able to bundle related changes across multiple flags into a single request, preview the impact, and submit it for review. Reviewers should have clear visibility into what's changing and what the new configuration will look like.
+In regulated industries, peer review is often required before changes reach production—commonly known as the four-eyes principle. Think of it like a pull request: users should be able to bundle related changes across multiple flags into a single request, preview the impact, and submit it for review. Reviewers should have clear visibility into what's changing and what the new configuration will look like.
 
 Even if your organization doesn't require approvals, having an optional review step is still valuable, as it allows you to:
 - **Coordinate multiple changes**:
