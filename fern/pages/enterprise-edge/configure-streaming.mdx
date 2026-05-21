@@ -196,7 +196,7 @@ Streaming in Edge is currently in beta. It is designed to reconnect and rehydrat
 
 If behavior does not match your expectations after a controlled feature configuration change, compare the affected instances in the Enterprise Edge UI or with `delta_revision_id`. Confirm whether the instances serving the same environment and project scope converge on the same revision.
 
-If the issue persists, collect the affected environment and project, the latest revision reported by each instance, the client request details, and relevant Edge logs. You can restart the affected nodes to force a fresh connection and cache hydration. If you need to restore polling while we investigate, disable streaming and contact our support team with the data you collected.
+If the issue persists, collect the affected environment and project, the latest revision reported by each instance, the client request details, and relevant Edge logs. Restarting an affected node forces a fresh upstream connection, but it may first restore feature data from its configured backup storage. If the unexpected state is also present in that backup, restarting may not resolve it. If you need to restore polling while we investigate, disable streaming and contact our support team with the data you collected.
 
 </Accordion>
 </AccordionGroup>
