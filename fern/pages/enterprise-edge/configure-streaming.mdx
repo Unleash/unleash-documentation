@@ -51,9 +51,10 @@ Start Edge with streaming enabled using either the CLI flag or the environment v
 
 ```shell
 docker run --rm -it -p 3063:3063 \
-  -e UPSTREAM_URL=https://<your-unleash-instance>.com \
-  -e TOKENS=<your_client_token> \
-  unleashorg/unleash-edge-enterprise:latest edge --streaming
+  unleashorg/unleash-edge-enterprise:latest edge \
+  --upstream-url https://<your-unleash-instance>.com \
+  --tokens <your_client_token> \
+  --streaming
 ```
 
 </Tab>
