@@ -16,12 +16,31 @@ This page covers how to enable streaming, monitor the health of streaming Edge i
 
 ## Prerequisites
 
-To run Edge in streaming mode, you need:
+The requirements depend on how you host Edge and Unleash.
 
-- The Enterprise Edge build
-- An Unleash Enterprise instance
-- A license that includes Edge streaming
+<Tabs>
+<Tab title="Managed Edge, managed Unleash">
+
+- An Enterprise plan with the Enterprise Edge add-on
+- Let us know which environments you need Edge streaming for — we manage the Edge tokens for you
+
+</Tab>
+<Tab title="Self-hosted Edge, managed Unleash">
+
+- An Enterprise plan with the Enterprise Edge add-on
+- The [Enterprise Edge Docker image](https://hub.docker.com/r/unleashorg/unleash-edge-enterprise)
 - One configured Edge token per environment
+
+</Tab>
+<Tab title="Self-hosted Edge, self-hosted Unleash">
+
+- The [Enterprise Edge Docker image](https://hub.docker.com/r/unleashorg/unleash-edge-enterprise)
+- An Unleash Enterprise instance
+- A license key that includes Enterprise Edge
+- One configured Edge token per environment
+
+</Tab>
+</Tabs>
 
 ## Enable streaming
 
@@ -31,25 +50,37 @@ Start Edge with streaming enabled using either the CLI flag or the environment v
 <Tab title="CLI flag">
 
 ```shell
-unleash-edge edge  --streaming --upstream-url https://your-unleash.com --tokens your-token
+docker run --rm -it -p 3063:3063 \
+  -e UPSTREAM_URL=https://<your-unleash-instance>.com \
+  -e TOKENS=<your_client_token> \
+  unleashorg/unleash-edge-enterprise:latest edge --streaming
 ```
 
 </Tab>
 <Tab title="Environment variable">
 
 ```shell
-STREAMING=true
+docker run --rm -it -p 3063:3063 \
+  -e UPSTREAM_URL=https://<your-unleash-instance>.com \
+  -e TOKENS=<your_client_token> \
+  -e STREAMING=true \
+  unleashorg/unleash-edge-enterprise:latest edge
 ```
 
 </Tab>
 </Tabs>
 
-Polling is the default mode, so you do not need to explicitly set `STREAMING=false` when you want to use polling.
+A healthy start keeps the process running. If Edge exits immediately after starting, streaming is not working — for example, because your license is invalid or the upstream does not support streaming. See [Troubleshooting](#troubleshooting) to resolve startup errors.
 
-When streaming is enabled, Edge uses the following upstream endpoints. Make sure both are reachable from Edge:
+Once Edge is running, you can verify that flag changes propagate correctly by connecting an SDK and observing flag evaluation, or by calling the client features endpoint directly:
 
-- `GET /api/client/delta` for initial cache hydration on startup
-- `GET /api/client/streaming` for receiving live updates
+```shell
+curl -s \
+  -H "Authorization: <your_client_token>" \
+  http://localhost:3063/api/client/features
+```
+
+Make a controlled change in Unleash — toggle a flag or update a strategy — then confirm the response reflects the change.
 
 <Note>
 In streaming mode, Edge also enables SDK-to-Edge streaming which is in beta state. This is not available in all SDKs, and is not yet recommended for production environments.
@@ -130,69 +161,6 @@ Recommended settings:
 - Require the condition to hold for at least five minutes
 - Include the affected `environment` and `projects` labels in the notification
 - Link the notification to the Enterprise Edge dashboard
-
-## Validate streaming
-
-This section covers three validation activities you can run against a streaming Edge instance: confirming that a flag change reaches Edge, testing reconnection behavior, and comparing nodes in a multi-node deployment.
-
-### Confirm a flag change reaches Edge
-
-To confirm that streaming is working, keep an SSE connection open against Edge while you make a controlled feature flag change in Unleash.
-
-<Steps>
-<Step title="Open a streaming connection">
-
-Run the following against the Edge node you want to validate:
-
-```shell
-curl -N \
-  -H "Accept: text/event-stream" \
-  -H "Authorization: $TOKEN" \
-  "$EDGE_URL/api/client/streaming"
-```
-
-The initial response contains an `unleash-connected` event with a hydration payload. The SSE envelope includes an `id` that matches the latest revision in the payload.
-
-</Step>
-<Step title="Make a controlled feature change in Unleash">
-
-Toggle a flag or update a strategy in the environment and project that your token covers.
-
-</Step>
-<Step title="Confirm Edge receives the update">
-
-Edge should emit an `unleash-updated` event on the open connection, with an `id` matching the new revision. If you do not see the event within a few seconds, follow [Troubleshooting](#troubleshooting).
-
-</Step>
-</Steps>
-
-### Test reconnection from a known revision
-
-To verify that Edge replays correctly when an SDK reconnects, note an event ID from the previous step and reconnect with `Last-Event-ID`:
-
-```shell
-curl -N \
-  -H "Accept: text/event-stream" \
-  -H "Last-Event-ID: $REVISION_ID" \
-  -H "Authorization: $TOKEN" \
-  "$EDGE_URL/api/client/streaming"
-```
-
-If the Edge node still has the requested revision in memory, it replays later events. If not, it sends a fresh hydration payload. In both cases, the SDK reaches the same effective feature state.
-
-### Compare nodes in a multi-node deployment
-
-Run the validation against each Edge node or load-balanced endpoint and compare the event type, the SSE envelope `id`, and the final feature state across nodes.
-
-You can also compare regular client API responses across nodes:
-
-```shell
-curl -i \
-  -H "Authorization: $TOKEN" \
-  "$EDGE_URL/api/client/features"
-```
-
-For the same token scope and request shape, matching `delta_revision_id` values should produce matching `ETag` headers. If two nodes report the same revision but return different ETags, collect the request URL, token scope, ETag from each node, response body if it is safe to share, and the Edge logs around the divergence, and reach out to our support team.
 
 ## Troubleshooting
 
