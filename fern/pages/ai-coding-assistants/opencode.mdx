@@ -33,9 +33,13 @@ Before you begin, make sure you have the following:
 
 ## Install the MCP server
 
-The Unleash MCP server runs as a local stdio process. Configuration uses the same npm package and credentials across all OpenCode interfaces.
+The Unleash MCP server runs as a local stdio process. The same configuration works across all OpenCode interfaces (TUI, CLI, and desktop app).
 
-First, create a credentials file and source it from your shell profile:
+<Steps>
+
+<Step title="Create a credentials file">
+
+Store your Unleash credentials in a centralized file and source it from your shell profile:
 
 ```bash
 mkdir -p ~/.unleash
@@ -65,16 +69,7 @@ Restart your terminal or run `source ~/.zshrc` to load the variables.
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
 
-
-Now configure your preferred interface:
-
-<Tabs>
-
-<Tab title="OpenCode TUI">
-
-**Requirements:** [OpenCode](https://opencode.ai) installed.
-
-<Steps>
+</Step>
 
 <Step title="Create the configuration file">
 
@@ -115,44 +110,6 @@ Within an agent session, ask: "What Unleash MCP tools are available?" The agent 
 </Step>
 
 </Steps>
-
-</Tab>
-
-<Tab title="OpenCode CLI">
-
-**Requirements:** macOS, Linux, or WSL.
-
-The CLI shares the same `opencode.json` configuration as the TUI. If you already configured the MCP server for the TUI, the CLI picks it up automatically.
-
-If you haven't configured it yet, create the `opencode.json` file as shown in the OpenCode TUI tab.
-
-**Non-interactive execution with `opencode run`:**
-
-```bash
-opencode run "Check if any feature flags should be cleaned up"
-```
-
-**Headless server mode with `opencode serve`:**
-
-```bash
-# Start server (keeps MCP connections alive)
-opencode serve &
-
-# Run multiple evaluations against the same server
-opencode run --attach http://localhost:4096 "Evaluate changes in src/payments/"
-opencode run --attach http://localhost:4096 "Evaluate changes in src/auth/"
-```
-
-**CI/CD integration with GitHub Actions:**
-
-```bash
-opencode github run --event '{"action":"opened","pull_request":{...}}' \
-  --github-token "$GITHUB_TOKEN"
-```
-
-</Tab>
-
-</Tabs>
 
 **Tool namespacing:** OpenCode prefixes MCP tool names with the server name.
 The Unleash tools appear as `unleash_evaluate_change`, `unleash_create_flag`, `unleash_get_flag_state`, and so on.
