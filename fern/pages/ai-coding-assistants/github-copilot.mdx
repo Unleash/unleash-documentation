@@ -332,7 +332,7 @@ Try one of the following prompts (or the [prompt patterns](#prompt-patterns) bel
 
 ## Tool reference
 
-The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+The Unleash MCP server exposes the following tools.
 
 <StickyTable>
 | Tool | Description | When to use |
@@ -341,6 +341,8 @@ The Unleash MCP server exposes nine tools. The following table summarizes each t
 | `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
 | `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
 | `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
+| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
 | `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
 | `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
@@ -467,6 +469,28 @@ Review the list, remove the conditional branches, and delete the flag from Unlea
 <Tip>
 Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
 </Tip>
+
+### Discover and audit flags
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, Copilot calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+Copilot calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, Copilot calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+Copilot compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
+</Step>
+</Steps>
 
 ## Define custom instructions
 
