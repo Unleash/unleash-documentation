@@ -636,7 +636,7 @@ You can create multiple hooks targeting different domains (e.g., `src/auth/**`, 
 ## Unleash Power
 
 A [Power](https://kiro.dev/docs/powers/) bundles MCP tools, steering files, and hook definitions into a single installable package.
-The Unleash Power is the recommended way to distribute the integration across teams and projects.
+The Unleash Power is the recommended way to distribute the integration across teams and projects, and is published as a public repository at [github.com/Unleash/unleash-kiro-power](https://github.com/Unleash/unleash-kiro-power). The example structure and files below mirror that repository; install it directly from GitHub or fork it to customize for your team.
 
 ### Directory structure
 
@@ -780,7 +780,7 @@ Examples: `checkout-stripe-integration`, `auth-sso-google`.
 You can install the Unleash Power from a local path or from GitHub:
 
 - **From local path:** Open the Powers panel, select "Add power from Local Path," and choose the `power-unleash/` directory.
-- **From GitHub:** Open the Powers panel, select "Add power from GitHub," and enter the repository URL.
+- **From GitHub:** Open the Powers panel, select "Add power from GitHub," and enter the repository URL `https://github.com/Unleash/unleash-kiro-power`. If your team forked the repo to customize it, use your fork's URL instead.
 
 When installed, the Power's MCP server is auto-registered in `~/.kiro/settings/mcp.json` under the "Powers" section with a namespaced server name (e.g., `power-unleash-unleash`).
 
@@ -966,6 +966,7 @@ Write your feature flag guidelines in steering files with appropriate inclusion 
 ## Related resources
 
 - [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Unleash Kiro Power on GitHub](https://github.com/Unleash/unleash-kiro-power) — installable Power bundling the MCP server config, steering files, and hook templates
 - [Spec-Driven Feature Flags: How Kiro and Unleash Turn Requirements into Safe Releases](https://www.getunleash.io/blog/spec-driven-feature-flags-kiro)
 - [Kiro documentation](https://kiro.dev/docs/)
 - [Kiro MCP configuration](https://kiro.dev/docs/mcp/)
