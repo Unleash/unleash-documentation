@@ -6,7 +6,7 @@ description: Integrate Unleash with Kiro using MCP to create feature flags, wrap
 keywords: kiro, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/kiro
-last-updated: May 25, 2026
+last-updated: May 26, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects Kiro to your Unleash instance, enabling AI-assisted feature flag management.
@@ -183,7 +183,7 @@ You can add the Unleash MCP server using the Command Palette or by creating the 
     <Step title="Verify the installation">
     Open the **MCP Servers** tab in the Kiro panel. The Unleash server should appear with its tools listed.
 
-    Within a Kiro chat session, ask: "What Unleash MCP tools are available?" Kiro lists all nine tools.
+    Within a Kiro chat session, ask: "What Unleash MCP tools are available?" Kiro lists every available tool.
     </Step>
 
     </Steps>
@@ -214,7 +214,7 @@ Example with auto-approval for read-only tools:
         "UNLEASH_PAT": "${UNLEASH_PAT}",
         "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
-      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change"],
+      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change", "list_projects", "list_flags"],
       "disabledTools": []
     }
   }
@@ -222,7 +222,7 @@ Example with auto-approval for read-only tools:
 ```
 
 <Tip>
-Use `autoApprove` for read-only tools like `get_flag_state`, `detect_flag`, and `evaluate_change`.
+Use `autoApprove` for read-only tools like `get_flag_state`, `detect_flag`, `evaluate_change`, `list_projects`, and `list_flags`.
 Keep write operations like `create_flag` and `toggle_flag_environment` behind manual approval for safety.
 </Tip>
 
@@ -277,7 +277,7 @@ You can use the same Unleash MCP tools as in the IDE: evaluate changes, create f
 
 ## Tool reference
 
-The Unleash MCP server exposes nine tools. The following table summarizes each tool and when to use it.
+The Unleash MCP server exposes the following tools.
 
 <StickyTable>
 | Tool | Description | When to use |
@@ -286,6 +286,8 @@ The Unleash MCP server exposes nine tools. The following table summarizes each t
 | `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
 | `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
 | `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
+| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
 | `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
 | `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
@@ -440,6 +442,32 @@ Review the list, remove the conditional branches, and delete the flag from Unlea
 
 <Tip>
 Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent [technical debt](/concepts/technical-debt).
+</Tip>
+
+### Discover and audit flags
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, Kiro calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+Kiro calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, Kiro calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+Kiro compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
+</Step>
+</Steps>
+
+<Tip>
+A spec-driven flag audit can be triggered manually from a Kiro hook. See the `flag-audit.kiro.hook` template in the [Unleash Kiro Power](https://github.com/Unleash/unleash-kiro-power) for an example that calls `list_flags` for both active and archived inventory.
 </Tip>
 
 ## Steering file templates
@@ -608,7 +636,7 @@ You can create multiple hooks targeting different domains (e.g., `src/auth/**`, 
 ## Unleash Power
 
 A [Power](https://kiro.dev/docs/powers/) bundles MCP tools, steering files, and hook definitions into a single installable package.
-The Unleash Power is the recommended way to distribute the integration across teams and projects.
+The Unleash Power is the recommended way to distribute the integration across teams and projects, and is published as a public repository at [github.com/Unleash/unleash-kiro-power](https://github.com/Unleash/unleash-kiro-power). The example structure and files below mirror that repository; install it directly from GitHub or fork it to customize for your team.
 
 ### Directory structure
 
@@ -692,7 +720,7 @@ match your project's high-risk directories.
         "UNLEASH_PAT": "${UNLEASH_PAT}",
         "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
-      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change"]
+      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change", "list_projects", "list_flags"]
     }
   }
 }
@@ -752,7 +780,7 @@ Examples: `checkout-stripe-integration`, `auth-sso-google`.
 You can install the Unleash Power from a local path or from GitHub:
 
 - **From local path:** Open the Powers panel, select "Add power from Local Path," and choose the `power-unleash/` directory.
-- **From GitHub:** Open the Powers panel, select "Add power from GitHub," and enter the repository URL.
+- **From GitHub:** Open the Powers panel, select "Add power from GitHub," and enter the repository URL `https://github.com/Unleash/unleash-kiro-power`. If your team forked the repo to customize it, use your fork's URL instead.
 
 When installed, the Power's MCP server is auto-registered in `~/.kiro/settings/mcp.json` under the "Powers" section with a namespaced server name (e.g., `power-unleash-unleash`).
 
@@ -938,6 +966,7 @@ Write your feature flag guidelines in steering files with appropriate inclusion 
 ## Related resources
 
 - [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Unleash Kiro Power on GitHub](https://github.com/Unleash/unleash-kiro-power) — installable Power bundling the MCP server config, steering files, and hook templates
 - [Spec-Driven Feature Flags: How Kiro and Unleash Turn Requirements into Safe Releases](https://www.getunleash.io/blog/spec-driven-feature-flags-kiro)
 - [Kiro documentation](https://kiro.dev/docs/)
 - [Kiro MCP configuration](https://kiro.dev/docs/mcp/)
