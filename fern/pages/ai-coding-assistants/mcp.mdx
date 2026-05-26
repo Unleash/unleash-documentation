@@ -125,7 +125,7 @@ Feature flags should be temporary. Regularly clean up flags after successful rol
 You have two ways to run the Unleash MCP server:
 
 - **Local MCP server**: Runs inside your LLM client on your machine. Use this setup if your organization allows installing MCP servers on developer laptops. See [Run the MCP server locally](#run-the-mcp-server-locally).
-- **[Remote MCP server](#remote-mcp-server)**: Hosted by your Unleash instance. Use this setup if developers cannot install local MCP servers, or if you want a single, managed entry point for all clients.
+- **[Remote MCP server](#remote-mcp-server)** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>: Hosted by your Unleash instance. Use this setup if developers cannot install local MCP servers, or if you want a single, managed entry point for all clients.
 
 ## Run the MCP server locally
 
@@ -259,6 +259,8 @@ node dist/index.js --dry-run --log-level debug
 ```
 
 ## Remote MCP server
+
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
 The remote MCP server lets LLM clients connect to a Streamable HTTP MCP server hosted by your Unleash instance, without installing anything locally. This is useful when developers cannot run MCP servers on their laptops, or when you want to manage MCP access centrally.
 

@@ -1,0 +1,23 @@
+---
+description: Review the Unleash MCP server v0.3.0 release notes, covering general availability, the remote MCP server in beta, and new flag and project discovery tools.
+tags: ["MCP server"]
+---
+
+# MCP server v0.3.0
+
+## Unleash MCP server is now generally available
+
+The [Unleash MCP server](/integrate/mcp) is now generally available. It gives your AI coding assistants a structured contract for managing feature flags safely, guiding them through evaluating risk, creating flags, wrapping code, and cleaning up after a rollout. It works with tools like [Claude Code](/integrate/claude-code), [Cursor](/integrate/cursor), [GitHub Copilot](/integrate/github-copilot), and [Kiro](/integrate/kiro).
+
+## New tools to list flags and projects
+
+Two new tools let assistants discover and audit your feature flags directly:
+
+- `list_projects` lists all Unleash projects available to your token.
+- `list_flags` lists the feature flags in a project, with support for filtering, ordering, and pagination.
+
+These tools power agentic flag-audit workflows and back the `detect_flag` inventory analysis, so assistants can enumerate flags before creating new ones or identify cleanup candidates. For details, see the [tool reference](/integrate/mcp#tool-reference).
+
+## Remote MCP server in beta
+
+You can now connect MCP clients to a [remote MCP server](/integrate/mcp#remote-mcp-server) hosted by your Unleash instance, without installing anything locally. This is useful when developers cannot run MCP servers on their machines, or when you want to manage MCP access centrally. The remote MCP server is in beta. To enable the option for your team, reach out to [beta@getunleash.io](mailto:beta@getunleash.io).
