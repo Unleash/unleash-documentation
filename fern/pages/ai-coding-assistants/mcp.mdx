@@ -23,11 +23,12 @@ A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP)
 
 This MCP server provides tools that integrate with the [Unleash Admin API](/get-started/unleash-overview#admin-api). It evaluates code changes to decide when a feature flag is needed, creates flags with proper validation and typing, and detects existing flags to prevent duplicates or encourage reuse. The server streams progress for visibility during operations, handles errors gracefully with helpful hints, and follows [best practices](/guides/feature-flag-best-practices) from the Unleash documentation.
 
-Every tool falls into one of three use cases:
+Every tool falls into one of these use cases:
 
 | Use case | Tools | What it does |
 |----------|-------|--------------|
 | **Evaluate and wrap code in feature flags** | `evaluate_change`, `detect_flag`, `create_flag`, `wrap_change` | Assess whether a code change needs a flag, create one if it does, and generate the wrapping code. |
+| **Discover and audit** | `list_projects`, `list_flags` | List projects available to your token and the flags within a project (active or archived). Useful before creating flags and for periodic flag audits. |
 | **Manage rollouts** | `get_flag_state`, `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy` | Check flag state, configure rollout strategies, and enable or disable flags across environments. |
 | **Clean up after rollout** | `cleanup_flag` | Generate instructions for safely removing a flag from your codebase after rollout. |
 
@@ -62,6 +63,30 @@ If no suitable flag exists, `create_flag` creates one in Unleash with the approp
 
 <Step title="Wrap the code">
 `wrap_change` generates framework-specific guard code for the new flag. The assistant applies the wrapping pattern to your code.
+</Step>
+</Steps>
+
+</Tab>
+
+<Tab title="Discover and audit">
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, the assistant calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+The assistant calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, the assistant calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+The assistant compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the `cleanup_flag` tool to remove them safely.
 </Step>
 </Steps>
 
