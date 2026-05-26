@@ -34,25 +34,11 @@ The Unleash MCP server runs as a local stdio process. Configuration differs by e
 
 First, create a shared credentials file that works across all environments:
 
-<Template
-  data={{
-    UNLEASH_BASE_URL: "https://your-instance.getunleash.io/api",
-    UNLEASH_PAT: "your-personal-access-token",
-    UNLEASH_DEFAULT_PROJECT: "default"
-  }}
-  tooltips={{
-    UNLEASH_BASE_URL: <p>Your Unleash instance API URL. Include <code>/api</code> at the end.</p>,
-    UNLEASH_PAT: <p>A personal access token with flag creation permissions.</p>,
-    UNLEASH_DEFAULT_PROJECT: <p>The default project for flag operations. If omitted, you must specify <code>projectId</code> in each tool call. Optional.</p>
-  }}
->
 ```bash title="~/.unleash/mcp.env"
 UNLEASH_BASE_URL={{UNLEASH_BASE_URL}}
 UNLEASH_PAT={{UNLEASH_PAT}}
 UNLEASH_DEFAULT_PROJECT={{UNLEASH_DEFAULT_PROJECT}}
 ```
-</Template>
-
 
 ### Configure your IDE
 
@@ -205,7 +191,7 @@ Add mcphub.nvim to your plugin manager. For example, with lazy.nvim:
 Export the required variables in your shell configuration:
 
 ```bash title="~/.zshrc or ~/.bashrc"
-export UNLEASH_BASE_URL="https://your-instance.getunleash.io/api"
+export UNLEASH_BASE_URL="https://your-instance.getunleash.io"
 export UNLEASH_PAT="your-personal-access-token"
 export UNLEASH_DEFAULT_PROJECT="default"
 ```
@@ -279,7 +265,7 @@ Fill in the following details (use Tab to move between fields):
 | **Tools** | `*` |
 
 For environment variables, add:
-- `UNLEASH_BASE_URL`: `https://your-instance.getunleash.io/api`
+- `UNLEASH_BASE_URL`: `https://your-instance.getunleash.io`
 - `UNLEASH_PAT`: Your personal access token
 - `UNLEASH_DEFAULT_PROJECT`: `default`
 
@@ -606,7 +592,7 @@ Run **MCP: List Servers** from the Command Palette and select **Show Output** to
 
 <Accordion title="Authentication failed">
 - Confirm your Unleash PAT is valid and has permissions to create and manage feature flags.
-- Check that `UNLEASH_BASE_URL` includes `/api` at the end.
+- Check that `UNLEASH_BASE_URL` does not include `/api` at the end.
 - For GitHub Enterprise plans, ensure the "MCP servers in Copilot" policy is enabled.
 </Accordion>
 

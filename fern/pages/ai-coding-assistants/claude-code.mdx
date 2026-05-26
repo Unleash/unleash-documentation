@@ -39,7 +39,7 @@ Claude Code uses environment variable expansion, and we recommend creating a cre
 ```bash
 mkdir -p ~/.unleash
 cat > ~/.unleash/mcp.env << 'EOF'
-UNLEASH_BASE_URL=https://your-instance.getunleash.io/api
+UNLEASH_BASE_URL=https://your-instance.getunleash.io
 UNLEASH_PAT=your-personal-access-token
 UNLEASH_DEFAULT_PROJECT=default
 EOF
@@ -67,7 +67,7 @@ source ~/.zshrc  # or ~/.bashrc
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `UNLEASH_BASE_URL` | Your Unleash instance API URL. Include `/api` at the end. | Yes |
+| `UNLEASH_BASE_URL` | Your Unleash instance API URL. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
 
@@ -268,7 +268,7 @@ Add the Unleash server to the `mcpServers` object:
       "command": "npx",
       "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
       "env": {
-        "UNLEASH_BASE_URL": "https://your-instance.getunleash.io/api",
+        "UNLEASH_BASE_URL": "https://your-instance.getunleash.io",
         "UNLEASH_PAT": "your-personal-access-token",
         "UNLEASH_DEFAULT_PROJECT": "default"
       }
@@ -728,7 +728,7 @@ Use `allowedMcpServers` and `deniedMcpServers` in managed settings to restrict w
 <Accordion title="Authentication failed">
 - Confirm your Unleash PAT is valid and has not expired
 - Check that the PAT has permissions to create and manage feature flags
-- Verify that `UNLEASH_BASE_URL` includes `/api` at the end
+- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end
 - For self-hosted instances, ensure the API is accessible from your machine
 </Accordion>
 
