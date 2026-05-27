@@ -5,10 +5,10 @@ keywords: enterprise edge, streaming, real-time updates, SSE, delta, revision, m
 og:site_name: Unleash
 og:title: Configure streaming in Enterprise Edge
 max-toc-depth: 3
-last-updated: May 21, 2026
+last-updated: May 27, 2026
 ---
 
-<Button small outlined className="version-button" href="/support/availability">Edge v21</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+<Button small outlined className="version-button" href="/support/availability">v8</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.2.2</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
 [Streaming](/unleash-edge#real-time-updates-with-streaming) mode replaces Edge's default polling loop with a persistent connection to upstream Unleash. Feature changes are pushed to Edge as they happen, reducing replication lag from the polling interval to near real time.
 
@@ -22,7 +22,7 @@ The requirements depend on how you host Edge and Unleash.
 <Tab title="Managed Edge, managed Unleash">
 
 - An Enterprise plan with the Enterprise Edge add-on
-- Let us know which environments you need Edge streaming for — we manage the Edge tokens for you
+- One Edge token per environment you want to stream. Unleash provisions and manages these tokens for you. Contact Unleash to set them up.
 
 </Tab>
 <Tab title="Self-hosted Edge, managed Unleash">
@@ -81,15 +81,15 @@ curl -s \
   http://localhost:3063/api/client/features
 ```
 
-Make a controlled change in Unleash — toggle a flag or update a strategy — then confirm the response reflects the change.
+Make a controlled change in Unleash, such as toggling a flag or updating a strategy, then confirm the response reflects the change.
 
 <Note>
-In streaming mode, Edge also enables SDK-to-Edge streaming which is in beta state. This is not available in all SDKs, and is not yet recommended for production environments.
+In streaming mode, Edge also enables SDK-to-Edge streaming, which is in beta. This is not available in all SDKs and is not yet recommended for production environments.
 </Note>
 
 ## Runtime behavior
 
-Once Edge is started with streaming enabled, it stays in that stage as long as the process is running. There is no automatic fallback to polling.
+Once Edge is started with streaming enabled, it stays in streaming mode as long as the process is running. There is no automatic fallback to polling.
 
 If the upstream connection drops, errors out, or becomes idle, Edge reconnects and resumes from the last event ID it received. While the connection is recovering, Edge keeps serving its last known state to connected SDKs. Temporary network interruptions are expected in distributed systems and normally recover without operator action.
 
@@ -192,7 +192,7 @@ Check:
 
 <Accordion title="Unexpected behavior or inconsistent responses">
 
-Streaming in Edge is currently in beta. It is designed to reconnect and rehydrate automatically, and brief transient states normally settle without intervention.
+Edge streaming is designed to reconnect and rehydrate automatically, and brief transient states normally settle without intervention.
 
 If behavior does not match your expectations after a controlled feature configuration change, compare the affected instances in the Enterprise Edge UI or with `delta_revision_id`. Confirm whether the instances serving the same environment and project scope converge on the same revision.
 
