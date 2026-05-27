@@ -75,7 +75,7 @@ To mark a feature as Beta (or another availability state), use the Fern badge sp
 <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 ```
 
-Used across SDK pages, `release-management-overview.mdx`, and `sdks/overview.mdx`.
+Used across SDK pages and other documentation pages where feature availability needs to be highlighted.
 
 ### Tabs
 
