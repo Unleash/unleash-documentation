@@ -276,9 +276,19 @@ The remote MCP server exposes the same [tools](#tool-reference) as the local ser
 
 To enable the remote MCP server on your instance:
 
+<Tabs>
+<Tab title="Hosted">
 1. In the Admin UI, go to **Admin settings > Remote MCP server**.
 2. Toggle **Enable Remote MCP Server for this instance** to **Enabled**.
 3. Save the configuration.
+</Tab>
+<Tab title="Self-hosted">
+1. Set the `UNLEASH_EXPERIMENTAL_REMOTE_MCP_SERVER=true` environment variable on your Unleash instance and restart it.
+2. In the Admin UI, go to **Admin settings > Remote MCP server**.
+3. Toggle **Enable Remote MCP Server for this instance** to **Enabled**.
+4. Save the configuration.
+</Tab>
+</Tabs>
 
 <Warning>
 Only enable the remote MCP server if your organization allows the [OAuth 2.0 Dynamic Client Registration](https://datatracker.ietf.org/doc/html/rfc7591) (DCR) authorization workflow. DCR lets MCP clients self-register with your instance without prior administrator approval, which is required to support clients such as Claude Code that do not pre-register OAuth clients. Review your organization's policy before enabling this.
