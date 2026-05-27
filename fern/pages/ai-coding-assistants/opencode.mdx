@@ -1,0 +1,907 @@
+---
+title: Integrate Unleash with OpenCode
+og:site_name: Unleash Documentation
+og:title: Integrate Unleash with OpenCode for AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in OpenCode's model-neutral AI coding agent.
+keywords: opencode, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation, open source
+max-toc-depth: 3
+slug: integrate/opencode
+last-updated: May 26, 2026
+---
+
+The [Unleash MCP server](/integrate/mcp) connects OpenCode to your Unleash instance, enabling AI-assisted feature flag management.
+You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from within OpenCode's terminal-first development environment.
+
+OpenCode supports MCP across three interfaces:
+
+- **OpenCode TUI** — The primary terminal-based interface with custom agents, skills, and commands
+- **OpenCode CLI** — Non-interactive mode via `opencode run` for scripts and CI/CD
+- **Desktop app** — GUI alternative available for macOS, Windows, and Linux
+
+OpenCode is model-neutral, supporting 75+ LLM providers through [Models.dev](https://models.dev), including Anthropic (Claude), OpenAI (GPT), Google (Gemini), xAI (Grok), and local models via Ollama.
+When developers can switch providers between sessions, governance cannot live in the model. It must live in the tools.
+Custom agents with fine-grained permission controls are the primary governance mechanism, ensuring consistent FeatureOps behavior regardless of which model writes the code.
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: The MCP server is distributed as an npm package
+- OpenCode: [TUI, CLI, or desktop app](https://opencode.ai) installed
+- An Unleash instance: Cloud or self-hosted, with API access enabled
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT): With permissions to create and manage feature flags
+
+## Install the MCP server
+
+The Unleash MCP server runs as a local stdio process. The same configuration works across all OpenCode interfaces (TUI, CLI, and desktop app).
+
+<Steps>
+
+<Step title="Create a credentials file">
+
+Store your Unleash credentials in a centralized file and source it from your shell profile:
+
+```bash
+mkdir -p ~/.unleash
+cat > ~/.unleash/mcp.env << 'EOF'
+UNLEASH_BASE_URL=https://your-instance.getunleash.io
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+EOF
+chmod 600 ~/.unleash/mcp.env
+```
+
+Add to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+# Unleash MCP credentials
+if [ -f ~/.unleash/mcp.env ]; then
+  source ~/.unleash/mcp.env
+  export UNLEASH_BASE_URL UNLEASH_PAT UNLEASH_DEFAULT_PROJECT
+fi
+```
+
+Restart your terminal or run `source ~/.zshrc` to load the variables.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance URL. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+</Step>
+
+<Step title="Create the configuration file">
+
+Create `opencode.json` at your project root:
+
+```json title="opencode.json"
+{
+  "mcp": {
+    "unleash": {
+      "type": "local",
+      "command": ["npx", "-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "environment": {
+        "UNLEASH_BASE_URL": "{env:UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "{env:UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "{env:UNLEASH_DEFAULT_PROJECT}"
+      }
+    }
+  }
+}
+```
+
+This file contains no credentials, only variable references that expand at runtime. You can safely commit it to version control.
+
+</Step>
+
+<Step title="Verify the installation">
+
+Run the MCP list command to confirm the server is connected:
+
+```bash
+opencode mcp list
+```
+
+The output should show `unleash: connected`.
+
+Within an agent session, ask: "What Unleash MCP tools are available?" The agent lists all available tools.
+
+</Step>
+
+</Steps>
+
+**Tool namespacing:** OpenCode prefixes MCP tool names with the server name.
+The Unleash tools appear as `unleash_evaluate_change`, `unleash_create_flag`, `unleash_get_flag_state`, and so on.
+
+**Configuration scopes:**
+
+| Location | Scope | Use case |
+|----------|-------|----------|
+| `opencode.json` (project root) | Project | Team-shared, version controlled |
+| `~/.config/opencode/opencode.json` | Global | Personal settings across all projects |
+
+Both are merged; project takes precedence on conflict. For team collaboration, use the project-level file.
+
+<Tip>
+OpenCode also supports `{file:path}` substitution as an alternative to `{env:VAR}`.
+Create individual credential files (e.g., `~/.unleash/pat`) containing only the value, then reference them with `"UNLEASH_PAT": "{file:~/.unleash/pat}"`.
+This is useful when credentials are managed by a secrets tool that writes individual files.
+</Tip>
+
+
+## Tool reference
+
+The Unleash MCP server exposes several tools. The following table summarizes each tool and when to use it.
+
+<StickyTable>
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
+| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+</StickyTable>
+
+## Workflows
+
+The Unleash MCP server supports these core workflows: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [discover and audit flags](#discover-and-audit-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
+OpenCode adds a fifth workflow unique to its architecture: [agent-guided flag evaluation](#agent-guided-flag-evaluation).
+
+### Evaluate and wrap code in feature flags
+
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+
+<Step title="Evaluate the change">
+Tell the agent what you are working on:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+The agent calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+The agent automatically calls `detect_flag` to search for existing flags.
+If a suitable flag exists, the agent suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+The agent calls `create_flag` with the appropriate name, type, and description.
+The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+The agent calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js"
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+
+</Steps>
+
+### Agent-guided flag evaluation
+
+Use this workflow to automate flag evaluation using a custom FeatureOps agent with permission controls.
+The agent evaluates risk without the developer explicitly asking, and its behavior is identical regardless of which model is selected.
+
+<Steps>
+
+<Step title="Define a FeatureOps agent">
+Create a custom agent with a system prompt encoding your team's policies (see [custom agent definitions](#custom-agent-definitions) below for a complete example).
+The agent's prompt instructs it to always call `evaluate_change` before writing implementation code.
+</Step>
+
+<Step title="Switch to the FeatureOps agent">
+Press Tab in the TUI to switch agents, or start a new session with `--agent featureops`.
+The agent's system prompt loads into context and guides every interaction.
+</Step>
+
+<Step title="Create and wrap in one flow">
+Describe your change. The agent calls `evaluate_change`, `detect_flag`, `create_flag`, and `wrap_change` as part of the same implementation.
+Because the agent's permission is set to `"ask"` for edit operations, you approve each modification before it takes effect.
+</Step>
+
+</Steps>
+
+<Tip>
+Agent-guided evaluation catches risk during implementation rather than during code review.
+The flag becomes part of the development flow, not an afterthought.
+Because agents are model-independent, the same governance applies whether the developer uses Claude, GPT, Gemini, or a local model.
+</Tip>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+The agent calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+The agent calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
+</Tab>
+
+<Tab title="Configure rollout">
+```text
+Set up a gradual rollout for stripe-payment-integration:
+10% for 24 hours, then 50% for 48 hours, then 100%.
+```
+
+The agent calls `set_flag_rollout` to configure the rollout strategy.
+</Tab>
+</Tabs>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag.
+Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect.
+See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
+</Warning>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+The agent calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent [technical debt](/concepts/technical-debt).
+</Tip>
+
+### Discover and audit flags
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, the agent calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+The agent calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, the agent calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+The agent compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
+</Step>
+</Steps>
+
+## AGENTS.md templates
+
+OpenCode uses [AGENTS.md](https://opencode.ai/docs/rules) files for project-level instructions, similar to Cursor Rules or Claude Code's CLAUDE.md.
+Store your [FeatureOps](https://featureops.io/) policies in AGENTS.md so the agent considers feature flags automatically in every session.
+
+For more details on project instructions, see the [OpenCode rules documentation](https://opencode.ai/docs/rules).
+
+### Standard AGENTS.md with FeatureOps policies
+
+This file loads into every agent session. Use it for organization-wide flag standards.
+
+```markdown title="AGENTS.md"
+# Project Instructions
+
+## Feature Flag Conventions
+
+When making changes to this codebase, follow these feature flag practices:
+
+1. **Always evaluate risk** – Before implementing high-risk changes (payments,
+   authentication, data migrations, external integrations), use the Unleash MCP
+   server to evaluate whether a feature flag is needed.
+
+2. **Naming conventions** – Use the format `{domain}-{feature}-{variant}`.
+   Examples: `checkout-stripe-integration`, `auth-sso-google`, `api-rate-limiting`.
+
+3. **Flag types**:
+   - `release` – For gradual feature rollouts
+   - `experiment` – For A/B tests and experiments
+   - `operational` – For system behavior toggles
+   - `kill-switch` – For emergency shutdowns
+   - `permission` – For role-based access
+
+4. **Prefer reuse** – Before creating a new flag, check if a similar flag already
+   exists using the detect_flag tool.
+
+5. **Clean up after rollout** – Once a feature is fully released (100% rollout for
+   2+ weeks), use cleanup_flag to remove dead code.
+
+## Unleash MCP Server
+
+This project uses the Unleash MCP server for feature flag management. Configuration
+is in `opencode.json`. Credentials are sourced from environment variables.
+
+Available tools: evaluate_change, detect_flag, create_flag, wrap_change,
+list_projects, list_flags, get_flag_state, set_flag_rollout,
+toggle_flag_environment, remove_flag_strategy, cleanup_flag.
+```
+
+### Domain-specific instructions via opencode.json
+
+Create additional instruction files for high-risk domains and load them via the `instructions` field in `opencode.json`.
+This field supports glob patterns and remote URLs.
+
+```json title="opencode.json" {2}
+{
+  "instructions": ["AGENTS.md", "docs/featureops-policy.md", "docs/domain-policies/*.md"],
+  "mcp": {
+    "unleash": {
+      "type": "local",
+      "command": ["npx", "-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "environment": {
+        "UNLEASH_BASE_URL": "{env:UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "{env:UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "{env:UNLEASH_DEFAULT_PROJECT}"
+      }
+    }
+  }
+}
+```
+
+```markdown title="docs/domain-policies/payments.md"
+# Payments Domain — Feature Flag Policy
+
+All changes in the payments domain require feature flags. No exceptions.
+
+- Use `kill-switch` type for external payment provider integrations
+  (Stripe, PayPal, etc.)
+- Use `release` type for internal payment logic changes
+- Naming: `payments-{feature}-{variant}`
+  (e.g., `payments-stripe-checkout`, `payments-refund-v2`)
+- Always include a fallback path for external provider calls
+- Evaluate risk with evaluate_change before writing implementation code
+```
+
+## Custom agent definitions
+
+Custom agents are OpenCode's primary governance mechanism. Each agent has a mode, a system prompt, and fine-grained permission controls that gate what the agent can do.
+Permissions support three levels per tool: `ask` (prompt for approval), `allow` (execute without prompting), and `deny` (block entirely).
+
+For more details on agents, see the [OpenCode agents documentation](https://opencode.ai/docs/agents).
+
+Agents can be defined in two formats: JSON in `opencode.json` or as markdown files in `.opencode/agents/`.
+
+### FeatureOps agent
+
+A primary agent with a custom prompt that always evaluates changes for feature flags.
+Edit operations require approval; destructive bash commands are blocked.
+
+<Tabs>
+
+<Tab title="JSON format">
+
+```json title="opencode.json (agent section)"
+{
+  "agent": {
+    "featureops": {
+      "description": "Feature flag management with Unleash governance policies",
+      "mode": "primary",
+      "prompt": "{file:.opencode/agents/featureops-prompt.md}",
+      "permission": {
+        "read": "allow",
+        "edit": "ask",
+        "bash": {
+          "*": "deny",
+          "npx @unleash/mcp*": "allow",
+          "npm test*": "allow",
+          "git status": "allow",
+          "git diff*": "allow"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "skill": "allow"
+      }
+    }
+  }
+}
+```
+
+```markdown title=".opencode/agents/featureops-prompt.md"
+You are a FeatureOps agent. Your job is to evaluate code changes for risk and
+manage feature flags using the Unleash MCP server.
+
+## Workflow
+
+1. When the developer describes a change, always call evaluate_change first
+2. If a flag is needed, call detect_flag to check for duplicates
+3. Only create a new flag if no suitable existing flag is found
+4. Use wrap_change to generate framework-specific guard code
+5. Suggest a rollout strategy based on the change's risk level
+
+## Naming Convention
+
+Use the format {domain}-{feature}-{variant}. Examples:
+- checkout-stripe-integration
+- auth-sso-google
+- api-rate-limiting
+
+## Flag Types
+
+- release: Gradual feature rollouts
+- experiment: A/B tests
+- operational: System behavior toggles
+- kill-switch: Emergency shutdowns
+- permission: Role-based access
+```
+
+</Tab>
+
+<Tab title="Markdown format">
+
+```markdown title=".opencode/agents/featureops.md"
+---
+description: Feature flag management with Unleash governance policies
+mode: primary
+permission:
+  read: allow
+  edit: ask
+  bash:
+    "*": deny
+    "npx @unleash/mcp*": allow
+    "npm test*": allow
+    "git status": allow
+    "git diff*": allow
+  glob: allow
+  grep: allow
+  skill: allow
+---
+You are a FeatureOps agent. Your job is to evaluate code changes for risk and
+manage feature flags using the Unleash MCP server.
+
+## Workflow
+
+1. When the developer describes a change, always call evaluate_change first
+2. If a flag is needed, call detect_flag to check for duplicates
+3. Only create a new flag if no suitable existing flag is found
+4. Use wrap_change to generate framework-specific guard code
+5. Suggest a rollout strategy based on the change's risk level
+
+## Naming Convention
+
+Use the format {domain}-{feature}-{variant}. Examples:
+- checkout-stripe-integration
+- auth-sso-google
+- api-rate-limiting
+
+## Flag Types
+
+- release: Gradual feature rollouts
+- experiment: A/B tests
+- operational: System behavior toggles
+- kill-switch: Emergency shutdowns
+- permission: Role-based access
+```
+
+</Tab>
+
+</Tabs>
+
+### Flag reviewer agent
+
+A read-only subagent that evaluates code changes for feature flag compliance without creating or modifying anything.
+
+```markdown title=".opencode/agents/flag-reviewer.md"
+---
+description: Reviews code changes for feature flag compliance
+mode: subagent
+temperature: 0.1
+permission:
+  read: allow
+  edit: deny
+  bash: deny
+  glob: allow
+  grep: allow
+---
+You are a feature flag reviewer. Analyze code changes and determine:
+
+1. Whether the changes should be behind a feature flag (use evaluate_change)
+2. Whether existing flags are being used correctly (use get_flag_state)
+3. Whether any flags should be cleaned up (use cleanup_flag for analysis only)
+
+Do NOT create or modify flags. Report findings and recommendations.
+```
+
+## Skill and command definitions
+
+Skills and commands package reusable workflows and common operations.
+Skills define multi-step processes that agents invoke automatically.
+Commands define prompt templates that developers invoke with `/command-name` in the TUI.
+
+### evaluate-and-flag skill
+
+```markdown title=".opencode/skills/evaluate-and-flag/SKILL.md"
+---
+name: evaluate-and-flag
+description: Evaluate whether current code changes need a feature flag, then
+  create and wrap the flag if needed. Handles duplicate detection, naming
+  conventions, and framework-specific wrapping.
+---
+
+## What I do
+
+Evaluate the current code changes for risk and create a feature flag if needed.
+
+## Steps
+
+1. **Evaluate risk** – Call evaluate_change with a description of the current
+   changes. Include the component, service, and risk factors.
+
+2. **Check for duplicates** – If a flag is needed, call detect_flag to check for
+   existing similar flags. Present matches to the developer.
+
+3. **Create the flag** – If no suitable flag exists, call create_flag with:
+   - Name following {domain}-{feature}-{variant} convention
+   - Appropriate type (release, experiment, operational, kill-switch, permission)
+   - Clear description
+
+4. **Wrap the code** – Call wrap_change to generate framework-specific guard code.
+   Insert the code at the appropriate location.
+
+5. **Suggest rollout** – Recommend a rollout strategy:
+   - Low risk: Enable immediately in staging, 50% in production
+   - Medium risk: 10% then 50% then 100% over 48 hours
+   - High risk: 10% then 25% then 50% then 100% over one week with error monitoring
+
+## When to skip
+
+- CSS-only changes
+- Documentation updates
+- Test file changes
+- Dependency version bumps (unless major versions)
+```
+
+### cleanup-flag skill
+
+```markdown title=".opencode/skills/cleanup-flag/SKILL.md"
+---
+name: cleanup-flag
+description: Safely remove a feature flag after successful rollout. Handles code
+  removal, test validation, and cleanup recommendations.
+---
+
+## What I do
+
+Remove a feature flag and its associated conditional code after a feature has
+been fully rolled out.
+
+## Steps
+
+1. **Verify rollout status** – Call get_flag_state to confirm the flag is at
+   100% rollout and has been stable.
+
+2. **Get cleanup instructions** – Call cleanup_flag to get:
+   - File locations where the flag is used
+   - Which code path to preserve (usually "enabled")
+   - Tests to run after cleanup
+
+3. **Remove conditional code** – Remove the feature flag check, keeping only
+   the enabled code path. Remove unused imports and dead code.
+
+4. **Run tests** – Execute the project's test suite to verify nothing breaks.
+
+5. **Recommend flag deletion** – After code changes are merged, recommend
+   deleting the flag from Unleash via the Admin UI or API.
+
+## Safety checks
+
+- Confirm all code is committed before making changes
+- Create a snapshot before cleanup
+- Run tests after cleanup
+- Do not delete the flag from Unleash until code changes are merged
+```
+
+### evaluate-flag command
+
+```markdown title=".opencode/commands/evaluate-flag.md"
+---
+description: Evaluate whether changes need a feature flag
+agent: featureops
+---
+Evaluate whether the following changes should be behind a feature flag using
+the Unleash MCP server.
+
+Focus on: $ARGUMENTS
+
+Steps:
+1. Call evaluate_change with the description
+2. If a flag is needed, call detect_flag to check for duplicates
+3. If no suitable flag exists, suggest a name and type
+4. Ask for approval before creating the flag
+```
+
+Usage: `/evaluate-flag Stripe payment integration in the checkout service`
+
+### Team distribution
+
+Commit the `.opencode/` directory to version control so the entire team shares the same agents, skills, and commands:
+
+```
+.opencode/
+├── agents/
+│   ├── featureops.md
+│   ├── featureops-prompt.md
+│   └── flag-reviewer.md
+├── skills/
+│   ├── evaluate-and-flag/
+│   │   └── SKILL.md
+│   └── cleanup-flag/
+│       └── SKILL.md
+└── commands/
+    ├── evaluate-flag.md
+    └── cleanup-flag.md
+```
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** The agent calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** The agent calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** The agent calls `toggle_flag_environment` or `get_flag_state`.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** The agent calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+<Accordion title="Discover and audit flags">
+**Intent:** Take inventory of existing flags and identify cleanup candidates.
+
+**Prompts:**
+```text
+List all feature flags in the [projectId] project and identify any that should be cleaned up.
+```
+```text
+Run a flag audit: list all projects, then check for flags at 100% rollout for more than 14 days.
+```
+
+**Expected behavior:** The agent calls `list_projects` (if no project is specified), then `list_flags` for active and archived flags. It cross-references results against code and reports cleanup candidates.
+</Accordion>
+
+<Accordion title="Agent-guided evaluation (FeatureOps agent)">
+**Intent:** Automatically evaluate code changes based on encoded policies using a custom agent.
+
+**Trigger:** Switch to the FeatureOps agent via Tab key or start with `--agent featureops`.
+
+**Expected behavior:** The agent's system prompt instructs it to call `evaluate_change` whenever the developer describes a code change. If a flag is needed, the agent notifies you and offers to create it. Permission controls gate flag creation with `"ask"`, so you approve before the flag is created. This works identically across all LLM providers.
+</Accordion>
+
+<Accordion title="Skill-orchestrated workflow">
+**Intent:** Run a multi-step FeatureOps workflow using a skill.
+
+**Trigger:** The agent discovers the `evaluate-and-flag` skill automatically when the context is relevant, or you ask for it directly.
+
+**Expected behavior:** The skill orchestrates the full workflow: evaluate the current changes, check for duplicates, create the flag if needed, wrap the code, and suggest a rollout strategy. Each step calls the appropriate MCP tool.
+</Accordion>
+
+<Accordion title="CLI-based evaluation">
+**Intent:** Evaluate and flag changes from the terminal without the interactive TUI.
+
+**Prompts:**
+```bash
+# Non-interactive evaluation
+opencode run "Evaluate whether the Stripe integration should be behind a feature flag"
+
+# With specific agent and model
+opencode run --agent featureops --model anthropic/claude-sonnet-4-20250514 \
+  "Evaluate the Stripe payment integration for feature flagging"
+
+# Batch processing with the attach pattern
+opencode serve &
+opencode run --attach http://localhost:4096 "Evaluate changes in src/payments/"
+opencode run --attach http://localhost:4096 "Evaluate changes in src/auth/"
+
+# CI/CD with GitHub Actions
+opencode github run --event '{"action":"opened","pull_request":{...}}' \
+  --github-token "$GITHUB_TOKEN"
+```
+
+**Expected behavior:** The CLI agent uses the same MCP tools as the TUI. In non-interactive mode, the agent outputs results and exits. The attach pattern avoids cold-booting MCP servers for each invocation.
+</Accordion>
+
+## Enterprise governance
+
+OpenCode Enterprise provides controls relevant to MCP server deployment in organizations.
+
+- **SSO integration** — Central config integrates with your organization's SSO provider. Enables credential access for internal AI gateways through existing identity systems. No separate OpenCode accounts needed.
+- **Private AI gateway** — Restrict all AI provider access to internal infrastructure. Disable all external providers to ensure requests route through approved channels. Combined with the Unleash MCP server (which connects to your own Unleash instance), the entire stack operates within your network.
+- **Managed configuration** — Non-overridable policies deployed via MDM on macOS (`.mobileconfig` profiles), `/etc/opencode/` on Linux, and `%ProgramData%\opencode` on Windows. Managed config has the highest precedence in the configuration hierarchy, so individual developers cannot override these settings.
+- **Agent permission restrictions** — Enforce FeatureOps agent definitions and permission policies via managed config. A managed FeatureOps agent with `"edit": "ask"` ensures every file change requires approval, regardless of the developer's local configuration.
+- **Disabled providers list** — Restrict which LLM providers are available to developers. Useful for organizations that need to route all AI traffic through approved gateways.
+
+For MCP server governance, commit `opencode.json` and the `.opencode/` directory to version control. This ensures all team members use the same MCP servers, agents, and skills with the same permission policies.
+
+<Tip>
+Use custom agents with `"ask"` permissions for write operations like `create_flag` and `toggle_flag_environment`. Read-only operations like `get_flag_state`, `detect_flag`, and `evaluate_change` can safely use `"allow"`.
+</Tip>
+
+## Troubleshooting
+
+<Accordion title="MCP server not appearing in OpenCode">
+- Verify `opencode.json` for syntax errors
+- Check that the `mcp` key is at the top level of the JSON object
+- Confirm the `command` field is an array of strings, not a single string
+- Run `opencode mcp list` to check server status
+- Restart OpenCode after making changes
+</Accordion>
+
+<Accordion title="Environment variables not expanding">
+- OpenCode uses `{env:VAR}` syntax (curly braces, no dollar sign prefix)
+- Restart your terminal after modifying your shell profile
+- Verify variables are exported: `echo $UNLEASH_BASE_URL`
+- Check that your shell profile sources `~/.unleash/mcp.env` and exports the variables
+</Accordion>
+
+<Accordion title="Authentication failed">
+- Confirm your Unleash PAT is valid and has not expired
+- Check that the PAT has permissions to create and manage feature flags
+- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end
+- Test directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/api/admin/projects"`
+</Accordion>
+
+<Accordion title="No envFile support">
+OpenCode does not support `envFile` like Cursor or VS Code. Use `{env:VAR}` substitution in the `environment` object and source credentials from your shell profile. Alternatively, use `{file:path}` substitution to read credentials from individual files. If you are migrating from Cursor, replace `envFile` references with `{env:VAR}` entries.
+</Accordion>
+
+<Accordion title="Command format errors">
+OpenCode's MCP `command` field takes an array (`["npx", "-y", "@unleash/mcp@latest"]`), not a string with separate `args` like Cursor or Claude Code. This is a common migration mistake. Each argument must be a separate element in the array.
+</Accordion>
+
+<Accordion title="Node.js not found">
+Local servers using npx require Node.js 18+. Verify with `node --version`. If Node.js is installed but not found by OpenCode, check that OpenCode inherits your shell PATH.
+</Accordion>
+
+<Accordion title="Tool approval prompts">
+By default, agents with `"ask"` permissions request approval before executing MCP tools. Configure permissions in agent definitions or use managed config to set organization-wide defaults. The five built-in agents have their own permission presets (Build has full access, Plan and Explore are read-only).
+</Accordion>
+
+<Accordion title="Variable substitution confusion">
+OpenCode uses `{env:VAR}` (curly braces, no dollar sign). Claude Code uses `${VAR}`. Cursor uses `${env:VAR}`. Mixing formats between tools is a common error when teams use multiple AI assistants. Check that your `opencode.json` uses the correct syntax.
+</Accordion>
+
+<Accordion title="MCP context overhead">
+If you have many MCP servers configured, their tool descriptions may exceed the model's context window. Use `"enabled": false` to disable servers you don't need for the current project. Consider the context impact when adding multiple MCP servers.
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with OpenCode.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check">
+While the MCP server can automate flag creation, high-risk changes should involve human review. Use custom agents with `"ask"` permissions for flag creation, rollout plans, and cleanup decisions.
+</Card>
+
+<Card title="Define naming conventions" icon="tag">
+Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in AGENTS.md and in custom agent prompts so the agent applies them automatically.
+</Card>
+
+<Card title="Prevent duplication" icon="clone">
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock">
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+
+<Card title="Use project scope for teams" icon="users">
+Configure MCP servers at project scope (`opencode.json`) and commit to version control along with `.opencode/` definitions. All team members get the same configuration, agents, and skills.
+</Card>
+
+<Card title="Use custom agents for governance" icon="shield-halved">
+Define a FeatureOps agent with permission controls that gate flag creation and enforce your team's policies. Agents work the same regardless of which model the developer selects.
+</Card>
+</CardGroup>
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [OpenCode homepage](https://opencode.ai)
+- [OpenCode documentation](https://opencode.ai/docs)
+- [OpenCode MCP configuration](https://opencode.ai/docs/mcp-servers)
+- [OpenCode agents documentation](https://opencode.ai/docs/agents)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
