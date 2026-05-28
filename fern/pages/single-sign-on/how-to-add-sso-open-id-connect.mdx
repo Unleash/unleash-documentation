@@ -11,129 +11,153 @@ last-updated: May 28, 2026
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
-## Introduction
+This guide walks you through setting up single sign-on (SSO) for Unleash using the OpenID Connect (OIDC) protocol, with Okta as the identity provider (IdP). Unleash supports a variety of identity providers and protocols; visit our [reference documentation](/concepts/sso) to explore other options.
 
-In this guide we will do a deep dive on the Single-Sign-On (SSO) using the OpenID Connect protocol and connect it with Okta as IdP. Unleash supports other identity providers and protocols, have a look at [all available Single-Sign-On options](/concepts/sso)
+## Prerequisites
 
-## Basic configuration
+To follow along, you'll need:
 
-### Step 1: Sign-in to Unleash
+- An Unleash instance with [Admin access](/concepts/rbac).
+- An Okta account with permission to create applications.
 
-In order to configure SSO you will need to log in to the Unleash instance with a user that have "Admin" role. If you are self-hosting Unleash then a default user will be automatically created the first time you start Unleash:
+## Create an OIDC application in Okta
 
-- username: `admin`
-- password: `unleash4all`
+To create a new OIDC application in Okta, do the following:
 
-### Step 2: Navigate to SSO configuration
-
-Unleash enterprise supports multiple authentication providers, and we provide in depth guides for each of them. To find them navigate to "Admin" => "Single-Sign-On" section.
-
-<Frame background="subtle">
-![admin-authentication](/assets/sso-oidc.png)
-</Frame>
-
-### Step 3: Okta with OpenID Connect
-
-Open a new tab/window in your browser and sign in to your Okta account. We will need to create a new Application which will hold the settings we need for Unleash.
-
-**a) Create new Okta application**
-
-Navigate to "Admin/Applications" and click the "Add Apps" button.
+1. Sign in to your Okta account and go to **Admin > Applications**.
+2. Click **Add Apps**, then **Create Application**.
+3. Select **OIDC - OpenID Connect**, choose **Web Application** as the application type, and click **Create**.
 
 <Frame background="subtle">
 ![Okta: Add Apps](/assets/okta_add_application-768x345.png)
 </Frame>
 
-Then click "Create Application" and choose a new "OIDC - OpenID Connect" application, and choose application type "Web Application" and click create.
-
 <Frame background="subtle">
 ![Okta: Create Apps](/assets/okta-oidc-create.png)
 </Frame>
 
-**b) Configure Application Integration**
+## Configure the Okta application
 
-Give you application a name. And set the Sign-in redirect URI to:
+To configure the application, do the following:
 
-`https://[region].app.unleash-hosted.com/[instanceName]/auth/oidc/callback`
-
-(In a self-hosted scenario the URL must match your `UNLEASH_URL` configuration)
-
-You can also configure the optional Sign-out redirect URIs: `https://[region].app.unleash-hosted.com/[instanceName]/`
+1. Give your application a name.
+2. Set **Sign-in redirect URI** to `https://[region].app.unleash-hosted.com/[instanceName]/auth/oidc/callback`. For self-hosted instances, the URL must match your `UNLEASH_URL` configuration.
+3. Optional: set **Sign-out redirect URI** to `https://[region].app.unleash-hosted.com/[instanceName]/`.
+4. Click **Save**.
 
 <Frame background="subtle">
 ![Okta: Configure OpenID Connect](/assets/sso-oidc-okta.png)
 </Frame>
 
-Save your new application and you will get the required details you need to configure the Unleash side of things:
+After saving, Okta provides the **Discover URL**, **Client ID**, and **Client Secret** you need to configure the Unleash side.
 
 <Frame background="subtle">
 ![Okta: Configure OpenID Connect](/assets/okta-oidc-details.png)
 </Frame>
 
-**c) Configure OpenID Connect provider in Unleash**
+## Configure the OpenID Connect provider in Unleash
 
-Navigate to Unleash and insert the details (Discover URL, Client Id and Client Secret) into Unleash.
+To finalize the configuration, do the following:
+
+1. In the Unleash Admin UI, go to **Admin settings > Single sign-on > OpenID Connect**.
+2. Enter the **Discover URL**, **Client ID**, and **Client Secret** from your Okta application.
+3. Optional: To automatically create users for first-time sign-ins, select **Auto-create users**. Provide a list of valid email domains and choose a default root role for new users. The default root role is **Editor**.
+4. Click **Save**.
 
 <Note>
-Please note that the `Discover URL` must be a valid URL and must include the `https://` prefix. For example: **https://dev-example-okta.com** is a valid discovery URL.
+The **Discover URL** must be a valid URL and include the `https://` prefix. For example, `https://dev-example-okta.com` is a valid Discover URL.
 </Note>
-
-You may also choose to "Auto-create users". This will make Unleash automatically create new users on the fly the first time they sign-in to Unleash with the given SSO provider (JIT). If you decide to automatically create users in Unleash you must also provide a list of valid email domains. You must also decide which root Unleash role they will be assigned (Editor role will be the default).
 
 <Frame background="subtle">
 ![Unleash: Configure OpenID Connect](/assets/sso-oidc-unleash.png)
 </Frame>
 
-### Step 4: Verify
+## Test your configuration
 
-Log out of Unleash and sign back in again. You should now be presented with the "Sign in with OpenID Connect" option. Click the button and follow the sign-in flow. If all goes well you should be successfully signed in to Unleash.
+To test that things are working as expected, log out of Unleash and verify that the login screen gives you the option to sign in with OpenID Connect. Click **Sign in with OpenID Connect** and complete the sign-in flow.
 
-(If something is not working you can still sign-in with username and password).
+If something is not working, you can still sign in with your username and password.
 
 <Frame background="subtle">
 ![Verify SSO](/assets/sso-oidc-verify.png)
 </Frame>
 
-Success!
+## Configure OIDC through environment variables
 
-## Configuration via Environment variables (Since Unleash Enterprise 6.1.0)
+<Button small outlined className="version-button" href="/support/availability">v6.1</Button>
 
-Beware, configuring OIDC through environment variables will disable editing settings in the Administration GUI. If you want to fallback to the GUI, make sure
-the OIDC_ENABLED is not set and then restart Unleash.
+Instead of configuring OIDC through the Admin UI, you can configure it through environment variables.
 
-### Step 1 Setup required variables for OIDC (minimal setup)
+<Warning>
+Configuring OIDC through environment variables disables editing the settings in the Admin UI. To fall back to the UI, unset `OIDC_ENABLED` and restart Unleash.
+</Warning>
 
-| Variable name      | Purpose                                                               | Required | Example values                                                |
-|--------------------|-----------------------------------------------------------------------|----------|---------------------------------------------------------------|
-| OIDC_ENABLED       | Tells Unleash to use environment variables for configuring OIDC       | yes      | true / false (false will turn off OIDC login)                 |
-| OIDC_DISCOVER_URL  | URL used to dynamically retrieve the OIDC configuration        | yes      | https://myoidchost.azure.com/.well-known/openid-configuration |
-| OIDC_CLIENT_ID     | The OIDC client ID of this application.                               | yes      | FB87266D-CDDB-4BCF-BB1F-8392FD0EDC1B                          |
-| OIDC_CLIENT_SECRET | Shared secret from OpenID server. Used to authenticate login requests | yes      | qjcVfeFjEfoYAF3AEsX2IMUWYuUzAbXO                              |
+### Required configuration
 
-Once these are configured OIDC should be working.
+<ParamField path="OIDC_ENABLED" type="boolean" required={true}>
+  Tells Unleash to use environment variables to configure OIDC. Setting this to `false` turns off OIDC login.
+</ParamField>
 
-### Step 2 (optional) - Auto create users from specific email domains
+<ParamField path="OIDC_DISCOVER_URL" type="string" required={true}>
+  URL used to dynamically retrieve the OIDC configuration. For example, `https://myoidchost.azure.com/.well-known/openid-configuration`.
+</ParamField>
 
-| Variable name                  | Purpose                                                                                        | Required | Example values              |
-|--------------------------------|------------------------------------------------------------------------------------------------|----------|-----------------------------|
-| OIDC_AUTO_CREATE               | Tells Unleash to auto create users from the specific domains in OIDC_AUTO_CREATE_EMAIL_DOMAINS | no       | true / false                |
-| OIDC_AUTO_CREATE_EMAIL_DOMAINS | A comma separated list of domains to auto-create users for, if not set accepts all domains     | no       | getunleash.io,getunleash.ai |
+<ParamField path="OIDC_CLIENT_ID" type="string" required={true}>
+  The OIDC client ID of this application. For example, `FB87266D-CDDB-4BCF-BB1F-8392FD0EDC1B`.
+</ParamField>
 
-### Step 3 (optional) Enable group syncing
+<ParamField path="OIDC_CLIENT_SECRET" type="string" required={true}>
+  Shared secret from the OpenID server, used to authenticate login requests.
+</ParamField>
 
-| Variable name               | Purpose                                                                                                  | Required   | Example values              |
-|-----------------------------|----------------------------------------------------------------------------------------------------------|------------|-----------------------------|
-| --------------------------- | -------------------------------------------------------------------------------------------------------- | ---------- | -----------------           |
-| OIDC_ENABLE_GROUP_SYNCING   | Tell Unleash to setup group syncing from OIDC login requests (defaults to false)                                             | No         | true or false               |
-| OIDC_GROUP_JSON_PATH        | a json path expression telling where in the response Unleash can find the group membership information   | No         | groups                      |
-| OIDC_ADD_GROUPS_SCOPE       | Tells Unleash to add the `groups` access scope to the request (defaults to false)                                            | No         | true / false                |
-| OIDC_DEFAULT_ROOT_ROLE      | Which role to grant users auto created from SSO, defaults to Viewer                                      | No         | 'Viewer', 'Editor', 'Admin' |
+### Auto-create users
 
-### Step 4 (optional) - Further customizations
+Configure these optional variables to automatically create Unleash users for SSO sign-ins from specific email domains.
 
-| Variable name                   | Purpose                                                                                                                                                                          | Required | Example values      |
-|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------------------|
-| OIDC_ACR_VALUES                 | Authentication Context Class Reference, used to request extra values in the acr claim returned from the server. If multiple values are required, they should be space separated. | no       |
-| OIDC_ID_TOKEN_SIGNING_ALGORITHM | Only use this if your provider is failing with unsupported algorithm, the default should be fine here                                                                            | No       | RS256, RS384, RS512 |
-| OIDC_ENABLE_SINGLE_SIGN_OUT     | Should Unleash call the single signout of the OIDC endpoint (defaults to false)
-| OIDC_EXTRA_SCOPES               | Space-separated list of additional scopes to request during login, beyond the default `openid email profile` and `groups` if group syncing is enabled.                           | No       | custom1 custom2     |
+<ParamField path="OIDC_AUTO_CREATE" type="boolean" default="false">
+  Tells Unleash to auto-create users from the domains in `OIDC_AUTO_CREATE_EMAIL_DOMAINS`.
+</ParamField>
+
+<ParamField path="OIDC_AUTO_CREATE_EMAIL_DOMAINS" type="string">
+  A comma-separated list of domains to auto-create users for. If not set, all domains are accepted. For example, `getunleash.io,getunleash.ai`.
+</ParamField>
+
+<ParamField path="OIDC_DEFAULT_ROOT_ROLE" type="string" default="Viewer">
+  The root role to grant users auto-created through SSO. Allowed values: `Viewer`, `Editor`, `Admin`.
+</ParamField>
+
+### Group syncing
+
+Configure these optional variables to sync groups from your identity provider to Unleash.
+
+<ParamField path="OIDC_ENABLE_GROUP_SYNCING" type="boolean" default="false">
+  Tells Unleash to set up group syncing from OIDC login requests.
+</ParamField>
+
+<ParamField path="OIDC_GROUP_JSON_PATH" type="string">
+  A JSON path expression that tells Unleash where to find the group membership information in the response. For example, `groups`.
+</ParamField>
+
+<ParamField path="OIDC_ADD_GROUPS_SCOPE" type="boolean" default="false">
+  Tells Unleash to add the `groups` access scope to the request.
+</ParamField>
+
+### Additional options
+
+The following variables are optional.
+
+<ParamField path="OIDC_ACR_VALUES" type="string">
+  Authentication Context Class Reference. Used to request extra values in the `acr` claim returned from the server. If multiple values are required, they should be space-separated.
+</ParamField>
+
+<ParamField path="OIDC_ID_TOKEN_SIGNING_ALGORITHM" type="string">
+  Use this only if your provider is failing with an unsupported algorithm; the default should be fine. Allowed values: `RS256`, `RS384`, `RS512`.
+</ParamField>
+
+<ParamField path="OIDC_ENABLE_SINGLE_SIGN_OUT" type="boolean" default="false">
+  Whether Unleash should call the OIDC single sign-out endpoint. Requires Unleash v8 or later.
+</ParamField>
+
+<ParamField path="OIDC_EXTRA_SCOPES" type="string">
+  Space-separated list of additional scopes to request during login, beyond the default `openid email profile` and the `groups` scope if group syncing is enabled. For example, `custom1 custom2`. Requires Unleash v8 or later.
+</ParamField>
