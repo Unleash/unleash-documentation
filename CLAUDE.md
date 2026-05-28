@@ -67,6 +67,16 @@ Navigation structure and tab placement are defined in `docs.yml`, not by the fil
 
 Fern components available in MDX: `<Note>`, `<Warning>`, `<Tip>`, `<Frame>`, `<Tabs>`, `<Tab>`, `<Steps>`, `<Accordion>`, `<AccordionGroup>`, `<Card>`, `<CardGroup>`, `<CodeBlock>`.
 
+### Availability badges
+
+To mark a feature as Beta (or another availability state), use the Fern badge span, not a `<Note>` or prose. Place it on its own line right after the heading, or inline after a list item's bold label:
+
+```html
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+```
+
+Used across SDK pages and other documentation pages where feature availability needs to be highlighted.
+
 ### Tabs
 
 The site has 7 tabs: Docs, APIs, SDKs, Enterprise Edge, Guides, Academy, Release notes. Each tab's navigation tree is defined under `navigation:` in `docs.yml`.
