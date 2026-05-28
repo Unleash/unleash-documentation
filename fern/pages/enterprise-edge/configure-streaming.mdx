@@ -1,0 +1,202 @@
+---
+title: Configure streaming
+description: Enable, monitor, and troubleshoot streaming mode for self-hosted Enterprise Edge.
+keywords: enterprise edge, streaming, real-time updates, SSE, delta, revision, monitoring, prometheus, alerting
+og:site_name: Unleash
+og:title: Configure streaming in Enterprise Edge
+max-toc-depth: 3
+last-updated: May 27, 2026
+---
+
+<Button small outlined className="version-button" href="/support/availability">Unleash v8</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.2.2</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+[Streaming](/unleash-edge#real-time-updates-with-streaming) mode replaces Edge's default polling loop with a persistent connection to upstream Unleash. Feature changes are pushed to Edge as they happen, reducing replication lag from the polling interval to near real time.
+
+This page covers how to enable streaming, monitor the health of streaming Edge instances, and troubleshoot common issues. For the streaming configuration option, see the [configuration reference](/unleash-edge/configure#synchronization-and-polling).
+
+## Prerequisites
+
+The requirements depend on how you host Edge and Unleash.
+
+<Tabs>
+<Tab title="Managed Edge, managed Unleash">
+
+- An Enterprise plan with the Enterprise Edge add-on
+- One Edge token per environment you want to stream. Unleash provisions and manages these tokens for you. Contact Unleash to set them up.
+
+</Tab>
+<Tab title="Self-hosted Edge, managed Unleash">
+
+- An Enterprise plan with the Enterprise Edge add-on
+- The [Enterprise Edge Docker image](https://hub.docker.com/r/unleashorg/unleash-edge-enterprise)
+- One configured Edge token per environment
+
+</Tab>
+<Tab title="Self-hosted Edge, self-hosted Unleash">
+
+- The [Enterprise Edge Docker image](https://hub.docker.com/r/unleashorg/unleash-edge-enterprise)
+- An Unleash Enterprise instance
+- A license key that includes Enterprise Edge
+- One configured Edge token per environment
+
+</Tab>
+</Tabs>
+
+## Enable streaming
+
+Start Edge with streaming enabled using either the CLI flag or the environment variable.
+
+<Tabs>
+<Tab title="CLI flag">
+
+```shell
+docker run --rm -it -p 3063:3063 \
+  unleashorg/unleash-edge-enterprise:latest edge \
+  --upstream-url https://<your-unleash-instance>.com \
+  --tokens <your_client_token> \
+  --streaming
+```
+
+</Tab>
+<Tab title="Environment variable">
+
+```shell
+docker run --rm -it -p 3063:3063 \
+  -e UPSTREAM_URL=https://<your-unleash-instance>.com \
+  -e TOKENS=<your_client_token> \
+  -e STREAMING=true \
+  unleashorg/unleash-edge-enterprise:latest edge
+```
+
+</Tab>
+</Tabs>
+
+A healthy start keeps the process running. If Edge exits immediately after starting, check the logs for startup validation errors such as an invalid token, missing license entitlement, or an upstream Unleash instance that does not support streaming. See [Troubleshooting](#troubleshooting) to resolve startup errors.
+
+Once Edge is running, you can verify that flag changes propagate correctly by connecting an SDK and observing flag evaluation, or by calling the client features endpoint directly:
+
+```shell
+curl -s \
+  -H "Authorization: <your_client_token>" \
+  http://localhost:3063/api/client/features
+```
+
+Make a controlled change in Unleash, such as toggling a flag or updating a strategy, then confirm the response reflects the change.
+
+<Note>
+In streaming mode, Edge also enables SDK-to-Edge streaming, which is in beta. This is not available in all SDKs and is not yet recommended for production environments.
+</Note>
+
+## Runtime behavior
+
+Once Edge is started with streaming enabled, it stays in streaming mode as long as the process is running. There is no automatic fallback to polling.
+
+If the upstream connection drops, errors out, or becomes idle, Edge reconnects and resumes from the last event ID it received. While the connection is recovering, Edge keeps serving its last known state to connected SDKs. Temporary network interruptions are expected in distributed systems and normally recover without operator action.
+
+Startup validation catches configuration issues such as missing license entitlement, invalid tokens, unsupported upstream versions, and unsupported token combinations. After a successful start, most operational checks focus on confirming that instances converge on the same revision after Unleash changes.
+
+## Self-hosted operations
+
+The following sections cover operational recommendations for self-hosted Edge deployments running in streaming mode.
+
+### Monitor streaming health
+
+Tracking the revision each instance has applied is the standard way to confirm your fleet is in sync. Every active instance serving the same environment and project scope should converge on the same revision after Unleash changes.
+
+Revision values only advance when there are changes to the upstream feature configuration. A stable revision is expected when no feature flags, strategies, segments, or related configuration have changed.
+
+You can inspect this in two ways.
+
+<Tabs>
+<Tab title="Enterprise Edge UI">
+
+In the Unleash Admin UI, go to **Admin settings > Enterprise Edge**.
+
+The page lists each registered Edge instance, the tokens it serves, and the revision ID each token has observed. Use this view to answer questions like:
+
+- Which Edge instances are connected
+- Which token scopes each instance serves
+- Whether one instance is behind the others
+- Whether a specific environment or project scope is stale
+
+If one instance reports an older revision than the rest of the fleet for the same token scope after a feature configuration change, that instance may still be reconnecting or catching up.
+
+For more details, see [Enterprise Edge observability](/concepts/enterprise-edge-observability).
+
+</Tab>
+<Tab title="Prometheus metric">
+
+Edge exports the latest delta revision it has applied as a Prometheus metric:
+
+```text
+delta_revision_id{environment="<environment>",projects="<project-list>"} <revision>
+```
+
+Your observability stack may add labels such as `app_name`, `instance_id`, `pod`, `region`, or `cluster`. Use those labels to compare revisions across instances.
+
+Compare revisions across instances by deployment label:
+
+```promql
+max by (cluster, namespace, pod, environment, projects) (
+  delta_revision_id{job="unleash-edge"}
+)
+```
+
+</Tab>
+</Tabs>
+
+### Monitor revision state across instances
+
+As part of your standard observability setup, you can configure an alert for when instances in your fleet report different revisions for the same token scope.
+
+Short-lived revision differences are expected while changes propagate through a distributed system. They are usually only worth investigating when they persist beyond the normal propagation window, for example 5 to 15 minutes.
+
+All Edge instances serving the same environment and project scope should eventually converge on the same revision, so the alert compares instances that share the same `environment` and `projects` labels. Consecutive upstream changes can extend the time where instances briefly report different revisions, because each new change gives the fleet another revision to apply.
+
+Example alert expression:
+
+```promql
+count_values by (environment, projects) (
+  "revision",
+  max by (pod, environment, projects) (
+    delta_revision_id{job="unleash-edge"}
+  )
+) > 1
+```
+
+Recommended settings:
+
+- Evaluate every minute
+- Require the condition to hold for at least five minutes
+- Include the affected `environment` and `projects` labels in the notification
+- Link the notification to the Enterprise Edge dashboard
+
+### Troubleshooting
+
+The following covers the cases that usually need operator attention when running Edge self-hosted with streaming enabled.
+
+<AccordionGroup>
+<Accordion title="Edge does not start">
+
+Edge validates its streaming configuration during startup. If the process exits immediately, the most useful source of information is the startup log entry that explains which validation failed.
+
+Check:
+- That you are connected to an Unleash Enterprise instance
+- That your license key includes Enterprise Edge
+- That the token exists and has access to the expected environment and projects
+- That the deployment uses one configured Edge token per environment
+- That Edge can reach the upstream Unleash instance and the client delta endpoint
+- If the same configuration works in one environment but not another, compare the token scope, license key, upstream URL, and network policy between those environments
+
+</Accordion>
+
+<Accordion title="Unexpected behavior or inconsistent responses">
+
+Edge streaming is designed to reconnect and rehydrate automatically, and brief transient states normally settle without intervention.
+
+If behavior does not match your expectations after a controlled feature configuration change, compare the affected instances in the Enterprise Edge UI or with `delta_revision_id`. Confirm whether the instances serving the same environment and project scope converge on the same revision.
+
+If the issue persists, collect the affected environment and project, the latest revision reported by each instance, the client request details, and relevant Edge logs. Restarting an affected node forces a fresh upstream connection, but it may first restore feature data from its configured backup storage. If the unexpected state is also present in that backup, restarting may not resolve it. If you need to restore polling while we investigate, disable streaming and contact our support team with the data you collected.
+
+</Accordion>
+</AccordionGroup>

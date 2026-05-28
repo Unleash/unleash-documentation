@@ -761,6 +761,10 @@ navigation:
           - page: Configure Enterprise Edge
             path: pages/enterprise-edge/configure.mdx
             slug: configure
+          - page: Configure streaming
+            availability: beta
+            path: pages/enterprise-edge/configure-streaming.mdx
+            slug: configure-streaming
           - page: Migrate from Unleash Proxy
             path: pages/enterprise-edge/migrate-from-proxy.mdx
             slug: migrate-from-proxy
