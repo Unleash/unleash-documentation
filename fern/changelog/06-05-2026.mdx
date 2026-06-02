@@ -1,0 +1,42 @@
+---
+description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated rollouts becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, an updated SDK onboarding experience, and read-only users.
+tags: ["Unleash", "Enterprise Edge", "MCP server"]
+---
+
+# Unleash v8.0.0
+
+## Announcement: Unleash open source moves to AGPLv3
+
+Starting with 8.0.0, the source code in the [primary Unleash GitHub repository](https://github.com/Unleash/unleash) and the [`unleash-server` npm package](https://www.npmjs.com/package/unleash-server) move from the Apache 2.0 license to the GNU Affero General Public License v3 (AGPLv3).
+
+Most users are unaffected:
+
+- Official open-source Docker images remain under Apache 2.0. Running a pre-built Unleash container without modifying the source is unaffected.
+- Unleash SDKs keep their current permissive licenses, so your application code is unaffected.
+- Unleash Enterprise and Unleash Cloud are unaffected. Your deployment, terms, and obligations are unchanged.
+
+The change applies if you modify the Unleash source and make it available to users over a network, for example as a public or commercial SaaS. In that case, AGPLv3 requires you to make your modified source available under the same license, or to contact us for a commercial license. For the full reasoning and a use-case breakdown, see [Evolving our open source commitment](https://www.getunleash.io/blog/unleash-moving-to-agplv3).
+
+## Automated release management now generally available
+
+[Release templates](/concepts/release-templates), [impact metrics](/concepts/impact-metrics), safeguards, and milestone progression are now generally available for all customers.
+
+Impact metrics are application-level time series, such as counters, gauges, and histograms for error rates, latency, and adoption, collected through Unleash SDKs. [Safeguards](/concepts/impact-metrics#configure-safeguards) let you set thresholds on those metrics, and [milestone progression](/concepts/impact-metrics#automate-release-progression) advances a release template to its next milestone when the signals stay healthy, pauses the rollout when a threshold is crossed, or disables the environment.
+
+## Remote MCP server now generally available
+
+The [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) is now generally available. It lets you connect MCP clients to a server hosted by your Unleash instance, without installing anything locally. Use it when developers cannot run MCP servers on their machines, or when you want to manage MCP access centrally.
+
+## Streaming between Unleash and Edge in beta
+
+[Unleash Edge](/unleash-edge) can now receive flag updates from Unleash as a real-time stream instead of polling. Flag changes propagate to your Edge nodes, and to your applications, in milliseconds. Streaming is available on both managed and self-hosted [Enterprise Edge](/unleash-edge#real-time-updates-with-streaming).
+
+## Improved project onboarding
+
+Getting your first flag live means connecting an SDK, wrapping your code, and enabling the flag, and it's easy to lose track of where you are in that sequence. To make onboarding smoother and connecting SDKs easier, the flag page now shows a contextual banner that points you to the next step based on your current setup state. The SDK connection wizard now also works for any SDK you add to a project, not only the first one, so connecting additional SDKs follows the same guided flow, with the setup steps organized into a collapsible checklist.
+
+## Read-only users
+
+You can now request read-only users for your Unleash instance. A read-only user holds the **Viewer** root role and can view all projects with the open or protected [collaboration mode](/concepts/project-collaboration-mode) without making changes. To grant visibility into a private project, add the user to that project with the **Reader** project role.
+
+A read-only user is converted to a regular user when they submit a change request, are granted access to a specific project, or create a personal access token.

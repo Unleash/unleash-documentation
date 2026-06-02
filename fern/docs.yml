@@ -124,7 +124,6 @@ navigation:
               - page: Release templates
                 path: pages/concepts/release-templates.mdx
               - page: Impact metrics
-                availability: beta
                 path: pages/concepts/impact-metrics.mdx
 
           - section: Identity and access
