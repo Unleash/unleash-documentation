@@ -242,9 +242,6 @@ navigation:
                 path: pages/single-sign-on/how-to-add-sso-saml-keycloak.mdx
               - page: Azure SAML
                 path: pages/single-sign-on/how-to-add-sso-azure-saml.mdx
-              - page: Google Auth
-                path: pages/single-sign-on/how-to-add-sso-google.mdx
-                hidden: true
               - page: Keycloak group syncing
                 path: pages/single-sign-on/how-to-setup-sso-keycloak-group-sync.mdx
               - page: Group SSO sync
