@@ -112,15 +112,15 @@ First, make sure your Unleash instance is running (locally or remotely) and gene
       -e STRICT=true \
       -e UPSTREAM_URL=<your_unleash_instance> \
       -e TOKENS='<your_backend_token>' \
-      unleashorg/unleash-edge \
+      unleashorg/unleash-edge-enterprise:<version> \
       edge
     ```
 
     <Info>
 
-    By default, the command above uses the latest `unleashorg/unleash-edge` tag.
+    Replace `<version>` with the Enterprise Edge version you want to run.
 
-    You can also pick a specific version from the list of [tags on Docker Hub](https://hub.docker.com/r/unleashorg/unleash-edge).
+    You can pick a specific version from the list of [tags on Docker Hub](https://hub.docker.com/r/unleashorg/unleash-edge-enterprise).
 
     </Info>
 

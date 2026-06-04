@@ -88,7 +88,7 @@ Set the `UPSTREAM_URL` environment variable to your Unleash instance URL (e.g., 
         docker run -p 3063:3063 \
         -e UPSTREAM_URL='<UPSTREAM_URL>' \
         -e TOKENS='<BACKEND_API_TOKEN>' \
-        unleashorg/unleash-edge:latest edge
+        unleashorg/unleash-edge-enterprise:<version> edge
         ```
     - To add configurations for other projects/environments dynamically after startup, you can send an authorized request to Edge using a different Backend API token:
         ```bash
