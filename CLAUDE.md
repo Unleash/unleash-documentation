@@ -26,12 +26,13 @@ fern/
   apis/                 # OpenAPI specs (committed, updated by CI)
     admin-api/          # All endpoints except Client and Frontend
     client-api/         # Client-tagged endpoints only
+    edge-api/           # Unleash Edge Client and Frontend compatible endpoints
     frontend-api/       # Frontend API-tagged endpoints only
   changelog/            # Release notes (Fern changelog tab)
   fonts/                # Custom Sen font
   assets/               # Logos, favicon, images
 scripts/
-  fetch-openapi.mjs     # Fetches OpenAPI specs from hosted Unleash instance
+  fetch-openapi.mjs     # Fetches OpenAPI specs from hosted Unleash and Edge instances
 ```
 
 ## Commands

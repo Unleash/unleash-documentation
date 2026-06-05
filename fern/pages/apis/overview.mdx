@@ -1,18 +1,19 @@
 ---
 title: API overview
-subtitle: Explore Unleash's Client, Frontend, and Admin APIs
+subtitle: Explore Unleash's Client, Frontend, Admin, and Edge APIs
 slug: /api
-description: "Unleash API docs: manage feature flags with Client, Frontend, and Admin APIs for SDKs, metrics, automation, and integrations."
+description: "Unleash API docs: manage feature flags with Client, Frontend, Admin, and Edge APIs for SDKs, metrics, automation, and integrations."
 last-updated: May 11, 2026
 ---
 
-Unleash provides a set of APIs to give you full programmatic control over your feature flags and to connect your applications and services to Unleash. There are three main APIs, each designed for a specific purpose.
+Unleash provides a set of APIs to give you full programmatic control over your feature flags and to connect your applications and services to Unleash. The main Unleash APIs are designed for SDK connections, frontend evaluation, and administration. Unleash Edge also exposes API-compatible endpoints for low-latency feature flag access.
 
 | API            | Path | Used by | Primary use case |
 |---------------|----|-----|---|
 | Client API | `<your-unleash-url>/api/client` | [Backend SDKs](/sdks/node), [Unleash Edge](/unleash-edge) | Fetch all [feature flags](/concepts/feature-flags) and [strategies](/concepts/activation-strategies) for server-side evaluation. |
 | Frontend API| `<your-unleash-url>/api/frontend` | [Frontend SDKs](/sdks/react) | Fetch enabled [feature flags](/concepts/feature-flags) for a specific [Unleash Context](/concepts/unleash-context). |
 | Admin API| `<your-unleash-url>/api/admin` | Admin UI, integrations, automation | Manage [feature flags](/concepts/feature-flags), [projects](/concepts/projects), [environments](/concepts/environments), [users](/concepts/rbac), and [integrations](/integrate). |
+| Unleash Edge API | `<your-edge-url>/api/client`, `<your-edge-url>/api/frontend` | Backend and frontend SDKs connected through [Unleash Edge](/unleash-edge) | Serve cached Client API data and evaluated Frontend API responses from Edge. |
 
 ## Client API
 
@@ -74,6 +75,14 @@ All requests require the `Authorization` header:
 curl -H "Authorization: YOUR_TOKEN" \
   https://your-unleash-instance.com/api/admin/projects
 ```
+
+## Unleash Edge API
+
+Unleash Edge exposes Client API and Frontend API compatible endpoints from your Edge deployment. Use these endpoints when SDKs connect to Edge instead of directly to your Unleash instance.
+
+**Base paths**: `<your-edge-url>/api/client`, `<your-edge-url>/api/frontend`
+
+**Primary use**: Reduce latency and load on your main Unleash instance by serving SDK requests from Edge.
 
 ## API authentication and tokens
 

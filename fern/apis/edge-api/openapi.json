@@ -1,0 +1,1954 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Unleash Edge",
+    "description": "Unleash edge is a proxy for Unleash. It can return both evaluated feature toggles as well as the raw data from Unleash's client API",
+    "version": "20.2.4"
+  },
+  "paths": {
+    "/api/client/features": {
+      "get": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "get_features",
+        "parameters": [
+          {
+            "name": "namePrefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return feature toggles for this token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientFeatures"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters used"
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "post_features",
+        "parameters": [
+          {
+            "name": "namePrefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return feature toggles for this token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientFeatures"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters used"
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/client/features/{feature_name}": {
+      "get": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "get_feature",
+        "parameters": [
+          {
+            "name": "feature_name",
+            "in": "path",
+            "description": "The name of the feature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a single feature toggle for this token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientFeature"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          },
+          "404": {
+            "description": "The feature was not found"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/client/metrics": {
+      "post": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "post_metrics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientMetrics"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted client metrics"
+          },
+          "403": {
+            "description": "Was not allowed to post metrics"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/client/metrics/bulk": {
+      "post": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "post_bulk_metrics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchMetricsRequestBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted bulk metrics"
+          },
+          "403": {
+            "description": "Was not allowed to post bulk metrics"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/client/register": {
+      "post": {
+        "tags": [
+          "Client API"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientApplication"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted client application registration"
+          },
+          "403": {
+            "description": "Was not allowed to register client application"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/frontend": {
+      "get": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_get_enabled_features",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "appName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "currentTime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "remoteAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "properties",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return enabled feature toggles for this token in evaluated state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrontendResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_post_enabled_features",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Context"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Return enabled feature toggles for this token in evaluated state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrontendResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/frontend/all": {
+      "get": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_get_all_features",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "appName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "currentTime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "remoteAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "properties",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return all known feature toggles for this token in evaluated (true|false) state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrontendResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_post_all_features",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Context"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Return all known feature toggles for this token in evaluated (true|false) state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrontendResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/frontend/client/metrics": {
+      "post": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_post_metrics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientMetrics"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted frontend client metrics"
+          },
+          "403": {
+            "description": "Was not allowed to post metrics"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/frontend/client/register": {
+      "post": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_register_client",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientApplication"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted frontend client application registration"
+          },
+          "403": {
+            "description": "Was not allowed to register client application"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/api/frontend/features/{feature_name}": {
+      "get": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_get_feature",
+        "parameters": [
+          {
+            "name": "feature_name",
+            "in": "path",
+            "description": "The name of the feature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "appName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "currentTime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "remoteAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "name": "properties",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return evaluated state for a single feature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluatedToggle"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          },
+          "404": {
+            "description": "The feature was not found"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Frontend API"
+        ],
+        "operationId": "frontend_post_feature",
+        "parameters": [
+          {
+            "name": "feature_name",
+            "in": "path",
+            "description": "The name of the feature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Context"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Return evaluated state for a single feature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluatedToggle"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Was not allowed to access features"
+          },
+          "404": {
+            "description": "The feature was not found"
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BTreeMap": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "propertyNames": {
+          "type": "string"
+        }
+      },
+      "BatchMetricsRequestBody": {
+        "type": "object",
+        "required": [
+          "applications",
+          "metrics"
+        ],
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientApplication"
+            }
+          },
+          "impactMetrics": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImpactMetric"
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientMetricsEnv"
+            }
+          }
+        }
+      },
+      "Bucket": {
+        "type": "object",
+        "required": [
+          "le",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "le": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "BucketMetricSample": {
+        "type": "object",
+        "required": [
+          "count",
+          "sum",
+          "buckets"
+        ],
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bucket"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "labels": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BTreeMap"
+              }
+            ]
+          },
+          "sum": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ClientApplication": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MetricsMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "appName",
+              "interval",
+              "started",
+              "strategies"
+            ],
+            "properties": {
+              "appName": {
+                "type": "string"
+              },
+              "connectVia": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/components/schemas/ConnectVia"
+                }
+              },
+              "connectionId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "environment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "instanceId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "interval": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 0
+              },
+              "projects": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "started": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "strategies": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ClientFeature": {
+        "type": "object",
+        "required": [
+          "name",
+          "enabled"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "dependencies": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/FeatureDependency"
+            }
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "impressionData": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "lastSeenAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stale": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "strategies": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Strategy"
+            }
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "variants": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Variant"
+            }
+          }
+        }
+      },
+      "ClientFeatures": {
+        "type": "object",
+        "required": [
+          "version",
+          "features"
+        ],
+        "properties": {
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientFeature"
+            }
+          },
+          "meta": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Meta"
+              }
+            ]
+          },
+          "query": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Query"
+              }
+            ]
+          },
+          "segments": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Segment"
+            }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "ClientMetrics": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MetricsMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "appName"
+            ],
+            "properties": {
+              "appName": {
+                "type": "string"
+              },
+              "bucket": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MetricBucket"
+                  }
+                ]
+              },
+              "connectionId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "environment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "impactMetrics": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/components/schemas/ImpactMetric"
+                }
+              },
+              "instanceId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "ClientMetricsEnv": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MetricsMetadata"
+          },
+          {
+            "type": "object",
+            "required": [
+              "featureName",
+              "appName",
+              "environment",
+              "timestamp",
+              "yes",
+              "no",
+              "variants"
+            ],
+            "properties": {
+              "appName": {
+                "type": "string"
+              },
+              "environment": {
+                "type": "string"
+              },
+              "featureName": {
+                "type": "string"
+              },
+              "no": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 0
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "variants": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
+                "propertyNames": {
+                  "type": "string"
+                }
+              },
+              "yes": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 0
+              }
+            }
+          }
+        ]
+      },
+      "ConnectVia": {
+        "type": "object",
+        "required": [
+          "appName",
+          "instanceId"
+        ],
+        "properties": {
+          "appName": {
+            "type": "string"
+          },
+          "instanceId": {
+            "type": "string"
+          }
+        }
+      },
+      "Constraint": {
+        "type": "object",
+        "required": [
+          "contextName",
+          "operator"
+        ],
+        "properties": {
+          "caseInsensitive": {
+            "type": "boolean"
+          },
+          "contextName": {
+            "type": "string"
+          },
+          "inverted": {
+            "type": "boolean"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "values": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "appName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currentTime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "environment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "properties": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "remoteAddress": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "EvaluatedToggle": {
+        "type": "object",
+        "required": [
+          "name",
+          "enabled",
+          "variant",
+          "impression_data",
+          "impressionData"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "impressionData": {
+            "type": "boolean"
+          },
+          "impression_data": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/EvaluatedVariant"
+          }
+        }
+      },
+      "EvaluatedVariant": {
+        "type": "object",
+        "required": [
+          "name",
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "payload": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Payload"
+              }
+            ]
+          }
+        }
+      },
+      "FeatureDependency": {
+        "type": "object",
+        "required": [
+          "feature"
+        ],
+        "properties": {
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "feature": {
+            "type": "string"
+          },
+          "variants": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FrontendResult": {
+        "type": "object",
+        "required": [
+          "toggles"
+        ],
+        "properties": {
+          "toggles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvaluatedToggle"
+            }
+          }
+        }
+      },
+      "ImpactMetric": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "help",
+              "samples",
+              "type"
+            ],
+            "properties": {
+              "help": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "samples": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NumericMetricSample"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "counter"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "help",
+              "samples",
+              "type"
+            ],
+            "properties": {
+              "help": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "samples": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NumericMetricSample"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "gauge"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "help",
+              "samples",
+              "type"
+            ],
+            "properties": {
+              "help": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "samples": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BucketMetricSample"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "histogram"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "etag": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "queryHash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revisionId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      },
+      "MetricBucket": {
+        "type": "object",
+        "required": [
+          "start",
+          "stop",
+          "toggles"
+        ],
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "stop": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "toggles": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ToggleStats"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MetricsMetadata": {
+        "type": "object",
+        "properties": {
+          "platformName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "platformVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sdkType": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SdkType"
+              }
+            ]
+          },
+          "sdkVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "yggdrasilVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "NumericMetricSample": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "labels": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BTreeMap"
+              }
+            ]
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Operator": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "NOT_IN"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "IN"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "STR_ENDS_WITH"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "STR_STARTS_WITH"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "STR_CONTAINS"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "NUM_EQ"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "NUM_GT"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "NUM_GTE"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "NUM_LT"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "NUM_LTE"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "DATE_AFTER"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "DATE_BEFORE"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "SEMVER_EQ"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "SEMVER_LT"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "SEMVER_GT"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "SEMVER_LTE"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "IN_CIDR"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "SEMVER_GTE"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "REGEX"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "UNKNOWN"
+            ],
+            "properties": {
+              "UNKNOWN": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "Override": {
+        "type": "object",
+        "required": [
+          "contextName",
+          "values"
+        ],
+        "properties": {
+          "contextName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Payload": {
+        "type": "object",
+        "required": [
+          "type",
+          "value"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "Query": {
+        "type": "object",
+        "properties": {
+          "environment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "inlineSegmentConstraints": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "namePrefix": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "projects": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SdkType": {
+        "type": "string",
+        "enum": [
+          "frontend",
+          "backend"
+        ]
+      },
+      "Segment": {
+        "type": "object",
+        "required": [
+          "id",
+          "constraints"
+        ],
+        "properties": {
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Constraint"
+            }
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Strategy": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "constraints": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Constraint"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "segments": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "sortOrder": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "variants": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/StrategyVariant"
+            }
+          }
+        }
+      },
+      "StrategyVariant": {
+        "type": "object",
+        "required": [
+          "name",
+          "weight"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "payload": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Payload"
+              }
+            ]
+          },
+          "stickiness": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ToggleStats": {
+        "type": "object",
+        "required": [
+          "no",
+          "yes"
+        ],
+        "properties": {
+          "no": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "variants": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "yes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "Variant": {
+        "type": "object",
+        "required": [
+          "name",
+          "weight"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "overrides": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Override"
+            }
+          },
+          "payload": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Payload"
+              }
+            ]
+          },
+          "stickiness": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "weightType": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/WeightType"
+              }
+            ]
+          }
+        }
+      },
+      "WeightType": {
+        "type": "string",
+        "enum": [
+          "fix",
+          "variable"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "Authorization": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Client API",
+      "description": "Unleash Edge client endpoints"
+    },
+    {
+      "name": "Frontend API",
+      "description": "Unleash Edge frontend endpoints"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://edge.unleash-instance.example.com",
+      "description": "Your Unleash Edge instance (replace with your actual URL)"
+    }
+  ]
+}
