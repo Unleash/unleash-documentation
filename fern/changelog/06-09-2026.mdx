@@ -1,5 +1,5 @@
 ---
-description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated rollouts becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, an updated SDK onboarding experience, and read-only users.
+description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated release management becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, an updated SDK onboarding experience, a redesigned user access overview, and read-only users.
 tags: ["Unleash", "Enterprise Edge", "MCP server"]
 ---
 
@@ -19,9 +19,9 @@ The change applies if you modify the Unleash source and make it available to use
 
 ## Automated release management now generally available
 
-[Release templates](/concepts/release-templates), [impact metrics](/concepts/impact-metrics), safeguards, and milestone progression are now generally available for all customers.
+[Release templates](/concepts/release-templates), [impact metrics](/concepts/impact-metrics), [safeguards](/concepts/impact-metrics#configure-safeguards), and [milestone progression](/concepts/impact-metrics#automate-release-progression) are now generally available for all customers.
 
-Impact metrics are application-level time series, such as counters, gauges, and histograms for error rates, latency, and adoption, collected through Unleash SDKs. [Safeguards](/concepts/impact-metrics#configure-safeguards) let you set thresholds on those metrics, and [milestone progression](/concepts/impact-metrics#automate-release-progression) advances a release template to its next milestone when the signals stay healthy, pauses the rollout when a threshold is crossed, or disables the environment.
+Impact metrics are application-level time series, such as counters, gauges, and histograms for error rates, latency, and adoption. They can be recorded by Unleash SDKs or queried from an existing Prometheus or VictoriaMetrics instance. Safeguards let you set thresholds on those metrics that automatically pause a rollout or disable an environment when a metric crosses the limit. Milestone progression advances a release template to its next milestone when the metrics stay healthy for a configured interval, removing the need to step rollouts forward manually.
 
 ## Remote MCP server now generally available
 
@@ -33,10 +33,12 @@ The [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) is now general
 
 ## Improved project onboarding
 
-Getting your first flag live means connecting an SDK, wrapping your code, and enabling the flag, and it's easy to lose track of where you are in that sequence. To make onboarding smoother and connecting SDKs easier, the flag page now shows a contextual banner that points you to the next step based on your current setup state. The SDK connection wizard now also works for any SDK you add to a project, not only the first one, so connecting additional SDKs follows the same guided flow, with the setup steps organized into a collapsible checklist.
+To make connecting SDKs easier, the flag page now shows a contextual banner that points you to the next step based on your current setup state. The SDK connection wizard also works for any SDK you add to a project, not only the first one, with the setup steps organized into a collapsible checklist.
+
+## Redesigned access overview
+
+The [access overview page](/concepts/rbac#view-a-users-roles-and-permissions) is redesigned to give admins and individual users a clearer view of a user's instance and project access in one place.
 
 ## Read-only users
 
-You can now request read-only users for your Unleash instance. A read-only user holds the **Viewer** root role and can view all projects with the open or protected [collaboration mode](/concepts/project-collaboration-mode) without making changes. To grant visibility into a private project, add the user to that project with the **Reader** project role.
-
-A read-only user is converted to a regular user when they submit a change request, are granted access to a specific project, or create a personal access token.
+You can now request read-only users for your Unleash instance. A read-only user holds the **Viewer** root role and can view all projects with the open or protected [collaboration mode](/concepts/project-collaboration-mode) without making changes.

@@ -292,9 +292,12 @@ role that encapsulates the needed permissions.
 
 <Button small outlined className="version-button" href="/support/availability">v6.9</Button>
 
-The access overview page helps administrators see exactly what a user can do in Unleash and which roles grant those permissions. You can explore permissions at the root level or for specific environments and projects.
+The access overview page shows exactly what a user can do in Unleash, in a single view. The page is organized into two sections:
 
-To view a user's permissions, go to **Admin settings > User config > Users**. Select a user and click **Access overview**.
+- **Instance access**: The user's root role, shown as a badge next to **Root access**. Expand the row to see every root-level permission and whether the user has it.
+- **Project access**: A count of the [projects](/concepts/projects) the user can access. Use the project and environment filters to drill into a specific project. Each project expands to show feature and strategy permissions, plus a per-environment breakdown.
+
+To view a user's access overview, go to **Admin settings > User config > Users**, select a user, and click **Access overview**. Individual users can see the same view for themselves from their profile settings.
 
 
 ## User groups
