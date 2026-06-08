@@ -51,11 +51,12 @@ The following is a list of feature flag types, their purpose, and expected lifet
 
 | Feature flag type | Used to                                                                                                                                                       | Expected lifetime |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| Release             | Manage the deployment of new or incomplete features.                                                                                          | 40 days           |
+| Release             | Manage the release of new or incomplete features.                                                                                          | 40 days           |
 | Experiment          | Perform multivariate or A/B testing.                                                                                                                              | 40 days           |
 | Operational         | Transition between technical implementations with minimal risk.                                                                                                            | 7 days            |
 | Kill switch         | Gracefully degrade system functionality. | Permanent         |
 | Permission          | Control feature access based on user roles or entitlements.                                                                                             | Permanent         |
+| Sunset              | Used to manage features we want to remove.                                                                                                              | 90 days         |
 
 To learn more, visit [Types of feature flags](/get-started/what-is-a-feature-flag#types-of-feature-flags).
 
