@@ -15,6 +15,7 @@ layout:
   page-width: full
   tabs-placement: header
   content-width: 55rem
+  mobile-toc: true
 
 theme:
   sidebar: minimal

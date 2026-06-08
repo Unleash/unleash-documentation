@@ -62,14 +62,15 @@ main {
     }
 }
 
-.fern-layout-guide,
-.fern-layout-reference .fern-layout-page {
+.fern-layout-content-wrapper {
     background-color: var(--container-bg-color);
     border-radius: 0.75rem;
-    margin-top: 2rem;
+    overflow: clip;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05),
                 0 0px 1px 0 rgba(0, 0, 0, 0.1);
     max-width: calc(var(--content-width, 880px) + var(--page-padding, 2rem) * 2);
+    margin: auto;
+    margin-top: 2rem;
 }
 
 /* =====================================
@@ -83,16 +84,14 @@ main {
 
 /* Below 1024px: sidebar collapses to mobile menu */
 @media (max-width: 1024px) {
-    .fern-layout-guide,
-    .fern-layout-reference .fern-layout-page {
+    .fern-layout-content-wrapper {
         margin-top: 1rem;
     }
 }
 
 /* Small screens: keep container look with small edge margins, reduced rounding */
 @media (max-width: 768px) {
-    .fern-layout-guide,
-    .fern-layout-reference .fern-layout-page {
+    .fern-layout-content-wrapper {
         border-radius: 0.5rem;
         margin-left: 8px;
         margin-right: 8px;
