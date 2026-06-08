@@ -503,7 +503,7 @@ When making changes to this codebase, follow these feature flag practices:
    - `operational`: For system behavior toggles
    - `kill-switch`: For emergency shutdowns
    - `permission`: For role-based access
-   - 'sunset': Manage features we want to remove 
+   - `sunset`: For planned feature removal
 
 4. **Prefer reuse**: Before creating a new flag, check if a similar flag already
    exists using the detect_flag tool.
@@ -743,7 +743,7 @@ Examples: `checkout-stripe-integration`, `auth-sso-google`.
 - `operational` – System behavior toggles
 - `kill-switch` – Emergency shutdowns
 - `permission` – Role-based access
-- 'sunset' - Manage features we want to remove 
+- `sunset` – Planned feature removal
 
 ## Rules
 - Always use detect_flag before creating a new flag
