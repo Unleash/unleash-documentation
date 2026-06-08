@@ -29,7 +29,7 @@ own [custom root roles](#custom-root-roles) and [custom project roles](#custom-p
 |------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
 | **Admin**  | Root    | Users with the root admin role have superuser access to Unleash and can perform any operation within the Unleash platform.                                                                                                                                                                                                                                          | All versions       |
 | **Editor** | Root    | Users with the root editor role have access to most features in Unleash, but they cannot manage users and roles in the root scope. Editors are project owners for projects they create and get superuser rights within the context of those projects. Users with the editor role will also get access to most permissions on the default project by default. | All versions       |
-| **Viewer** | Root    | Users with the root viewer role can only read root resources in Unleash. Viewers can be added to specific projects as project members. Users with the viewer role may not view API tokens. Read-only access is also available as an optional add-on: a read-only user holds the Viewer root role and is automatically converted to a regular user when they submit a change request, are granted access to a project, or create a personal access token.                                                                                                                                                                          | All versions       |
+| **Viewer** | Root    | Users with the root viewer role can only read root resources in Unleash. Viewers can be added to specific projects as project members. Users with the viewer role may not view API tokens.                                                                                                                                                                          | All versions       |
 | **Owner**  | Project | Users with the project owner role have full control over the project, and can add and manage other users within the project context, manage feature flags within the project, and control advanced project features like archiving and deleting the project.                                                                                                      | [Enterprise](https://www.getunleash.io/pricing) |
 | **Member** | Project | Users with the project member role are allowed to view, create, and update feature flags within a project, but have limited permissions in regards to managing the project's user access and can not archive or delete the project.                                                                                                                               | [Enterprise](https://www.getunleash.io/pricing) |
 
@@ -275,6 +275,14 @@ You can assign the following permissions on a per-environment level within the p
 | Apply a change request       | Apply change requests in the environment.                                                                                                                                                                                                                                                                                               |
 | Skip change requests         | Skip the change request process for a project and environment where change requests are enabled.  |
 
+## Read-only users
+
+<Button small outlined className="version-button" href="/support/availability">v8.0</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+Read-only access is available as an optional add-on. A read-only user holds the **Viewer** root role and can view all projects with the open or protected [collaboration mode](/concepts/project-collaboration-mode) without making changes. To grant visibility into a private project, add the user to that project with the **Reader** project role.
+
+A read-only user is automatically converted to a regular user when they submit a change request, are granted access to a specific project, or create a personal access token.
+
 ## Multiple project roles
 
 <Button small outlined className="version-button" href="/support/availability">v5.6</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -296,9 +304,9 @@ role that encapsulates the needed permissions.
 The access overview page shows exactly what a user can do in Unleash, in a single view. The page is organized into two sections:
 
 - **Instance access**: The user's root role, shown as a badge next to **Root access**. Expand the row to see every root-level permission and whether the user has it.
-- **Project access**: A count of the [projects](/concepts/projects) the user can access. Use the project and environment filters to drill into a specific project. Each project expands to show feature and strategy permissions, plus a per-environment breakdown.
+- **Project access**: A count of the [projects](/concepts/projects) the user can access. Use the project and environment filters to view a specific project. Each project expands to show feature and strategy permissions, and a per-environment breakdown.
 
-To view a user's access overview, go to **Admin settings > User config > Users**, select a user, and click **Access overview**. Individual users can see the same view for themselves from their profile settings.
+To view a user's access overview, go to **Admin settings > User config > Users**, select a user, and click **Access overview**.
 
 
 ## User groups

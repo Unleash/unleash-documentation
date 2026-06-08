@@ -1,13 +1,15 @@
 ---
-description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated release management becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, an updated SDK onboarding experience, a redesigned user access overview, and read-only users.
+description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated release management becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, improved project onboarding, a redesigned user access overview, and read-only users.
 tags: ["Unleash", "Enterprise Edge", "MCP server"]
 ---
 
 # Unleash v8.0.0
 
+If you self-host Unleash, review the [v7 to v8 migration guide](/deploy/upgrading-unleash#upgrading-from-v7-to-v8) before you upgrade. No API endpoints were removed, but several deprecated schema properties have been.
+
 ## Announcement: Unleash open source moves to AGPLv3
 
-Starting with 8.0.0, the source code in the [primary Unleash GitHub repository](https://github.com/Unleash/unleash) and the [`unleash-server` npm package](https://www.npmjs.com/package/unleash-server) move from the Apache 2.0 license to the GNU Affero General Public License v3 (AGPLv3).
+Starting with Unleash v8, the source code in the [primary Unleash GitHub repository](https://github.com/Unleash/unleash) and the [`unleash-server` npm package](https://www.npmjs.com/package/unleash-server) move from the Apache 2.0 license to the GNU Affero General Public License v3 (AGPLv3).
 
 Most users are unaffected:
 
@@ -19,7 +21,7 @@ The change applies if you modify the Unleash source and make it available to use
 
 ## Automated release management now generally available
 
-[Release templates](/concepts/release-templates), [impact metrics](/concepts/impact-metrics), [safeguards](/concepts/impact-metrics#configure-safeguards), and [milestone progression](/concepts/impact-metrics#automate-release-progression) are now generally available for all customers.
+[Release templates](/concepts/release-templates), [impact metrics](/concepts/impact-metrics), [safeguards](/concepts/impact-metrics#configure-safeguards), and [milestone progression](/concepts/impact-metrics#automate-release-progression) are now generally available.
 
 Impact metrics are application-level time series, such as counters, gauges, and histograms for error rates, latency, and adoption. They can be recorded by Unleash SDKs or queried from an existing Prometheus or VictoriaMetrics instance. Safeguards let you set thresholds on those metrics that automatically pause a rollout or disable an environment when a metric crosses the limit. Milestone progression advances a release template to its next milestone when the metrics stay healthy for a configured interval, removing the need to step rollouts forward manually.
 
@@ -33,7 +35,7 @@ The [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) is now general
 
 ## Improved project onboarding
 
-To make connecting SDKs easier, the flag page now shows a contextual banner that points you to the next step based on your current setup state. The SDK connection wizard also works for any SDK you add to a project, not only the first one, with the setup steps organized into a collapsible checklist.
+We've further improved the project onboarding experience. The project page now shows a three-step **Project setup** checklist that tracks creating a feature flag, connecting one or more SDKs, and toggling the flag on and off to confirm metrics flow back to Unleash. On the flag page, a contextual banner points you to the next step based on your current setup state. SDK setup now also works for any SDK you add to a project, not only the first one.
 
 ## Redesigned access overview
 
