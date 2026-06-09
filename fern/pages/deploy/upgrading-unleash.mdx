@@ -15,7 +15,11 @@ Before you begin any major version upgrade, we strongly recommend performing a [
 
 ## Upgrading from v7 to v8
 
-Unleash v8, released in June 2026, includes an open-source license change and removes several deprecated schema properties. Ensure you address the following before or during your upgrade to v8.
+Unleash v8, released in June 2026, raises the minimum tested PostgreSQL version, includes an open-source license change, and removes several deprecated schema properties. Ensure you address the following before or during your upgrade to v8.
+
+### Database requirement: PostgreSQL v15+
+
+Unleash v8 raises the minimum tested PostgreSQL version to **15**. Unleash v8 does not currently use any PostgreSQL 15-only features, so existing instances on PostgreSQL 14 may continue to work. However, only PostgreSQL 15 and later are officially tested and supported. Plan to upgrade your PostgreSQL instance before or alongside your Unleash upgrade.
 
 ### Open-source license change to AGPLv3
 
