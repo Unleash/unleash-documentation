@@ -5,7 +5,7 @@ og:title: Feature flags - Release, test, and manage features without changing co
 description: Feature flags are a core concept of Unleash. They allow you to release, test, and manage features and functionality across your application without changing the source code.
 keywords: feature flags, activation strategies, environments, lifecycle, dependencies
 max-toc-depth: 3
-last-updated: May 14, 2026
+last-updated: June 8, 2026
 ---
 
 ## Overview
@@ -51,11 +51,12 @@ The following is a list of feature flag types, their purpose, and expected lifet
 
 | Feature flag type | Used to                                                                                                                                                       | Expected lifetime |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| Release             | Manage the deployment of new or incomplete features.                                                                                          | 40 days           |
+| Release             | Manage the release of new or incomplete features.                                                                                          | 40 days           |
 | Experiment          | Perform multivariate or A/B testing.                                                                                                                              | 40 days           |
 | Operational         | Transition between technical implementations with minimal risk.                                                                                                            | 7 days            |
 | Kill switch         | Gracefully degrade system functionality. | Permanent         |
 | Permission          | Control feature access based on user roles or entitlements.                                                                                             | Permanent         |
+| Sunset              | Coordinate the planned removal of an existing feature.                                                                                                              | 90 days           |
 
 To learn more, visit [Types of feature flags](/get-started/what-is-a-feature-flag#types-of-feature-flags).
 

@@ -5,6 +5,7 @@ keywords: feature flags, feature toggles, progressive rollouts, trunk-based deve
 og:site_name: Unleash Documentation
 og:title: What is a Feature Flag? Complete Guide to Feature Flags
 max-toc-depth: 2
+last-updated: June 8, 2026
 ---
 
 Feature flags allow you to release, test, and manage features and functionality across your application without redeploying. Organizations use added control and flexibility to deliver more and higher quality features with reduced cost, time, and risk.
@@ -16,7 +17,7 @@ In this guide, we'll introduce you to the basics of feature flags and why so man
 - Feature flags let you turn features on or off at runtime without changing source code or redeploying.
 - They decouple code deployment from feature release, giving teams control over what users see and when.
 - Developers use them to reduce risk, run production experiments, and speed up release cycles.
-- Release, experiment, kill switch, operational, and permission flags each address a different stage or need in the feature lifecycle.
+- Release, experiment, kill switch, operational, permission, and sunset flags each address a different stage or need in the feature lifecycle.
 - [FeatureOps](https://featureops.io/) is the discipline that extends feature flags into autonomous release workflows guided by real production signals.
 
 ## What is a feature flag?
@@ -163,6 +164,16 @@ Operational flags should be short-lived, existing only long enough to confirm th
 - **Lifespan**: Varies from short-lived to permanent.
 
 Permission flags allow for features to be selectively enabled for different user segments, such as internal, beta, or premium users. They help with phased feature exposure and help drive engagement and value differentiation. Their lifespan can vary significantly. While they might be permanent for certain features exclusive to specific user tiers, it's crucial to distinguish these from short-lived feature flags. For features eventually intended for broader release, the toggles should be transitional, aligning with broader access strategies and product evolution.
+</Tab>
+
+<Tab title="Sunset flags">
+- **Purpose**: Coordinate the planned removal of an existing feature.
+- **Benefits**: A controlled, observable path to retirement that reduces the risk of breaking dependent users or systems.
+- **Lifespan**: Short-lived; typically a few weeks to a few months, ending when the feature is fully removed.
+
+Sunset flags wrap a feature that you plan to retire, letting you gradually disable it for selected user segments while you monitor the impact. You can pause the rollout or re-enable the feature if downstream issues surface, then remove the code path once the feature is fully decommissioned.
+
+Sunset flags are inherently temporary. Their lifespan should align with the deprecation timeline you communicate to users and dependent teams. Once the feature is removed from the codebase, archive the flag to avoid leaving stale references behind.
 </Tab>
 </Tabs>
 
