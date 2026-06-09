@@ -5,7 +5,7 @@ og:title: Release Management Overview - Unleash Documentation
 description: Release management helps you standardize, automate and safeguard your feature rollouts with release templates, impact metrics, automated progressions and safeguards.
 keywords: release management, release templates, impact metrics, safeguards, automated rollouts, feature flags, milestones
 max-toc-depth: 3
-last-updated: May 14, 2026
+last-updated: June 9, 2026
 ---
 
 Release management in Unleash helps you standardize, automate and safeguard your feature rollouts. Instead of manually controlling each stage of a release, you can define a reusable, structured rollout process that progresses automatically while monitoring application health to prevent issues from affecting users.
@@ -71,9 +71,6 @@ When you apply a release template to a feature flag in a specific environment, U
 
 ### Automated progressions
 
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
-
-
 Automated progressions eliminate manual [milestone](/concepts/release-templates#milestone) transitions. You configure time intervals for each milestone, and Unleash automatically advances to the next stage when the interval elapses.
 
 For example, you might configure a release to:
@@ -86,8 +83,6 @@ For example, you might configure a release to:
 Automated progressions reduce the operational overhead of managing releases, especially for teams shipping features frequently or outside standard working hours.
 
 ### Impact metrics and safeguards
-
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
 [Impact metrics](/concepts/impact-metrics) connect application data to your release process. You define metrics in your application code using the Unleash SDK, such as error counts, request latency, or memory usage.
 Unleash stores and visualizes these metrics, allowing you to monitor feature health directly in the Admin UI.
