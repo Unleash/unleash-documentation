@@ -1,5 +1,5 @@
 ---
-description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated release management becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, improved project onboarding, a redesigned user access overview, and read-only users.
+description: Review Unleash v8.0.0 release notes, covering the move to AGPLv3, automated release management becoming generally available, the remote MCP server becoming generally available, streaming between Unleash and Edge in beta, improved project onboarding, a redesigned user access overview, the new sunset flag type, and read-only users.
 tags: ["Unleash", "Enterprise Edge", "MCP server"]
 ---
 
@@ -40,6 +40,10 @@ We've further improved the project onboarding experience. The project page now s
 ## Redesigned access overview
 
 The [access overview page](/concepts/rbac#view-a-users-roles-and-permissions) is redesigned to give admins and individual users a clearer view of a user's instance and project access in one place.
+
+## New `sunset` flag type
+
+We introduced a new `sunset` [flag type](/concepts/feature-flags#feature-flag-types) to help you coordinate the planned removal of an existing feature. Use it to wrap a feature you plan to retire, so you can gradually disable it for selected user segments while monitoring the impact, and pause or re-enable the rollout if downstream issues surface.
 
 ## Read-only users
 
