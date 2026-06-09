@@ -19,6 +19,20 @@ For an overview of how Unleash SDKs work, including offline behavior, feature co
 - MacOS: 12.15
 - iOS: 12
 
+## Installation
+
+#### Swift Package Manager
+
+In your `Package.swift` dependencies:
+
+```swift
+.package(url: "https://github.com/Unleash/unleash-ios-sdk.git", from: "LATEST_VERSION")
+```
+
+#### Xcode
+
+**File → Add Package Dependencies**, enter `https://github.com/Unleash/unleash-ios-sdk`.
+
 ## Usage
 
 To get started, import the SDK and initialize the Unleash client:
@@ -347,10 +361,6 @@ func handleImpressionEvent(_ payload: Any?) {
 
 unleash.subscribe(.impression, callback: handleImpressionEvent)
 ```
-
-## Installation
-
-In your Xcode project, go to File -> Swift Packages -> Add Package Dependency, supply the link to this repository, and set the appropriate package constraints (typically up to next major version).
 
 ## Migrating to v2
 
