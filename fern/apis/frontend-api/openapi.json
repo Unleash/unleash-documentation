@@ -8,7 +8,7 @@
   ],
   "info": {
     "title": "Unleash API",
-    "version": "7.4.1"
+    "version": "8.0.0"
   },
   "security": [
     {
@@ -239,22 +239,22 @@
           "name": {
             "type": "string",
             "description": "The name of the addon type. When creating new addons, this goes in the payload's `type` field.",
-            "example": "slack"
+            "example": "my-app"
           },
           "displayName": {
             "type": "string",
             "description": "The addon type's name as it should be displayed in the admin UI.",
-            "example": "Slack"
+            "example": "App for Unleash"
           },
           "documentationUrl": {
             "type": "string",
             "description": "A URL to where you can find more information about using this addon type.",
-            "example": "https://docs.getunleash.io/docs/addons/slack"
+            "example": "https://docs.getunleash.io/integrate/"
           },
           "description": {
             "type": "string",
             "description": "A description of the addon type.",
-            "example": "Allows Unleash to post updates to Slack."
+            "example": "The Unleash App for X."
           },
           "howTo": {
             "type": "string",
@@ -266,8 +266,8 @@
             "description": "A list of [Unleash tag types](https://docs.getunleash.io/concepts/feature-flags#tags) that this addon uses. These tags will be added to the Unleash instance when an addon of this type is created.",
             "example": [
               {
-                "name": "slack",
-                "description": "Slack tag used by the slack-addon to specify the slack channel.",
+                "name": "addon-name",
+                "description": "Addon tag used by the addon to specify the unleash config.",
                 "icon": "S"
               }
             ],
@@ -284,7 +284,7 @@
             "example": [
               {
                 "name": "url",
-                "displayName": "Slack webhook URL",
+                "displayName": "Addon URL",
                 "description": "(Required)",
                 "type": "url",
                 "required": true,
@@ -294,7 +294,7 @@
                 "name": "username",
                 "displayName": "Username",
                 "placeholder": "Unleash",
-                "description": "The username to use when posting messages to slack. Defaults to \"Unleash\".",
+                "description": "The username to use when using the addon.",
                 "type": "text",
                 "required": false,
                 "sensitive": false
@@ -303,7 +303,7 @@
                 "name": "emojiIcon",
                 "displayName": "Emoji Icon",
                 "placeholder": ":unleash:",
-                "description": "The emoji_icon to use when posting messages to slack. Defaults to \":unleash:\".",
+                "description": "The emoji_icon to use when posting messages. Defaults to \":unleash:\".",
                 "type": "text",
                 "required": false,
                 "sensitive": false
@@ -311,7 +311,7 @@
               {
                 "name": "defaultChannel",
                 "displayName": "Default channel",
-                "description": "(Required) Default channel to post updates to if not specified in the slack-tag",
+                "description": "(Required) Default channel to post updates to if not specified in the addon-tag",
                 "type": "text",
                 "required": true,
                 "sensitive": false
@@ -352,17 +352,17 @@
               "url": {
                 "type": "string",
                 "description": "A URL to where the addon configuration should redirect to install addons of this type.",
-                "example": "https://app-for-slack.getunleash.io/install"
+                "example": "https://app-for-install.getunleash.io/install"
               },
               "title": {
                 "type": "string",
                 "description": "The title of the installation configuration. This will be displayed to the user when installing addons of this type.",
-                "example": "App for Slack installation"
+                "example": "App for Unleash installation"
               },
               "helpText": {
                 "type": "string",
                 "description": "The help text of the installation configuration. This will be displayed to the user when installing addons of this type.",
-                "example": "Clicking the Install button will send you to Slack to initiate the installation procedure for the Unleash App for Slack for your workspace"
+                "example": "Clicking the Install button will send you to Addon to initiate the installation procedure for the Unleash App for App for your workspace"
               }
             }
           },
@@ -391,7 +391,28 @@
                 "text": {
                   "type": "string",
                   "description": "The text of the alert. This is what will be displayed to the user.",
-                  "example": "Please ensure you have the Unleash App for Slack installed in your Slack workspace if you haven't installed it already. If you want the Unleash App for Slack bot to post messages to private channels, you'll need to invite it to those channels."
+                  "example": "Please ensure you have the Unleash App for X installed."
+                },
+                "link": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "url"
+                  ],
+                  "description": "An optional link to display at the end of the alert text.",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "description": "The URL of the link.",
+                      "example": "https://docs.getunleash.io/integrate/slack-app"
+                    },
+                    "title": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "The display title of the link.",
+                      "example": "Read these instructions to migrate to new Slack App smoothly."
+                    }
+                  }
                 }
               }
             }
@@ -426,7 +447,7 @@
                 "name": "webhook",
                 "displayName": "Webhook",
                 "description": "A Webhook is a generic way to post messages from Unleash to third party services.",
-                "documentationUrl": "https://docs.getunleash.io/docs/addons/webhook",
+                "documentationUrl": "https://docs.getunleash.io/integrate/webhook",
                 "parameters": [
                   {
                     "name": "url",
@@ -458,7 +479,7 @@
                     "name": "bodyTemplate",
                     "displayName": "Body template",
                     "placeholder": "{\n  \"event\": \"{{event.type}}\",\n  \"createdBy\": \"{{event.createdBy}}\",\n  \"featureToggle\": \"{{event.data.name}}\",\n  \"timestamp\": \"{{event.data.createdAt}}\"\n}",
-                    "description": "(Optional) You may format the body using a mustache template. If you don't specify anything, the format will similar to the events format (https://docs.getunleash.io/api/events)",
+                    "description": "(Optional) You may format the body using a mustache template. If you don't specify anything, the format will be similar to the events format (https://docs.getunleash.io/concepts/events)",
                     "type": "textfield",
                     "required": false,
                     "sensitive": false
@@ -493,66 +514,36 @@
                 ]
               },
               {
-                "name": "slack",
-                "displayName": "Slack",
-                "description": "Allows Unleash to post updates to Slack.",
-                "documentationUrl": "https://docs.getunleash.io/docs/addons/slack",
+                "name": "new-app",
+                "displayName": "Addon Name",
+                "description": "The App for X that can be combined with Unleash.",
+                "documentationUrl": "https://docs.getunleash.io/integrate/",
                 "parameters": [
                   {
-                    "name": "url",
-                    "displayName": "Slack webhook URL",
+                    "name": "accessToken",
+                    "displayName": "Access token",
                     "description": "(Required)",
-                    "type": "url",
+                    "type": "text",
                     "required": true,
                     "sensitive": true
                   },
                   {
-                    "name": "username",
-                    "displayName": "Username",
-                    "placeholder": "Unleash",
-                    "description": "The username to use when posting messages to slack. Defaults to \"Unleash\".",
+                    "name": "defaultChannels",
+                    "displayName": "Channels",
+                    "description": "A comma-separated list of channels to post the configured events to. These channels are always notified, regardless of the event type or the presence of a addon tag.",
                     "type": "text",
                     "required": false,
-                    "sensitive": false
-                  },
-                  {
-                    "name": "emojiIcon",
-                    "displayName": "Emoji Icon",
-                    "placeholder": ":unleash:",
-                    "description": "The emoji_icon to use when posting messages to slack. Defaults to \":unleash:\".",
-                    "type": "text",
-                    "required": false,
-                    "sensitive": false
-                  },
-                  {
-                    "name": "defaultChannel",
-                    "displayName": "Default channel",
-                    "description": "(Required) Default channel to post updates to if not specified in the slack-tag",
-                    "type": "text",
-                    "required": true,
                     "sensitive": false
                   }
                 ],
                 "events": [
-                  "feature-created",
-                  "feature-updated",
-                  "feature-archived",
-                  "feature-revived",
-                  "feature-stale-on",
-                  "feature-stale-off",
-                  "feature-environment-enabled",
-                  "feature-environment-disabled",
-                  "feature-strategy-remove",
-                  "feature-strategy-update",
-                  "feature-strategy-add",
-                  "feature-metadata-updated",
-                  "feature-variants-updated",
-                  "feature-project-change"
+                  "addon-config-created",
+                  "feature-created"
                 ],
                 "tagTypes": [
                   {
-                    "name": "slack",
-                    "description": "Slack tag used by the slack-addon to specify the slack channel.",
+                    "name": "tag-name",
+                    "description": "A tag used by the X-addon to specify a configuration.",
                     "icon": "S"
                   }
                 ]
@@ -561,7 +552,7 @@
                 "name": "teams",
                 "displayName": "Microsoft Teams",
                 "description": "Allows Unleash to post updates to Microsoft Teams.",
-                "documentationUrl": "https://docs.getunleash.io/docs/addons/teams",
+                "documentationUrl": "https://docs.getunleash.io/integrate/teams",
                 "parameters": [
                   {
                     "name": "url",
@@ -593,7 +584,7 @@
                 "name": "datadog",
                 "displayName": "Datadog",
                 "description": "Allows Unleash to post updates to Datadog.",
-                "documentationUrl": "https://docs.getunleash.io/docs/addons/datadog",
+                "documentationUrl": "https://docs.getunleash.io/integrate/datadog",
                 "parameters": [
                   {
                     "name": "url",
@@ -1674,12 +1665,6 @@
             "description": "An SDK version identifier. Usually formatted as \"unleash-client-<language>:<version>\"",
             "example": "unleash-client-java:7.0.0"
           },
-          "environment": {
-            "description": "The SDK's configured 'environment' property. This property was deprecated in v5. This property  does **not** control which Unleash environment the SDK gets toggles for. To control Unleash environments, use the SDKs API key.",
-            "deprecated": true,
-            "type": "string",
-            "example": "development"
-          },
           "platformName": {
             "description": "The platform the application is running on. For languages that compile to binaries, this can be omitted",
             "type": "string",
@@ -2087,8 +2072,7 @@
       "clientMetricsSchema": {
         "type": "object",
         "required": [
-          "appName",
-          "bucket"
+          "appName"
         ],
         "description": "Client usage metrics, accumulated in buckets of hour by hour by default",
         "properties": {
@@ -2101,12 +2085,6 @@
             "description": "A [(somewhat) unique identifier](https://docs.getunleash.io/sdks/node#advanced-usage) for the application",
             "type": "string",
             "example": "application-name-dacb1234"
-          },
-          "environment": {
-            "description": "Which environment the application is running in. This property was deprecated in v5. This can be determined by the API key calling this endpoint.",
-            "type": "string",
-            "example": "development",
-            "deprecated": true
           },
           "sdkVersion": {
             "type": "string",
@@ -2135,12 +2113,13 @@
           },
           "bucket": {
             "type": "object",
+            "nullable": true,
             "required": [
               "start",
               "stop",
               "toggles"
             ],
-            "description": "Holds all metrics gathered over a window of time. Typically 1 hour wide",
+            "description": "Holds all metrics gathered over a window of time. Typically 1 hour wide. May be omitted or null when the request only carries impact metrics.",
             "properties": {
               "start": {
                 "$ref": "#/components/schemas/dateSchema",
@@ -2284,7 +2263,8 @@
               "DATE_BEFORE",
               "SEMVER_EQ",
               "SEMVER_GT",
-              "SEMVER_LT"
+              "SEMVER_LT",
+              "REGEX"
             ],
             "example": "IN"
           },
@@ -2647,10 +2627,11 @@
               "kill-switch",
               "release",
               "operational",
-              "permission"
+              "permission",
+              "sunset"
             ],
             "example": "release",
-            "description": "The feature flag's [type](https://docs.getunleash.io/concepts/feature-flags#feature-flag-types). One of experiment, kill-switch, release, operational, or permission"
+            "description": "The feature flag's [type](https://docs.getunleash.io/concepts/feature-flags#feature-flag-types). One of experiment, kill-switch, release, operational, permission, or sunset"
           },
           "description": {
             "type": "string",
@@ -3185,6 +3166,18 @@
             "nullable": true,
             "example": "Regular"
           },
+          "companyRole": {
+            "description": "The role of the user within the company.",
+            "type": "string",
+            "nullable": true,
+            "example": "Developer"
+          },
+          "productUpdatesEmailConsent": {
+            "type": "boolean",
+            "description": "Whether the user has consented to receive product update emails.",
+            "nullable": true,
+            "example": false
+          },
           "activeSessions": {
             "description": "Count of active browser sessions for this user",
             "type": "integer",
@@ -3372,13 +3365,55 @@
           }
         }
       },
+      "edgeEnvironmentProjectsListSchema": {
+        "type": "object",
+        "description": "Schema to request api tokens for a list of environment -> projects tuples",
+        "required": [
+          "tokens"
+        ],
+        "properties": {
+          "tokens": {
+            "type": "array",
+            "description": "A list of requested api tokens.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "A list of requested environment -> projects tuples.",
+              "required": [
+                "environment",
+                "projects"
+              ],
+              "properties": {
+                "environment": {
+                  "type": "string",
+                  "description": "The name of an existing environment",
+                  "example": "development",
+                  "nullable": false
+                },
+                "projects": {
+                  "type": "array",
+                  "description": "The list of projects Edge wants access to, or '*' for a wildcard token",
+                  "items": {
+                    "type": "string",
+                    "example": "default"
+                  },
+                  "nullable": false
+                }
+              },
+              "nullable": false
+            },
+            "nullable": false
+          }
+        }
+      },
       "edgeTokenSchema": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "token",
           "projects",
-          "type"
+          "type",
+          "environment"
         ],
         "description": "A representation of a client token, limiting access to [CLIENT](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#backend-tokens) (used by serverside SDKs) or [FRONTEND](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#frontend-tokens) (used by proxy SDKs)",
         "properties": {
@@ -3392,6 +3427,11 @@
               "developerexperience",
               "enterprisegrowth"
             ]
+          },
+          "environment": {
+            "description": "The environment this token as access to",
+            "type": "string",
+            "example": "development"
           },
           "type": {
             "description": "The [API token](https://docs.getunleash.io/concepts/api-tokens-and-client-keys)'s **type**. Unleash supports three different types of API tokens ([ADMIN](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#admin-tokens), [CLIENT](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#backend-tokens), [FRONTEND](https://docs.getunleash.io/concepts/api-tokens-and-client-keys#frontend-tokens)). They all have varying access, so when validating a token it's important to know what kind you're dealing with",
@@ -3825,7 +3865,11 @@
               "change-request-requested-approvers-updated",
               "impact-metric-created",
               "impact-metric-updated",
-              "impact-metric-deleted"
+              "impact-metric-deleted",
+              "user-access-request-registered",
+              "user-access-request-approved",
+              "user-access-request-rejected",
+              "remote-mcp-server-settings-updated"
             ],
             "example": "feature-created"
           },
@@ -4317,6 +4361,134 @@
           }
         }
       },
+      "featureEnvironmentSafeguardSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "triggerCondition",
+          "impactMetric"
+        ],
+        "description": "A safeguard configuration for a feature environment.",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ULID identifier for this safeguard",
+            "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
+          },
+          "action": {
+            "type": "object",
+            "required": [
+              "type",
+              "featureName",
+              "environment",
+              "project"
+            ],
+            "additionalProperties": false,
+            "description": "Disable a feature in an environment when triggered.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The type of action to perform.",
+                "example": "disableFeatureEnvironment"
+              },
+              "featureName": {
+                "type": "string",
+                "description": "The feature flag name this safeguard applies to."
+              },
+              "environment": {
+                "type": "string",
+                "description": "The environment this safeguard applies to."
+              },
+              "project": {
+                "type": "string",
+                "description": "The project this safeguard applies to."
+              }
+            }
+          },
+          "triggerCondition": {
+            "$ref": "#/components/schemas/safeguardTriggerConditionSchema",
+            "description": "The condition that triggers the safeguard."
+          },
+          "impactMetric": {
+            "type": "object",
+            "required": [
+              "id",
+              "metricName",
+              "timeRange",
+              "aggregationMode",
+              "labelSelectors"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The unique identifier for this impact metric",
+                "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
+              },
+              "metricName": {
+                "type": "string",
+                "description": "The Prometheus metric series to query. It includes both unleash prefix and metric type and display name",
+                "example": "unleash_counter_feature_toggle_usage_total"
+              },
+              "timeRange": {
+                "type": "string",
+                "enum": [
+                  "hour",
+                  "day",
+                  "week",
+                  "month"
+                ],
+                "description": "The time range for the metric data.",
+                "example": "day"
+              },
+              "aggregationMode": {
+                "type": "string",
+                "description": "The aggregation mode for the metric data.",
+                "enum": [
+                  "rps",
+                  "count",
+                  "avg",
+                  "sum",
+                  "p95",
+                  "p99",
+                  "p50"
+                ],
+                "example": "rps"
+              },
+              "labelSelectors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": "The selected labels and their values for filtering the metric data.",
+                "example": {
+                  "environment": [
+                    "development"
+                  ],
+                  "project": [
+                    "default"
+                  ]
+                }
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "internal",
+                  "external"
+                ],
+                "description": "The Prometheus data source for this metric. Internal is the Unleash-managed Prometheus, external is a customer-provided Prometheus instance. Defaults to internal if not specified.",
+                "example": "internal"
+              }
+            },
+            "description": "The metric configuration used to evaluate the safeguard condition."
+          }
+        }
+      },
       "featureEnvironmentSchema": {
         "type": "object",
         "additionalProperties": false,
@@ -4413,9 +4585,16 @@
           },
           "releasePlans": {
             "type": "array",
-            "description": "Release plans for this feature environment (only available when milestoneProgression feature flag is enabled)",
+            "description": "Release plans for this feature environment",
             "items": {
               "$ref": "#/components/schemas/releasePlanSchema"
+            }
+          },
+          "safeguards": {
+            "type": "array",
+            "description": "Safeguards for this feature environment",
+            "items": {
+              "$ref": "#/components/schemas/featureEnvironmentSafeguardSchema"
             }
           },
           "yes": {
@@ -4570,26 +4749,6 @@
           "description": "The lifecycle stage of the feature"
         }
       },
-      "featureLinkSchema": {
-        "type": "object",
-        "required": [
-          "url"
-        ],
-        "properties": {
-          "url": {
-            "type": "string",
-            "example": "https://github.com/search?q=cleanupReminder&type=code",
-            "description": "The URL the feature is linked to"
-          },
-          "title": {
-            "type": "string",
-            "example": "Github cleanup",
-            "description": "The description of the link",
-            "nullable": true
-          }
-        },
-        "description": "The link to any URL related to the feature"
-      },
       "featureLinksSchema": {
         "type": "object",
         "description": "A list of links for a feature",
@@ -4608,7 +4767,7 @@
             "type": "array",
             "description": "List of feature links",
             "items": {
-              "$ref": "#/components/schemas/featureLinkSchema"
+              "$ref": "#/components/schemas/linkSchema"
             }
           }
         }
@@ -4737,36 +4896,12 @@
             "example": "2023-01-29T15:21:39.975Z",
             "description": "The date the feature was archived"
           },
-          "lastSeenAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "deprecated": true,
-            "example": "2023-01-28T16:21:39.975Z",
-            "description": "The date when metrics where last collected for the feature. This field was deprecated in v5, use the one in featureEnvironmentSchema"
-          },
           "environments": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/featureEnvironmentSchema"
             },
             "description": "The list of environments where the feature can be used"
-          },
-          "variants": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/variantSchema"
-            },
-            "description": "The list of feature variants",
-            "deprecated": true
-          },
-          "strategies": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            },
-            "description": "This was deprecated in v5 and will be removed in a future major version",
-            "deprecated": true
           },
           "tags": {
             "type": "array",
@@ -5023,9 +5158,16 @@
           },
           "releasePlans": {
             "type": "array",
-            "description": "Release plans for this feature environment (only available when milestoneProgression feature flag is enabled)",
+            "description": "Release plans for this feature environment",
             "items": {
               "$ref": "#/components/schemas/releasePlanSchema"
+            }
+          },
+          "safeguards": {
+            "type": "array",
+            "description": "Safeguards for this feature environment",
+            "items": {
+              "$ref": "#/components/schemas/featureEnvironmentSafeguardSchema"
             }
           },
           "yes": {
@@ -5123,14 +5265,6 @@
             "example": "2023-01-29T15:21:39.975Z",
             "description": "The date the feature was archived"
           },
-          "lastSeenAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "deprecated": true,
-            "example": "2023-01-28T16:21:39.975Z",
-            "description": "The date when metrics where last collected for the feature. This field was deprecated in v5 and will be removed in a future release, use the one in featureEnvironmentSchema"
-          },
           "environments": {
             "type": "array",
             "items": {
@@ -5148,22 +5282,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "variants": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/variantSchema"
-            },
-            "description": "The list of feature variants. This field was deprecated in v5",
-            "deprecated": true
-          },
-          "strategies": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            },
-            "description": "This is a legacy field that was deprecated in v5",
-            "deprecated": true
           },
           "tags": {
             "type": "array",
@@ -5351,16 +5469,6 @@
             "type": "string",
             "example": "my-tag",
             "description": "The value of the tag"
-          },
-          "type": {
-            "deprecated": true,
-            "type": "string",
-            "description": "The [type](https://docs.getunleash.io/concepts/feature-flags#tags) of the tag. This property is deprecated and will be removed in a future version of Unleash. Superseded by the `tagType` property."
-          },
-          "value": {
-            "deprecated": true,
-            "type": "string",
-            "description": "The value of the tag. This property is deprecated and will be removed in a future version of Unleash. Superseded by the `tagValue` property."
           },
           "createdByUserId": {
             "type": "number",
@@ -5838,6 +5946,55 @@
             "items": {
               "$ref": "#/components/schemas/frontendApiFeatureSchema"
             }
+          }
+        }
+      },
+      "groupItemSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "description": "A detailed information about a user group",
+        "properties": {
+          "id": {
+            "description": "The group id",
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "description": "The name of the group",
+            "type": "string",
+            "example": "DX team"
+          },
+          "description": {
+            "description": "A custom description of the group",
+            "type": "string",
+            "nullable": true,
+            "example": "Current members of the DX squad"
+          },
+          "mappingsSSO": {
+            "description": "A list of SSO groups that should map to this Unleash group",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "SSOGroup1",
+              "SSOGroup2"
+            ]
+          },
+          "rootRole": {
+            "type": "number",
+            "nullable": true,
+            "description": "A role id that is used as the root role for all users in this group. This can be either the id of the Viewer, Editor or Admin role.",
+            "example": 1
+          },
+          "scimId": {
+            "description": "The SCIM ID of the group, only present if managed by SCIM",
+            "type": "string",
+            "nullable": true,
+            "example": "01HTMEXAMPLESCIMID7SWWGHN7"
           }
         }
       },
@@ -7011,6 +7168,26 @@
           }
         }
       },
+      "linkSchema": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://github.com/search?q=cleanupReminder&type=code",
+            "description": "The URL the feature is linked to"
+          },
+          "title": {
+            "type": "string",
+            "example": "Github cleanup",
+            "description": "The description of the link",
+            "nullable": true
+          }
+        },
+        "description": "The link to any URL related to the feature"
+      },
       "loginSchema": {
         "type": "object",
         "additionalProperties": false,
@@ -7142,6 +7319,15 @@
                 "default"
               ]
             }
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "internal",
+              "external"
+            ],
+            "description": "The Prometheus data source for this metric. Internal is the Unleash-managed Prometheus, external is a customer-provided Prometheus instance. Defaults to internal if not specified.",
+            "example": "internal"
           }
         }
       },
@@ -7159,6 +7345,56 @@
             "type": "string"
           }
         }
+      },
+      "onboardingStatusSchema": {
+        "type": "object",
+        "description": "The current onboarding status of a project.",
+        "example": {
+          "status": "first-flag-created",
+          "feature": "my-feature-flag"
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "onboarding-started",
+                  "sdk-connected",
+                  "onboarded"
+                ],
+                "example": "onboarding-started"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "first-flag-created"
+                ],
+                "example": "first-flag-created"
+              },
+              "feature": {
+                "type": "string",
+                "description": "The name of the feature flag",
+                "example": "my-feature-flag"
+              }
+            },
+            "required": [
+              "status",
+              "feature"
+            ],
+            "additionalProperties": false
+          }
+        ]
       },
       "outdatedSdksSchema": {
         "type": "object",
@@ -7487,49 +7723,7 @@
             }
           },
           "onboardingStatus": {
-            "type": "object",
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "onboarding-started",
-                      "onboarded"
-                    ],
-                    "example": "onboarding-started"
-                  }
-                },
-                "required": [
-                  "status"
-                ],
-                "additionalProperties": false
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "first-flag-created"
-                    ],
-                    "example": "first-flag-created"
-                  },
-                  "feature": {
-                    "type": "string",
-                    "description": "The name of the feature flag",
-                    "example": "my-feature-flag"
-                  }
-                },
-                "required": [
-                  "status",
-                  "feature"
-                ],
-                "additionalProperties": false
-              }
-            ],
-            "description": "The current onboarding status of the project."
+            "$ref": "#/components/schemas/onboardingStatusSchema"
           },
           "latestEvents": {
             "type": "array",
@@ -7894,7 +8088,8 @@
               "DATE_BEFORE",
               "SEMVER_EQ",
               "SEMVER_GT",
-              "SEMVER_LT"
+              "SEMVER_LT",
+              "REGEX"
             ],
             "example": "IN"
           },
@@ -8356,6 +8551,7 @@
         "required": [
           "rootRole",
           "projects",
+          "groups",
           "features",
           "subscriptions"
         ],
@@ -8373,6 +8569,14 @@
               "my-projectA",
               "my-projectB"
             ]
+          },
+          "groups": {
+            "description": "Experimental: Which groups this user is a member of",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/groupItemSchema"
+            },
+            "example": []
           },
           "subscriptions": {
             "description": "Which email subscriptions this user is subscribed to",
@@ -8622,7 +8826,6 @@
           "favorite",
           "impressionData",
           "createdAt",
-          "lastSeenAt",
           "environments"
         ],
         "description": "A project feature flag definition",
@@ -8663,14 +8866,6 @@
             "format": "date-time",
             "example": "2023-01-28T15:21:39.975Z",
             "description": "The date the feature was created"
-          },
-          "lastSeenAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "deprecated": true,
-            "example": "2023-01-28T16:21:39.975Z",
-            "description": "The date and time when metrics where last collected for this flag in any environment. This field was deprecated in v5. You should instead use the `lastSeenAt` property on the individual environments listed under the `environments` property."
           },
           "environments": {
             "type": "array",
@@ -9012,55 +9207,13 @@
             "description": "`true` if the project was favorited, otherwise `false`."
           },
           "onboardingStatus": {
-            "type": "object",
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "onboarding-started",
-                      "onboarded"
-                    ],
-                    "example": "onboarding-started"
-                  }
-                },
-                "required": [
-                  "status"
-                ],
-                "additionalProperties": false
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "first-flag-created"
-                    ],
-                    "example": "first-flag-created"
-                  },
-                  "feature": {
-                    "type": "string",
-                    "description": "The name of the feature flag",
-                    "example": "my-feature-flag"
-                  }
-                },
-                "required": [
-                  "status",
-                  "feature"
-                ],
-                "additionalProperties": false
-              }
-            ],
-            "description": "The current onboarding status of the project."
+            "$ref": "#/components/schemas/onboardingStatusSchema"
           }
         }
       },
       "projectSchema": {
         "type": "object",
-        "additionalProperties": false,
+        "additionalProperties": true,
         "required": [
           "id",
           "name"
@@ -9842,6 +9995,7 @@
           "id",
           "milestoneId",
           "sortOrder",
+          "name",
           "strategyName"
         ],
         "properties": {
@@ -9867,10 +10021,16 @@
             "description": "A descriptive title for the strategy",
             "example": "Gradual Rollout 25-Prod"
           },
-          "strategyName": {
+          "name": {
             "type": "string",
             "description": "The name of the strategy type",
             "example": "flexibleRollout"
+          },
+          "strategyName": {
+            "type": "string",
+            "description": "The name of the strategy type",
+            "example": "flexibleRollout",
+            "deprecated": true
           },
           "parameters": {
             "description": "An object containing the parameters for the strategy",
@@ -9917,6 +10077,131 @@
             "items": {
               "type": "number"
             }
+          },
+          "disabled": {
+            "type": "boolean",
+            "description": "A toggle to disable the strategy. defaults to false. Disabled strategies are not evaluated or returned to the SDKs",
+            "example": false,
+            "nullable": true
+          }
+        }
+      },
+      "releasePlanSafeguardSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "triggerCondition",
+          "impactMetric"
+        ],
+        "description": "A safeguard configuration for a release plan.",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ULID identifier for this safeguard",
+            "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
+          },
+          "action": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "additionalProperties": false,
+            "description": "The action to take when the safeguard is triggered.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The type of action to perform.",
+                "example": "pauseReleasePlanProgressions"
+              },
+              "id": {
+                "type": "string",
+                "description": "The ID of the release plan this safeguard applies to.",
+                "example": "01JB9GGTGQYEQ9D40R17T3YVW2"
+              }
+            }
+          },
+          "triggerCondition": {
+            "$ref": "#/components/schemas/safeguardTriggerConditionSchema",
+            "description": "The condition that triggers the safeguard."
+          },
+          "impactMetric": {
+            "type": "object",
+            "required": [
+              "id",
+              "metricName",
+              "timeRange",
+              "aggregationMode",
+              "labelSelectors"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The unique identifier for this impact metric",
+                "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
+              },
+              "metricName": {
+                "type": "string",
+                "description": "The Prometheus metric series to query. It includes both unleash prefix and metric type and display name",
+                "example": "unleash_counter_feature_toggle_usage_total"
+              },
+              "timeRange": {
+                "type": "string",
+                "enum": [
+                  "hour",
+                  "day",
+                  "week",
+                  "month"
+                ],
+                "description": "The time range for the metric data.",
+                "example": "day"
+              },
+              "aggregationMode": {
+                "type": "string",
+                "description": "The aggregation mode for the metric data.",
+                "enum": [
+                  "rps",
+                  "count",
+                  "avg",
+                  "sum",
+                  "p95",
+                  "p99",
+                  "p50"
+                ],
+                "example": "rps"
+              },
+              "labelSelectors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": "The selected labels and their values for filtering the metric data.",
+                "example": {
+                  "environment": [
+                    "development"
+                  ],
+                  "project": [
+                    "default"
+                  ]
+                }
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "internal",
+                  "external"
+                ],
+                "description": "The Prometheus data source for this metric. Internal is the Unleash-managed Prometheus, external is a customer-provided Prometheus instance. Defaults to internal if not specified.",
+                "example": "internal"
+              }
+            },
+            "description": "The metric configuration used to evaluate the safeguard condition."
           }
         }
       },
@@ -10008,7 +10293,7 @@
             "type": "array",
             "description": "An array of safeguards configured for this release plan.",
             "items": {
-              "$ref": "#/components/schemas/safeguardSchema"
+              "$ref": "#/components/schemas/releasePlanSafeguardSchema"
             }
           }
         }
@@ -10094,6 +10379,20 @@
             "example": "2022-01-01T00:00:00Z",
             "nullable": true
           }
+        }
+      },
+      "releasePlanTemplatesSchema": {
+        "description": "A collection of release plan templates",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/releasePlanTemplateSchema"
+        }
+      },
+      "releasePlansSchema": {
+        "description": "A collection of release plans",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/releasePlanSchema"
         }
       },
       "requestsPerSecondSchema": {
@@ -10383,116 +10682,6 @@
               "$ref": "#/components/schemas/roleSchema"
             },
             "description": "A list of roles"
-          }
-        }
-      },
-      "safeguardSchema": {
-        "type": "object",
-        "required": [
-          "id",
-          "action",
-          "triggerCondition",
-          "impactMetric"
-        ],
-        "description": "A safeguard configuration for a release plan.",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ULID identifier for this safeguard",
-            "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
-          },
-          "action": {
-            "type": "object",
-            "required": [
-              "type",
-              "id"
-            ],
-            "additionalProperties": false,
-            "description": "The action to take when the safeguard is triggered.",
-            "properties": {
-              "type": {
-                "type": "string",
-                "description": "The type of action to perform.",
-                "example": "pauseReleasePlanProgressions"
-              },
-              "id": {
-                "type": "string",
-                "description": "The ID of the release plan this safeguard applies to.",
-                "example": "01JB9GGTGQYEQ9D40R17T3YVW2"
-              }
-            }
-          },
-          "triggerCondition": {
-            "$ref": "#/components/schemas/safeguardTriggerConditionSchema",
-            "description": "The condition that triggers the safeguard."
-          },
-          "impactMetric": {
-            "type": "object",
-            "required": [
-              "id",
-              "metricName",
-              "timeRange",
-              "aggregationMode",
-              "labelSelectors"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "The unique identifier for this impact metric",
-                "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
-              },
-              "metricName": {
-                "type": "string",
-                "description": "The Prometheus metric series to query. It includes both unleash prefix and metric type and display name",
-                "example": "unleash_counter_feature_toggle_usage_total"
-              },
-              "timeRange": {
-                "type": "string",
-                "enum": [
-                  "hour",
-                  "day",
-                  "week",
-                  "month"
-                ],
-                "description": "The time range for the metric data.",
-                "example": "day"
-              },
-              "aggregationMode": {
-                "type": "string",
-                "description": "The aggregation mode for the metric data.",
-                "enum": [
-                  "rps",
-                  "count",
-                  "avg",
-                  "sum",
-                  "p95",
-                  "p99",
-                  "p50"
-                ],
-                "example": "rps"
-              },
-              "labelSelectors": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "description": "The selected labels and their values for filtering the metric data.",
-                "example": {
-                  "environment": [
-                    "development"
-                  ],
-                  "project": [
-                    "default"
-                  ]
-                }
-              }
-            },
-            "description": "The metric configuration used to evaluate the safeguard condition."
           }
         }
       },
@@ -10834,6 +11023,43 @@
           }
         }
       },
+      "signupDataSchema": {
+        "type": "object",
+        "description": "An object describing the user and company signup data.",
+        "additionalProperties": false,
+        "properties": {
+          "shouldSetPassword": {
+            "type": "boolean",
+            "description": "Whether the user should set a password as part of the signup process.",
+            "example": false
+          },
+          "name": {
+            "type": "string",
+            "description": "The user's name.",
+            "example": "Mark Scout"
+          },
+          "companyRole": {
+            "type": "string",
+            "description": "The role of the user within the company.",
+            "example": "Developer"
+          },
+          "companyName": {
+            "type": "string",
+            "description": "The name of the company.",
+            "example": "Lumon Industries"
+          },
+          "companyIsNA": {
+            "type": "boolean",
+            "description": "Whether the company is based in North America.",
+            "example": true
+          },
+          "productUpdatesEmailConsent": {
+            "type": "boolean",
+            "description": "Whether the user has consented to receive product update emails.",
+            "example": true
+          }
+        }
+      },
       "sortOrderSchema": {
         "type": "object",
         "description": "A map of object IDs and their corresponding sort orders.",
@@ -11053,6 +11279,54 @@
               "type": "json",
               "value": "{\"color\": \"red\"}"
             }
+          }
+        }
+      },
+      "submitSignupDataSchema": {
+        "type": "object",
+        "description": "An object describing the user and company signup data submission.",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The user's name.",
+            "example": "Mark Scout"
+          },
+          "companyRole": {
+            "type": "string",
+            "description": "The role of the user within the company.",
+            "example": "Developer"
+          },
+          "companyName": {
+            "type": "string",
+            "description": "The name of the company.",
+            "example": "Lumon Industries"
+          },
+          "companyIsNA": {
+            "type": "boolean",
+            "description": "Whether the company is based in North America.",
+            "example": true
+          },
+          "productUpdatesEmailConsent": {
+            "type": "boolean",
+            "description": "Whether the user has consented to receive product update emails.",
+            "example": true
+          },
+          "password": {
+            "type": "string",
+            "example": "k!5As3HquUrQ",
+            "description": "The user's new password."
+          },
+          "inviteEmails": {
+            "type": "array",
+            "description": "A list of email addresses to invite.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "marks@lumon.industries",
+              "hellyr@lumon.industries"
+            ]
           }
         }
       },
@@ -11372,6 +11646,11 @@
             "description": "The URL of the Unleash instance.",
             "example": "https://unleash.mycompany.com/enterprise"
           },
+          "logRocketAppId": {
+            "type": "string",
+            "description": "The LogRocket app ID used to initialize session replay in the admin UI. Only used when the `logRocketEnabled` flag is on.",
+            "example": "1knhci/unleash-sandbox"
+          },
           "baseUriPath": {
             "type": "string",
             "description": "The base URI path at which this Unleash instance is listening.",
@@ -11426,6 +11705,18 @@
             "description": "Whether a Prometheus API is available.",
             "example": true
           },
+          "impactMetrics": {
+            "type": "string",
+            "enum": [
+              "disabled",
+              "unconfigured",
+              "external",
+              "internal",
+              "full"
+            ],
+            "description": "Impact metrics availability for this instance. `disabled` when the killswitch is on; `unconfigured` when no source is set up yet; `internal`/`external`/`full` depending on which data sources are available.",
+            "example": "internal"
+          },
           "frontendApiOrigins": {
             "type": "array",
             "description": "The list of origins that the front-end API should accept requests from.",
@@ -11463,7 +11754,7 @@
               {
                 "value": "Documentation",
                 "icon": "library_books",
-                "href": "https://docs.getunleash.io/docs",
+                "href": "https://docs.getunleash.io",
                 "title": "User documentation"
               },
               {
@@ -11680,10 +11971,11 @@
               "kill-switch",
               "release",
               "operational",
-              "permission"
+              "permission",
+              "sunset"
             ],
             "example": "kill-switch",
-            "description": "Type of the flag e.g. experiment, kill-switch, release, operational, permission"
+            "description": "Type of the flag e.g. experiment, kill-switch, release, operational, permission, sunset"
           },
           "stale": {
             "type": "boolean",
@@ -11708,7 +12000,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The name of the strategy type"
+            "description": "The name of the strategy type. This property is deprecated and the ability to change a strategy's type will be removed in a future release.",
+            "deprecated": true
           },
           "sortOrder": {
             "type": "number",
@@ -11732,6 +12025,24 @@
             "description": "A toggle to disable the strategy. defaults to true. Disabled strategies are not evaluated or returned to the SDKs",
             "example": false,
             "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "description": "Strategy level variants",
+            "items": {
+              "$ref": "#/components/schemas/strategyVariantSchema"
+            }
+          },
+          "segments": {
+            "type": "array",
+            "description": "A list of segment ids attached to the strategy",
+            "example": [
+              1,
+              2
+            ],
+            "items": {
+              "type": "number"
+            }
           },
           "parameters": {
             "$ref": "#/components/schemas/parametersSchema"
@@ -11998,7 +12309,8 @@
             "required": [
               "root",
               "project",
-              "environment"
+              "environment",
+              "groups"
             ],
             "additionalProperties": false,
             "description": "The access overview (list of permissions) for the user",
@@ -12049,6 +12361,13 @@
                       "example": true
                     }
                   }
+                }
+              },
+              "groups": {
+                "type": "array",
+                "description": "Experimental: The list of groups the user is in",
+                "items": {
+                  "$ref": "#/components/schemas/groupItemSchema"
                 }
               },
               "project": {
@@ -12341,6 +12660,18 @@
             "type": "string",
             "nullable": true,
             "example": "Regular"
+          },
+          "companyRole": {
+            "description": "The role of the user within the company.",
+            "type": "string",
+            "nullable": true,
+            "example": "Developer"
+          },
+          "productUpdatesEmailConsent": {
+            "type": "boolean",
+            "description": "Whether the user has consented to receive product update emails.",
+            "nullable": true,
+            "example": false
           },
           "activeSessions": {
             "description": "Count of active browser sessions for this user",
@@ -13243,7 +13574,7 @@
                 ]
               },
               "enableGroupSyncing": {
-                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
                 "type": "boolean",
                 "example": false
               },
@@ -13261,6 +13592,11 @@
                 "description": "Enable PKCE (Proof Key for Code Exchange) for enhanced security. Recommended for public clients and provides additional protection against authorization code interception attacks.",
                 "type": "boolean",
                 "example": false
+              },
+              "extraScopes": {
+                "description": "Space-separated list of additional scopes to request during login, beyond the default `openid email profile` and `groups` if group syncing is enabled.",
+                "type": "string",
+                "example": "custom_scope1 custom_scope2"
               }
             }
           },
@@ -13334,7 +13670,7 @@
                 ]
               },
               "enableGroupSyncing": {
-                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
                 "type": "boolean",
                 "example": false
               },
@@ -13352,6 +13688,11 @@
                 "description": "Enable PKCE (Proof Key for Code Exchange) for enhanced security. Recommended for public clients and provides additional protection against authorization code interception attacks.",
                 "type": "boolean",
                 "example": false
+              },
+              "extraScopes": {
+                "description": "Space-separated list of additional scopes to request during login, beyond the default `openid email profile` and `groups` if group syncing is enabled.",
+                "type": "string",
+                "example": "custom_scope1 custom_scope2"
               }
             }
           }
@@ -13811,7 +14152,7 @@
                 "example": 2
               },
               "enableGroupSyncing": {
-                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
                 "type": "boolean",
                 "example": false
               },
@@ -13884,7 +14225,7 @@
                 "example": 2
               },
               "enableGroupSyncing": {
-                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+                "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
                 "type": "boolean",
                 "example": false
               },
@@ -14041,6 +14382,43 @@
               "payload",
               "action"
             ],
+            "description": "Update a milestone strategy belonging to this feature.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "updateMilestoneStrategy"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "required": [
+                  "id"
+                ],
+                "$ref": "#/components/schemas/updateMilestoneStrategySchema",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "0103487d-8788-4cda-af59-0a68642dbc5a",
+                    "description": "The ID of the strategy to update."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
             "description": "Update a strategy belonging to this feature.",
             "properties": {
               "feature": {
@@ -14484,7 +14862,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "changeSafeguard"
+                  "changeReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -14524,7 +14902,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "deleteSafeguard"
+                  "deleteReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -14540,6 +14918,76 @@
                     "example": "01JB9GGTGQYEQ9D40R17T3YVW3",
                     "description": "The ID of the release plan. This ID is an ulid"
                   },
+                  "safeguardId": {
+                    "type": "string",
+                    "example": "01K7NXD655W7R89659K58RE07A",
+                    "description": "The ID of the safeguard to delete."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Create or update a safeguard for a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "changeFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguard"
+                ],
+                "properties": {
+                  "safeguard": {
+                    "$ref": "#/components/schemas/createSafeguardSchema"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Delete a safeguard from a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "deleteFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguardId"
+                ],
+                "properties": {
                   "safeguardId": {
                     "type": "string",
                     "example": "01K7NXD655W7R89659K58RE07A",
@@ -14694,6 +15142,43 @@
               "payload",
               "action"
             ],
+            "description": "Update a milestone strategy belonging to this feature.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "updateMilestoneStrategy"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "required": [
+                  "id"
+                ],
+                "$ref": "#/components/schemas/updateMilestoneStrategySchema",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "0103487d-8788-4cda-af59-0a68642dbc5a",
+                    "description": "The ID of the strategy to update."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
             "description": "Update a strategy belonging to this feature.",
             "properties": {
               "feature": {
@@ -15137,7 +15622,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "changeSafeguard"
+                  "changeReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -15177,7 +15662,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "deleteSafeguard"
+                  "deleteReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -15193,6 +15678,76 @@
                     "example": "01JB9GGTGQYEQ9D40R17T3YVW3",
                     "description": "The ID of the release plan. This ID is an ulid"
                   },
+                  "safeguardId": {
+                    "type": "string",
+                    "example": "01K7NXD655W7R89659K58RE07A",
+                    "description": "The ID of the safeguard to delete."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Create or update a safeguard for a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "changeFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguard"
+                ],
+                "properties": {
+                  "safeguard": {
+                    "$ref": "#/components/schemas/createSafeguardSchema"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Delete a safeguard from a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "deleteFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguardId"
+                ],
+                "properties": {
                   "safeguardId": {
                     "type": "string",
                     "example": "01K7NXD655W7R89659K58RE07A",
@@ -15227,7 +15782,7 @@
           "conflict": {
             "type": "string",
             "example": "Feature has been archived",
-            "description": "A string describing the conflicts related to this change. Only present if there are any concflicts on the feature level."
+            "description": "A string describing the conflicts related to this change. Only present if there are any conflicts on the feature level."
           },
           "changes": {
             "type": "array",
@@ -15325,6 +15880,43 @@
               "payload",
               "action"
             ],
+            "description": "Update a milestone strategy belonging to this feature.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "updateMilestoneStrategy"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "required": [
+                  "id"
+                ],
+                "$ref": "#/components/schemas/updateMilestoneStrategySchema",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "0103487d-8788-4cda-af59-0a68642dbc5a",
+                    "description": "The ID of the strategy to update."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
             "description": "Update a strategy belonging to this feature.",
             "properties": {
               "feature": {
@@ -15768,7 +16360,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "changeSafeguard"
+                  "changeReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -15808,7 +16400,7 @@
               "action": {
                 "type": "string",
                 "enum": [
-                  "deleteSafeguard"
+                  "deleteReleasePlanSafeguard"
                 ],
                 "description": "The name of this action."
               },
@@ -15824,6 +16416,76 @@
                     "example": "01JB9GGTGQYEQ9D40R17T3YVW3",
                     "description": "The ID of the release plan. This ID is an ulid"
                   },
+                  "safeguardId": {
+                    "type": "string",
+                    "example": "01K7NXD655W7R89659K58RE07A",
+                    "description": "The ID of the safeguard to delete."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Create or update a safeguard for a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "changeFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguard"
+                ],
+                "properties": {
+                  "safeguard": {
+                    "$ref": "#/components/schemas/createSafeguardSchema"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "feature",
+              "payload",
+              "action"
+            ],
+            "description": "Delete a safeguard from a feature environment.",
+            "properties": {
+              "feature": {
+                "type": "string",
+                "example": "my-best-feature",
+                "description": "The name of the feature that this change applies to."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "deleteFeatureEnvSafeguard"
+                ],
+                "description": "The name of this action."
+              },
+              "payload": {
+                "type": "object",
+                "required": [
+                  "safeguardId"
+                ],
+                "properties": {
                   "safeguardId": {
                     "type": "string",
                     "example": "01K7NXD655W7R89659K58RE07A",
@@ -17788,7 +18450,7 @@
       },
       "notificationsSchema": {
         "type": "array",
-        "description": "A list of [notifications](https://docs.getunleash.io/concepts/notifications)",
+        "description": "A list of [notifications](https://docs.getunleash.io/api/get-notifications)",
         "items": {
           "type": "object",
           "additionalProperties": false,
@@ -17900,6 +18562,15 @@
             "description": "The authentication type used to log in.",
             "example": "simple",
             "type": "string"
+          },
+          "type": {
+            "description": "The type of event. `login` for sign-in attempts and `logout` for sign-outs.",
+            "type": "string",
+            "enum": [
+              "login",
+              "logout"
+            ],
+            "example": "login"
           },
           "created_at": {
             "description": "The date and time of when the login was attempted.",
@@ -20577,6 +21248,20 @@
           }
         }
       },
+      "remoteMcpSettingsSchema": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "description": "An object describing the remote MCP server settings.",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the remote MCP server is currently enabled."
+          }
+        }
+      },
       "scimTokenSchema": {
         "type": "object",
         "required": [
@@ -20667,7 +21352,7 @@
             "example": 2
           },
           "enableGroupSyncing": {
-            "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+            "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
             "type": "boolean",
             "example": false
           },
@@ -20749,7 +21434,7 @@
             ]
           },
           "enableGroupSyncing": {
-            "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/guides/how-to-set-up-group-sso-sync)",
+            "description": "Should we enable group syncing. Refer to the documentation [Group syncing](https://docs.getunleash.io/single-sign-on/how-to-set-up-group-sso-sync)",
             "type": "boolean",
             "example": false
           },
@@ -20767,6 +21452,11 @@
             "description": "Enable PKCE (Proof Key for Code Exchange) for enhanced security. Recommended for public clients and provides additional protection against authorization code interception attacks.",
             "type": "boolean",
             "example": false
+          },
+          "extraScopes": {
+            "description": "Space-separated list of additional scopes to request during login, beyond the default `openid email profile` and `groups` if group syncing is enabled.",
+            "type": "string",
+            "example": "custom_scope1 custom_scope2"
           }
         }
       },
@@ -20990,8 +21680,7 @@
         "description": "Schema representing the creation of a release plan milestone strategy.",
         "type": "object",
         "required": [
-          "sortOrder",
-          "strategyName"
+          "sortOrder"
         ],
         "properties": {
           "sortOrder": {
@@ -21005,10 +21694,16 @@
             "description": "A descriptive title for the strategy",
             "example": "Gradual Rollout 25-Prod"
           },
-          "strategyName": {
+          "name": {
             "type": "string",
             "description": "The name of the strategy type",
             "example": "flexibleRollout"
+          },
+          "strategyName": {
+            "type": "string",
+            "description": "The name of the strategy type",
+            "example": "flexibleRollout",
+            "deprecated": true
           },
           "parameters": {
             "description": "An object containing the parameters for the strategy",
@@ -21140,6 +21835,56 @@
             "items": {
               "type": "number"
             }
+          }
+        }
+      },
+      "updateMilestoneStrategySchema": {
+        "type": "object",
+        "description": "Update a milestone strategy configuration for a feature flag",
+        "properties": {
+          "sortOrder": {
+            "type": "number",
+            "description": "The order of the strategy in the list in feature environment configuration"
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/constraintSchema"
+            },
+            "description": "A list of the constraints attached to the strategy. See https://docs.getunleash.io/concepts/activation-strategies#constraints"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "description": "A descriptive title for the strategy",
+            "example": "Gradual Rollout 25-Prod"
+          },
+          "disabled": {
+            "type": "boolean",
+            "description": "A toggle to disable the strategy. defaults to true. Disabled strategies are not evaluated or returned to the SDKs",
+            "example": false,
+            "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "description": "Strategy level variants",
+            "items": {
+              "$ref": "#/components/schemas/strategyVariantSchema"
+            }
+          },
+          "segments": {
+            "type": "array",
+            "description": "A list of segment ids attached to the strategy",
+            "example": [
+              1,
+              2
+            ],
+            "items": {
+              "type": "number"
+            }
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/parametersSchema"
           }
         }
       },
@@ -21640,6 +22385,156 @@
           }
         }
       },
+      "availableImpactMetricsSchema": {
+        "type": "object",
+        "required": [
+          "metrics"
+        ],
+        "description": "Response containing the available impact metrics and their metadata.",
+        "additionalProperties": false,
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "description": "The list of available impact metrics.",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "help",
+                "displayName",
+                "source"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The metric name.",
+                  "example": "http_requests_total"
+                },
+                "help": {
+                  "type": "string",
+                  "description": "The help text for the metric.",
+                  "example": "Total number of HTTP requests."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "A human-readable display name.",
+                  "example": "HTTP Requests Total"
+                },
+                "source": {
+                  "type": "string",
+                  "enum": [
+                    "internal",
+                    "external"
+                  ],
+                  "description": "Whether this metric comes from an internal or external source.",
+                  "example": "internal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "impactMetricsDataSchema": {
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "step",
+          "series",
+          "labels"
+        ],
+        "description": "Response containing time series data from a metrics source.",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "The start of the queried time range as a Unix epoch timestamp in seconds.",
+            "example": "1712745600"
+          },
+          "end": {
+            "type": "string",
+            "description": "The end of the queried time range as a Unix epoch timestamp in seconds.",
+            "example": "1712832000"
+          },
+          "step": {
+            "type": "string",
+            "description": "The step interval between data points.",
+            "example": "15m"
+          },
+          "series": {
+            "type": "array",
+            "description": "Array of time series results.",
+            "items": {
+              "type": "object",
+              "required": [
+                "metric",
+                "data"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "metric": {
+                  "type": "object",
+                  "description": "Label key-value pairs identifying this series.",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "data": {
+                  "type": "array",
+                  "description": "Array of [timestamp, value] data points. Timestamps are Unix epoch seconds; values are strings.",
+                  "items": {
+                    "type": "array",
+                    "description": "A [timestamp, value] tuple. The first element is a Unix timestamp (number), the second is the metric value (string).",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "number",
+                          "description": "Unix timestamp in seconds."
+                        },
+                        {
+                          "type": "string",
+                          "description": "Metric value as a string."
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "labels": {
+            "type": "object",
+            "description": "Available label values for the queried metric, keyed by label name.",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "debug": {
+            "type": "object",
+            "description": "Internal debug information. This field is not part of the public API and may be removed without notice.",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The PromQL query that was executed."
+              },
+              "metricType": {
+                "type": "string",
+                "description": "The resolved metric type."
+              },
+              "isTruncated": {
+                "type": "boolean",
+                "description": "Whether the series data was truncated due to limits."
+              }
+            }
+          }
+        }
+      },
       "impactMetricsConfigSchema": {
         "type": "object",
         "required": [
@@ -21648,7 +22543,6 @@
           "yAxisMin",
           "aggregationMode",
           "labelSelectors",
-          "type",
           "displayName",
           "id"
         ],
@@ -21708,16 +22602,14 @@
               ]
             }
           },
-          "type": {
+          "source": {
             "type": "string",
-            "description": "The type of metric",
             "enum": [
-              "counter",
-              "gauge",
-              "histogram",
-              "unknown"
+              "internal",
+              "external"
             ],
-            "example": "counter"
+            "description": "The Prometheus data source for this metric. Defaults to internal.",
+            "example": "internal"
           },
           "displayName": {
             "type": "string",
@@ -21858,6 +22750,134 @@
             "description": "Optional title for the impact metric chart.",
             "example": "Feature Toggle Usage",
             "nullable": false
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "internal",
+              "external"
+            ],
+            "description": "The Prometheus data source for this metric. Defaults to internal.",
+            "example": "internal"
+          }
+        }
+      },
+      "registerImpactMetricSchema": {
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "description": "Describes a new impact metric to register with a zero initial value.",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_:][a-zA-Z0-9_:]*$",
+            "description": "The metric name. Must start with a letter or underscore and contain only alphanumerics, underscores or colons.",
+            "example": "checkout_completions"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "counter",
+              "gauge",
+              "histogram"
+            ],
+            "description": "The type of metric to register.",
+            "example": "counter"
+          }
+        }
+      },
+      "externalImpactMetricsSourceSchema": {
+        "description": "Configuration for connecting to an external impact-metrics source (any Prometheus-compatible endpoint). A valid URL must be supplied whenever `enabled` is true, including when re-enabling after a previous disable.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled"
+        ],
+        "example": {
+          "enabled": true,
+          "url": "https://metrics.example.com"
+        },
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the external impact-metrics source is active. When `true`, `url` must be a valid non-empty URL.",
+            "example": true
+          },
+          "url": {
+            "type": "string",
+            "description": "Base URL of the external impact-metrics source. Basic-Auth credentials may be embedded in the URL (e.g. `https://user:pass@metrics.example.com`); they are extracted into an `Authorization` header on outbound requests. Required (non-empty, valid URL) when `enabled` is true; an empty string is discarded when `enabled` is false.",
+            "example": "https://metrics.example.com"
+          }
+        }
+      },
+      "setExternalImpactMetricsSourceSchema": {
+        "description": "Configuration for connecting to an external impact-metrics source (any Prometheus-compatible endpoint). A valid URL must be supplied whenever `enabled` is true, including when re-enabling after a previous disable.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled"
+        ],
+        "example": {
+          "enabled": true,
+          "url": "https://metrics.example.com"
+        },
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the external impact-metrics source is active. When `true`, `url` must be a valid non-empty URL.",
+            "example": true
+          },
+          "url": {
+            "type": "string",
+            "description": "Base URL of the external impact-metrics source. Basic-Auth credentials may be embedded in the URL (e.g. `https://user:pass@metrics.example.com`); they are extracted into an `Authorization` header on outbound requests. Required (non-empty, valid URL) when `enabled` is true; an empty string is discarded when `enabled` is false.",
+            "example": "https://metrics.example.com"
+          }
+        }
+      },
+      "validateExternalImpactMetricsSourceSchema": {
+        "description": "Request body for validating an external impact-metrics source URL. The URL is checked on the fly and is not persisted.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url"
+        ],
+        "example": {
+          "url": "https://metrics.example.com"
+        },
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Base URL of the external impact-metrics source to test. Basic-Auth credentials may be embedded in the URL (e.g. `https://user:pass@metrics.example.com`); they are extracted into an `Authorization` header on outbound requests.",
+            "example": "https://metrics.example.com"
+          }
+        }
+      },
+      "validateExternalImpactMetricsSourceResultSchema": {
+        "description": "Result of validating an external impact-metrics source URL. The endpoint always returns 200; failures are reported in the `error` field while `metrics` is empty.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metrics"
+        ],
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "description": "List of metric names discovered at the supplied URL. Empty when the URL could not be validated.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "http_requests_total",
+              "process_cpu_seconds_total"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "Human-readable explanation of why the URL could not be validated. Omitted on success.",
+            "example": "External source returned HTTP 401"
           }
         }
       },
@@ -22185,6 +23205,15 @@
                     "default"
                   ]
                 }
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "internal",
+                  "external"
+                ],
+                "description": "The Prometheus data source for this metric. Internal is the Unleash-managed Prometheus, external is a customer-provided Prometheus instance. Defaults to internal if not specified.",
+                "example": "internal"
               }
             },
             "description": "Metric configuration that should be evaluated for the safeguard."
@@ -22192,6 +23221,71 @@
           "triggerCondition": {
             "$ref": "#/components/schemas/safeguardTriggerConditionSchema",
             "description": "The condition that triggers the safeguard."
+          }
+        }
+      },
+      "approveUserAccessRequestSchema": {
+        "type": "object",
+        "required": [
+          "rootRole"
+        ],
+        "description": "The data required to approve a user access request.",
+        "additionalProperties": false,
+        "properties": {
+          "rootRole": {
+            "type": "integer",
+            "description": "The ID of the root role to assign to the new user.",
+            "example": 2
+          }
+        }
+      },
+      "userAccessRequestSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "requestedAt"
+        ],
+        "description": "An object describing a user access request.",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ULID identifier for this user access request.",
+            "example": "01JB9GGTGQYEQ9D40R17T3YVW1"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address of the user requesting access.",
+            "example": "rocky@planet-erid.com"
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time of when the user access was requested.",
+            "example": "2023-12-27T13:37:00+01:00"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The URL of the user profile image generated based on the email address.",
+            "example": "https://www.gravatar.com/avatar/abc123"
+          }
+        }
+      },
+      "userAccessRequestsSchema": {
+        "description": "A response model with a list of user access requests.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "userAccessRequests"
+        ],
+        "properties": {
+          "userAccessRequests": {
+            "type": "array",
+            "description": "A list of user access requests.",
+            "items": {
+              "$ref": "#/components/schemas/userAccessRequestSchema"
+            }
           }
         }
       }
@@ -22277,7 +23371,8 @@
           }
         },
         "summary": "Retrieve enabled feature flags for the provided context.",
-        "description": "This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context. Context values are provided as query parameters. If the Frontend API is disabled 404 is returned."
+        "description": "This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context. Context values are provided as query parameters. If the Frontend API is disabled 404 is returned.",
+        "x-stability-level": "stable"
       },
       "post": {
         "tags": [
@@ -22362,7 +23457,8 @@
           }
         },
         "summary": "Retrieve enabled feature flags for the provided context, using POST.",
-        "description": "This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context, using POST. Context values are provided as a `context` property in the request body. If the Frontend API is disabled 404 is returned."
+        "description": "This endpoint returns the list of feature flags that the frontend API evaluates to enabled for the given context, using POST. Context values are provided as a `context` property in the request body. If the Frontend API is disabled 404 is returned.",
+        "x-stability-level": "stable"
       }
     },
     "/api/frontend/client/metrics": {
@@ -22472,7 +23568,8 @@
               }
             }
           }
-        }
+        },
+        "x-stability-level": "stable"
       }
     },
     "/api/frontend/client/register": {
@@ -22579,7 +23676,8 @@
               }
             }
           }
-        }
+        },
+        "x-stability-level": "stable"
       }
     }
   }
