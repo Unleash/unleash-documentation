@@ -26,6 +26,8 @@ jobs:
         with:
           files: |
             fern/pages/**/*.mdx
+          files_ignore: |
+            fern/pages/welcome.mdx
 
       - name: Update last-updated frontmatter
         if: steps.changed-files.outputs.any_changed == 'true'
