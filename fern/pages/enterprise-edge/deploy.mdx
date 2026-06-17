@@ -5,6 +5,7 @@ keywords: enterprise edge, deploy, self-hosted, docker, kubernetes, helm, persis
 og:site_name: Unleash
 og:title: Deploy Enterprise Edge
 max-toc-depth: 2
+last-updated: June 17, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v7.3</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -57,6 +58,14 @@ Edge runs as a single binary or container. Minimum requirements per instance:
 | CPU | 0.1 cores | 1 core |
 | Memory | 64 MB | 128 MB |
 | Disk | 100 MB | 500 MB (with persistence) |
+
+### File handle limits
+
+For high-traffic deployments, increase the number of file handles the container can open. The default limit of `1024` is often too low for thousands of concurrent connections.
+
+Set the limit in Docker with the `--ulimit nofile=65536:65536` flag. For reference, Unleash Cloud sets this to `65536` on its AMIs.
+
+Docker subprocesses can't exceed the host's file handle limit, so you may also need to raise the limit on the host machine.
 
 ## Modes of operation
 
