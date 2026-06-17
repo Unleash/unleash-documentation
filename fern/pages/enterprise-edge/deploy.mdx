@@ -59,12 +59,13 @@ Edge runs as a single binary or container. Minimum requirements per instance:
 | Memory | 64 MB | 128 MB |
 | Disk | 100 MB | 500 MB (with persistence) |
 
-### Further considerations
+### File handle limits
 
-If you're expecting high traffic, we also recommend increasing number of file handles the container is allowed to open. 
+For high-traffic deployments, increase the number of file handles the container can open. The default limit of `1024` is often too low for thousands of concurrent connections.
 
-In our hosting setup, our AMIs sets this to 65536. And if you're expecting 1000s of concurrent connections, you should consider increasing this limit from the default of 1024. You can set this in Docker with the `--ulimit nofile=65536:65536` flag. However, keep in mind that subprocesses of Docker is not allowed to set this limit higher than the host's limit. So you may also need to increase the file handle limit on the host machine.`
+Set the limit in Docker with the `--ulimit nofile=65536:65536` flag. For reference, Unleash Cloud sets this to `65536` on its AMIs.
 
+Docker subprocesses can't exceed the host's file handle limit, so you may also need to raise the limit on the host machine.
 
 ## Modes of operation
 
