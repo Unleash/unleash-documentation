@@ -2,7 +2,7 @@
 title: Microsoft Teams Workflow
 og:site_name: Unleash Documentation
 og:title: Microsoft Teams Workflow
-description: "Set up the Unleash Microsoft Teams Workflow integration to post feature flag updates, configure events, webhooks, channels, and retries."
+description: "Set up the Unleash Microsoft Teams Workflow integration to post feature flag updates, configure events, workflows, channels, and retries."
 max-toc-depth: 2
 slug: integrate/teams-workflow
 last-updated: June 18, 2026
@@ -11,56 +11,57 @@ last-updated: June 18, 2026
 <Button small outlined className="version-button" href="/support/availability">v8.1</Button>
 
 
-The Microsoft Teams Workflow integration allows Unleash to post Updates when a feature flag is updated.
+The Microsoft Teams Workflow integration uses a Microsoft Teams workflow to post updates to your channel when [events](/concepts/events) occur in Unleash, for example when a feature flag is updated.
 
-To set up this integration, you need to set up a webhook connector for your channel. You can follow [Create Incoming Webhooks with workflows for Microsoft Teams](https://support.microsoft.com/en-US/teams/apps-service/create-incoming-webhooks-with-workflows-for-microsoft-teams) on how to do that.
+To set up this integration, you need to create a workflow for your channel. Follow Microsoft's guide on [creating incoming webhooks with workflows for Microsoft Teams](https://support.microsoft.com/en-US/teams/apps-service/create-incoming-webhooks-with-workflows-for-microsoft-teams).
 
-The Microsoft Teams Workflow integration will perform a single retry if the HTTP POST against the Microsoft Teams Webhook URL fails (either a 50x or network error). Duplicate events may happen, and you should never assume events always comes in order.
+If the HTTP POST to the Microsoft Teams workflow URL fails with a 50x or network error, Unleash retries once. Duplicate events can occur, and you should not assume that events always arrive in order.
 
 ## Configuration
 
-#### Events
+### Events
 
-You can choose to trigger updates for the following events:
-- feature-created
-- feature-updated
-- feature-archived
-- feature-revived
-- feature-stale-on
-- feature-stale-off
-- feature-environment-enabled
-- feature-environment-disabled
-- feature-strategy-remove
-- feature-strategy-update
-- feature-strategy-add
-- feature-metadata-updated
-- feature-variants-updated
-- feature-project-change
-- feature-potentially-stale-on
-- change-added
-- change-discarded
-- change-edited
-- change-request-applied
-- change-request-approval-added
-- change-request-approved
-- change-request-cancelled
-- change-request-created
-- change-request-discarded
-- change-request-rejected
-- change-request-sent-to-review
-- change-request-scheduled
-- change-request-scheduled-application-success
-- change-request-scheduled-application-failure
-- change-request-schedule-suspended
-- release-plan-progressions-paused
-- release-plan-progressions-resumed
+You can choose to trigger updates for the following [events](/concepts/events):
 
-#### Parameters
+- `feature-created`
+- `feature-updated`
+- `feature-archived`
+- `feature-revived`
+- `feature-stale-on`
+- `feature-stale-off`
+- `feature-environment-enabled`
+- `feature-environment-disabled`
+- `feature-strategy-remove`
+- `feature-strategy-update`
+- `feature-strategy-add`
+- `feature-metadata-updated`
+- `feature-variants-updated`
+- `feature-project-change`
+- `feature-potentially-stale-on`
+- `change-added`
+- `change-discarded`
+- `change-edited`
+- `change-request-applied`
+- `change-request-approval-added`
+- `change-request-approved`
+- `change-request-cancelled`
+- `change-request-created`
+- `change-request-discarded`
+- `change-request-rejected`
+- `change-request-sent-to-review`
+- `change-request-scheduled`
+- `change-request-scheduled-application-success`
+- `change-request-scheduled-application-failure`
+- `change-request-schedule-suspended`
+- `release-plan-progressions-paused`
+- `release-plan-progressions-resumed`
 
-Unleash Microsoft Teams Workflow integration takes the following parameters.
+### Parameters
 
-- **Microsoft Teams Workflow Webhook URL** - This is the only required property.
+The Microsoft Teams Workflow integration takes the following parameters:
 
-#### Tags
+- **Microsoft Teams Workflow URL**: the only required property.
 
-Microsoft teams's incoming webhooks are channel specific. You will be able to create multiple integrations to support messaging on multiple channels.
+### Tags
+
+Microsoft Teams workflows are channel-specific. You can create multiple integrations to post updates to multiple channels.

@@ -1085,6 +1085,8 @@ redirects:
     destination: "/concepts/api-tokens-and-client-keys"
   - source: "/integrate/slack"
     destination: "/integrate/slack-app"
+  - source: "/integrate/teams"
+    destination: "/integrate/teams-workflow"
   - source: "/integrate/jira-server-plugin-usage"
     destination: "/integrate/jira-cloud-plugin-usage"
   - source: "/integrations/:slug*"
