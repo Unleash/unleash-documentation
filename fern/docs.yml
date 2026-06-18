@@ -278,7 +278,7 @@ navigation:
               - page: Slack
                 path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
-              - page: Microsoft Teams Workflow
+              - page: Microsoft Teams workflow
                 path: pages/integrate/teams-workflow.mdx
                 slug: integrate/teams-workflow
               - page: Terraform
