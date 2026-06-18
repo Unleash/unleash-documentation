@@ -278,9 +278,9 @@ navigation:
               - page: Slack
                 path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
-              - page: Microsoft Teams
-                path: pages/integrate/teams.mdx
-                slug: integrate/teams
+              - page: Microsoft Teams workflow
+                path: pages/integrate/teams-workflow.mdx
+                slug: integrate/teams-workflow
               - page: Terraform
                 path: pages/integrate/terraform.mdx
               - page: Webhook
@@ -1085,6 +1085,8 @@ redirects:
     destination: "/concepts/api-tokens-and-client-keys"
   - source: "/integrate/slack"
     destination: "/integrate/slack-app"
+  - source: "/integrate/teams"
+    destination: "/integrate/teams-workflow"
   - source: "/integrate/jira-server-plugin-usage"
     destination: "/integrate/jira-cloud-plugin-usage"
   - source: "/integrations/:slug*"
