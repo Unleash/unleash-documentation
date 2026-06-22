@@ -1004,19 +1004,10 @@ check:
 
 redirects:
   # --- Academy to Learning Lab ---
-  # Map old per-course pages to the matching new course; keep the wildcard last as a catch-all.
-  - source: "/unleash-academy/foundational"
-    destination: "/learning-lab/understand"
-  - source: "/unleash-academy/advanced-for-devs"
-    destination: "/learning-lab/build"
-  - source: "/unleash-academy/managing-unleash-for-devops"
-    destination: "/learning-lab/scale"
-  - source: "/unleash-academy/introduction"
-    destination: "/learning-lab"
   - source: "/unleash-academy"
-    destination: "/learning-lab"
+    destination: "/learning-lab/introduction"
   - source: "/unleash-academy/:slug*"
-    destination: "/learning-lab"
+    destination: "/learning-lab/introduction"
   # --- Helm charts ---
   - source: "/helm-charts/index.yaml"
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/index.yaml"

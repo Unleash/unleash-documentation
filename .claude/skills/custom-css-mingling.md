@@ -67,10 +67,6 @@ Decorative mountain texture in the bottom-right corner, rendered via `body::afte
 
 **The z-index trade-off:** Fern's `main` has Tailwind `z-0`. The mountain needs to render behind content, so `main` gets `z-index: 1`. But at <=1024px, Fern's header tabs dropdown sits between `#fern-header` and `main` — if `main` has a stacking context, it covers the tabs. So we hide the mountain and reset `main` to `z-index: auto` at <=1024px.
 
-## Learning Lab
-
-The Learning Lab pages use Fern's native `<CardGroup>` / `<Card>` components with **no custom CSS** — card images render with Fern's defaults. The old `unleash-academy-*` / `--academy-*` styling was removed when Academy became the Learning Lab and courses moved to an external LMS.
-
 ## Theme config in `docs.yml`
 
 Prefer Fern config over custom CSS when possible:
