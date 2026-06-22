@@ -20,7 +20,7 @@ fern/
     guides/             # Best practices, workflows, language-specific tutorials
     sdks/               # SDK documentation (backend/ and frontend/ subdirectories)
     enterprise-edge/    # Enterprise Edge deployment and configuration
-    academy/            # Unleash Academy courses
+    learning-lab/       # Unleash Learning Lab landing page (courses hosted in external LMS)
     apis/               # API overview pages
     integrate/          # Integrations (Datadog, Slack, Jira, Terraform, etc.)
   apis/                 # OpenAPI specs (committed, updated by CI)
@@ -79,7 +79,7 @@ Used across SDK pages and other documentation pages where feature availability n
 
 ### Tabs
 
-The site has 7 tabs: Docs, APIs, SDKs, Enterprise Edge, Guides, Academy, Release notes. Each tab's navigation tree is defined under `navigation:` in `docs.yml`.
+The site has 7 tabs: Docs, APIs, SDKs, Enterprise Edge, Guides, Learning Lab, Release notes. Each tab's navigation tree is defined under `navigation:` in `docs.yml`.
 
 ### API reference
 
