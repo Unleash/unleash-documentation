@@ -4,7 +4,7 @@ This site is powered by [Fern](https://buildwithfern.com/), which uses Tailwind 
 
 ## Key files
 
-- `fern/styles.css` — All custom CSS. Overrides Fern for theming, layout, landing page, academy, footer, and mountain backdrop.
+- `fern/styles.css` — All custom CSS. Overrides Fern for theming, layout, landing page, footer, and mountain backdrop.
 - `fern/docs.yml` — Fern config. Colors, typography, navbar links, layout, redirects. Also registers the footer component.
 - `fern/components/CustomFooter.tsx` — Footer component. SSR'd by Fern via `footer:` in `docs.yml`. Styled by CSS classes in `styles.css`.
 
@@ -66,10 +66,6 @@ Fern's key breakpoint is **1024px** — the sidebar collapses and header tabs be
 Decorative mountain texture in the bottom-right corner, rendered via `body::after` with `position: fixed`.
 
 **The z-index trade-off:** Fern's `main` has Tailwind `z-0`. The mountain needs to render behind content, so `main` gets `z-index: 1`. But at <=1024px, Fern's header tabs dropdown sits between `#fern-header` and `main` — if `main` has a stacking context, it covers the tabs. So we hide the mountain and reset `main` to `z-index: auto` at <=1024px.
-
-## Academy
-
-Custom MDX components with `unleash-academy-*` classes and `--academy-*` CSS variables. Self-contained. All selectors use doubled classes for specificity.
 
 ## Theme config in `docs.yml`
 

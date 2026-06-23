@@ -52,9 +52,9 @@ tabs:
     slug: unleash-edge
   guides:
     display-name: Guides    
-  academy:
-    display-name: Academy
-    slug: unleash-academy
+  learning-lab:
+    display-name: Learning Lab
+    slug: learning-lab
   release-notes:
     display-name: Release notes
     changelog: ./changelog
@@ -936,19 +936,23 @@ navigation:
               - page: Advanced Ruby on Rails examples
                 path: pages/guides/language-specific-tutorials/rails/rails-examples.mdx
 
-  - tab: academy
+  - tab: learning-lab
     layout:
-      - page: Unleash Academy
-        path: pages/academy/academy.mdx
+      - page: Unleash Learning Lab
+        path: pages/learning-lab/learning-lab.mdx
         slug: introduction
-      - page: Foundational
-        path: pages/academy/foundational.mdx
-      - page: Advanced for Developers
-        path: pages/academy/advanced-for-devs.mdx
-        slug: advanced-for-devs
-      - page: Managing Unleash for DevOps/Admins
-        path: pages/academy/managing-unleash-for-devops.mdx
-        slug: managing-unleash-for-devops
+      - page: Understand
+        path: pages/learning-lab/understand.mdx
+        slug: understand
+      - page: Build
+        path: pages/learning-lab/build.mdx
+        slug: build
+      - page: Scale
+        path: pages/learning-lab/scale.mdx
+        slug: scale
+      - page: Champion
+        path: pages/learning-lab/champion.mdx
+        slug: champion
 
   - tab: release-notes
 
@@ -999,6 +1003,11 @@ check:
     missing-redirects: warn
 
 redirects:
+  # --- Academy to Learning Lab ---
+  - source: "/unleash-academy"
+    destination: "/learning-lab/introduction"
+  - source: "/unleash-academy/:slug*"
+    destination: "/learning-lab/introduction"
   # --- Helm charts ---
   - source: "/helm-charts/index.yaml"
     destination: "https://raw.githubusercontent.com/Unleash/helm-charts/gh-pages/index.yaml"
