@@ -1,15 +1,20 @@
 import fs from 'node:fs/promises';
 
-const url = 'https://us.app.unleash-hosted.com/ushosted/docs/openapi.json';
+const unleashOpenApiUrl = 'https://us.app.unleash-hosted.com/ushosted/docs/openapi.json';
+const edgeOpenApiUrl = 'https://unleashsbx.edge.getunleash.io/docs/openapi.json';
 
-console.log('📥 Fetching OpenAPI spec...');
+async function fetchOpenApiSpec(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch OpenAPI spec from ${url}: ${response.statusText}`);
+    }
 
-const response = await fetch(url);
-if (!response.ok) {
-    throw new Error(`Failed to fetch OpenAPI spec: ${response.statusText}`);
+    return response.json();
 }
 
-const data = await response.json();
+console.log('📥 Fetching Unleash OpenAPI spec...');
+
+const data = await fetchOpenApiSpec(unleashOpenApiUrl);
 
 // Replace server URL with user-agnostic example
 data.servers = [
@@ -118,3 +123,27 @@ console.log(`✅ Saved to fern/apis/admin-api/openapi.json`);
 console.log(`📦 Version: ${adminApiData.info.version}`);
 console.log(`🔗 Endpoints: ${Object.keys(adminApiData.paths || {}).length}`);
 console.log(`🚫 Filtered out tags: Client, Frontend API`);
+
+console.log('📥 Fetching Unleash Edge OpenAPI spec...');
+
+const edgeApiData = await fetchOpenApiSpec(edgeOpenApiUrl);
+
+edgeApiData.servers = [
+    {
+        url: 'https://edge.unleash-instance.example.com',
+        description: 'Your Unleash Edge instance (replace with your actual URL)',
+    },
+];
+
+const edgeApiJsonString = cleanJsonString(edgeApiData);
+
+await fs.mkdir('./fern/apis/edge-api', { recursive: true });
+await fs.writeFile(
+    './fern/apis/edge-api/openapi.json',
+    edgeApiJsonString,
+    'utf8',
+);
+
+console.log(`✅ Saved to fern/apis/edge-api/openapi.json`);
+console.log(`📦 Version: ${edgeApiData.info.version}`);
+console.log(`🔗 Endpoints: ${Object.keys(edgeApiData.paths || {}).length}`);

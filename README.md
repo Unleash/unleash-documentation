@@ -41,15 +41,16 @@ That's it. The dev server starts at `http://localhost:3000`.
 | --- | --- |
 | `fern docs dev` | Starts the local dev server. |
 | `fern check --strict-broken-links` | Validates the documentation and checks for broken links. |
-| `node scripts/fetch-openapi.mjs` | Manually refreshes the API specs from the hosted Unleash instance. Only needed if you want a newer spec than what's committed. |
+| `node scripts/fetch-openapi.mjs` | Manually refreshes the API specs from the hosted Unleash and Unleash Edge instances. Only needed if you want newer specs than what's committed. |
 
 ## How API specs are updated
 
-CI automatically fetches the latest OpenAPI spec from the hosted Unleash instance on every push to `main` and every PR. The spec is split into three domains to keep the API reference navigable:
+CI automatically fetches the latest OpenAPI specs from hosted Unleash and Unleash Edge instances on every push to `main` and every PR. The Unleash spec is split into three domains to keep the API reference navigable, and the Edge spec is published as its own reference:
 
 - **Admin API** (`fern/apis/admin-api/`): All endpoints except Client and Frontend.
 - **Client API** (`fern/apis/client-api/`): Client-tagged endpoints only.
 - **Frontend API** (`fern/apis/frontend-api/`): Frontend API-tagged endpoints only.
+- **Unleash Edge API** (`fern/apis/edge-api/`): Client and Frontend compatible endpoints exposed by Unleash Edge.
 
 You only need to run `node scripts/fetch-openapi.mjs` locally if you're working on API reference content and need a spec that's newer than the last CI run.
 

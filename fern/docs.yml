@@ -391,6 +391,31 @@ navigation:
             contents:
               - endpoint: POST /api/frontend/client/register
 
+      - api: Unleash Edge API
+        api-name: edge-api
+        skip-slug: true
+        layout:
+          - section: "Client API"
+            skip-slug: true
+            contents:
+              - endpoint: GET /api/client/features
+              - endpoint: POST /api/client/features
+              - endpoint: GET /api/client/features/{feature_name}
+              - endpoint: POST /api/client/metrics
+              - endpoint: POST /api/client/metrics/bulk
+              - endpoint: POST /api/client/register
+          - section: "Frontend API"
+            skip-slug: true
+            contents:
+              - endpoint: GET /api/frontend
+              - endpoint: POST /api/frontend
+              - endpoint: GET /api/frontend/all
+              - endpoint: POST /api/frontend/all
+              - endpoint: GET /api/frontend/features/{feature_name}
+              - endpoint: POST /api/frontend/features/{feature_name}
+              - endpoint: POST /api/frontend/client/metrics
+              - endpoint: POST /api/frontend/client/register
+
       - api: Admin API
         api-name: admin-api
         skip-slug: true
