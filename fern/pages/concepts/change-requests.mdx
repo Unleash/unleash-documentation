@@ -26,7 +26,7 @@ Anyone with project access can create a change request; however, only users with
 
 The **skip change requests** [permission](/concepts/rbac#environment-level-permissions) allows users to bypass the change request flow for environment-specific actions, such as enabling or disabling a flag or updating its activation strategies in that environment. With this permission in place, you can quickly turn a flag on or off in case you experience issues with a release. This permission alone does not grant access to any other resource, so the user still needs additional permissions, such as to turn a flag on or off.
 
-The skip change requests permission applies only to environment-specific actions. It does not apply to feature-level actions that affect a flag across all environments, such as archiving or deleting a flag. In a project with change requests enabled, these actions must go through a change request, even for users who have the skip change requests permission. To archive a flag in such a project, add it to a change request using the archive feature change type.
+The skip change requests permission applies only to environment-specific actions. It does not apply to feature-level actions that affect a flag across all environments, such as archiving or deleting a flag. In a project with change requests enabled, these actions must go through a change request, even for users who have the skip change requests permission.
 
 Admin users also see the change request flow, but they can approve and apply their own changes.
 
