@@ -78,11 +78,20 @@ curl -H "Authorization: YOUR_TOKEN" \
 
 ## Unleash Edge API
 
-Unleash Edge exposes Client API and Frontend API compatible endpoints from your Edge deployment. Use these endpoints when SDKs connect to Edge instead of directly to your Unleash instance.
+[Unleash Edge](/unleash-edge) sits between your applications and your Unleash instance, exposing endpoints that are compatible with the Client API and Frontend API. SDKs connect to Edge instead of connecting directly to Unleash, which reduces latency and offloads traffic from your main instance.
 
-**Base paths**: `<your-edge-url>/api/client`, `<your-edge-url>/api/frontend`
+Edge serves cached Client API data for server-side evaluation and returns evaluated Frontend API responses for client-side applications.
 
-**Primary use**: Reduce latency and load on your main Unleash instance by serving SDK requests from Edge.
+**Authentication**: [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) for Client API endpoints, [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) for Frontend API endpoints.
+
+**Base paths**:
+
+- Client API endpoints: `<your-edge-url>/api/client`
+- Frontend API endpoints: `<your-edge-url>/api/frontend`
+
+<Note>
+The Unleash Edge API documents the endpoints that Edge exposes to your SDKs. These are different from the endpoints that Edge calls back to your Unleash instance, such as token validation and metrics ingestion. Those endpoints live on your Unleash server and appear under the Unleash Edge section of the Admin API, for example [Register Edge observability metrics](/api/register-edge-observability-metrics).
+</Note>
 
 ## API authentication and tokens
 

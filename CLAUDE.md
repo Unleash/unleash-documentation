@@ -84,10 +84,11 @@ The site has 7 tabs: Docs, APIs, SDKs, Enterprise Edge, Guides, Academy, Release
 
 ### API reference
 
-The OpenAPI spec is split into 3 domains to keep the API reference navigable:
+The Unleash OpenAPI spec is split into 3 domains to keep the API reference navigable, and Unleash Edge is published as its own reference:
 - **Admin API** — all endpoints except Client and Frontend
 - **Client API** — Client-tagged endpoints only
 - **Frontend API** — Frontend API-tagged endpoints only
+- **Unleash Edge API** — Client and Frontend compatible endpoints exposed by Unleash Edge (separate spec)
 
 ## Writing standards
 
