@@ -5,6 +5,7 @@ og:title: Change requests - Require approval before making changes to feature fl
 description: Change requests allow you to require an additional approval step before any changes can be made in an environment. This functionality supports the "four-eyes principle", ensuring compliance in industries with strict legal or regulatory requirements.
 keywords: change requests, approval, compliance, four-eyes principle, scheduled changes
 max-toc-depth: 3
+last-updated: June 29, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v4.19</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -23,7 +24,9 @@ You can require up to 10 approvals for a change request. When you add an approve
 
 Anyone with project access can create a change request; however, only users with specific permissions can approve, apply, or skip them. None of the predefined roles have any change request permissions, so you must create [custom project roles](/concepts/rbac#custom-project-roles).
 
-The **skip change requests** [permission](/concepts/rbac#environment-level-permissions) allows users to bypass the change request flow. With this permission in place, you can quickly turn a flag on or off in case you experience issues with a release. This permission alone does not grant access to any other resource, so the user still needs additional permissions, such as to turn a flag on or off.
+The **skip change requests** [permission](/concepts/rbac#environment-level-permissions) allows users to bypass the change request flow for environment-specific actions, such as enabling or disabling a flag or updating its activation strategies in that environment. With this permission in place, you can quickly turn a flag on or off in case you experience issues with a release. This permission alone does not grant access to any other resource, so the user still needs additional permissions, such as to turn a flag on or off.
+
+The skip change requests permission applies only to environment-specific actions. It does not apply to feature-level actions that affect a flag across all environments, such as archiving or deleting a flag. In a project with change requests enabled, these actions must go through a change request, even for users who have the skip change requests permission.
 
 Admin users also see the change request flow, but they can approve and apply their own changes.
 

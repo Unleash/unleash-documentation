@@ -5,7 +5,7 @@ keywords: rbac, role-based access control, permissions, root roles, project role
 og:site_name: Unleash Documentation
 og:title: Role-based Access Control in Unleash
 max-toc-depth: 3
-last-updated: June 9, 2026
+last-updated: June 29, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v4.0</Button>
@@ -273,7 +273,7 @@ You can assign the following permissions on a per-environment level within the p
 | Update variants              | Create, edit, and remove variants within the environment.                                                                                                                                                                                                                                                                                |
 | Approve a change request     | Approve [change requests](/concepts/change-requests) in the environment.                                                                                                                                                                                                                                                                       |
 | Apply a change request       | Apply change requests in the environment.                                                                                                                                                                                                                                                                                               |
-| Skip change requests         | Skip the change request process for a project and environment where change requests are enabled.  |
+| Skip change requests         | Skip the change request process for environment-specific actions, such as enabling or disabling flags, in an environment where change requests are enabled. This permission does not apply to feature-level actions that affect a flag across all environments, such as archiving flags, which must go through a change request.  |
 
 ## Multiple project roles
 
