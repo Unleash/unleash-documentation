@@ -6,7 +6,7 @@ og:title: Developer Toolbar
 keywords: developer toolbar, feature flags, debugging, local development, testing, overrides
 max-toc-depth: 3
 slug: integrate/toolbar
-last-updated: May 11, 2026
+last-updated: June 29, 2026
 ---
 
 The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you override feature flag values and context properties at runtime without making server changes. It's designed for local development and testing workflows where you need to quickly test different flag configurations or context values.
@@ -22,6 +22,8 @@ The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you ove
 - **Persistence**: Choose between memory, session, or local storage for your overrides
 - **Framework support**: Works with React, Next.js, Vue, Angular, and JavaScript
 - **SSR support**: Cookie-based state sync for server-side rendering in Next.js
+- **Movable and dismissible**: Drag the floating icon to any window edge, minimize it to the icon, or hide it entirely until the next page refresh
+- **Custom banner**: Show an optional message (with an optional link) to clarify the toolbar's scope for your team
 
 <Warning>
 The toolbar is intended for development and testing environments only. Don't use it in production unless you're building a public demo where users interact with feature flags without Unleash access.
@@ -336,8 +338,12 @@ import '@unleash/toolbar/toolbar.css';
 |--------|------|---------|-------------|
 | `storageMode` | `'memory'` \| `'session'` \| `'local'` | `'local'` | Where to persist overrides. `local` survives browser restarts, `session` clears when tab closes, `memory` clears on reload. |
 | `storageKey` | `string` | `'unleash-toolbar-state'` | Storage key for persistence. |
-| `position` | `'top-left'` \| `'top-right'` \| `'bottom-left'` \| `'bottom-right'` \| `'left'` \| `'right'` | `'bottom-right'` | Toolbar button position. |
+| `position` | `'top-left'` \| `'top-right'` \| `'bottom-left'` \| `'bottom-right'` \| `'left'` \| `'right'` | `'bottom-right'` | Starting toolbar position. Once the user drags the toolbar, the dragged position takes over. |
+| `draggable` | `boolean` | `true` | Allow dragging the floating icon to any window edge. The chosen position is persisted. |
 | `initiallyVisible` | `boolean` | `false` | Whether the toolbar panel is open on load. |
+| `banner` | `string` | - | Optional message shown as a banner below the header. Useful for clarifying the toolbar's scope to your team. Empty by default. |
+| `bannerLink` | `string` | - | Optional URL shown as a link next to the banner message. Only rendered when `banner` is also set. Opens in a new tab. |
+| `bannerLinkText` | `string` | `'Read more'` | Text for the banner link. Only used when `bannerLink` is set. |
 | `sortAlphabetically` | `boolean` | `false` | Sort flags alphabetically instead of by evaluation order. |
 | `themePreset` | `'light'` \| `'dark'` | `'light'` | Color theme preset. |
 | `theme` | `object` | - | Custom theme with `primaryColor`, `backgroundColor`, `textColor`, `borderColor`, `fontFamily`. |
@@ -349,6 +355,24 @@ import '@unleash/toolbar/toolbar.css';
 - **`local`** (recommended for development): Persists across all tabs and browser restarts. Set overrides once, test everywhere.
 - **`session`**: Persists within the current tab only. Useful for testing different configurations in multiple tabs simultaneously.
 - **`memory`**: No persistence. Clears on every page reload. Use for quick one-off tests.
+
+### Moving and hiding the toolbar
+
+- **Move it**: Drag the floating icon to any window edge. It snaps to the nearest edge and remembers its position across reloads. Set `draggable: false` to disable dragging and keep the configured `position`.
+- **Minimize it**: Click the minimize (`_`) button in the panel header to collapse the panel back to the floating icon.
+- **Hide it completely**: Click the close (`×`) button to hide both the panel and the icon. This is temporary; the toolbar reappears (minimized) after a page refresh.
+
+### Adding a banner
+
+Use the `banner` option to display a message in the toolbar, for example to clarify which flags the toolbar can override. Optionally add a link with `bannerLink` (and customize its label with `bannerLinkText`).
+
+```javascript
+initUnleashToolbar(client, {
+  banner: 'Only client-side flags are overridable here. Backend-only flags are unaffected.',
+  bannerLink: 'https://docs.getunleash.io/integrate/toolbar',
+  bannerLinkText: 'Learn more', // defaults to "Read more"
+});
+```
 
 ## API reference
 
@@ -408,10 +432,10 @@ The toolbar is optimized for minimal impact:
 
 | Package | Size (gzipped) |
 |---------|----------------|
-| Core | ~8 KB |
-| React wrapper | ~0.2 KB |
-| Next.js utilities | ~0.6 KB |
-| CSS | ~2.4 KB |
+| Core | ~9.5 KB |
+| React wrapper | ~0.6 KB |
+| Next.js utilities | ~0.7 KB |
+| CSS | ~2.7 KB |
 
 ## Requirements
 
