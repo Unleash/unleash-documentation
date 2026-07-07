@@ -1,0 +1,568 @@
+---
+title: Integrate Unleash with OpenAI Codex
+og:site_name: Unleash Documentation
+og:title: Integrate Unleash with OpenAI Codex for AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in the OpenAI Codex CLI and IDE extension.
+keywords: codex, openai codex, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
+max-toc-depth: 3
+slug: integrate/codex
+last-updated: July 7, 2026
+---
+
+The [Unleash MCP server](/integrate/mcp) connects OpenAI Codex to your Unleash instance, enabling AI-assisted feature flag management.
+You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from within Codex.
+
+Codex supports MCP across two local interfaces that share the same configuration file:
+
+- **Codex CLI** — The open-source terminal agent, installed with npm or Homebrew
+- **Codex IDE extension** — The editor integration for VS Code and compatible editors
+
+Codex governs the agent while it writes code, through an operating-system sandbox and an approval prompt that appears before each action, including every MCP tool call. Feature flags govern the code after it ships, through progressive rollout and instant rollback. The two work together: Codex keeps a human in the loop at authoring time, and Unleash keeps the release under control at runtime.
+
+<Note>
+This guide covers the **local** Unleash MCP server, a stdio process that runs in the Codex CLI and IDE extension.
+It is the simplest setup and the focus of this page.
+
+Unleash also offers a [remote MCP server](/integrate/mcp#remote-mcp-server) (Streamable HTTP, available on Enterprise plans),
+which matters for Codex cloud agents that run in a network-isolated sandbox that cannot run a local stdio server.
+Codex can connect to a remote HTTP MCP server. Remember to enable internet access for the environment and add your Unleash host to the allowlist for both read and write methods (GET, POST, PATCH, DELETE) so flag changes work too.
+
+If you are not using cloud tasks, create and wrap flags locally with the setup below, then let cloud-delegated pull requests ship behind those flags.
+</Note>
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: The MCP server is distributed as an npm package
+- Codex: The [CLI](https://developers.openai.com/codex/cli) or the IDE extension, installed
+- A signed-in Codex session: Run `codex login` and sign in with your ChatGPT account, or configure an API key
+- An Unleash instance: Cloud or self-hosted, with API access enabled
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT): With permissions to create and manage feature flags
+
+<Warning>
+You must sign in before the agent can call MCP tools. You can add the server and run `codex mcp list` before signing in, but the first tool call in an unauthenticated session fails with a 401 error. Run `codex login` first.
+</Warning>
+
+## Install the MCP server
+
+Codex stores its configuration in `~/.codex/config.toml`. The CLI and the IDE extension read the same file, so you configure the server once.
+
+<Steps>
+
+<Step title="Create a credentials file">
+
+Store your Unleash credentials in a centralized file and source it from your shell profile:
+
+```bash
+mkdir -p ~/.unleash
+cat > ~/.unleash/mcp.env << 'EOF'
+UNLEASH_BASE_URL=https://your-instance.getunleash.io
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+EOF
+chmod 600 ~/.unleash/mcp.env
+```
+
+Add to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+# Unleash MCP credentials
+if [ -f ~/.unleash/mcp.env ]; then
+  source ~/.unleash/mcp.env
+  export UNLEASH_BASE_URL UNLEASH_PAT UNLEASH_DEFAULT_PROJECT
+fi
+```
+
+Restart your terminal or run `source ~/.zshrc` to load the variables.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance URL, without a trailing `/api`. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+</Step>
+
+<Step title="Add the server with the CLI">
+
+Run `codex mcp add` from your project root. This writes the server configuration to `~/.codex/config.toml`:
+
+```bash
+codex mcp add unleash \
+  --env UNLEASH_BASE_URL="$UNLEASH_BASE_URL" \
+  --env UNLEASH_PAT="$UNLEASH_PAT" \
+  --env UNLEASH_DEFAULT_PROJECT="${UNLEASH_DEFAULT_PROJECT:-default}" \
+  -- npx -y @unleash/mcp@latest --log-level error
+```
+
+Alternatively, edit `~/.codex/config.toml` directly:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.unleash]
+command = "npx"
+args = ["-y", "@unleash/mcp@latest", "--log-level", "error"]
+env = { UNLEASH_BASE_URL = "https://your-instance.getunleash.io", UNLEASH_PAT = "your-personal-access-token", UNLEASH_DEFAULT_PROJECT = "default" }
+```
+
+
+<Note>
+Codex uses TOML with a `[mcp_servers.unleash]` table (note the underscore in `mcp_servers`). The `command` is a string and `args` is an array. The `env` table holds literal values and does not perform `${VAR}` expansion. To forward a variable from your shell instead, use the `env_vars` key (an array of names) rather than `env`.
+</Note>
+
+<Tip>
+You can also write `env` as a subtable, which is easier to read for several variables:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.unleash]
+command = "npx"
+args = ["-y", "@unleash/mcp@latest", "--log-level", "error"]
+
+[mcp_servers.unleash.env]
+UNLEASH_BASE_URL = "https://your-instance.getunleash.io"
+UNLEASH_PAT = "your-personal-access-token"
+UNLEASH_DEFAULT_PROJECT = "default"
+```
+</Tip>
+
+</Step>
+
+<Step title="Verify the installation">
+
+Confirm the server is registered:
+
+```bash
+codex mcp list      # shows: unleash
+codex mcp get unleash
+```
+
+Then start a session and ask: "What Unleash MCP tools are available?" The agent lists every available tool. Codex prefixes MCP tool names with the server name, so the Unleash tools appear as `unleash/evaluate_change`, `unleash/list_flags`, and so on.
+
+</Step>
+
+</Steps>
+
+
+## Approval and sandbox model
+
+Codex enforces an authoring-time boundary through two independent controls. Understanding them explains how MCP tool calls behave.
+
+### The approval prompt
+
+By default, Codex asks before it runs a tool. When the agent calls an Unleash tool, it shows you the tool name and its arguments, then waits:
+
+```text
+Allow the unleash MCP server to run tool "list_projects"?
+
+  limit: 100
+  offset: 0
+  order: asc
+
+  › 1. Allow                   Run the tool and continue.
+    2. Allow for this session  Run the tool and remember this choice for this session.
+    3. Always allow            Run the tool and remember this choice for future tool calls.
+    4. Cancel                  Cancel this tool call
+```
+
+For a write like `create_flag` or `toggle_flag_environment`, you see the flag name and target environment before anything happens. This is a genuine control, so keep the prompt on for writes and reserve "Always allow" for read-only tools.
+
+### The sandbox
+
+Codex runs commands inside an operating-system sandbox: `read-only`, `workspace-write` (the default for interactive work, with network off), or `danger-full-access`. These map to the UI presets **Read Only**, **Auto**, and **Full Access**. The Unleash MCP server reaches your instance normally under the default `workspace-write` sandbox, so you do not need to weaken the sandbox to manage flags.
+
+<Warning>
+In non-interactive `codex exec`, the approval prompt cannot be shown, so MCP tool calls are auto-cancelled with the message `user cancelled MCP tool call`. There is currently no configuration that pre-approves an MCP server while keeping the sandbox (this is a [known open issue](https://github.com/openai/codex/issues/24135)).
+
+For automation, run `codex exec` with `--dangerously-bypass-approvals-and-sandbox` inside an isolated runner with a tightly scoped PAT. For day-to-day flag work, use an interactive session and approve the prompts.
+</Warning>
+
+## Tool reference
+
+The Unleash MCP server exposes the following tools.
+
+<StickyTable>
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
+| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+</StickyTable>
+
+## Workflows
+
+The Unleash MCP server supports these core workflows: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [discover and audit flags](#discover-and-audit-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
+
+### Evaluate and wrap code in feature flags
+
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+
+<Step title="Evaluate the change">
+Tell the agent what you are working on:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+The agent calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+The agent automatically calls `detect_flag` to search for existing flags.
+If a suitable flag exists, the agent suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+The agent calls `create_flag`. Codex shows the approval prompt with the flag name and type. Approve it, and the flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+The agent calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js" {6}
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+
+</Steps>
+
+### Discover and audit flags
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, the agent calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+The agent calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only. Results are paginated with `offset`, `limit`, and `order`; the agent fetches additional pages automatically when a project has many flags.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, the agent calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+The agent compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
+</Step>
+</Steps>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+The agent calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+The agent calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production. Codex shows the approval prompt with the flag name and environment before the change runs.
+</Tab>
+
+</Tabs>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
+</Warning>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+The agent calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent [technical debt](/concepts/technical-debt).
+</Tip>
+
+## AGENTS.md templates
+
+Codex reads [AGENTS.md](https://developers.openai.com/codex/guides/agents-md) files for project instructions.
+Store your [FeatureOps](https://featureops.io/) policies in AGENTS.md so the agent considers feature flags automatically in every session.
+
+Codex merges AGENTS.md files from a global `~/.codex/AGENTS.md` down through your repository, with files closer to the working directory taking precedence. Put universal conventions at the repository root and stricter policies in subdirectories.
+
+### Repository root: universal conventions
+
+```markdown title="AGENTS.md"
+# Feature Flag Conventions
+
+When making changes to this codebase, follow these feature flag practices:
+
+1. **Always evaluate risk** – Before implementing high-risk changes (payments,
+   authentication, data migrations, external integrations), use the Unleash MCP
+   server to evaluate whether a feature flag is needed.
+
+2. **Naming conventions** – Use the format `{domain}-{feature}-{variant}`.
+   Examples: `checkout-stripe-integration`, `auth-sso-google`, `api-rate-limiting`.
+
+3. **Flag types**:
+   - `release` – For gradual feature rollouts
+   - `experiment` – For A/B tests and experiments
+   - `operational` – For system behavior toggles
+   - `kill-switch` – For emergency shutdowns
+   - `permission` – For role-based access
+
+4. **Prefer reuse** – Before creating a new flag, check if a similar flag already
+   exists using the detect_flag tool.
+
+5. **Clean up after rollout** – Once a feature is fully released (100% rollout for
+   2+ weeks), use cleanup_flag to remove dead code.
+
+## Unleash MCP Server
+
+This project uses the Unleash MCP server (configured in ~/.codex/config.toml) for
+feature flag management. Approve write operations after reviewing the arguments.
+
+Available tools: evaluate_change, detect_flag, create_flag, wrap_change,
+list_projects, list_flags, get_flag_state, set_flag_rollout,
+toggle_flag_environment, remove_flag_strategy, cleanup_flag.
+```
+
+### Subdirectory: domain-specific policy
+
+Place this file in a high-risk directory (for example `payments/AGENTS.md`). Because it is closer to the working directory, it overrides the root policy when the agent works in that subtree.
+
+```markdown title="payments/AGENTS.md"
+# Payments Domain — Feature Flag Policy
+
+All changes in the payments domain require feature flags. No exceptions.
+
+- Use `kill-switch` type for external payment provider integrations
+  (Stripe, PayPal, etc.)
+- Use `release` type for internal payment logic changes
+- Naming: `payments-{feature}-{variant}`
+  (e.g., `payments-stripe-checkout`, `payments-refund-v2`)
+- Always include a fallback path for external provider calls
+- Evaluate risk with evaluate_change before writing implementation code
+- Keep approval prompts on for all flag writes in this domain
+```
+
+## Enterprise governance
+
+On Business and Enterprise plans, Codex supports [admin-enforced managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration) through a `requirements.toml` file that Codex fetches from the Codex service and applies across the CLI, IDE, and cloud. Use it to keep the authoring-time boundary in place for every developer.
+
+- **Require a safe sandbox** — Restrict the allowed sandbox modes so developers cannot run in full-access mode for routine work.
+- **Keep approvals on** — Restrict the allowed approval policies so tool calls are not silently auto-approved.
+- **Allowlist the Unleash server** — Define which MCP servers are permitted, so the Unleash server is available and unvetted servers are not.
+- **Control network access** — Define network policy centrally for the sandbox.
+
+This pairs with Unleash's own governance. The MCP server inherits the PAT's permissions and cannot exceed them, so scope the token tightly. Enable [change requests](/concepts/change-requests) on production environments so that enabling a flag requires human approval regardless of what any agent requests. Codex governs how the agent runs; Unleash governs how the release ships.
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** The agent calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed. It prompts for approval before each write.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** The agent calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** The agent calls `toggle_flag_environment` or `get_flag_state`. Writes go through the approval prompt.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** The agent calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+<Accordion title="Discover and audit flags">
+**Intent:** Take inventory of existing flags and identify cleanup candidates.
+
+**Prompts:**
+```text
+List all feature flags in the [projectId] project and identify any that should be cleaned up.
+```
+```text
+Run a flag audit: list all projects, then check for flags at 100% rollout for more than 14 days.
+```
+
+**Expected behavior:** The agent calls `list_projects` (if no project is specified), then `list_flags` for active and archived flags. It cross-references results against code and reports cleanup candidates.
+</Accordion>
+
+<Accordion title="Policy-driven evaluation with AGENTS.md">
+**Intent:** Automatically evaluate code changes based on encoded policies.
+
+**Trigger:** An AGENTS.md file instructs the agent to evaluate risk for high-risk domains.
+
+**Expected behavior:** When you describe a change in a covered domain (for example authentication), the agent calls `evaluate_change` on its own and proposes a flag that follows the documented naming convention, without being asked each time.
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="401 errors on every tool call">
+The agent is not signed in. Run `codex login` and sign in with your ChatGPT account, or configure an API key. `codex mcp list` can show the server as registered before you sign in, but tool calls fail with a 401 until you authenticate.
+</Accordion>
+
+<Accordion title="'user cancelled MCP tool call' in codex exec">
+Non-interactive `codex exec` cannot show the approval prompt, so approval-required calls are auto-cancelled. Run an interactive session and approve the prompt, or use `--dangerously-bypass-approvals-and-sandbox` for automation inside an isolated runner. This is a [known open limitation](https://github.com/openai/codex/issues/24135); a per-server auto-approve setting is proposed but not yet available.
+</Accordion>
+
+<Accordion title="MCP server not appearing in Codex">
+- Verify `~/.codex/config.toml` for TOML syntax errors
+- Confirm the table is `[mcp_servers.unleash]` with an underscore in `mcp_servers`
+- Confirm `command` is a string and `args` is an array
+- Run `codex mcp list` to check the server status
+- Restart Codex after making changes
+</Accordion>
+
+<Accordion title="Authentication or API errors">
+- Confirm your Unleash PAT is valid and has not expired
+- Check that the PAT has permissions to create and manage feature flags
+- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end (the server appends it, and a trailing `/api` produces doubled `/api/api/` paths)
+- Test directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/api/admin/projects"`
+</Accordion>
+
+<Accordion title="Environment variables not applied">
+- The `env` table in `config.toml` holds literal values and does not expand `${VAR}` references
+- To forward a shell variable, use `env_vars = ["VAR_NAME"]` (an array) instead of `env`
+- If you used `codex mcp add` with `--env`, the values are written literally into `config.toml`
+</Accordion>
+
+<Accordion title="Node.js not found">
+Local servers using npx require Node.js 18+. Verify with `node --version`. If Node.js is installed but not found by Codex, check that Codex inherits your shell PATH.
+</Accordion>
+
+<Accordion title="Codex cloud agent cannot reach Unleash">
+Cloud sandboxes are network-isolated by default, and they cannot run a local stdio MCP server. You have two options:
+
+- Run flag operations in the CLI or IDE extension (recommended for most teams), then let cloud tasks open pull requests that ship behind the flags you created.
+- Use the [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) (Enterprise), which Codex connects to by `url`. Enable internet access for the cloud environment, add your Unleash host to the allowlist, and allow write methods (POST, PATCH, DELETE) so flag changes work. Verify the remote server's authentication flow works in a headless environment before relying on it.
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with Codex.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check">
+Leave Codex's approval prompt on for write operations like `create_flag` and `toggle_flag_environment`. The prompt shows the arguments, so you review the exact flag and environment before the call runs.
+</Card>
+
+<Card title="Keep the default sandbox" icon="shield-halved">
+The MCP server reaches your Unleash instance under the default `workspace-write` sandbox. There is no need to switch to full-access mode to manage flags.
+</Card>
+
+<Card title="Define naming conventions" icon="tag">
+Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in AGENTS.md so the agent applies them automatically.
+</Card>
+
+<Card title="Prevent duplication" icon="clone">
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
+</Card>
+
+<Card title="Keep flags temporary" icon="clock">
+Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
+</Card>
+
+<Card title="Enforce policy org-wide" icon="building-shield">
+Use `requirements.toml` to require a safe sandbox, keep approvals on, and allowlist the Unleash server across the CLI, IDE, and cloud.
+</Card>
+</CardGroup>
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [OpenAI Codex documentation](https://developers.openai.com/codex)
+- [Codex MCP configuration](https://developers.openai.com/codex/mcp)
+- [Codex AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md)
+- [Codex sandboxing](https://developers.openai.com/codex/concepts/sandboxing)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
+```
