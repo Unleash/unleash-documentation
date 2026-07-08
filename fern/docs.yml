@@ -302,6 +302,8 @@ navigation:
                 path: pages/ai-coding-assistants/cursor.mdx
               - page: OpenCode
                 path: pages/ai-coding-assistants/opencode.mdx
+              - page: OpenAI Codex
+                path: pages/ai-coding-assistants/codex.mdx
 
           - page: Developer Toolbar
             path: pages/integrate/toolbar.mdx
