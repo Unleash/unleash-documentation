@@ -295,6 +295,12 @@ The Unleash MCP server exposes the following tools.
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
 </StickyTable>
 
+<Warning>
+Kiro's MCP client does not currently render MCP `resource_link` responses. Calling `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, or `remove_flag_strategy` fails with `Error calling MCP tool: Unsupported response item type: resource_link`, though the operation may still succeed in Unleash. The other tools (`evaluate_change`, `detect_flag`, `wrap_change`, `cleanup_flag`) return plain text and work normally.
+
+You can still run the core evaluate-and-wrap workflow; just create flags yourself in the Unleash UI instead of through `create_flag`. Add the affected tools to `disabledTools` in `.kiro/settings/mcp.json` to stop Kiro from calling them. This is a Kiro limitation that affects any MCP server returning `resource_link` content, not only Unleash.
+</Warning>
+
 ## Workflows
 
 The Unleash MCP server supports three use cases: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
@@ -881,6 +887,10 @@ Autopilot mode works well for read-only operations like checking flag state and 
 </Tip>
 
 ## Troubleshooting
+
+<Accordion title="Error calling MCP tool: Unsupported response item type: resource_link">
+Kiro cannot render the `resource_link` content that `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, and `remove_flag_strategy` return, so it rejects the response with this error even though the operation may have succeeded in Unleash. Confirm the result in the Unleash UI, add these tools to `disabledTools` so Kiro stops calling them, and create flags in the UI before wrapping your code with `wrap_change`.
+</Accordion>
 
 <Accordion title="MCP server not appearing in Kiro">
 - Check `.kiro/settings/mcp.json` for syntax errors
