@@ -214,7 +214,7 @@ Example with auto-approval for read-only tools:
         "UNLEASH_PAT": "${UNLEASH_PAT}",
         "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
-      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change", "list_projects", "list_flags"],
+      "autoApprove": ["detect_flag", "evaluate_change"],
       "disabledTools": []
     }
   }
@@ -222,7 +222,7 @@ Example with auto-approval for read-only tools:
 ```
 
 <Tip>
-Use `autoApprove` for read-only tools like `get_flag_state`, `detect_flag`, `evaluate_change`, `list_projects`, and `list_flags`.
+Use `autoApprove` for the read-only tools that work in Kiro: `detect_flag` and `evaluate_change`.
 Keep write operations like `create_flag` and `toggle_flag_environment` behind manual approval for safety.
 </Tip>
 
@@ -296,7 +296,7 @@ The Unleash MCP server exposes the following tools.
 </StickyTable>
 
 <Warning>
-Kiro's MCP client does not currently render MCP `resource_link` responses. Calling `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, or `remove_flag_strategy` fails with `Error calling MCP tool: Unsupported response item type: resource_link`, though the operation may still succeed in Unleash. The other tools (`evaluate_change`, `detect_flag`, `wrap_change`, `cleanup_flag`) return plain text and work normally.
+Kiro's MCP client does not currently render MCP `resource_link` responses. Calling `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, or `remove_flag_strategy` fails, though the operation may still succeed in Unleash. The other tools (`evaluate_change`, `detect_flag`, `wrap_change`, `cleanup_flag`) return plain text and work normally.
 
 You can still run the core evaluate-and-wrap workflow; just create flags yourself in the Unleash UI instead of through `create_flag`. Add the affected tools to `disabledTools` in `.kiro/settings/mcp.json` to stop Kiro from calling them. This is a Kiro limitation that affects any MCP server returning `resource_link` content, not only Unleash.
 </Warning>
@@ -727,7 +727,7 @@ match your project's high-risk directories.
         "UNLEASH_PAT": "${UNLEASH_PAT}",
         "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
-      "autoApprove": ["get_flag_state", "detect_flag", "evaluate_change", "list_projects", "list_flags"]
+      "autoApprove": ["detect_flag", "evaluate_change"]
     }
   }
 }
