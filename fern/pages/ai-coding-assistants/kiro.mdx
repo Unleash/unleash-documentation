@@ -215,8 +215,15 @@ Example with auto-approval for read-only tools:
         "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
       },
       "autoApprove": ["detect_flag", "evaluate_change"],
-      "disabledTools": []
-    }
+      "disabledTools": [
+        "create_flag",
+        "get_flag_state",
+        "list_flags",
+        "list_projects",
+        "set_flag_rollout",
+        "toggle_flag_environment",
+        "remove_flag_strategy"
+      ]
   }
 }
 ```
