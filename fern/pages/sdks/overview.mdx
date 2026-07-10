@@ -62,12 +62,12 @@ The following tables show which features are supported by each backend SDK. Some
 #### Initialization
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| Async initialization | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Block until synchronized | ✅ | ✅ | ✅ | ⭕ | ⭕ | ✅ | ✅ | ⭕ |
-| Context provider | ✅ | N/A | N/A | N/A | N/A | ✅ | ✅ | N/A |
-| Global fallback function | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Async initialization | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | ✅ |
+| Block until synchronized | ✅ | ✅ | ✅ | ⭕ | ⭕ | ✅ | ✅ | ✅ |
+| Context provider | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| Global fallback function | ✅ | ✅ | ✅ | ✅ | ⭕ | ⭕ | ⭕ | ⭕ |
 | Flag Query: `namePrefix`, `tags` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| Flag Query: `project_name` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | ⭕ |
+| Flag Query: `project_name` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 #### Custom headers
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
@@ -79,9 +79,9 @@ The following tables show which features are supported by each backend SDK. Some
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Gradual rollout](/concepts/activation-strategies) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Gradual rollout with custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
+| [Gradual rollout with custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (0.16.0) |
 | [IP](/concepts/activation-strategies#ips), [hostname](/concepts/activation-strategies#hosts) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [IP](/concepts/activation-strategies#ips) with CIDR syntax | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ | ✅ | ✅ |
+| [IP](/concepts/activation-strategies#ips) with CIDR syntax | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (5.0.0) | ✅ | ✅ |
 
 #### Custom strategies
 All backend SDKs have basic support.
@@ -91,7 +91,7 @@ All backend SDKs have support for the basic operators (`IN`, `NOT_IN`).
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Advanced operators](/concepts/activation-strategies#advanced-operators) | ✅ (5.1) | ✅ (3.12) | ✅ (3.3) | ✅ (5.1) | ✅ (4.2) | ✅ (2.1) | ✅ (1.3.1) | ⭕ |
+| [Advanced operators](/concepts/activation-strategies#advanced-operators) | ✅ (5.1) | ✅ (3.12) | ✅ (3.3) | ✅ (5.1) | ✅ (4.2) | ✅ (2.1) | ✅ (1.3.1) | ✅ (0.16.0) |
 
 
 #### Unleash context
@@ -108,7 +108,7 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Strategy variants](/concepts/strategy-variants) and [custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
+| [Strategy variants](/concepts/strategy-variants) and [custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (0.16.0) |
 
 
 #### Local backup
@@ -121,7 +121,7 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Usage metrics | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | [Impression data](/concepts/impression-data) | ✅ | ✅ | ✅ | ✅ | ⭕ | ✅  | ✅ | ⭕ |
-| [Impact metrics](/concepts/impact-metrics) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅  | ⭕ | ⭕ |
+| [Impact metrics](/concepts/impact-metrics) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅  | ❌ | ⭕ |
 
 #### Bootstrap
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
