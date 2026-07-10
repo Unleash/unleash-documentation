@@ -1,0 +1,115 @@
+---
+title: Ruby OpenFeature provider
+slug: /sdks/openfeature/ruby
+description: Use the Unleash OpenFeature Ruby provider with the Unleash Ruby SDK.
+keywords: [unleash, ruby, openfeature, provider, sdk, feature flags]
+max-toc-depth: 3
+last-updated: July 10, 2026
+---
+
+The Unleash OpenFeature Ruby provider lets Ruby applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
+
+The provider wraps the regular [Unleash Ruby SDK](/sdks/ruby), so it uses the same backend SDK behavior for polling, local evaluation, caching, metrics, and shutdown.
+
+## Requirements
+
+-   Ruby 3.4 or later
+-   The [Unleash Ruby SDK](/sdks/ruby)
+-   The OpenFeature Ruby SDK
+
+## Installation
+
+Add the OpenFeature SDK, the Unleash Ruby SDK, and the provider to your application's Gemfile:
+
+```ruby
+gem 'openfeature-sdk'
+gem 'unleash'
+gem 'unleash-openfeature-provider'
+```
+
+Then install your dependencies:
+
+```bash
+bundle install
+```
+
+## Configuration
+
+Create an `Unleash::Client`, pass it to `Unleash::OpenFeature::Provider::UnleashFlagProvider`, and register that provider with OpenFeature.
+
+```ruby
+require 'open_feature/sdk'
+require 'unleash'
+require 'unleash-openfeature-provider'
+
+unleash_client = Unleash::Client.new(
+  app_name: 'my-ruby-app',
+  url: '<YOUR_UNLEASH_URL>/api',
+  custom_http_headers: {
+    Authorization: '<YOUR_API_TOKEN>'
+  }
+)
+
+OpenFeature::SDK.configure do |config|
+  config.set_provider(
+    Unleash::OpenFeature::Provider::UnleashFlagProvider.new(unleash_client)
+  )
+end
+```
+
+Use a backend client token with the Ruby provider. The provider wraps the backend Ruby SDK and evaluates flags locally.
+
+## Evaluate a flag
+
+Build an OpenFeature client and evaluate flags through the OpenFeature API:
+
+```ruby
+client = OpenFeature::SDK.build_client
+
+context = OpenFeature::SDK::EvaluationContext.new(
+  targeting_key: 'user-123'
+)
+
+enabled = client.fetch_boolean_value(
+  flag_key: 'my-feature',
+  default_value: false,
+  evaluation_context: context
+)
+```
+
+The provider supports boolean flag evaluation and variant payload evaluation for strings, numbers, integers, floats, and objects.
+
+## Context mapping
+
+OpenFeature evaluation context is mapped to [Unleash context](/concepts/unleash-context) before each evaluation.
+
+The following OpenFeature fields map directly to top-level Unleash context fields:
+
+-   `currentTime`
+-   `userId`
+-   `sessionId`
+-   `remoteAddress`
+-   `environment`
+-   `appName`
+
+Other scalar fields are added to the Unleash context [properties](/concepts/unleash-context#the-properties-field). Nested values are ignored. If `targeting_key` is present, it is mapped to `userId`.
+
+## Shutdown
+
+Shut down the underlying Unleash client when your application exits:
+
+```ruby
+unleash_client.shutdown
+```
+
+## Example
+
+Run the provider's [boolean flag example](https://github.com/Unleash/unleash-openfeature-ruby-provider/blob/main/examples/boolean_flag.rb) with your Unleash URL and API token:
+
+```bash
+bundle exec ruby examples/boolean_flag.rb \
+  --url https://app.unleash-hosted.com/demo/api \
+  --api-key "$UNLEASH_API_KEY" \
+  --flag-key my-feature \
+  --targeting-key user-123
+```

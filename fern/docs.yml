@@ -740,6 +740,12 @@ navigation:
           - page: Vue
             path: pages/sdks/frontend/vue.mdx
 
+      - section: OpenFeature providers
+        skip-slug: true
+        contents:
+          - page: Ruby
+            path: pages/sdks/openfeature/ruby.mdx
+
       - section: Community SDKs
         collapsed: true
         contents:
