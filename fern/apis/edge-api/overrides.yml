@@ -7,7 +7,9 @@
 # Code samples follow the SDK documentation in fern/pages/sdks/. A sample whose
 # language matches an auto-generated HTTP snippet (javascript, python, java, go,
 # ruby, php, csharp, swift) replaces that snippet in the language dropdown;
-# other languages (kotlin, dart, rust) get their own dropdown entry.
+# other languages (kotlin, dart, rust) get their own dropdown entry. The
+# language key (not sdk) is intentional: sdk is only for Fern-generated SDKs,
+# and the install field requires the language key per Fern's extension docs.
 paths:
   /api/client/features:
     get:
