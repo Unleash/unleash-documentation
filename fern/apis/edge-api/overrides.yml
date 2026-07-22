@@ -1,0 +1,884 @@
+# Hand-written SDK code samples, deep-merged onto openapi.json at build time
+# via the overrides entry in generators.yml.
+# CI overwrites openapi.json on every spec refresh (scripts/fetch-openapi.mjs).
+# Never edit openapi.json by hand. Add manual changes here instead; Fern merges
+# this file onto the spec at build time.
+#
+# Code samples follow the SDK documentation in fern/pages/sdks/. A sample whose
+# language matches an auto-generated HTTP snippet (javascript, python, java, go,
+# ruby, php, csharp, swift) replaces that snippet in the language dropdown;
+# other languages (kotlin, dart, rust) get their own dropdown entry.
+paths:
+  /api/client/features:
+    get:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: Node.js SDK
+              install: npm install unleash-client
+              code: |
+                import { initialize } from 'unleash-client';
+
+                const unleash = initialize({
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  appName: 'my-app',
+                  customHeaders: { Authorization: '<your-backend-token>' },
+                });
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                const enabled = unleash.isEnabled('my-feature');
+
+            - language: python
+              name: Python SDK
+              install: pip install UnleashClient
+              code: |
+                from UnleashClient import UnleashClient
+
+                client = UnleashClient(
+                    url="https://edge.unleash-instance.example.com/api/",
+                    app_name="my-app",
+                    custom_headers={'Authorization': '<your-backend-token>'})
+
+                client.initialize_client()
+
+                # The SDK fetches all feature flag configurations from this
+                # endpoint at startup and polls for updates in the background.
+                enabled = client.is_enabled("my-feature")
+
+            - language: java
+              name: Java SDK
+              code: |
+                UnleashConfig config = UnleashConfig.builder()
+                        .appName("my-app")
+                        .instanceId("my-instance")
+                        .unleashAPI("https://edge.unleash-instance.example.com/api/")
+                        .apiKey("<your-backend-token>")
+                        .build();
+
+                Unleash unleash = new DefaultUnleash(config);
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                boolean enabled = unleash.isEnabled("my-feature");
+
+            - language: go
+              name: Go SDK
+              install: go get github.com/Unleash/unleash-go-sdk/v6@latest
+              code: |
+                package main
+
+                import (
+                    "net/http"
+
+                    unleash "github.com/Unleash/unleash-go-sdk/v6"
+                )
+
+                func main() {
+                    err := unleash.Initialize(
+                        unleash.WithAppName("my-app"),
+                        unleash.WithUrl("https://edge.unleash-instance.example.com/api/"),
+                        unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+                    )
+                    if err != nil {
+                        panic(err)
+                    }
+                    defer unleash.Close()
+
+                    // The SDK fetches all feature flag configurations from this
+                    // endpoint at startup and polls for updates in the background.
+                    enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{})
+                }
+
+            - language: ruby
+              name: Ruby SDK
+              install: gem install unleash
+              code: |
+                require 'unleash'
+
+                @unleash = Unleash::Client.new(
+                  app_name: 'my-app',
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  custom_http_headers: { 'Authorization': '<your-backend-token>' }
+                )
+
+                # The SDK fetches all feature flag configurations from this
+                # endpoint at startup and polls for updates in the background.
+                enabled = @unleash.is_enabled?('my-feature')
+
+            - language: php
+              name: PHP SDK
+              install: composer require unleash/client guzzlehttp/guzzle symfony/cache
+              code: |
+                use Unleash\Client\UnleashBuilder;
+
+                $unleash = UnleashBuilder::create()
+                    ->withAppName('my-app')
+                    ->withAppUrl('https://edge.unleash-instance.example.com/api/')
+                    ->withInstanceId('my-instance')
+                    ->withHeader('Authorization', '<your-backend-token>')
+                    ->build();
+
+                // The SDK fetches feature flag configurations from this endpoint
+                // on demand and caches them. It does not poll in the background.
+                $enabled = $unleash->isEnabled('my-feature');
+
+            - language: csharp
+              name: .NET SDK
+              install: dotnet add package unleash.client
+              code: |
+                using Unleash;
+
+                var settings = new UnleashSettings()
+                {
+                    AppName = "my-app",
+                    UnleashApi = new Uri("https://edge.unleash-instance.example.com/api/"),
+                    CustomHttpHeaders = new Dictionary<string, string>()
+                    {
+                        { "Authorization", "<your-backend-token>" }
+                    }
+                };
+
+                var unleash = new DefaultUnleash(settings);
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                var enabled = unleash.IsEnabled("my-feature");
+
+            - language: rust
+              name: Rust SDK
+              code: |
+                // The SDK reads its configuration from these environment variables:
+                // UNLEASH_API_URL=https://edge.unleash-instance.example.com/api/
+                // UNLEASH_CLIENT_SECRET=<your-backend-token>
+                let config = EnvironmentConfig::from_env()?;
+                let client = client::ClientBuilder::default()
+                    .interval(500)
+                    .into_client::<UserFeatures, reqwest::Client>(
+                        &config.api_url,
+                        &config.app_name,
+                        &config.instance_id,
+                        config.secret,
+                    )?;
+                client.register().await?;
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+
+  /api/client/features/{feature_name}:
+    get:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: Node.js SDK
+              install: npm install unleash-client
+              code: |
+                import { initialize } from 'unleash-client';
+
+                const unleash = initialize({
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  appName: 'my-app',
+                  customHeaders: { Authorization: '<your-backend-token>' },
+                });
+
+                // The SDK evaluates flags locally against its cached
+                // configuration. It does not fetch flags one at a time.
+                const enabled = unleash.isEnabled('my-feature');
+
+            - language: python
+              name: Python SDK
+              install: pip install UnleashClient
+              code: |
+                from UnleashClient import UnleashClient
+
+                client = UnleashClient(
+                    url="https://edge.unleash-instance.example.com/api/",
+                    app_name="my-app",
+                    custom_headers={'Authorization': '<your-backend-token>'})
+
+                client.initialize_client()
+
+                # The SDK evaluates flags locally against its cached
+                # configuration. It does not fetch flags one at a time.
+                enabled = client.is_enabled("my-feature")
+
+            - language: java
+              name: Java SDK
+              code: |
+                UnleashConfig config = UnleashConfig.builder()
+                        .appName("my-app")
+                        .instanceId("my-instance")
+                        .unleashAPI("https://edge.unleash-instance.example.com/api/")
+                        .apiKey("<your-backend-token>")
+                        .build();
+
+                Unleash unleash = new DefaultUnleash(config);
+
+                // The SDK evaluates flags locally against its cached
+                // configuration. It does not fetch flags one at a time.
+                boolean enabled = unleash.isEnabled("my-feature");
+
+            - language: go
+              name: Go SDK
+              install: go get github.com/Unleash/unleash-go-sdk/v6@latest
+              code: |
+                package main
+
+                import (
+                    "net/http"
+
+                    unleash "github.com/Unleash/unleash-go-sdk/v6"
+                )
+
+                func main() {
+                    err := unleash.Initialize(
+                        unleash.WithAppName("my-app"),
+                        unleash.WithUrl("https://edge.unleash-instance.example.com/api/"),
+                        unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+                    )
+                    if err != nil {
+                        panic(err)
+                    }
+                    defer unleash.Close()
+
+                    // The SDK evaluates flags locally against its cached
+                    // configuration. It does not fetch flags one at a time.
+                    enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{})
+                }
+
+            - language: ruby
+              name: Ruby SDK
+              install: gem install unleash
+              code: |
+                require 'unleash'
+
+                @unleash = Unleash::Client.new(
+                  app_name: 'my-app',
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  custom_http_headers: { 'Authorization': '<your-backend-token>' }
+                )
+
+                # The SDK evaluates flags locally against its cached
+                # configuration. It does not fetch flags one at a time.
+                enabled = @unleash.is_enabled?('my-feature')
+
+            - language: php
+              name: PHP SDK
+              install: composer require unleash/client guzzlehttp/guzzle symfony/cache
+              code: |
+                use Unleash\Client\UnleashBuilder;
+
+                $unleash = UnleashBuilder::create()
+                    ->withAppName('my-app')
+                    ->withAppUrl('https://edge.unleash-instance.example.com/api/')
+                    ->withInstanceId('my-instance')
+                    ->withHeader('Authorization', '<your-backend-token>')
+                    ->build();
+
+                // The SDK evaluates flags locally against its cached
+                // configuration. It does not fetch flags one at a time.
+                $enabled = $unleash->isEnabled('my-feature');
+
+            - language: csharp
+              name: .NET SDK
+              install: dotnet add package unleash.client
+              code: |
+                using Unleash;
+
+                var settings = new UnleashSettings()
+                {
+                    AppName = "my-app",
+                    UnleashApi = new Uri("https://edge.unleash-instance.example.com/api/"),
+                    CustomHttpHeaders = new Dictionary<string, string>()
+                    {
+                        { "Authorization", "<your-backend-token>" }
+                    }
+                };
+
+                var unleash = new DefaultUnleash(settings);
+
+                // The SDK evaluates flags locally against its cached
+                // configuration. It does not fetch flags one at a time.
+                var enabled = unleash.IsEnabled("my-feature");
+
+            - language: rust
+              name: Rust SDK
+              code: |
+                // The SDK reads its configuration from these environment variables:
+                // UNLEASH_API_URL=https://edge.unleash-instance.example.com/api/
+                // UNLEASH_CLIENT_SECRET=<your-backend-token>
+                let config = EnvironmentConfig::from_env()?;
+                let client = client::ClientBuilder::default()
+                    .interval(500)
+                    .into_client::<UserFeatures, reqwest::Client>(
+                        &config.api_url,
+                        &config.app_name,
+                        &config.instance_id,
+                        config.secret,
+                    )?;
+                client.register().await?;
+
+                // The SDK evaluates flags locally against its cached
+                // configuration. It does not fetch flags one at a time.
+
+  /api/client/metrics:
+    post:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: Node.js SDK
+              install: npm install unleash-client
+              code: |
+                import { initialize } from 'unleash-client';
+
+                const unleash = initialize({
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  appName: 'my-app',
+                  customHeaders: { Authorization: '<your-backend-token>' },
+                  metricsInterval: 60000, // milliseconds
+                });
+
+                // The SDK counts each flag evaluation locally and reports usage
+                // metrics to this endpoint at a regular interval.
+                const enabled = unleash.isEnabled('my-feature');
+
+            - language: python
+              name: Python SDK
+              install: pip install UnleashClient
+              code: |
+                from UnleashClient import UnleashClient
+
+                client = UnleashClient(
+                    url="https://edge.unleash-instance.example.com/api/",
+                    app_name="my-app",
+                    metrics_interval=60,  # seconds
+                    custom_headers={'Authorization': '<your-backend-token>'})
+
+                client.initialize_client()
+
+                # The SDK counts each flag evaluation locally and reports usage
+                # metrics to this endpoint at a regular interval.
+                enabled = client.is_enabled("my-feature")
+
+            - language: java
+              name: Java SDK
+              code: |
+                UnleashConfig config = UnleashConfig.builder()
+                        .appName("my-app")
+                        .instanceId("my-instance")
+                        .unleashAPI("https://edge.unleash-instance.example.com/api/")
+                        .apiKey("<your-backend-token>")
+                        .sendMetricsInterval(60) // seconds
+                        .build();
+
+                Unleash unleash = new DefaultUnleash(config);
+
+                // The SDK counts each flag evaluation locally and reports usage
+                // metrics to this endpoint at a regular interval.
+                boolean enabled = unleash.isEnabled("my-feature");
+
+            - language: go
+              name: Go SDK
+              install: go get github.com/Unleash/unleash-go-sdk/v6@latest
+              code: |
+                package main
+
+                import (
+                    "net/http"
+                    "time"
+
+                    unleash "github.com/Unleash/unleash-go-sdk/v6"
+                )
+
+                func main() {
+                    err := unleash.Initialize(
+                        unleash.WithAppName("my-app"),
+                        unleash.WithUrl("https://edge.unleash-instance.example.com/api/"),
+                        unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+                        unleash.WithMetricsInterval(60 * time.Second),
+                    )
+                    if err != nil {
+                        panic(err)
+                    }
+                    defer unleash.Close()
+
+                    // The SDK counts each flag evaluation locally and reports usage
+                    // metrics to this endpoint at a regular interval.
+                    enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{})
+                }
+
+            - language: ruby
+              name: Ruby SDK
+              install: gem install unleash
+              code: |
+                require 'unleash'
+
+                @unleash = Unleash::Client.new(
+                  app_name: 'my-app',
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  metrics_interval: 60, # seconds
+                  custom_http_headers: { 'Authorization': '<your-backend-token>' }
+                )
+
+                # The SDK counts each flag evaluation locally and reports usage
+                # metrics to this endpoint at a regular interval.
+                enabled = @unleash.is_enabled?('my-feature')
+
+            - language: php
+              name: PHP SDK
+              install: composer require unleash/client guzzlehttp/guzzle symfony/cache
+              code: |
+                use Unleash\Client\UnleashBuilder;
+
+                $unleash = UnleashBuilder::create()
+                    ->withAppName('my-app')
+                    ->withAppUrl('https://edge.unleash-instance.example.com/api/')
+                    ->withInstanceId('my-instance')
+                    ->withHeader('Authorization', '<your-backend-token>')
+                    ->withMetricsInterval(60_000) // milliseconds
+                    ->build();
+
+                // The SDK counts each flag evaluation locally and reports usage
+                // metrics to this endpoint at a regular interval.
+                $enabled = $unleash->isEnabled('my-feature');
+
+            - language: csharp
+              name: .NET SDK
+              install: dotnet add package unleash.client
+              code: |
+                using Unleash;
+
+                var settings = new UnleashSettings()
+                {
+                    AppName = "my-app",
+                    UnleashApi = new Uri("https://edge.unleash-instance.example.com/api/"),
+                    CustomHttpHeaders = new Dictionary<string, string>()
+                    {
+                        { "Authorization", "<your-backend-token>" }
+                    }
+                };
+
+                var unleash = new DefaultUnleash(settings);
+
+                // The SDK counts each flag evaluation locally and reports usage
+                // metrics to this endpoint at a regular interval.
+                var enabled = unleash.IsEnabled("my-feature");
+
+            - language: rust
+              name: Rust SDK
+              code: |
+                // The SDK reads its configuration from these environment variables:
+                // UNLEASH_API_URL=https://edge.unleash-instance.example.com/api/
+                // UNLEASH_CLIENT_SECRET=<your-backend-token>
+                let config = EnvironmentConfig::from_env()?;
+                let client = client::ClientBuilder::default()
+                    .interval(500)
+                    .into_client::<UserFeatures, reqwest::Client>(
+                        &config.api_url,
+                        &config.app_name,
+                        &config.instance_id,
+                        config.secret,
+                    )?;
+                client.register().await?;
+
+                // The SDK counts each flag evaluation locally and reports usage
+                // metrics to this endpoint at a regular interval.
+
+  /api/client/register:
+    post:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: Node.js SDK
+              install: npm install unleash-client
+              code: |
+                import { initialize } from 'unleash-client';
+
+                const unleash = initialize({
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  appName: 'my-app',
+                  customHeaders: { Authorization: '<your-backend-token>' },
+                });
+
+                // The SDK calls this endpoint automatically at startup to
+                // register your application with Unleash.
+
+            - language: python
+              name: Python SDK
+              install: pip install UnleashClient
+              code: |
+                from UnleashClient import UnleashClient
+
+                client = UnleashClient(
+                    url="https://edge.unleash-instance.example.com/api/",
+                    app_name="my-app",
+                    custom_headers={'Authorization': '<your-backend-token>'})
+
+                client.initialize_client()
+
+                # The SDK calls this endpoint automatically at startup to
+                # register your application with Unleash.
+
+            - language: java
+              name: Java SDK
+              code: |
+                UnleashConfig config = UnleashConfig.builder()
+                        .appName("my-app")
+                        .instanceId("my-instance")
+                        .unleashAPI("https://edge.unleash-instance.example.com/api/")
+                        .apiKey("<your-backend-token>")
+                        .build();
+
+                Unleash unleash = new DefaultUnleash(config);
+
+                // The SDK calls this endpoint automatically at startup to
+                // register your application with Unleash.
+
+            - language: go
+              name: Go SDK
+              install: go get github.com/Unleash/unleash-go-sdk/v6@latest
+              code: |
+                package main
+
+                import (
+                    "net/http"
+
+                    unleash "github.com/Unleash/unleash-go-sdk/v6"
+                )
+
+                func main() {
+                    err := unleash.Initialize(
+                        unleash.WithAppName("my-app"),
+                        unleash.WithUrl("https://edge.unleash-instance.example.com/api/"),
+                        unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+                    )
+                    if err != nil {
+                        panic(err)
+                    }
+                    defer unleash.Close()
+
+                    // The SDK calls this endpoint automatically at startup to
+                    // register your application with Unleash.
+                }
+
+            - language: ruby
+              name: Ruby SDK
+              install: gem install unleash
+              code: |
+                require 'unleash'
+
+                @unleash = Unleash::Client.new(
+                  app_name: 'my-app',
+                  url: 'https://edge.unleash-instance.example.com/api/',
+                  custom_http_headers: { 'Authorization': '<your-backend-token>' }
+                )
+
+                # The SDK calls this endpoint automatically at startup to
+                # register your application with Unleash.
+
+            - language: php
+              name: PHP SDK
+              install: composer require unleash/client guzzlehttp/guzzle symfony/cache
+              code: |
+                use Unleash\Client\UnleashBuilder;
+
+                $unleash = UnleashBuilder::create()
+                    ->withAppName('my-app')
+                    ->withAppUrl('https://edge.unleash-instance.example.com/api/')
+                    ->withInstanceId('my-instance')
+                    ->withHeader('Authorization', '<your-backend-token>')
+                    ->build();
+
+                // The SDK calls this endpoint automatically at startup to
+                // register your application with Unleash.
+
+            - language: csharp
+              name: .NET SDK
+              install: dotnet add package unleash.client
+              code: |
+                using Unleash;
+
+                var settings = new UnleashSettings()
+                {
+                    AppName = "my-app",
+                    UnleashApi = new Uri("https://edge.unleash-instance.example.com/api/"),
+                    CustomHttpHeaders = new Dictionary<string, string>()
+                    {
+                        { "Authorization", "<your-backend-token>" }
+                    }
+                };
+
+                var unleash = new DefaultUnleash(settings);
+
+                // The SDK calls this endpoint automatically at startup to
+                // register your application with Unleash.
+
+            - language: rust
+              name: Rust SDK
+              code: |
+                // The SDK reads its configuration from these environment variables:
+                // UNLEASH_API_URL=https://edge.unleash-instance.example.com/api/
+                // UNLEASH_CLIENT_SECRET=<your-backend-token>
+                let config = EnvironmentConfig::from_env()?;
+                let client = client::ClientBuilder::default()
+                    .interval(500)
+                    .into_client::<UserFeatures, reqwest::Client>(
+                        &config.api_url,
+                        &config.app_name,
+                        &config.instance_id,
+                        config.secret,
+                    )?;
+                client.register().await?;
+
+                // The SDK calls this endpoint automatically at startup to
+                // register your application with Unleash.
+
+  /api/frontend:
+    get:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: JavaScript SDK
+              install: npm install unleash-proxy-client
+              code: |
+                import { UnleashClient } from 'unleash-proxy-client';
+
+                const unleash = new UnleashClient({
+                    url: 'https://edge.unleash-instance.example.com/api/frontend',
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app',
+                });
+
+                unleash.start();
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                unleash.on('ready', () => {
+                  const enabled = unleash.isEnabled('my-feature');
+                });
+
+            - language: swift
+              name: iOS SDK
+              code: |
+                import UnleashProxyClientSwift
+
+                var unleash = UnleashProxyClientSwift.UnleashClient(
+                    unleashUrl: "https://edge.unleash-instance.example.com/api/frontend",
+                    clientKey: "<your-frontend-token>",
+                    refreshInterval: 15,
+                    appName: "my-app"
+                )
+
+                unleash.start()
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                let enabled = unleash.isEnabled(name: "my-feature")
+
+            - language: kotlin
+              name: Android SDK
+              install: implementation("io.getunleash:unleash-android:<version>")
+              code: |
+                val unleash = DefaultUnleash(
+                    androidContext = applicationContext,
+                    unleashConfig = UnleashConfig.newBuilder(appName = "my-app")
+                        .proxyUrl("https://edge.unleash-instance.example.com/api/frontend")
+                        .clientKey("<your-frontend-token>")
+                        .build()
+                )
+
+                unleash.start()
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                val enabled = unleash.isEnabled("my-feature")
+
+            - language: dart
+              name: Flutter SDK
+              install: flutter pub add unleash_proxy_client_flutter
+              code: |
+                import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
+
+                final unleash = UnleashClient(
+                    url: Uri.parse('https://edge.unleash-instance.example.com/api/frontend'),
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app');
+
+                unleash.start();
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                final enabled = unleash.isEnabled('my-feature');
+
+    post:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: JavaScript SDK
+              install: npm install unleash-proxy-client
+              code: |
+                import { UnleashClient } from 'unleash-proxy-client';
+
+                const unleash = new UnleashClient({
+                    url: 'https://edge.unleash-instance.example.com/api/frontend',
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app',
+                    usePOSTrequests: true,
+                });
+
+                unleash.start();
+
+                // When you enable usePOSTrequests, the SDK fetches evaluated
+                // feature flags from this endpoint using POST requests.
+                unleash.on('ready', () => {
+                  const enabled = unleash.isEnabled('my-feature');
+                });
+
+  /api/frontend/client/metrics:
+    post:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: JavaScript SDK
+              install: npm install unleash-proxy-client
+              code: |
+                import { UnleashClient } from 'unleash-proxy-client';
+
+                const unleash = new UnleashClient({
+                    url: 'https://edge.unleash-instance.example.com/api/frontend',
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app',
+                    metricsInterval: 60, // seconds
+                });
+
+                unleash.start();
+
+                // The SDK reports flag usage metrics to this endpoint at a
+                // regular interval.
+
+            - language: swift
+              name: iOS SDK
+              code: |
+                import UnleashProxyClientSwift
+
+                var unleash = UnleashProxyClientSwift.UnleashClient(
+                    unleashUrl: "https://edge.unleash-instance.example.com/api/frontend",
+                    clientKey: "<your-frontend-token>",
+                    refreshInterval: 15,
+                    appName: "my-app"
+                )
+
+                unleash.start()
+
+                // The SDK reports flag usage metrics to this endpoint at a
+                // regular interval.
+
+            - language: kotlin
+              name: Android SDK
+              install: implementation("io.getunleash:unleash-android:<version>")
+              code: |
+                val unleash = DefaultUnleash(
+                    androidContext = applicationContext,
+                    unleashConfig = UnleashConfig.newBuilder(appName = "my-app")
+                        .proxyUrl("https://edge.unleash-instance.example.com/api/frontend")
+                        .clientKey("<your-frontend-token>")
+                        .metricsStrategy.interval(60000) // milliseconds
+                        .build()
+                )
+
+                unleash.start()
+
+                // The SDK reports flag usage metrics to this endpoint at a
+                // regular interval.
+
+            - language: dart
+              name: Flutter SDK
+              install: flutter pub add unleash_proxy_client_flutter
+              code: |
+                import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
+
+                final unleash = UnleashClient(
+                    url: Uri.parse('https://edge.unleash-instance.example.com/api/frontend'),
+                    clientKey: '<your-frontend-token>',
+                    metricsInterval: 30, // seconds
+                    appName: 'my-app');
+
+                unleash.start();
+
+                // The SDK reports flag usage metrics to this endpoint at a
+                // regular interval.
+
+  /api/frontend/client/register:
+    post:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: JavaScript SDK
+              install: npm install unleash-proxy-client
+              code: |
+                import { UnleashClient } from 'unleash-proxy-client';
+
+                const unleash = new UnleashClient({
+                    url: 'https://edge.unleash-instance.example.com/api/frontend',
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app',
+                });
+
+                unleash.start();
+
+                // The SDK calls this endpoint automatically at startup to
+                // register itself with Unleash.
+
+            - language: swift
+              name: iOS SDK
+              code: |
+                import UnleashProxyClientSwift
+
+                var unleash = UnleashProxyClientSwift.UnleashClient(
+                    unleashUrl: "https://edge.unleash-instance.example.com/api/frontend",
+                    clientKey: "<your-frontend-token>",
+                    refreshInterval: 15,
+                    appName: "my-app"
+                )
+
+                unleash.start()
+
+                // The SDK calls this endpoint automatically at startup to
+                // register itself with Unleash.
+
+            - language: kotlin
+              name: Android SDK
+              install: implementation("io.getunleash:unleash-android:<version>")
+              code: |
+                val unleash = DefaultUnleash(
+                    androidContext = applicationContext,
+                    unleashConfig = UnleashConfig.newBuilder(appName = "my-app")
+                        .proxyUrl("https://edge.unleash-instance.example.com/api/frontend")
+                        .clientKey("<your-frontend-token>")
+                        .build()
+                )
+
+                unleash.start()
+
+                // The SDK calls this endpoint automatically at startup to
+                // register itself with Unleash.
+
+            - language: dart
+              name: Flutter SDK
+              install: flutter pub add unleash_proxy_client_flutter
+              code: |
+                import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
+
+                final unleash = UnleashClient(
+                    url: Uri.parse('https://edge.unleash-instance.example.com/api/frontend'),
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app');
+
+                unleash.start();
+
+                // The SDK calls this endpoint automatically at startup to
+                // register itself with Unleash.

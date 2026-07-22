@@ -443,18 +443,13 @@ func main() {
 	}
 
 	enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{Ctx: ctx})
-	variant := unleash.GetVariant("checkout-experiment", unleash.VariantOptions{Ctx: ctx})
-
-	_ = enabled
-    enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{Ctx: ctx})
 	if enabled {
 		// New behaviour
 	}
 
 	variant := unleash.GetVariant("checkout-experiment", unleash.VariantOptions{Ctx: ctx})
-
-	if variant.flagEnabled {
-		// checking variant name to pick New behaviour
+	if variant.Name == "blue" {
+		// blue variant behavior
 	}
 }
 ```
