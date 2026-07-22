@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 
 const unleashOpenApiUrl = 'https://us.app.unleash-hosted.com/ushosted/docs/openapi.json';
-const edgeOpenApiUrl = 'https://unleashsbx.edge.getunleash.io/docs/openapi.json';
+const edgeOpenApiUrl = 'https://hosted.edge.getunleash.io/docs/openapi.json';
 
 async function fetchOpenApiSpec(url) {
     const response = await fetch(url);
