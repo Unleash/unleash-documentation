@@ -50,6 +50,7 @@ paths:
 
             - language: java
               name: Java SDK
+              install: implementation("io.getunleash:unleash-client-java:<version>")
               code: |
                 UnleashConfig config = UnleashConfig.builder()
                         .appName("my-app")
@@ -149,23 +150,29 @@ paths:
 
             - language: rust
               name: Rust SDK
+              install: cargo add unleash-api-client
               code: |
                 // The SDK reads its configuration from these environment variables:
                 // UNLEASH_API_URL=https://app.unleash-instance.example.com/api/
                 // UNLEASH_CLIENT_SECRET=<your-backend-token>
                 let config = EnvironmentConfig::from_env()?;
-                let client = client::ClientBuilder::default()
-                    .interval(500)
-                    .into_client::<UserFeatures, reqwest::Client>(
-                        &config.api_url,
-                        &config.app_name,
-                        &config.instance_id,
-                        config.secret,
-                    )?;
+                let client = Arc::new(
+                    client::ClientBuilder::default()
+                        .interval(15000)
+                        .into_client::<UserFeatures>(
+                            &config.api_url,
+                            &config.app_name,
+                            &config.instance_id,
+                            config.secret,
+                        )?,
+                );
                 client.register().await?;
 
-                // The SDK fetches all feature flag configurations from this
-                // endpoint at startup and polls for updates in the background.
+                // The client does not poll on its own. Run the polling loop in a
+                // background task. The loop fetches feature flag configurations
+                // from this endpoint at the configured interval.
+                let poller = client.clone();
+                tokio::spawn(async move { poller.poll_for_updates().await });
 
   /api/client/features/{featureName}:
     get:
@@ -206,6 +213,7 @@ paths:
 
             - language: java
               name: Java SDK
+              install: implementation("io.getunleash:unleash-client-java:<version>")
               code: |
                 UnleashConfig config = UnleashConfig.builder()
                         .appName("my-app")
@@ -305,23 +313,28 @@ paths:
 
             - language: rust
               name: Rust SDK
+              install: cargo add unleash-api-client
               code: |
                 // The SDK reads its configuration from these environment variables:
                 // UNLEASH_API_URL=https://app.unleash-instance.example.com/api/
                 // UNLEASH_CLIENT_SECRET=<your-backend-token>
                 let config = EnvironmentConfig::from_env()?;
-                let client = client::ClientBuilder::default()
-                    .interval(500)
-                    .into_client::<UserFeatures, reqwest::Client>(
-                        &config.api_url,
-                        &config.app_name,
-                        &config.instance_id,
-                        config.secret,
-                    )?;
+                let client = Arc::new(
+                    client::ClientBuilder::default()
+                        .interval(15000)
+                        .into_client::<UserFeatures>(
+                            &config.api_url,
+                            &config.app_name,
+                            &config.instance_id,
+                            config.secret,
+                        )?,
+                );
                 client.register().await?;
 
                 // The SDK evaluates flags locally against its cached
                 // configuration. It does not fetch flags one at a time.
+                let poller = client.clone();
+                tokio::spawn(async move { poller.poll_for_updates().await });
 
   /api/client/metrics:
     post:
@@ -364,6 +377,7 @@ paths:
 
             - language: java
               name: Java SDK
+              install: implementation("io.getunleash:unleash-client-java:<version>")
               code: |
                 UnleashConfig config = UnleashConfig.builder()
                         .appName("my-app")
@@ -468,23 +482,28 @@ paths:
 
             - language: rust
               name: Rust SDK
+              install: cargo add unleash-api-client
               code: |
                 // The SDK reads its configuration from these environment variables:
                 // UNLEASH_API_URL=https://app.unleash-instance.example.com/api/
                 // UNLEASH_CLIENT_SECRET=<your-backend-token>
                 let config = EnvironmentConfig::from_env()?;
-                let client = client::ClientBuilder::default()
-                    .interval(500)
-                    .into_client::<UserFeatures, reqwest::Client>(
-                        &config.api_url,
-                        &config.app_name,
-                        &config.instance_id,
-                        config.secret,
-                    )?;
+                let client = Arc::new(
+                    client::ClientBuilder::default()
+                        .interval(15000)
+                        .into_client::<UserFeatures>(
+                            &config.api_url,
+                            &config.app_name,
+                            &config.instance_id,
+                            config.secret,
+                        )?,
+                );
                 client.register().await?;
 
-                // The SDK counts each flag evaluation locally and reports usage
-                // metrics to this endpoint at a regular interval.
+                // The client does not send metrics on its own. The polling loop
+                // submits usage metrics to this endpoint.
+                let poller = client.clone();
+                tokio::spawn(async move { poller.poll_for_updates().await });
 
   /api/client/register:
     post:
@@ -523,6 +542,7 @@ paths:
 
             - language: java
               name: Java SDK
+              install: implementation("io.getunleash:unleash-client-java:<version>")
               code: |
                 UnleashConfig config = UnleashConfig.builder()
                         .appName("my-app")
@@ -617,20 +637,21 @@ paths:
 
             - language: rust
               name: Rust SDK
+              install: cargo add unleash-api-client
               code: |
                 // The SDK reads its configuration from these environment variables:
                 // UNLEASH_API_URL=https://app.unleash-instance.example.com/api/
                 // UNLEASH_CLIENT_SECRET=<your-backend-token>
                 let config = EnvironmentConfig::from_env()?;
                 let client = client::ClientBuilder::default()
-                    .interval(500)
-                    .into_client::<UserFeatures, reqwest::Client>(
+                    .interval(15000)
+                    .into_client::<UserFeatures>(
                         &config.api_url,
                         &config.app_name,
                         &config.instance_id,
                         config.secret,
                     )?;
-                client.register().await?;
 
-                // The SDK calls this endpoint automatically at startup to
-                // register your application with Unleash.
+                // Calling register sends your application's registration to this
+                // endpoint.
+                client.register().await?;
