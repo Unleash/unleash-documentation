@@ -1,7 +1,9 @@
 ---
 title: Ruby OpenFeature provider
 slug: /sdks/openfeature/ruby
-description: Use the Unleash OpenFeature Ruby provider with the Unleash Ruby SDK.
+og:site_name: Unleash
+og:title: Ruby OpenFeature provider
+description: Set up the Unleash OpenFeature provider for Ruby to evaluate feature flags through the OpenFeature API.
 keywords: [unleash, ruby, openfeature, provider, sdk, feature flags]
 max-toc-depth: 3
 last-updated: July 23, 2026
@@ -9,7 +11,7 @@ last-updated: July 23, 2026
 
 The Unleash OpenFeature Ruby provider lets Ruby applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
 
-The provider wraps the regular [Unleash Ruby SDK](/sdks/ruby), so it uses the same backend SDK behavior for polling, local evaluation, caching, metrics, and shutdown.
+The provider wraps the [Unleash Ruby SDK](/sdks/ruby) and uses the same backend SDK behavior for polling, local evaluation, caching, metrics, and shutdown.
 
 ## Requirements
 
@@ -35,7 +37,7 @@ bundle install
 
 ## Configuration
 
-Create an `Unleash::OpenFeature::Provider::UnleashFlagProvider` with the same [options](/sdks/ruby#configuration) you would pass to the Unleash Ruby SDK client, then register that provider with OpenFeature.
+Create an `Unleash::OpenFeature::Provider::UnleashFlagProvider` with the same [options](/sdks/ruby#configuration) you would pass to the Unleash Ruby SDK client, then register it with OpenFeature.
 
 ```ruby
 require 'open_feature/sdk'
@@ -72,11 +74,17 @@ enabled = client.fetch_boolean_value(
 )
 ```
 
-The provider supports boolean flag evaluation and variant payload evaluation for strings, numbers, integers, floats, and objects.
+The provider supports all OpenFeature evaluation methods. Boolean evaluation uses the flag's enabled state. All other types resolve from the payload of the flag's [variant](/concepts/feature-flag-variants):
+
+-   String values accept `string` and `csv` payloads.
+-   Number, integer, and float values accept `number` payloads.
+-   Object values accept `json` payloads.
+
+If the flag is disabled, or the variant payload is missing or has a different type, the evaluation returns the default value.
 
 ## Context mapping
 
-OpenFeature evaluation context is mapped to [Unleash context](/concepts/unleash-context) before each evaluation.
+The provider maps the OpenFeature evaluation context to an [Unleash context](/concepts/unleash-context) before each evaluation.
 
 The following OpenFeature fields map directly to top-level Unleash context fields:
 
@@ -87,11 +95,13 @@ The following OpenFeature fields map directly to top-level Unleash context field
 -   `environment`
 -   `appName`
 
-Other scalar fields are added to the Unleash context [properties](/concepts/unleash-context#the-properties-field). Nested values are ignored. If `targeting_key` is present, it is mapped to `userId`.
+If you set `targeting_key`, the provider maps it to `userId`. The `targeting_key` takes precedence over a `userId` field set on the evaluation context.
+
+The provider adds all other scalar fields, such as strings, numbers, booleans, and time values, to the Unleash context [properties](/concepts/unleash-context#the-properties-field). It discards nested values, such as arrays and hashes.
 
 ## Shutdown
 
-Shut down the provider when your application exits.
+Shut down the provider when your application exits. This also shuts down the underlying Unleash client.
 
 ```ruby
 provider.shutdown
@@ -99,11 +109,11 @@ provider.shutdown
 
 ## Example
 
-Run the provider's [boolean flag example](https://github.com/Unleash/unleash-openfeature-ruby-provider/blob/main/examples/boolean_flag.rb) with your Unleash URL and API token:
+To try the provider against your Unleash instance, clone the [provider repository](https://github.com/Unleash/unleash-openfeature-ruby-provider) and run the [boolean flag example](https://github.com/Unleash/unleash-openfeature-ruby-provider/blob/main/examples/boolean_flag.rb) with your Unleash URL and API token:
 
 ```bash
 bundle exec ruby examples/boolean_flag.rb \
-  --url https://app.unleash-hosted.com/demo/api \
+  --url '<YOUR_UNLEASH_URL>/api' \
   --api-key "$UNLEASH_API_KEY" \
   --flag-key my-feature \
   --targeting-key user-123
