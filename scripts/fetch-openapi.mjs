@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 
 const unleashOpenApiUrl = 'https://us.app.unleash-hosted.com/ushosted/docs/openapi.json';
-const edgeOpenApiUrl = 'https://unleashsbx.edge.getunleash.io/docs/openapi.json';
+const edgeOpenApiUrl = 'https://hosted.edge.getunleash.io/docs/openapi.json';
 
 async function fetchOpenApiSpec(url) {
     const response = await fetch(url);
@@ -12,17 +12,14 @@ async function fetchOpenApiSpec(url) {
     return response.json();
 }
 
-console.log('📥 Fetching Unleash OpenAPI spec...');
-
-const data = await fetchOpenApiSpec(unleashOpenApiUrl);
-
-// Replace server URL with user-agnostic example
-data.servers = [
-    {
-        url: 'https://app.unleash-instance.example.com',
-        description: 'Your Unleash instance (replace with your actual URL)',
-    },
-];
+// A failed fetch must not fail the docs publish; keep the committed specs instead
+function warnAndKeepPrevious(specName, error) {
+    const message = `Could not update ${specName} OpenAPI spec, publishing with the previously committed version: ${error.message}`;
+    console.warn(`⚠️ ${message}`);
+    if (process.env.GITHUB_ACTIONS) {
+        console.log(`::warning::${message}`);
+    }
+}
 
 // Helper function to filter tags and endpoints
 function filterOpenApiSpec(data, tagsToKeep = null, tagsToFilter = []) {
@@ -46,7 +43,7 @@ function filterOpenApiSpec(data, tagsToKeep = null, tagsToFilter = []) {
                 const operation = filtered.paths[path][method];
                 if (operation.tags) {
                     let shouldKeep = false;
-                    
+
                     if (tagsToKeep) {
                         // Keep only if endpoint has one of the tags to keep
                         shouldKeep = operation.tags.some(tag => tagsToKeep.includes(tag));
@@ -79,71 +76,91 @@ const cleanJsonString = (json) => {
         .replace(/!\[Beta\]\([^)]+\)\s*/g, '');
 };
 
-// Client API: Keep ONLY "Client" tag
-const clientApiData = filterOpenApiSpec(data, ['Client']);
-const clientApiJsonString = cleanJsonString(clientApiData);
+console.log('📥 Fetching Unleash OpenAPI spec...');
 
-await fs.writeFile(
-    './fern/apis/client-api/openapi.json',
-    clientApiJsonString,
-    'utf8',
-);
+try {
+    const data = await fetchOpenApiSpec(unleashOpenApiUrl);
 
-console.log(`✅ Saved to fern/apis/client-api/openapi.json`);
-console.log(`📦 Version: ${clientApiData.info.version}`);
-console.log(`🔗 Endpoints: ${Object.keys(clientApiData.paths || {}).length}`);
-console.log(`✅ Kept only tag: Client`);
+    // Replace server URL with user-agnostic example
+    data.servers = [
+        {
+            url: 'https://app.unleash-instance.example.com',
+            description: 'Your Unleash instance (replace with your actual URL)',
+        },
+    ];
 
-// Frontend API: Keep ONLY "Frontend API" tag
-const frontendApiData = filterOpenApiSpec(data, ['Frontend API']);
-const frontendApiJsonString = cleanJsonString(frontendApiData);
+    // Client API: Keep ONLY "Client" tag
+    const clientApiData = filterOpenApiSpec(data, ['Client']);
+    const clientApiJsonString = cleanJsonString(clientApiData);
 
-await fs.writeFile(
-    './fern/apis/frontend-api/openapi.json',
-    frontendApiJsonString,
-    'utf8',
-);
+    await fs.writeFile(
+        './fern/apis/client-api/openapi.json',
+        clientApiJsonString,
+        'utf8',
+    );
 
-console.log(`✅ Saved to fern/apis/frontend-api/openapi.json`);
-console.log(`📦 Version: ${frontendApiData.info.version}`);
-console.log(`🔗 Endpoints: ${Object.keys(frontendApiData.paths || {}).length}`);
-console.log(`✅ Kept only tag: Frontend API`);
+    console.log(`✅ Saved to fern/apis/client-api/openapi.json`);
+    console.log(`📦 Version: ${clientApiData.info.version}`);
+    console.log(`🔗 Endpoints: ${Object.keys(clientApiData.paths || {}).length}`);
+    console.log(`✅ Kept only tag: Client`);
 
-// Admin API: Filter out "Client" and "Frontend API" tags
-const adminApiData = filterOpenApiSpec(data, null, ['Client', 'Frontend API']);
-const adminApiJsonString = cleanJsonString(adminApiData);
+    // Frontend API: Keep ONLY "Frontend API" tag
+    const frontendApiData = filterOpenApiSpec(data, ['Frontend API']);
+    const frontendApiJsonString = cleanJsonString(frontendApiData);
 
-await fs.writeFile(
-    './fern/apis/admin-api/openapi.json',
-    adminApiJsonString,
-    'utf8',
-);
+    await fs.writeFile(
+        './fern/apis/frontend-api/openapi.json',
+        frontendApiJsonString,
+        'utf8',
+    );
 
-console.log(`✅ Saved to fern/apis/admin-api/openapi.json`);
-console.log(`📦 Version: ${adminApiData.info.version}`);
-console.log(`🔗 Endpoints: ${Object.keys(adminApiData.paths || {}).length}`);
-console.log(`🚫 Filtered out tags: Client, Frontend API`);
+    console.log(`✅ Saved to fern/apis/frontend-api/openapi.json`);
+    console.log(`📦 Version: ${frontendApiData.info.version}`);
+    console.log(`🔗 Endpoints: ${Object.keys(frontendApiData.paths || {}).length}`);
+    console.log(`✅ Kept only tag: Frontend API`);
+
+    // Admin API: Filter out "Client" and "Frontend API" tags
+    const adminApiData = filterOpenApiSpec(data, null, ['Client', 'Frontend API']);
+    const adminApiJsonString = cleanJsonString(adminApiData);
+
+    await fs.writeFile(
+        './fern/apis/admin-api/openapi.json',
+        adminApiJsonString,
+        'utf8',
+    );
+
+    console.log(`✅ Saved to fern/apis/admin-api/openapi.json`);
+    console.log(`📦 Version: ${adminApiData.info.version}`);
+    console.log(`🔗 Endpoints: ${Object.keys(adminApiData.paths || {}).length}`);
+    console.log(`🚫 Filtered out tags: Client, Frontend API`);
+} catch (error) {
+    warnAndKeepPrevious('Unleash', error);
+}
 
 console.log('📥 Fetching Unleash Edge OpenAPI spec...');
 
-const edgeApiData = await fetchOpenApiSpec(edgeOpenApiUrl);
+try {
+    const edgeApiData = await fetchOpenApiSpec(edgeOpenApiUrl);
 
-edgeApiData.servers = [
-    {
-        url: 'https://edge.unleash-instance.example.com',
-        description: 'Your Unleash Edge instance (replace with your actual URL)',
-    },
-];
+    edgeApiData.servers = [
+        {
+            url: 'https://edge.unleash-instance.example.com',
+            description: 'Your Unleash Edge instance (replace with your actual URL)',
+        },
+    ];
 
-const edgeApiJsonString = cleanJsonString(edgeApiData);
+    const edgeApiJsonString = cleanJsonString(edgeApiData);
 
-await fs.mkdir('./fern/apis/edge-api', { recursive: true });
-await fs.writeFile(
-    './fern/apis/edge-api/openapi.json',
-    edgeApiJsonString,
-    'utf8',
-);
+    await fs.mkdir('./fern/apis/edge-api', { recursive: true });
+    await fs.writeFile(
+        './fern/apis/edge-api/openapi.json',
+        edgeApiJsonString,
+        'utf8',
+    );
 
-console.log(`✅ Saved to fern/apis/edge-api/openapi.json`);
-console.log(`📦 Version: ${edgeApiData.info.version}`);
-console.log(`🔗 Endpoints: ${Object.keys(edgeApiData.paths || {}).length}`);
+    console.log(`✅ Saved to fern/apis/edge-api/openapi.json`);
+    console.log(`📦 Version: ${edgeApiData.info.version}`);
+    console.log(`🔗 Endpoints: ${Object.keys(edgeApiData.paths || {}).length}`);
+} catch (error) {
+    warnAndKeepPrevious('Unleash Edge', error);
+}
