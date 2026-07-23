@@ -145,9 +145,9 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 
 ## OpenFeature providers
 
-Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors while still using Unleash for flag management and evaluation.
+Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. In OpenFeature, a provider is the component that connects the OpenFeature SDK to a flag management system. The Unleash providers translate OpenFeature API calls into Unleash SDK operations: Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
 
-Not every feature exposed by an Unleash SDK is available through the OpenFeature API. Use the underlying Unleash SDK directly if your application needs Unleash-specific capabilities that OpenFeature does not model.
+OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as the full [Unleash context](/concepts/unleash-context) for fine-grained targeting, [impression data](/concepts/impression-data), [impact metrics](/concepts/impact-metrics), and automated [release management](/concepts/release-management-overview) with milestones. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
 
 Unleash maintains the following OpenFeature providers:
 
