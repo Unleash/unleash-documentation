@@ -14,10 +14,16 @@ async function fetchOpenApiSpec(url) {
 
 // A failed fetch must not fail the docs publish; keep the committed specs instead
 function warnAndKeepPrevious(specName, error) {
-    const message = `Could not update ${specName} OpenAPI spec, publishing with the previously committed version: ${error.message}`;
+    const reason = error instanceof Error ? error.message : String(error);
+    const message = `Could not update ${specName} OpenAPI spec, publishing with the previously committed version: ${reason}`;
     console.warn(`⚠️ ${message}`);
     if (process.env.GITHUB_ACTIONS) {
-        console.log(`::warning::${message}`);
+        // Workflow command data requires %, \r, and \n to be percent-encoded
+        const escaped = message
+            .replace(/%/g, '%25')
+            .replace(/\r/g, '%0D')
+            .replace(/\n/g, '%0A');
+        console.log(`::warning::${escaped}`);
     }
 }
 
@@ -78,9 +84,16 @@ const cleanJsonString = (json) => {
 
 console.log('📥 Fetching Unleash OpenAPI spec...');
 
+// Only fetch/parse failures are non-fatal; write errors must still fail the job
+// so a partially updated spec is never published
+let data = null;
 try {
-    const data = await fetchOpenApiSpec(unleashOpenApiUrl);
+    data = await fetchOpenApiSpec(unleashOpenApiUrl);
+} catch (error) {
+    warnAndKeepPrevious('Unleash', error);
+}
 
+if (data) {
     // Replace server URL with user-agnostic example
     data.servers = [
         {
@@ -133,15 +146,18 @@ try {
     console.log(`📦 Version: ${adminApiData.info.version}`);
     console.log(`🔗 Endpoints: ${Object.keys(adminApiData.paths || {}).length}`);
     console.log(`🚫 Filtered out tags: Client, Frontend API`);
-} catch (error) {
-    warnAndKeepPrevious('Unleash', error);
 }
 
 console.log('📥 Fetching Unleash Edge OpenAPI spec...');
 
+let edgeApiData = null;
 try {
-    const edgeApiData = await fetchOpenApiSpec(edgeOpenApiUrl);
+    edgeApiData = await fetchOpenApiSpec(edgeOpenApiUrl);
+} catch (error) {
+    warnAndKeepPrevious('Unleash Edge', error);
+}
 
+if (edgeApiData) {
     edgeApiData.servers = [
         {
             url: 'https://edge.unleash-instance.example.com',
@@ -161,6 +177,4 @@ try {
     console.log(`✅ Saved to fern/apis/edge-api/openapi.json`);
     console.log(`📦 Version: ${edgeApiData.info.version}`);
     console.log(`🔗 Endpoints: ${Object.keys(edgeApiData.paths || {}).length}`);
-} catch (error) {
-    warnAndKeepPrevious('Unleash Edge', error);
 }
