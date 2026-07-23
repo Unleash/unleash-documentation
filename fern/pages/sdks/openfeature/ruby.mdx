@@ -35,7 +35,7 @@ bundle install
 
 ## Configuration
 
-Create an `Unleash::OpenFeature::Provider::UnleashFlagProvider` with the same options you would pass to the Unleash Ruby SDK client, then register that provider with OpenFeature.
+Create an `Unleash::OpenFeature::Provider::UnleashFlagProvider` with the same [options](/sdks/ruby#configuration) you would pass to the Unleash Ruby SDK client, then register that provider with OpenFeature.
 
 ```ruby
 require 'open_feature/sdk'
@@ -53,8 +53,6 @@ OpenFeature::SDK.configure do |config|
   config.set_provider(provider)
 end
 ```
-
-Use a backend client token with the Ruby provider. The provider wraps the backend Ruby SDK, evaluates flags locally.
 
 ## Evaluate a flag
 
