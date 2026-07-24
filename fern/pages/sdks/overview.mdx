@@ -6,7 +6,7 @@ keywords: sdk, client, library, backend, frontend, mobile, feature flags, evalua
 og:site_name: Unleash Documentation
 og:title: Unleash SDK Overview - Client Libraries for Feature Flags
 max-toc-depth: 3
-last-updated: June 9, 2026
+last-updated: July 23, 2026
 ---
 
 Unleash offers a number of client libraries (SDKs) designed to help you integrate Unleash into your applications. The SDKs provide an interface for fetching and evaluating feature flags.
@@ -145,11 +145,9 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 
 ## OpenFeature providers
 
-Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors while still using Unleash for flag management and evaluation.
+Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. In OpenFeature, a provider is the component that connects the OpenFeature SDK to a flag management system. The Unleash providers translate OpenFeature API calls into Unleash SDK operations: Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
 
-Not every feature exposed by an Unleash SDK is available through the OpenFeature API. Use the underlying Unleash SDK directly if your application needs Unleash-specific capabilities that OpenFeature does not model.
-
-Unleash maintains OpenFeature providers for selected SDK ecosystems. We also work with ecosystem-owned providers to help keep their Unleash integrations aligned with Unleash behavior.
+OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as the full [Unleash context](/concepts/unleash-context) for fine-grained targeting, [impression data](/concepts/impression-data), [impact metrics](/concepts/impact-metrics), and automated [release management](/concepts/release-management-overview) with milestones. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
 
 Unleash maintains the following OpenFeature providers:
 
@@ -158,10 +156,10 @@ Unleash maintains the following OpenFeature providers:
 -   [Ruby provider](/sdks/openfeature/ruby)
 -   PHP provider
 -   Android provider
--   iOS/Swift provider
+-   iOS provider
 -   Python provider
 
-Unleash is also involved in the maintenance of the following ecosystem OpenFeature providers:
+Unleash also helps maintain the following ecosystem-owned OpenFeature providers, keeping their Unleash integrations aligned with Unleash behavior:
 
 -   .NET provider
 -   Java provider
