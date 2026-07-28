@@ -41,11 +41,12 @@ Why? AWS Lambda is designed to reuse the same instance for multiple invocations,
 You’ll also need to provide an [Unleash Server side API Token](/concepts/api-tokens-and-client-keys) as an environment variable for the AWS Lambda. This authorizes the SDK to connect to the Unleash API.
 
 ```javascript
-
+import {
     startUnleash,
     InMemStorageProvider,
     destroyWithFlush,
 } from "unleash-client";
+
 let unleash;
 
 async function init() {
@@ -69,7 +70,7 @@ export const handler = async (event, context) => {
     await init();
     return {
         statusCode: 200,
-        body: { message: `` },
+        body: { message: "Unleash SDK initialized" },
     };
 };
 ```
@@ -104,7 +105,7 @@ We’ve initialized the Unleash SDK and have code to handle graceful shutdown. I
 Luckily this is straightforward. We can use the SDK as we would in any Node.js application. In the example below, we read the value of the **`simpleFlag`** flag and return the status as part of the JSON response from the function.
 
 ```javascript
-
+import {
     startUnleash,
     InMemStorageProvider,
     destroyWithFlush,

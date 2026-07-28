@@ -134,7 +134,7 @@ Strategy variants are meant to work with impression data. You get the name of th
 
 The output from the impression data in your app may look like this code snippet:
 
-```js
+```json
 {
     "eventType": "getVariant",
     "eventId": "c41aa58b-d2c7-45cf-b668-7267f465e01a",
@@ -194,21 +194,21 @@ An advantage of having your feature disabled for the Control group is that you c
 
 Here is an example of a payload that is returned from Google Analytics that includes impression event data:
 
-```js
+```json
 {
-    "client_id": "unleash_client"
-    "user_id": "uuid1234"
-    "timestamp_micros": "1730407349525000"
-    "non_personalized_ads": true
+    "client_id": "unleash_client",
+    "user_id": "uuid1234",
+    "timestamp_micros": "1730407349525000",
+    "non_personalized_ads": true,
     "events": [
         {
-            "name":"select_item"
+            "name": "select_item",
             "params": {
-                "items":[]
-                "event":"screen_view"
-                "app_name":"myAppName"
-                "feature":"myFeatureName"
-                "treatment":"variantValue"
+                "items": [],
+                "event": "screen_view",
+                "app_name": "myAppName",
+                "feature": "myFeatureName",
+                "treatment": "variantValue"
             }
         }
     ]

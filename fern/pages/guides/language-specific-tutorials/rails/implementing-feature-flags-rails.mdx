@@ -191,7 +191,7 @@ class PostsController < ApplicationController
     is_top3 = UNLEASH.is_enabled?('top-3', @unleash_context)
     @posts = is_top3 ? Post.order(created_at: :desc).limit(3) : Post.all
   end
-
+end
 ```
 
 ## 6. Verify the toggle experience

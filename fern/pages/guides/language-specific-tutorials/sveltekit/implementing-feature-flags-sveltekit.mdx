@@ -266,7 +266,7 @@ Now that our SDK is setup, we can modify our `App.svelte` to set the value of th
 +  import { useFlag } from '@unleash/proxy-client-svelte';
 +  const maxHabitsIncreased = useFlag('maxHabitsIncreased');
 +  let maxHabits = $maxHabitsIncreased ? 6 : 2;
--  lex maxHabits = 3;
+-  let maxHabits = 2;
 ```
 
 ## Conclusion

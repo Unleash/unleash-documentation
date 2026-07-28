@@ -176,7 +176,7 @@ Once Unleash has been installed, open up a code editor like VSCode to view your 
 In `src/index.tsx`, import the `<FlagProvider>`:
 
 ```js
-
+import { FlagProvider } from "@unleash/proxy-client-react";
 ```
 
 Paste in a configuration object:
@@ -213,7 +213,7 @@ In this case, we want to rollout a new notifications badge that will appear in t
 In `src/components/NavBar.tsx`, import the `useFlag` feature:
 
 ```js
-
+import { useFlag } from "@unleash/proxy-client-react";
 ```
 
 Within the `NavBar` component in the file, define and reference the flag you created.
