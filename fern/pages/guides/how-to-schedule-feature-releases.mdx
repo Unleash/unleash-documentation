@@ -5,6 +5,7 @@ keywords: schedule, feature releases, strategy constraints, date constraints, un
 og:site_name: "Unleash Documentation"
 og:title: "Schedule feature releases"
 max-toc-depth: 3
+last-updated: July 28, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v4.16</Button>
@@ -50,7 +51,7 @@ The payload's `"name"` property should contain the name of the strategy to apply
 
 The `"constraint"` object should have the same format as described in the code sample below. The activation date must be in an [RFC 3339-compatible format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.8), e.g. `"1990-12-31T23:59:60Z"`.
 
-```json title="Add a feature activation strategy with a scheduled activation time"
+```http title="Add a feature activation strategy with a scheduled activation time"
 POST api/admin/projects/<project-id>/features/environments/<environment>/strategies
 
 {

@@ -6,6 +6,7 @@ keywords: java, spring, boot, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Java Spring Boot Feature Flag Examples"
 max-toc-depth: 3
+last-updated: July 28, 2026
 ---
 
 In our [Java Spring Boot feature flag tutorial](/guides/implement-feature-flags-in-spring-boot), we implemented a simple feature flag that could be turned on and off. In the real world, many feature flag use cases have more nuance than this. This document will walk you through some common examples of using feature flags in Java Spring Boot with some of those more advanced use cases in mind.
@@ -36,7 +37,7 @@ You can achieve this same result using our API:
 OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 MediaType mediaType = MediaType.parse("application/json");
-RequestBody body = RequestBody.create("{\n  \"name\": \"flexibleRollout\",\n  \"title\": \"",\n  \"disabled\": false,\n  \"sortOrder\": 9999,\n  \"constraints\": [\n    {\n      \"values\": [\n        \"1\",\n        \"2\"\n      ],\n      \"inverted\": false,\n      \"operator\": \"IN\",\n      \"contextName\": \"appName\",\n      \"caseInsensitive\": false\n    }\n  ],\n  \"variants\": [\n    {\n      \"name\": \"blue_group\",\n      \"weight\": 0,\n      \"weightType\": \"fix\",\n      \"stickiness\": \"custom.context.field\",\n      \"payload\": {\n        \"type\": \"json\",\n        \"value\": \"{\\\"color\\\": \\\"red\\\"}\"\n      }\n    }\n  ],\n  \"parameters\": {\n    \"groupId\": \"some_new\",\n    \"rollout\": \"25\",\n    \"stickiness\": \"sessionId\"\n  },\n  \"segments\": [\n    1,\n    2\n  ]\n}", mediaType);
+RequestBody body = RequestBody.create("{\n  \"name\": \"flexibleRollout\",\n  \"title\": \"\",\n  \"disabled\": false,\n  \"sortOrder\": 9999,\n  \"constraints\": [\n    {\n      \"values\": [\n        \"1\",\n        \"2\"\n      ],\n      \"inverted\": false,\n      \"operator\": \"IN\",\n      \"contextName\": \"appName\",\n      \"caseInsensitive\": false\n    }\n  ],\n  \"variants\": [\n    {\n      \"name\": \"blue_group\",\n      \"weight\": 0,\n      \"weightType\": \"fix\",\n      \"stickiness\": \"custom.context.field\",\n      \"payload\": {\n        \"type\": \"json\",\n        \"value\": \"{\\\"color\\\": \\\"red\\\"}\"\n      }\n    }\n  ],\n  \"parameters\": {\n    \"groupId\": \"some_new\",\n    \"rollout\": \"25\",\n    \"stickiness\": \"sessionId\"\n  },\n  \"segments\": [\n    1,\n    2\n  ]\n}", mediaType);
 Request request = new Request.Builder()
   .url("<your-unleash-url>/api/admin/projects/:projectId/features/:featureName/environments/:environment/strategies")
   .method("POST", body)

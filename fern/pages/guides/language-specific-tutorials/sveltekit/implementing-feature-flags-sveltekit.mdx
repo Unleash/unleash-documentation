@@ -6,7 +6,7 @@ keywords: implement, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "How to Implement Feature Flags in SvelteKit"
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: July 28, 2026
 ---
 
 Hello and welcome to another tutorial. This is about adding feature flags to an app made with [SvelteKit](https://kit.svelte.dev/), [Unleash](https://www.getunleash.io/) and the official [Unleash Svelte SDK](/sdks/svelte).
@@ -266,7 +266,7 @@ Now that our SDK is setup, we can modify our `App.svelte` to set the value of th
 +  import { useFlag } from '@unleash/proxy-client-svelte';
 +  const maxHabitsIncreased = useFlag('maxHabitsIncreased');
 +  let maxHabits = $maxHabitsIncreased ? 6 : 2;
--  lex maxHabits = 3;
+-  let maxHabits = 2;
 ```
 
 ## Conclusion
