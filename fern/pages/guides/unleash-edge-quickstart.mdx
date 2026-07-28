@@ -310,13 +310,11 @@ Then you can start updating your application:
 
     For example, if you're using the [Android example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Android):
 
-    ```kotlin title="app/src/main/java/com/example/myapplication/MyApplication.kt"
+    ```kotlin {4-5} title="app/src/main/java/com/example/myapplication/MyApplication.kt"
       val instance = DefaultUnleash(
           androidContext = this,
           unleashConfig = UnleashConfig.newBuilder(appName = "codesandbox-android")
-              // highlight-next-line
               .proxyUrl("http://10.0.2.2:3063/api/frontend/")
-              // highlight-next-line
               .clientKey("<your_frontend_token>")
               .build()
       )
@@ -333,11 +331,9 @@ Then you can start updating your application:
 
     For example, if you're using the [Flutter example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Flutter):
 
-    ```dart title="unleash_example/lib/main.dart"
+    ```dart {2-3} title="unleash_example/lib/main.dart"
       var unleash = UnleashClient(
-        // highlight-next-line
         url: Uri.parse('http://localhost:3063/api/frontend/'),
-        // highlight-next-line
         clientKey: '<your_frontend_token>',
         refreshInterval: 5,
         appName: 'local-flutter',
@@ -371,11 +367,9 @@ Then you can start updating your application:
 
     For example, if you're using the [Java example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Java):
 
-    ```java title="src/main/java/Main.java"
+    ```java {2-3} title="src/main/java/Main.java"
       var flag = "example-flag";
-      // highlight-next-line
       var url = "http://localhost:3063/api/";
-      // highlight-next-line
       var token = "<your_backend_token>";
 
     ```
@@ -386,11 +380,9 @@ Then you can start updating your application:
 
     For example, if you're using the [JavaScript example](https://github.com/Unleash/unleash-sdk-examples/tree/main/JavaScript):
 
-    ```javascript title="src/index.js"
+    ```javascript {2-3} title="src/index.js"
     const unleash = new UnleashClient({
-        // highlight-next-line
         url: "http://localhost:3063/api/frontend/",
-        // highlight-next-line
         clientKey: "<your_frontend_token>",
         appName: "javascript-codesandbox",
     });
@@ -446,12 +438,10 @@ Then you can start updating your application:
 
     For example, if you're using the [React example](https://github.com/Unleash/unleash-sdk-examples/tree/main/React):
 
-    ```tsx title="src/index.tsx"
+    ```tsx {3-4} title="src/index.tsx"
     <FlagProvider
       config={{
-        // highlight-next-line
         url: "http://localhost:3063/api/frontend/", // Unleash Edge running locally
-        // highlight-next-line
         clientKey: "<your_frontend_token>",
         refreshInterval: 15,
         appName: "codesandbox-react",
@@ -487,11 +477,9 @@ Then you can start updating your application:
 
     For example, if you're using the [Svelte example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Svelte):
 
-    ```javascript title="src/routes/+layout.svelte"
+    ```javascript {2-3} title="src/routes/+layout.svelte"
     const config = {
-      // highlight-next-line
       url: 'http://localhost:3063/api/frontend/',
-      // highlight-next-line
       clientKey: '<your_frontend_token>',
       refreshInterval: 5,
       metricsInterval: 5,
@@ -505,11 +493,9 @@ Then you can start updating your application:
 
     For example, if you're using the [Swift example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Swift):
 
-    ```swift title="Sources/UnleashExample/main.swift"
+    ```swift {2-3} title="Sources/UnleashExample/main.swift"
     var unleashClient =  UnleashProxyClientSwift.UnleashClientBase(
-        // highlight-next-line
         unleashUrl: "http://localhost:3063/api/frontend/",
-        // highlight-next-line
         clientKey: "<your_frontend_token>",
         refreshInterval: 15,
         appName: "codesandbox-swift",
@@ -531,11 +517,9 @@ Then you can start updating your application:
 
     For example, if you're using the [Vue example](https://github.com/Unleash/unleash-sdk-examples/tree/main/Vue):
 
-    ```javascript title="src/App.vue"
+    ```javascript {2-3} title="src/App.vue"
     const config = {
-      // highlight-next-line
       url: 'http://localhost:3063/api/frontend/',
-      // highlight-next-line
       clientKey: '<your_frontend_token>',
       refreshInterval: 5,
       metricsInterval: 5,
