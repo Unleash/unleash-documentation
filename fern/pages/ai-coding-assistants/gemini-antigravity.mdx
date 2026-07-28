@@ -135,7 +135,7 @@ Antigravity enforces an authoring-time boundary that also governs how MCP tool c
 
 The CLI gates agent actions through permission modes. Documented values include `always-proceed`, `agent-decides`, and `asks-for-review`, with stricter modes like `request-review` and `strict`. Useful flags:
 
-- `--mode accept-edits|plan` sets the execution mode for the session
+- `--mode` sets the execution mode for the session (either `accept-edits` or `plan`)
 - `--sandbox` runs with terminal restrictions
 - `--dangerously-skip-permissions` auto-approves every tool request (reserve for isolated environments)
 
