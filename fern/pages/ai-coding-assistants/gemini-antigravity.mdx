@@ -410,14 +410,14 @@ Antigravity can run managed agents server-side, each in its own isolated, networ
 {
   "mcpServers": {
     "unleash-remote": {
-      "serverUrl": "https://your-remote-unleash-mcp.example.com/mcp",
-      "headers": { "Authorization": "Bearer your-token" }
+      "serverUrl": "https://your-instance.getunleash.io/api/admin/mcp",
+      "headers": { "Authorization": "${UNLEASH_PAT}" }
     }
   }
 }
 ```
 
-Antigravity uses `serverUrl` for remote servers (Gemini CLI used `url`). Make the host reachable, allow write methods, and verify the authentication flow works in a headless environment. For everyday work in the desktop app and CLI, the local stdio server is simpler.
+Your Unleash instance exposes this endpoint at `/api/admin/mcp` once you enable it under **Admin settings > Remote MCP server**. Pass your PAT as the raw `Authorization` header value, with no `Bearer` prefix. Antigravity uses `serverUrl` for remote servers (Gemini CLI used `url`). Make the host reachable, allow write methods, and verify the authentication flow works in a headless environment. For everyday work in the desktop app and CLI, the local stdio server is simpler.
 
 ## Gemini Code Assist and Gemini CLI
 
