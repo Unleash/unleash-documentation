@@ -147,11 +147,16 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 
 Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. In OpenFeature, a provider is the component that connects the OpenFeature SDK to a flag management system. The Unleash providers translate OpenFeature API calls into Unleash SDK operations: Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
 
-OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as the full [Unleash context](/concepts/unleash-context) for fine-grained targeting, [impression data](/concepts/impression-data), [impact metrics](/concepts/impact-metrics), and automated [release management](/concepts/release-management-overview) with milestones. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
+OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics), including the [safeguards](/concepts/impact-metrics#configure-safeguards) that depend on them. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
 
 Unleash maintains the following OpenFeature providers:
 
+-   [Node.js provider](https://github.com/Unleash/unleash-openfeature-node-provider)
+-   [PHP provider](https://github.com/Unleash/unleash-openfeature-php-provider)
+-   [Python provider](https://github.com/Unleash/unleash-openfeature-python-provider)
 -   [Ruby provider](/sdks/openfeature/ruby)
+-   [Rust provider](https://github.com/Unleash/unleash-openfeature-rust-provider)
+-   [Swift provider](https://github.com/Unleash/unleash-openfeature-swift-provider)
 
 ## Community SDKs
 
