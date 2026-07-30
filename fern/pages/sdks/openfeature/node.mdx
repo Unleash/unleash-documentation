@@ -1,0 +1,126 @@
+---
+title: Node.js OpenFeature provider
+slug: /sdks/openfeature/node
+og:site_name: Unleash
+og:title: Node.js OpenFeature provider
+description: Set up the Unleash OpenFeature provider for Node.js to evaluate feature flags through the OpenFeature API.
+keywords: [unleash, node, nodejs, openfeature, provider, sdk, feature flags]
+max-toc-depth: 3
+last-updated: July 30, 2026
+---
+
+The Unleash OpenFeature Node.js provider lets server-side Node.js applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
+
+The provider wraps the [Unleash Node.js SDK](/sdks/node) and uses the same backend SDK behavior for polling, local evaluation, caching, metrics, and shutdown. The provider creates and starts the Unleash client when it initializes and destroys it, with a final metrics flush, when OpenFeature shuts down.
+
+## Requirements
+
+-   Node.js 22 or later
+
+## Installation
+
+Install the provider together with its peer dependencies, the OpenFeature server SDK and the Unleash Node.js SDK:
+
+```bash
+npm install @unleash/openfeature-node-provider @openfeature/server-sdk unleash-client
+```
+
+## Configuration
+
+Create an `UnleashProvider` with the same [options](/sdks/node#configuration-options) you would pass to the Unleash Node.js SDK client, then register it with OpenFeature.
+
+```ts
+import { OpenFeature } from '@openfeature/server-sdk';
+import { UnleashProvider } from '@unleash/openfeature-node-provider';
+
+const provider = new UnleashProvider({
+  appName: 'my-node-app',
+  url: '<YOUR_UNLEASH_URL>/api',
+  customHeaders: {
+    Authorization: '<YOUR_API_TOKEN>'
+  }
+});
+
+await OpenFeature.setProviderAndWait(provider);
+```
+
+`setProviderAndWait` resolves once the Unleash client is ready and synchronized. It rejects on the first Unleash error instead of waiting forever, so it cannot hang on a misconfigured connection. The Unleash client keeps retrying in the background, and the provider recovers once a fetch succeeds.
+
+If you need direct access to the underlying Unleash client, use `provider.unleashClient`.
+
+## Evaluate a flag
+
+Build an OpenFeature client and evaluate flags through the OpenFeature API:
+
+```ts
+const client = OpenFeature.getClient();
+
+const enabled = await client.getBooleanValue('my-feature', false, {
+  targetingKey: 'user-123'
+});
+```
+
+The provider supports all OpenFeature evaluation methods. Boolean evaluation uses the flag's enabled state. All other types resolve from the payload of the flag's [variant](/concepts/feature-flag-variants):
+
+-   String values accept `string` and `csv` payloads.
+-   Number values accept `number` payloads.
+-   Object values accept `json` payloads.
+
+If the flag doesn't exist, the flag is disabled, or the variant payload is missing or has a different type, the evaluation returns the default value. The detail methods, such as `getBooleanDetails`, additionally report the evaluation reason, the assigned variant name, and flag metadata with `featureEnabled` and `payloadType` fields.
+
+## Context mapping
+
+The provider maps the OpenFeature evaluation context to an [Unleash context](/concepts/unleash-context) before each evaluation. You can set a global context with `OpenFeature.setContext()` and override it per evaluation by passing a context to the evaluation method.
+
+The following OpenFeature fields map directly to top-level Unleash context fields:
+
+-   `currentTime`
+-   `userId`
+-   `sessionId`
+-   `remoteAddress`
+-   `environment`
+-   `appName`
+
+If you set `targetingKey`, the provider maps it to `userId`. The `targetingKey` takes precedence over a `userId` field set on the evaluation context.
+
+The provider adds all other fields to the Unleash context [properties](/concepts/unleash-context#the-properties-field). Strings and numbers pass through unchanged, while booleans and dates are converted to strings. It discards nested values, such as arrays and objects.
+
+## Events
+
+The provider translates Unleash client events into OpenFeature provider events:
+
+| Unleash client state | OpenFeature provider event |
+| --- | --- |
+| Ready and synchronized | `PROVIDER_READY` |
+| Configuration changed | `PROVIDER_CONFIGURATION_CHANGED` |
+| Fetch error while cached flags are served | `PROVIDER_STALE` |
+| Error before any flag data is available | `PROVIDER_ERROR` |
+| Recovery after an error | `PROVIDER_READY` |
+
+```ts
+import { ProviderEvents } from '@openfeature/server-sdk';
+
+provider.events.addHandler(ProviderEvents.ConfigurationChanged, () => {
+  console.log('Flag configuration changed');
+});
+```
+
+## Shutdown
+
+Shut down OpenFeature when your application exits. This also shuts down the underlying Unleash client and flushes any pending metrics.
+
+```ts
+await OpenFeature.close();
+```
+
+## Example
+
+To try the provider against your Unleash instance, clone the [provider repository](https://github.com/Unleash/unleash-openfeature-node-provider) and run the [sample application](https://github.com/Unleash/unleash-openfeature-node-provider/blob/main/sample/index.ts) with your Unleash URL and API token:
+
+```bash
+cd sample
+npm install
+UNLEASH_URL='<YOUR_UNLEASH_URL>/api' \
+UNLEASH_API_TOKEN='<YOUR_API_TOKEN>' \
+npm start
+```

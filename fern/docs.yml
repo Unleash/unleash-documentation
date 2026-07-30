@@ -743,6 +743,8 @@ navigation:
       - section: OpenFeature providers
         skip-slug: true
         contents:
+          - page: Node.js
+            path: pages/sdks/openfeature/node.mdx
           - page: Ruby
             path: pages/sdks/openfeature/ruby.mdx
 
