@@ -1,0 +1,86 @@
+---
+title: ServiceNow
+og:site_name: Unleash Documentation
+og:title: ServiceNow
+description: "Set up the Unleash ServiceNow integration to automatically track the state of your Unleash change requests in ServiceNow."
+max-toc-depth: 2
+slug: integrate/servicenow
+last-updated: July 30, 2026
+---
+
+<Button small outlined className="version-button" href="/support/availability">v8.1</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+The ServiceNow integration automatically tracks the state of your Unleash [change requests](/concepts/change-requests) in [ServiceNow](https://www.servicenow.com). For each change request in Unleash, the integration creates a standard change request in ServiceNow and updates its stage as the Unleash change request progresses.
+
+The ServiceNow change request serves as an audit trail. Change requests are created, approved, and applied in Unleash. Approvals or rejections in ServiceNow do not affect Unleash, and you cannot create a change request in ServiceNow and link it to Unleash.
+
+The integration tracks change requests created after you enable it. If you disable and re-enable the integration, change requests that changed state in the meantime are not updated in ServiceNow.
+
+## Change request lifecycle
+
+The Unleash change request lifecycle maps to ServiceNow change request stages as follows:
+
+| Unleash stage | ServiceNow stage                                  |
+| ------------- | ------------------------------------------------- |
+| Draft         | None, nothing is created yet                      |
+| In review     | `New`, the ServiceNow change is created           |
+| Approved      | `Implement`                                       |
+| Scheduled     | `Implement`, no change in ServiceNow              |
+| Applied       | `Closed`, with the close code set to `Successful` |
+| Cancelled     | `Canceled`                                        |
+| Rejected      | `Canceled`                                        |
+
+<Note>
+If new changes are added to an Unleash change request that was already approved, the corresponding ServiceNow change is cancelled and a new one is created.
+</Note>
+
+## Prerequisites
+
+To set up the integration, you need:
+
+- A ServiceNow instance that is reachable from Unleash.
+- A ServiceNow REST API key that uses the authentication profile **Header for API key** (`x-sn-apikey`) and an access policy for **Change management** with the REST API path `sn_chg_rest/change`. Leave the methods set to apply to all.
+- A standard change request template in your ServiceNow instance to use for the integration. We suggest creating a new template and naming it something recognizable, like `Unleash Change Request`.
+
+## Configuration
+
+To create the integration in Unleash:
+
+1. In the Admin UI, go to **Integrations**.
+2. Select **ServiceNow**.
+3. Configure the [parameters](#parameters), [events](#events), and optional [project and environment filters](#projects-and-environments).
+4. Click **Create**.
+
+#### Parameters
+
+The ServiceNow integration takes the following parameters:
+
+<ParamField path="ServiceNow instance URL" type="string" required={true}>
+  The base URL of your ServiceNow instance, for example `https://example.service-now.com`.
+</ParamField>
+
+<ParamField path="API key" type="string" required={true}>
+  The ServiceNow REST API key, sent as the `x-sn-apikey` header. The key requires an API access policy permitting key authentication on the Change Management API.
+</ParamField>
+
+<ParamField path="Standard change template" type="string" required={true}>
+  The `sys_id` of a standard change template in your ServiceNow instance.
+</ParamField>
+
+#### Events
+
+The integration can subscribe to the following events:
+
+- `change-request-applied`
+- `change-request-approved`
+- `change-request-cancelled`
+- `change-request-rejected`
+- `change-request-sent-to-review`
+
+<Warning>
+Select all available events when configuring the integration. If you select only a subset, the integration does not work as expected.
+</Warning>
+
+#### Projects and environments
+
+You can filter which [projects](/concepts/projects) and [environments](/concepts/environments) the integration is enabled for. If you don't select any projects or environments, the integration receives events from all of them.

@@ -275,6 +275,10 @@ navigation:
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
                     slug: integrate/jira-cloud-plugin-usage
 
+              - page: ServiceNow
+                availability: beta
+                path: pages/integrate/servicenow.mdx
+                slug: integrate/servicenow
               - page: Slack
                 path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
