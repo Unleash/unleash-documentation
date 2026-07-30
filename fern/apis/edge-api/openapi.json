@@ -3,7 +3,7 @@
   "info": {
     "title": "Unleash Edge",
     "description": "Unleash edge is a proxy for Unleash. It can return both evaluated feature toggles as well as the raw data from Unleash's client API",
-    "version": "20.2.4"
+    "version": "20.4.0"
   },
   "paths": {
     "/api/client/features": {
@@ -743,6 +743,15 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ClientMetricsEnv"
+            }
+          },
+          "seenTokens": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
             }
           }
         }

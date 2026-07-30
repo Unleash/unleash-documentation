@@ -37,7 +37,9 @@ The resources and their respective limits and environment variables are:
 | [Action](/concepts/actions) sets per project                                                 | N/A                                                    | 5                                                     | `UNLEASH_ACTION_SETS_PER_PROJECT_LIMIT`        |
 | [Action](/concepts/actions) set filters                                                      | N/A                                                    | 5                                                     | `UNLEASH_ACTION_SET_FILTERS_LIMIT`             |
 | [Action](/concepts/actions) set filter values                                                | N/A                                                    | 25                                                    | `UNLEASH_ACTION_SET_FILTER_VALUES_LIMIT`       |
-| [Release templates](/concepts/release-templates)                                             | N/A                                                    | 5                                                     | `UNLEASH_RELEASE_TEMPLATES_LIMIT`       |
+| [Release templates](/concepts/release-templates)                                             | N/A                                                    | 10                                                    | `UNLEASH_RELEASE_TEMPLATES_LIMIT`       |
+
+The release templates limit applies to the combined total of global and [project-level](/concepts/release-templates#create-a-project-level-release-template) release templates across your instance.
 
 
 

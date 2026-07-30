@@ -8,7 +8,7 @@
   ],
   "info": {
     "title": "Unleash API",
-    "version": "8.0.0"
+    "version": "8.0.3"
   },
   "security": [
     {
@@ -45,7 +45,7 @@
         "properties": {
           "provider": {
             "type": "string",
-            "description": "The addon provider, such as \"webhook\" or \"slack\". This string is **case sensitive** and maps to the provider's `name` property.\n\nThe list of all supported providers and their parameters for a specific Unleash instance can be found by making a GET request to the `api/admin/addons` endpoint: the `providers` property of that response will contain all available providers.\n\nThe default set of providers can be found in the [addons reference documentation](https://docs.getunleash.io/integrate). The default supported options are:\n- `datadog` for [Datadog](https://docs.getunleash.io/integrate/datadog)\n- `slack` for [Slack](https://docs.getunleash.io/integrate/slack)\n- `teams` for [Microsoft Teams](https://docs.getunleash.io/integrate/teams)\n- `webhook` for [webhooks](https://docs.getunleash.io/integrate/webhook)\n\nThe provider you choose for your addon dictates what properties the `parameters` object needs. Refer to the documentation for each provider for more information.\n",
+            "description": "The addon provider, such as \"webhook\" or \"slack\". This string is **case sensitive** and maps to the provider's `name` property.\n\nThe list of all supported providers and their parameters for a specific Unleash instance can be found by making a GET request to the `api/admin/addons` endpoint: the `providers` property of that response will contain all available providers.\n\nThe default set of providers can be found in the [addons reference documentation](https://docs.getunleash.io/integrate). The default supported options are:\n- `datadog` for [Datadog](https://docs.getunleash.io/integrate/datadog)\n- `slack` for [Slack](https://docs.getunleash.io/integrate/slack)\n- `teams-workflow` for [Microsoft Teams Workflow](https://docs.getunleash.io/integrate/teams-workflow)\n- `webhook` for [webhooks](https://docs.getunleash.io/integrate/webhook)\n\nThe provider you choose for your addon dictates what properties the `parameters` object needs. Refer to the documentation for each provider for more information.\n",
             "example": "webhook"
           },
           "description": {
@@ -549,9 +549,60 @@
                 ]
               },
               {
+                "name": "teams-workflow",
+                "displayName": "Microsoft Teams Workflow",
+                "description": "Allows Unleash to post updates to Microsoft Teams through a predefined Workflow",
+                "documentationUrl": "https://docs.getunleash.io/integrate/teams-workflow",
+                "parameters": [
+                  {
+                    "name": "url",
+                    "displayName": "Microsoft Teams Workflow webhook URL",
+                    "description": "(Required)",
+                    "type": "url",
+                    "required": true,
+                    "sensitive": true
+                  }
+                ],
+                "events": [
+                  "feature-created",
+                  "feature-updated",
+                  "feature-archived",
+                  "feature-revived",
+                  "feature-stale-on",
+                  "feature-stale-off",
+                  "feature-environment-enabled",
+                  "feature-environment-disabled",
+                  "feature-strategy-remove",
+                  "feature-strategy-update",
+                  "feature-strategy-add",
+                  "feature-metadata-updated",
+                  "feature-variants-updated",
+                  "feature-project-change",
+                  "feature-potentially-stale-on",
+                  "change-added",
+                  "change-discarded",
+                  "change-edited",
+                  "change-request-applied",
+                  "change-request-approval-added",
+                  "change-request-approved",
+                  "change-request-cancelled",
+                  "change-request-created",
+                  "change-request-discarded",
+                  "change-request-rejected",
+                  "change-request-sent-to-review",
+                  "change-request-scheduled",
+                  "change-request-scheduled-application-success",
+                  "change-request-scheduled-application-failure",
+                  "change-request-schedule-suspended",
+                  "release-plan-progressions-paused",
+                  "release-plan-progressions-resumed"
+                ]
+              },
+              {
                 "name": "teams",
                 "displayName": "Microsoft Teams",
                 "description": "Allows Unleash to post updates to Microsoft Teams.",
+                "deprecated": "This plugin is deprecated due to Microsoft no longer supporting direct incoming webhooks. Use teams-workflow instead",
                 "documentationUrl": "https://docs.getunleash.io/integrate/teams",
                 "parameters": [
                   {
@@ -1005,7 +1056,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "secret",
           "tokenName",
           "type",
           "projects",
@@ -1016,7 +1066,8 @@
           "secret": {
             "type": "string",
             "description": "The token used for authentication.",
-            "example": "project:environment.xyzrandomstring"
+            "example": "project:environment.xyzrandomstring",
+            "nullable": true
           },
           "tokenName": {
             "type": "string",
@@ -1081,6 +1132,12 @@
             "nullable": true,
             "description": "Alias is no longer in active use and will often be NULL. It's kept around as a way of allowing old proxy tokens created with the old metadata format to keep working.",
             "example": "randomid-or-some-alias"
+          },
+          "secure": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "True if using the new api token format. This means copy token will no longer work",
+            "example": true
           }
         }
       },
@@ -1496,6 +1553,13 @@
             "items": {
               "$ref": "#/components/schemas/impactMetricsSchema"
             }
+          },
+          "seenTokens": {
+            "description": "A list of API tokens observed by downstream providers. (Typically Unleash Edge)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1684,6 +1748,18 @@
             "description": "The version of the Unleash client specification the client supports",
             "type": "string",
             "example": "3.0.0"
+          },
+          "sdkFlavor": {
+            "description": "The identifier of an integration built on top of an Unleash SDK (e.g. an OpenFeature provider). Sent so adoption of the integration can be tracked alongside sdkVersion.",
+            "type": "string",
+            "maxLength": 256,
+            "example": "unleash-openfeature-node-provider"
+          },
+          "sdkFlavorVersion": {
+            "description": "The version of the integration identified by sdk flavor, that has been built on top of an Unleash SDK",
+            "type": "string",
+            "maxLength": 32,
+            "example": "1.0.1"
           },
           "interval": {
             "type": "number",
@@ -2111,6 +2187,18 @@
             "type": "string",
             "example": "3.0.0"
           },
+          "sdkFlavor": {
+            "description": "The identifier of an integration built on top of an Unleash SDK (e.g. an OpenFeature provider). Sent so adoption of the integration can be tracked alongside sdkVersion.",
+            "type": "string",
+            "maxLength": 256,
+            "example": "unleash-openfeature-node-provider"
+          },
+          "sdkFlavorVersion": {
+            "description": "The version of the integration identified by sdk flavor, that has been built on top of an Unleash SDK",
+            "type": "string",
+            "maxLength": 32,
+            "example": "1.0.1"
+          },
           "bucket": {
             "type": "object",
             "nullable": true,
@@ -2264,6 +2352,8 @@
               "SEMVER_EQ",
               "SEMVER_GT",
               "SEMVER_LT",
+              "SEMVER_GTE",
+              "SEMVER_LTE",
               "REGEX"
             ],
             "example": "IN"
@@ -2292,6 +2382,7 @@
           "value": {
             "description": "The context value that should be used for constraint evaluation. Use this property instead of `values` for properties that only accept single values.",
             "type": "string",
+            "minLength": 1,
             "example": "my-app"
           }
         }
@@ -3832,6 +3923,7 @@
               "banner-deleted",
               "safeguard-changed",
               "safeguard-deleted",
+              "safeguard-triggered",
               "release-plan-progressions-resumed",
               "release-plan-progressions-paused",
               "project-environment-added",
@@ -5734,6 +5826,45 @@
           }
         }
       },
+      "flagCreatorsSchema": {
+        "type": "object",
+        "description": "A paginated list of users who have created flags across accessible projects.",
+        "required": [
+          "flagCreators",
+          "total"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 50,
+            "description": "The total number of flag creators matching the search and access filters."
+          },
+          "flagCreators": {
+            "type": "array",
+            "description": "The flag creators returned in the current page.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 50,
+                  "description": "The user id."
+                },
+                "name": {
+                  "description": "Name of the user. If the user has no set name, the API falls back to using the user's username (if they have one) or email (if neither name or username is set).",
+                  "type": "string",
+                  "example": "User"
+                }
+              }
+            }
+          }
+        }
+      },
       "frontendApiClientSchema": {
         "type": "object",
         "required": [
@@ -6106,6 +6237,85 @@
           },
           "user": {
             "$ref": "#/components/schemas/userSchema"
+          }
+        }
+      },
+      "groupWriteResponseSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "description": "A user group returned after create or update. User membership is intentionally omitted; fetch the group resource when membership details are needed.",
+        "properties": {
+          "id": {
+            "description": "The group id",
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "description": "The name of the group",
+            "type": "string",
+            "example": "DX team"
+          },
+          "description": {
+            "description": "A custom description of the group",
+            "type": "string",
+            "nullable": true,
+            "example": "Current members of the DX squad"
+          },
+          "mappingsSSO": {
+            "description": "A list of SSO groups that should map to this Unleash group",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "SSOGroup1",
+              "SSOGroup2"
+            ]
+          },
+          "rootRole": {
+            "type": "number",
+            "nullable": true,
+            "description": "A role id that is used as the root role for all users in this group. This can be either the id of the Viewer, Editor or Admin role.",
+            "example": 1
+          },
+          "createdBy": {
+            "description": "A user who created this group",
+            "type": "string",
+            "nullable": true,
+            "example": "admin"
+          },
+          "createdAt": {
+            "description": "When was this group created",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-06-30T11:41:00.123Z"
+          },
+          "projects": {
+            "description": "A list of projects where this group is used",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "default",
+              "my-project"
+            ]
+          },
+          "userCount": {
+            "description": "The number of users that belong to this group",
+            "example": 1,
+            "type": "integer",
+            "minimum": 0
+          },
+          "scimId": {
+            "description": "The SCIM ID of the group, only present if managed by SCIM",
+            "type": "string",
+            "nullable": true,
+            "example": "01HTMEXAMPLESCIMID7SWWGHN7"
           }
         }
       },
@@ -8089,6 +8299,8 @@
               "SEMVER_EQ",
               "SEMVER_GT",
               "SEMVER_LT",
+              "SEMVER_GTE",
+              "SEMVER_LTE",
               "REGEX"
             ],
             "example": "IN"
@@ -8117,6 +8329,7 @@
           "value": {
             "description": "The context value that should be used for constraint evaluation. Use this property instead of `values` for properties that only accept single values.",
             "type": "string",
+            "minLength": 1,
             "example": "my-app"
           },
           "result": {
@@ -8553,7 +8766,8 @@
           "projects",
           "groups",
           "features",
-          "subscriptions"
+          "subscriptions",
+          "canChangePassword"
         ],
         "properties": {
           "rootRole": {
@@ -8595,6 +8809,11 @@
               "$ref": "#/components/schemas/featureSchema"
             },
             "example": []
+          },
+          "canChangePassword": {
+            "description": "Whether the current user has a local password that can be changed.",
+            "type": "boolean",
+            "example": true
           }
         }
       },
@@ -10352,6 +10571,12 @@
             "example": "This is my release plan",
             "nullable": true
           },
+          "project": {
+            "type": "string",
+            "description": "The project this release template belongs to. `null` for global release templates available in all projects.",
+            "example": "my-project",
+            "nullable": true
+          },
           "createdByUserId": {
             "type": "number",
             "description": "Release template: The ID of the user who created this template.",
@@ -11804,6 +12029,11 @@
           "unleashContext": {
             "type": "object",
             "description": "The context object used to configure the Unleash instance."
+          },
+          "storiesPageEnabled": {
+            "type": "boolean",
+            "description": "Whether the internal `/_stories` component gallery route is enabled. Controlled by the `ENABLE_STORIES_PAGE` environment variable.",
+            "example": false
           }
         }
       },
@@ -18610,6 +18840,98 @@
             "description": "A list of login events",
             "items": {
               "$ref": "#/components/schemas/loginEventSchema"
+            }
+          }
+        }
+      },
+      "userSessionSchema": {
+        "description": "A model representing a single active user session.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "description": "An opaque, non-reversible identifier for the session. Use this value to revoke the session; the underlying session id is never exposed.",
+            "type": "string",
+            "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "userId": {
+            "description": "The id of the user the session belongs to.",
+            "type": "integer",
+            "nullable": true,
+            "example": 13
+          },
+          "username": {
+            "description": "The username or email of the user.",
+            "type": "string",
+            "nullable": true,
+            "example": "admin"
+          },
+          "email": {
+            "description": "The email of the user, if known.",
+            "type": "string",
+            "nullable": true,
+            "example": "admin@example.com"
+          },
+          "ip": {
+            "description": "The IP address the session was first seen from. May be null for sessions created before IP capture was enabled.",
+            "type": "string",
+            "nullable": true,
+            "example": "::ffff:127.0.0.1"
+          },
+          "browser": {
+            "description": "The browser the session was started from, derived from the User-Agent. May be null when unknown or not captured.",
+            "type": "string",
+            "nullable": true,
+            "example": "Chrome"
+          },
+          "deviceType": {
+            "description": "The high-level device type the session was started from, derived from the User-Agent. May be null when unknown or not captured.",
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ],
+            "nullable": true,
+            "example": "desktop"
+          },
+          "createdAt": {
+            "description": "When the session was created.",
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-03-01T12:04:26.061Z"
+          },
+          "expiredAt": {
+            "description": "When the session expires, if known.",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-03-03T12:04:26.061Z"
+          },
+          "current": {
+            "description": "Whether this is the session of the user making the request. Revoking it will log the caller out.",
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "userSessionsSchema": {
+        "description": "A response model with a list of active user sessions.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessions"
+        ],
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "description": "A list of active user sessions",
+            "items": {
+              "$ref": "#/components/schemas/userSessionSchema"
             }
           }
         }
@@ -27023,7 +27345,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/groupSchema"
+                  "$ref": "#/components/schemas/groupWriteResponseSchema"
                 }
               }
             }
@@ -27300,11 +27622,11 @@
         },
         "responses": {
           "200": {
-            "description": "groupSchema",
+            "description": "groupWriteResponseSchema",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/groupSchema"
+                  "$ref": "#/components/schemas/groupWriteResponseSchema"
                 }
               }
             }
@@ -35503,7 +35825,7 @@
         ],
         "operationId": "getReleaseTemplates",
         "summary": "Get all release templates.",
-        "description": "**Enterprise feature**\n\nReturns a list of all release templates.",
+        "description": "**Enterprise feature**\n\nReturns a list of all global release templates.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanTemplatesSchema",
@@ -35551,7 +35873,7 @@
         ],
         "operationId": "createReleaseTemplate",
         "summary": "Create a release template.",
-        "description": "**Enterprise feature**\n\nCreates and returns a release template.",
+        "description": "**Enterprise feature**\n\nCreates and returns a global release template.",
         "responses": {
           "200": {
             "description": "#/components/schemas/releasePlanTemplateSchema",
@@ -36561,7 +36883,7 @@
           "Release Templates"
         ],
         "deprecated": true,
-        "operationId": "remoteMilestoneStrategy",
+        "operationId": "removeMilestoneStrategy",
         "summary": "Removes a strategy attached to a milestone",
         "description": "**Enterprise feature**\n\nDeletes the milestone strategy",
         "responses": {
@@ -37898,10 +38220,408 @@
         "x-stability-level": "beta"
       }
     },
+    "/api/admin/impact-metrics/metadata": {
+      "get": {
+        "summary": "Get available impact metrics",
+        "description": "**Enterprise feature**\n\nReturns all available impact metrics and their metadata.",
+        "tags": [
+          "Metrics"
+        ],
+        "operationId": "getAvailableImpactMetrics",
+        "responses": {
+          "200": {
+            "description": "availableImpactMetricsSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/availableImpactMetricsSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid. Provide a valid API token as the `authorization` header, e.g. `authorization:*.*.my-admin-token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "AuthenticationRequired",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You must log in to use Unleash. Your request had no authorization header, so we could not authorize you. Try logging in at /auth/simple/login.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The provided user credentials are valid, but the user does not have the necessary permissions to perform this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NoAccessError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You need the \"UPDATE_ADDON\" permission to perform this action in the \"development\" environment.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NotFoundError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Could not find the addon with ID \"12345\".",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-stability-level": "stable"
+      }
+    },
+    "/api/admin/impact-metrics": {
+      "get": {
+        "summary": "Query impact metrics time series data",
+        "description": "**Enterprise feature**\n\nQueries an impact metric source for time series data based on the provided metric name, time range, and aggregation mode.",
+        "tags": [
+          "Metrics"
+        ],
+        "operationId": "queryImpactMetricsTimeSeries",
+        "parameters": [
+          {
+            "name": "metricName",
+            "schema": {
+              "type": "string",
+              "example": "http_requests_total"
+            },
+            "description": "The Prometheus metric name to query.",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "range",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hour",
+                "day",
+                "week",
+                "month",
+                "threeMonths",
+                "sixMonths"
+              ],
+              "example": "day"
+            },
+            "description": "The time range for the query.",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "aggregationMode",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "rps",
+                "count",
+                "avg",
+                "sum",
+                "p50",
+                "p95",
+                "p99"
+              ],
+              "example": "rps"
+            },
+            "description": "The aggregation mode for the query.",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "labels",
+            "schema": {
+              "type": "string",
+              "example": "{\"endpoint\":[\"/api/admin\"]}"
+            },
+            "description": "A JSON-encoded object mapping label names to arrays of label values to filter by.",
+            "in": "query"
+          },
+          {
+            "name": "mode",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "display",
+                "edit"
+              ],
+              "example": "display"
+            },
+            "description": "Query mode. `edit` (default) also returns the available labels for the metric (used by filter UIs). `display` skips label discovery and returns time-series data only (cheaper; use for dashboard rendering).",
+            "in": "query"
+          },
+          {
+            "name": "source",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "internal",
+                "external"
+              ],
+              "example": "external",
+              "default": "internal"
+            },
+            "description": "Whether the metric comes from the internal Unleash impact metrics or an external source.",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "impactMetricsDataSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/impactMetricsDataSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid. Provide a valid API token as the `authorization` header, e.g. `authorization:*.*.my-admin-token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "AuthenticationRequired",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You must log in to use Unleash. Your request had no authorization header, so we could not authorize you. Try logging in at /auth/simple/login.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The provided user credentials are valid, but the user does not have the necessary permissions to perform this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NoAccessError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You need the \"UPDATE_ADDON\" permission to perform this action in the \"development\" environment.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NotFoundError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Could not find the addon with ID \"12345\".",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-stability-level": "stable"
+      }
+    },
+    "/api/admin/impact-metrics/plausible": {
+      "get": {
+        "summary": "Get Plausible analytics data",
+        "description": "**Enterprise feature**\n\nFetches analytics data from Plausible API for favorite events over the last 7 days.",
+        "tags": [
+          "Metrics"
+        ],
+        "operationId": "getPlausibleMetrics",
+        "responses": {
+          "200": {
+            "description": "plausibleMetricsResponseSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plausibleMetricsResponseSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid. Provide a valid API token as the `authorization` header, e.g. `authorization:*.*.my-admin-token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "AuthenticationRequired",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You must log in to use Unleash. Your request had no authorization header, so we could not authorize you. Try logging in at /auth/simple/login.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The provided user credentials are valid, but the user does not have the necessary permissions to perform this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NoAccessError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You need the \"UPDATE_ADDON\" permission to perform this action in the \"development\" environment.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NotFoundError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Could not find the addon with ID \"12345\".",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-stability-level": "stable"
+      }
+    },
     "/api/admin/projects/{projectId}/features/{featureName}/impact-metrics/config": {
       "post": {
-        "summary": "[BETA] Save flag level impact metrics configuration",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nSaves a configuration for an impact metric chart associated with a feature flag.",
+        "summary": "Save flag level impact metrics configuration",
+        "description": "**Enterprise feature**\n\nSaves a configuration for an impact metric chart associated with a feature flag.",
         "tags": [
           "Metrics"
         ],
@@ -38010,7 +38730,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "projectId",
@@ -38031,8 +38751,8 @@
         ]
       },
       "get": {
-        "summary": "[BETA] Get impact metrics configurations for a single feature",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nGets all impact metrics configurations associated with a specific feature flag.",
+        "summary": "Get impact metrics configurations for a single feature",
+        "description": "**Enterprise feature**\n\nGets all impact metrics configurations associated with a specific feature flag.",
         "tags": [
           "Metrics"
         ],
@@ -38076,7 +38796,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "projectId",
@@ -38099,8 +38819,8 @@
     },
     "/api/admin/impact-metrics/config": {
       "post": {
-        "summary": "[BETA] Save instance level impact metrics configuration",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nSaves a configuration for an instance level impact metric chart without a feature flag",
+        "summary": "Save instance level impact metrics configuration",
+        "description": "**Enterprise feature**\n\nSaves a configuration for an instance level impact metric chart without a feature flag",
         "tags": [
           "Metrics"
         ],
@@ -38128,11 +38848,11 @@
             }
           }
         },
-        "x-stability-level": "beta"
+        "x-stability-level": "stable"
       },
       "get": {
-        "summary": "[BETA] Get impact metrics configuration for the instance",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nGets all impact metrics configurations now associated with any feature flag.",
+        "summary": "Get impact metrics configuration for the instance",
+        "description": "**Enterprise feature**\n\nGets all impact metrics configurations now associated with any feature flag.",
         "tags": [
           "Metrics"
         ],
@@ -38149,13 +38869,13 @@
             }
           }
         },
-        "x-stability-level": "beta"
+        "x-stability-level": "stable"
       }
     },
     "/api/admin/projects/{projectId}/features/{featureName}/impact-metrics/config/{id}": {
       "delete": {
-        "summary": "[BETA] Delete flag level impact metric configuration",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nDeletes an impact metric configuration by its ID.",
+        "summary": "Delete flag level impact metric configuration",
+        "description": "**Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
         "tags": [
           "Metrics"
         ],
@@ -38219,7 +38939,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "projectId",
@@ -38250,8 +38970,8 @@
     },
     "/api/admin/impact-metrics/config/{id}": {
       "delete": {
-        "summary": "[BETA] Delete instance level impact metric configuration",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nDeletes an impact metric configuration by its ID.",
+        "summary": "Delete instance level impact metric configuration",
+        "description": "**Enterprise feature**\n\nDeletes an impact metric configuration by its ID.",
         "tags": [
           "Metrics"
         ],
@@ -38315,7 +39035,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "id",
@@ -38328,14 +39048,122 @@
         ]
       }
     },
+    "/api/admin/impact-metrics/register": {
+      "post": {
+        "summary": "Register a new impact metric",
+        "description": "**Enterprise feature**\n\nRegisters a new impact metric by pushing 0-values.",
+        "tags": [
+          "Metrics"
+        ],
+        "operationId": "registerImpactMetric",
+        "requestBody": {
+          "description": "registerImpactMetricSchema",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/registerImpactMetricSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "This response has no body."
+          },
+          "400": {
+            "description": "The request data does not match what we expect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "ValidationError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The request payload you provided doesn't conform to the schema. The .parameters property should be object. You sent [].",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid. Provide a valid API token as the `authorization` header, e.g. `authorization:*.*.my-admin-token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "AuthenticationRequired",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You must log in to use Unleash. Your request had no authorization header, so we could not authorize you. Try logging in at /auth/simple/login.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The provided user credentials are valid, but the user does not have the necessary permissions to perform this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9c40958a-daac-400e-98fb-3bb438567008",
+                      "description": "The ID of the error instance"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "NoAccessError",
+                      "description": "The name of the error kind"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You need the \"UPDATE_ADDON\" permission to perform this action in the \"development\" environment.",
+                      "description": "A description of what went wrong."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-stability-level": "stable"
+      }
+    },
     "/api/admin/impact-metrics/external-source": {
       "get": {
         "tags": [
           "Metrics"
         ],
         "operationId": "getExternalImpactMetricsSource",
-        "summary": "[BETA] Get the external impact-metrics source.",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nReturns the current configuration of the external impact-metrics source (any Prometheus-compatible endpoint).",
+        "summary": "Get the external impact-metrics source.",
+        "description": "**Enterprise feature**\n\nReturns the current configuration of the external impact-metrics source (any Prometheus-compatible endpoint).",
         "responses": {
           "200": {
             "description": "externalImpactMetricsSourceSchema",
@@ -38402,15 +39230,15 @@
             }
           }
         },
-        "x-stability-level": "beta"
+        "x-stability-level": "stable"
       },
       "post": {
         "tags": [
           "Metrics"
         ],
         "operationId": "setExternalImpactMetricsSource",
-        "summary": "[BETA] Set the external impact-metrics source.",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nUpdates the configuration of the external impact-metrics source (any Prometheus-compatible endpoint).",
+        "summary": "Set the external impact-metrics source.",
+        "description": "**Enterprise feature**\n\nUpdates the configuration of the external impact-metrics source (any Prometheus-compatible endpoint).",
         "requestBody": {
           "description": "setExternalImpactMetricsSourceSchema",
           "required": true,
@@ -38535,7 +39363,7 @@
             }
           }
         },
-        "x-stability-level": "beta"
+        "x-stability-level": "stable"
       }
     },
     "/api/admin/impact-metrics/external-source/validate": {
@@ -38544,8 +39372,8 @@
           "Metrics"
         ],
         "operationId": "validateExternalImpactMetricsSource",
-        "summary": "[BETA] Validate an external impact-metrics source URL.",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nTests an external impact-metrics source URL on the fly without persisting it. Returns the list of metric names found at the URL on success, or an `error` string explaining what went wrong. Always responds with 200; failures are reported in the body.",
+        "summary": "Validate an external impact-metrics source URL.",
+        "description": "**Enterprise feature**\n\nTests an external impact-metrics source URL on the fly without persisting it. Returns the list of metric names found at the URL on success, or an `error` string explaining what went wrong. Always responds with 200; failures are reported in the body.",
         "requestBody": {
           "description": "validateExternalImpactMetricsSourceSchema",
           "required": true,
@@ -38650,7 +39478,7 @@
             }
           }
         },
-        "x-stability-level": "beta"
+        "x-stability-level": "stable"
       }
     },
     "/api/admin/projects/{project}/features/{featureName}/environments/{environment}/progressions/{id}": {
@@ -38670,8 +39498,8 @@
             }
           }
         },
-        "summary": "[BETA] Create or update a milestone progression",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nCreates or updates a milestone progression by source milestone ID. If a progression with the given source milestone exists, it will be updated; otherwise, a new one will be created.",
+        "summary": "Create or update a milestone progression",
+        "description": "**Enterprise feature**\n\nCreates or updates a milestone progression by source milestone ID. If a progression with the given source milestone exists, it will be updated; otherwise, a new one will be created.",
         "responses": {
           "200": {
             "description": "#/components/schemas/milestoneProgressionSchema",
@@ -38738,7 +39566,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -38779,8 +39607,8 @@
           "Release Templates"
         ],
         "operationId": "deleteMilestoneProgression",
-        "summary": "[BETA] Delete a milestone progression",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nDeletes an existing milestone progression by source milestone ID.",
+        "summary": "Delete a milestone progression",
+        "description": "**Enterprise feature**\n\nDeletes an existing milestone progression by source milestone ID.",
         "responses": {
           "204": {
             "description": "This response has no body."
@@ -38867,7 +39695,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -38910,8 +39738,8 @@
           "Release Templates"
         ],
         "operationId": "resumeMilestoneProgressions",
-        "summary": "[BETA] Resume paused milestone progressions",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nResumes all paused milestone progressions for a release plan",
+        "summary": "Resume paused milestone progressions",
+        "description": "**Enterprise feature**\n\nResumes all paused milestone progressions for a release plan",
         "responses": {
           "200": {
             "description": "This response has no body."
@@ -38998,7 +39826,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -39041,8 +39869,8 @@
           "Release Templates"
         ],
         "operationId": "changeReleasePlanSafeguard",
-        "summary": "[BETA] Change a release plan safeguard",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nCreates or updates a safeguard for a specific feature, environment, and release plan.",
+        "summary": "Change a release plan safeguard",
+        "description": "**Enterprise feature**\n\nCreates or updates a safeguard for a specific feature, environment, and release plan.",
         "requestBody": {
           "description": "createSafeguardSchema",
           "required": true,
@@ -39113,7 +39941,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -39156,8 +39984,8 @@
           "Release Templates"
         ],
         "operationId": "deleteReleasePlanSafeguard",
-        "summary": "[BETA] Delete a release plan safeguard",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nDeletes a safeguard by its ID for a specific feature, environment, and release plan.",
+        "summary": "Delete a release plan safeguard",
+        "description": "**Enterprise feature**\n\nDeletes a safeguard by its ID for a specific feature, environment, and release plan.",
         "responses": {
           "204": {
             "description": "This response has no body."
@@ -39244,7 +40072,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -39295,8 +40123,8 @@
           "Features"
         ],
         "operationId": "changeFeatureEnvSafeguard",
-        "summary": "[BETA] Change a feature environment safeguard",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nCreates or updates a safeguard for a specific feature and environment.",
+        "summary": "Change a feature environment safeguard",
+        "description": "**Enterprise feature**\n\nCreates or updates a safeguard for a specific feature and environment.",
         "requestBody": {
           "description": "createSafeguardSchema",
           "required": true,
@@ -39367,7 +40195,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -39402,8 +40230,8 @@
           "Features"
         ],
         "operationId": "deleteFeatureEnvSafeguard",
-        "summary": "[BETA] Delete a feature environment safeguard",
-        "description": "**Enterprise feature**\n\n**[BETA]** This API is in beta state, which means it may change or be removed in the future.\n\nDeletes a safeguard by its ID for a specific feature and environment.",
+        "summary": "Delete a feature environment safeguard",
+        "description": "**Enterprise feature**\n\nDeletes a safeguard by its ID for a specific feature and environment.",
         "responses": {
           "204": {
             "description": "This response has no body."
@@ -39490,7 +40318,7 @@
             }
           }
         },
-        "x-stability-level": "beta",
+        "x-stability-level": "stable",
         "parameters": [
           {
             "name": "project",
@@ -41639,8 +42467,8 @@
         "tags": [
           "Archive"
         ],
-        "description": "This endpoint archives the specified feature.",
-        "summary": "Archives a feature",
+        "description": "This endpoint deletes the specified feature if it is archived. If the feature is not archived, it is left unchanged.",
+        "summary": "Deletes an archived feature",
         "operationId": "deleteFeature",
         "responses": {
           "200": {
