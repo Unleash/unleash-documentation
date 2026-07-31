@@ -8,7 +8,7 @@
   ],
   "info": {
     "title": "Unleash API",
-    "version": "8.0.0"
+    "version": "8.0.3"
   },
   "security": [
     {
@@ -45,7 +45,7 @@
         "properties": {
           "provider": {
             "type": "string",
-            "description": "The addon provider, such as \"webhook\" or \"slack\". This string is **case sensitive** and maps to the provider's `name` property.\n\nThe list of all supported providers and their parameters for a specific Unleash instance can be found by making a GET request to the `api/admin/addons` endpoint: the `providers` property of that response will contain all available providers.\n\nThe default set of providers can be found in the [addons reference documentation](https://docs.getunleash.io/integrate). The default supported options are:\n- `datadog` for [Datadog](https://docs.getunleash.io/integrate/datadog)\n- `slack` for [Slack](https://docs.getunleash.io/integrate/slack)\n- `teams` for [Microsoft Teams](https://docs.getunleash.io/integrate/teams)\n- `webhook` for [webhooks](https://docs.getunleash.io/integrate/webhook)\n\nThe provider you choose for your addon dictates what properties the `parameters` object needs. Refer to the documentation for each provider for more information.\n",
+            "description": "The addon provider, such as \"webhook\" or \"slack\". This string is **case sensitive** and maps to the provider's `name` property.\n\nThe list of all supported providers and their parameters for a specific Unleash instance can be found by making a GET request to the `api/admin/addons` endpoint: the `providers` property of that response will contain all available providers.\n\nThe default set of providers can be found in the [addons reference documentation](https://docs.getunleash.io/integrate). The default supported options are:\n- `datadog` for [Datadog](https://docs.getunleash.io/integrate/datadog)\n- `slack` for [Slack](https://docs.getunleash.io/integrate/slack)\n- `teams-workflow` for [Microsoft Teams Workflow](https://docs.getunleash.io/integrate/teams-workflow)\n- `webhook` for [webhooks](https://docs.getunleash.io/integrate/webhook)\n\nThe provider you choose for your addon dictates what properties the `parameters` object needs. Refer to the documentation for each provider for more information.\n",
             "example": "webhook"
           },
           "description": {
@@ -549,9 +549,60 @@
                 ]
               },
               {
+                "name": "teams-workflow",
+                "displayName": "Microsoft Teams Workflow",
+                "description": "Allows Unleash to post updates to Microsoft Teams through a predefined Workflow",
+                "documentationUrl": "https://docs.getunleash.io/integrate/teams-workflow",
+                "parameters": [
+                  {
+                    "name": "url",
+                    "displayName": "Microsoft Teams Workflow webhook URL",
+                    "description": "(Required)",
+                    "type": "url",
+                    "required": true,
+                    "sensitive": true
+                  }
+                ],
+                "events": [
+                  "feature-created",
+                  "feature-updated",
+                  "feature-archived",
+                  "feature-revived",
+                  "feature-stale-on",
+                  "feature-stale-off",
+                  "feature-environment-enabled",
+                  "feature-environment-disabled",
+                  "feature-strategy-remove",
+                  "feature-strategy-update",
+                  "feature-strategy-add",
+                  "feature-metadata-updated",
+                  "feature-variants-updated",
+                  "feature-project-change",
+                  "feature-potentially-stale-on",
+                  "change-added",
+                  "change-discarded",
+                  "change-edited",
+                  "change-request-applied",
+                  "change-request-approval-added",
+                  "change-request-approved",
+                  "change-request-cancelled",
+                  "change-request-created",
+                  "change-request-discarded",
+                  "change-request-rejected",
+                  "change-request-sent-to-review",
+                  "change-request-scheduled",
+                  "change-request-scheduled-application-success",
+                  "change-request-scheduled-application-failure",
+                  "change-request-schedule-suspended",
+                  "release-plan-progressions-paused",
+                  "release-plan-progressions-resumed"
+                ]
+              },
+              {
                 "name": "teams",
                 "displayName": "Microsoft Teams",
                 "description": "Allows Unleash to post updates to Microsoft Teams.",
+                "deprecated": "This plugin is deprecated due to Microsoft no longer supporting direct incoming webhooks. Use teams-workflow instead",
                 "documentationUrl": "https://docs.getunleash.io/integrate/teams",
                 "parameters": [
                   {
@@ -1005,7 +1056,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "secret",
           "tokenName",
           "type",
           "projects",
@@ -1016,7 +1066,8 @@
           "secret": {
             "type": "string",
             "description": "The token used for authentication.",
-            "example": "project:environment.xyzrandomstring"
+            "example": "project:environment.xyzrandomstring",
+            "nullable": true
           },
           "tokenName": {
             "type": "string",
@@ -1081,6 +1132,12 @@
             "nullable": true,
             "description": "Alias is no longer in active use and will often be NULL. It's kept around as a way of allowing old proxy tokens created with the old metadata format to keep working.",
             "example": "randomid-or-some-alias"
+          },
+          "secure": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "True if using the new api token format. This means copy token will no longer work",
+            "example": true
           }
         }
       },
@@ -1496,6 +1553,13 @@
             "items": {
               "$ref": "#/components/schemas/impactMetricsSchema"
             }
+          },
+          "seenTokens": {
+            "description": "A list of API tokens observed by downstream providers. (Typically Unleash Edge)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1684,6 +1748,18 @@
             "description": "The version of the Unleash client specification the client supports",
             "type": "string",
             "example": "3.0.0"
+          },
+          "sdkFlavor": {
+            "description": "The identifier of an integration built on top of an Unleash SDK (e.g. an OpenFeature provider). Sent so adoption of the integration can be tracked alongside sdkVersion.",
+            "type": "string",
+            "maxLength": 256,
+            "example": "unleash-openfeature-node-provider"
+          },
+          "sdkFlavorVersion": {
+            "description": "The version of the integration identified by sdk flavor, that has been built on top of an Unleash SDK",
+            "type": "string",
+            "maxLength": 32,
+            "example": "1.0.1"
           },
           "interval": {
             "type": "number",
@@ -2111,6 +2187,18 @@
             "type": "string",
             "example": "3.0.0"
           },
+          "sdkFlavor": {
+            "description": "The identifier of an integration built on top of an Unleash SDK (e.g. an OpenFeature provider). Sent so adoption of the integration can be tracked alongside sdkVersion.",
+            "type": "string",
+            "maxLength": 256,
+            "example": "unleash-openfeature-node-provider"
+          },
+          "sdkFlavorVersion": {
+            "description": "The version of the integration identified by sdk flavor, that has been built on top of an Unleash SDK",
+            "type": "string",
+            "maxLength": 32,
+            "example": "1.0.1"
+          },
           "bucket": {
             "type": "object",
             "nullable": true,
@@ -2264,6 +2352,8 @@
               "SEMVER_EQ",
               "SEMVER_GT",
               "SEMVER_LT",
+              "SEMVER_GTE",
+              "SEMVER_LTE",
               "REGEX"
             ],
             "example": "IN"
@@ -2292,6 +2382,7 @@
           "value": {
             "description": "The context value that should be used for constraint evaluation. Use this property instead of `values` for properties that only accept single values.",
             "type": "string",
+            "minLength": 1,
             "example": "my-app"
           }
         }
@@ -3832,6 +3923,7 @@
               "banner-deleted",
               "safeguard-changed",
               "safeguard-deleted",
+              "safeguard-triggered",
               "release-plan-progressions-resumed",
               "release-plan-progressions-paused",
               "project-environment-added",
@@ -5734,6 +5826,45 @@
           }
         }
       },
+      "flagCreatorsSchema": {
+        "type": "object",
+        "description": "A paginated list of users who have created flags across accessible projects.",
+        "required": [
+          "flagCreators",
+          "total"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 50,
+            "description": "The total number of flag creators matching the search and access filters."
+          },
+          "flagCreators": {
+            "type": "array",
+            "description": "The flag creators returned in the current page.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 50,
+                  "description": "The user id."
+                },
+                "name": {
+                  "description": "Name of the user. If the user has no set name, the API falls back to using the user's username (if they have one) or email (if neither name or username is set).",
+                  "type": "string",
+                  "example": "User"
+                }
+              }
+            }
+          }
+        }
+      },
       "frontendApiClientSchema": {
         "type": "object",
         "required": [
@@ -6106,6 +6237,85 @@
           },
           "user": {
             "$ref": "#/components/schemas/userSchema"
+          }
+        }
+      },
+      "groupWriteResponseSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "description": "A user group returned after create or update. User membership is intentionally omitted; fetch the group resource when membership details are needed.",
+        "properties": {
+          "id": {
+            "description": "The group id",
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "description": "The name of the group",
+            "type": "string",
+            "example": "DX team"
+          },
+          "description": {
+            "description": "A custom description of the group",
+            "type": "string",
+            "nullable": true,
+            "example": "Current members of the DX squad"
+          },
+          "mappingsSSO": {
+            "description": "A list of SSO groups that should map to this Unleash group",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "SSOGroup1",
+              "SSOGroup2"
+            ]
+          },
+          "rootRole": {
+            "type": "number",
+            "nullable": true,
+            "description": "A role id that is used as the root role for all users in this group. This can be either the id of the Viewer, Editor or Admin role.",
+            "example": 1
+          },
+          "createdBy": {
+            "description": "A user who created this group",
+            "type": "string",
+            "nullable": true,
+            "example": "admin"
+          },
+          "createdAt": {
+            "description": "When was this group created",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-06-30T11:41:00.123Z"
+          },
+          "projects": {
+            "description": "A list of projects where this group is used",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "default",
+              "my-project"
+            ]
+          },
+          "userCount": {
+            "description": "The number of users that belong to this group",
+            "example": 1,
+            "type": "integer",
+            "minimum": 0
+          },
+          "scimId": {
+            "description": "The SCIM ID of the group, only present if managed by SCIM",
+            "type": "string",
+            "nullable": true,
+            "example": "01HTMEXAMPLESCIMID7SWWGHN7"
           }
         }
       },
@@ -8089,6 +8299,8 @@
               "SEMVER_EQ",
               "SEMVER_GT",
               "SEMVER_LT",
+              "SEMVER_GTE",
+              "SEMVER_LTE",
               "REGEX"
             ],
             "example": "IN"
@@ -8117,6 +8329,7 @@
           "value": {
             "description": "The context value that should be used for constraint evaluation. Use this property instead of `values` for properties that only accept single values.",
             "type": "string",
+            "minLength": 1,
             "example": "my-app"
           },
           "result": {
@@ -8553,7 +8766,8 @@
           "projects",
           "groups",
           "features",
-          "subscriptions"
+          "subscriptions",
+          "canChangePassword"
         ],
         "properties": {
           "rootRole": {
@@ -8595,6 +8809,11 @@
               "$ref": "#/components/schemas/featureSchema"
             },
             "example": []
+          },
+          "canChangePassword": {
+            "description": "Whether the current user has a local password that can be changed.",
+            "type": "boolean",
+            "example": true
           }
         }
       },
@@ -10352,6 +10571,12 @@
             "example": "This is my release plan",
             "nullable": true
           },
+          "project": {
+            "type": "string",
+            "description": "The project this release template belongs to. `null` for global release templates available in all projects.",
+            "example": "my-project",
+            "nullable": true
+          },
           "createdByUserId": {
             "type": "number",
             "description": "Release template: The ID of the user who created this template.",
@@ -11804,6 +12029,11 @@
           "unleashContext": {
             "type": "object",
             "description": "The context object used to configure the Unleash instance."
+          },
+          "storiesPageEnabled": {
+            "type": "boolean",
+            "description": "Whether the internal `/_stories` component gallery route is enabled. Controlled by the `ENABLE_STORIES_PAGE` environment variable.",
+            "example": false
           }
         }
       },
@@ -18610,6 +18840,98 @@
             "description": "A list of login events",
             "items": {
               "$ref": "#/components/schemas/loginEventSchema"
+            }
+          }
+        }
+      },
+      "userSessionSchema": {
+        "description": "A model representing a single active user session.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "description": "An opaque, non-reversible identifier for the session. Use this value to revoke the session; the underlying session id is never exposed.",
+            "type": "string",
+            "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "userId": {
+            "description": "The id of the user the session belongs to.",
+            "type": "integer",
+            "nullable": true,
+            "example": 13
+          },
+          "username": {
+            "description": "The username or email of the user.",
+            "type": "string",
+            "nullable": true,
+            "example": "admin"
+          },
+          "email": {
+            "description": "The email of the user, if known.",
+            "type": "string",
+            "nullable": true,
+            "example": "admin@example.com"
+          },
+          "ip": {
+            "description": "The IP address the session was first seen from. May be null for sessions created before IP capture was enabled.",
+            "type": "string",
+            "nullable": true,
+            "example": "::ffff:127.0.0.1"
+          },
+          "browser": {
+            "description": "The browser the session was started from, derived from the User-Agent. May be null when unknown or not captured.",
+            "type": "string",
+            "nullable": true,
+            "example": "Chrome"
+          },
+          "deviceType": {
+            "description": "The high-level device type the session was started from, derived from the User-Agent. May be null when unknown or not captured.",
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ],
+            "nullable": true,
+            "example": "desktop"
+          },
+          "createdAt": {
+            "description": "When the session was created.",
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-03-01T12:04:26.061Z"
+          },
+          "expiredAt": {
+            "description": "When the session expires, if known.",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-03-03T12:04:26.061Z"
+          },
+          "current": {
+            "description": "Whether this is the session of the user making the request. Revoking it will log the caller out.",
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "userSessionsSchema": {
+        "description": "A response model with a list of active user sessions.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessions"
+        ],
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "description": "A list of active user sessions",
+            "items": {
+              "$ref": "#/components/schemas/userSessionSchema"
             }
           }
         }
