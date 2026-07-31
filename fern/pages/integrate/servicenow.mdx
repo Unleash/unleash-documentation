@@ -14,7 +14,7 @@ The ServiceNow integration automatically tracks the state of your Unleash [chang
 
 The ServiceNow change request serves as an audit trail. Change requests are created, approved, and applied in Unleash. Approvals or rejections in ServiceNow do not affect Unleash, and you cannot create a change request in ServiceNow and link it to Unleash.
 
-When the integration syncs a change request, a system user posts a comment on the Unleash change request with a link to the corresponding change request in ServiceNow.
+When the integration syncs a change request, a system user posts a comment on the Unleash change request with a link to the corresponding change request in ServiceNow. If the integration fails to create the change request in ServiceNow, a system user posts a comment describing the failure.
 
 The integration tracks change requests created after you enable it. If you disable and re-enable the integration, change requests that changed state in the meantime are not updated in ServiceNow.
 
