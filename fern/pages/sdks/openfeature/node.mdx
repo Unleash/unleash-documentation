@@ -44,7 +44,7 @@ const provider = new UnleashProvider({
 await OpenFeature.setProviderAndWait(provider);
 ```
 
-`setProviderAndWait` resolves once the Unleash client is ready and synchronized. It rejects on the first Unleash error instead of waiting forever, so it cannot hang on a misconfigured connection. The Unleash client keeps retrying in the background, and the provider recovers once a fetch succeeds.
+`setProviderAndWait` starts the Unleash SDK and waits for startup to complete before the provider is registered for use. After startup, the SDK continues refreshing feature flag data in the background.
 
 If you need direct access to the underlying Unleash client, use `provider.unleashClient`.
 
@@ -83,7 +83,7 @@ The following OpenFeature fields map directly to top-level Unleash context field
 
 If you set `targetingKey`, the provider maps it to `userId`. The `targetingKey` takes precedence over a `userId` field set on the evaluation context.
 
-The provider adds all other fields to the Unleash context [properties](/concepts/unleash-context#the-properties-field). Strings and numbers pass through unchanged, while booleans and dates are converted to strings. It discards nested values, such as arrays and objects.
+The provider adds all other fields to the Unleash context [properties](/concepts/unleash-context#the-properties-field). It discards nested values, such as arrays and objects.
 
 ## Events
 
