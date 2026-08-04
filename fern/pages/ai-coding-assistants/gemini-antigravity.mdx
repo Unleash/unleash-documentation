@@ -36,7 +36,7 @@ Unleash also offers a [remote MCP server](/integrate/mcp#remote-mcp-server) (Str
 Before you begin, make sure you have the following:
 
 - Node.js 18 or later: The MCP server is distributed as an npm package
-- Antigravity: The [desktop app](https://antigravity.google/) or the CLI (`brew install --cask antigravity-cli`, or the official installer), installed
+- Antigravity: The desktop app or the CLI ([download here](https://antigravity.google/download))
 - A signed-in Antigravity session: Sign in with your Google account, or use Cloud OAuth against a Gemini Enterprise Agent Platform project for enterprise
 - An Unleash instance: Cloud or self-hosted, with API access enabled
 - A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT): With permissions to create and manage feature flags
@@ -108,7 +108,11 @@ Edit the global MCP configuration at `~/.gemini/config/mcp_config.json` and add 
 In the desktop app, you can also add the server through the built-in MCP Store UI instead of editing the file. Both surfaces use the same configuration.
 
 <Note>
-Antigravity uses a `mcpServers` object (the same shape as Gemini CLI and Claude Code). The `command` is a string and `args` is an array. Use the `${VAR}` brace form in `env` and make sure the variables are exported in your shell. Avoid the no-brace `$VAR` form, which has a [known expansion bug](https://github.com/github/github-mcp-server/issues/2418), and avoid bash-style defaults like `${VAR:-default}`, which are not evaluated. To scope the server to a single team or workspace, put the same block in a workspace `.agents/mcp_config.json` or in a plugin's `plugins/<name>/mcp_config.json`.
+Antigravity uses a `mcpServers` object (the same shape as Gemini CLI and Claude Code).
+The `command` is a string and `args` is an array. Use the `${VAR}` brace form in `env` and make sure the variables are exported in your shell.
+Avoid the no-brace `$VAR` form and bash-style defaults like `${VAR:-default}`, which are not evaluated.
+
+To scope the server to a single team or workspace, put the same block in a workspace `.agents/mcp_config.json` or in a plugin's `plugins/<name>/mcp_config.json`.
 </Note>
 
 </Step>
@@ -121,7 +125,7 @@ Start an Antigravity session (desktop or CLI) and run the `/mcp` command, which 
 /mcp
 ```
 
-The `unleash` server appears with its tools once you are signed in. You can also ask the agent, "What Unleash MCP tools are available?" to confirm all eleven tools are discovered.
+The `unleash` server appears with its tools once you are signed in. You can also ask the agent, "What Unleash MCP tools are available?" to confirm which tools are discovered.
 
 </Step>
 
@@ -143,11 +147,12 @@ Keep a prompting mode for writes so you review the flag name, environment, or ro
 
 ### In the desktop app
 
-The desktop app applies the same gate through a Human-in-the-Loop review pane. As an agent works, it produces **Artifacts** (plans, task lists, walkthroughs, and browser recordings) that you review and comment on inline before it proceeds.
+The desktop app applies the same gate through a Human-in-the-Loop review pane.
+As an agent works, it produces **Artifacts** (plans, task lists, walkthroughs, and browser recordings) that you review and comment on inline before it proceeds.
 
-<Warning>
-Desktop review can be relaxed to proceed automatically, which is convenient but removes the human gate. Treat local review as an authoring-time convenience, and rely on the feature flag (and, at enterprise scale, Cloud IAM) as the boundary that cannot be switched off. Enable [change requests](/concepts/change-requests) on production so enabling a flag requires human approval regardless of what any agent does.
-</Warning>
+Desktop review can be relaxed to proceed automatically, which is convenient but removes the human gate.
+Treat local review as an authoring-time convenience, and rely on the feature flag (and, at enterprise scale, Cloud IAM) as the boundary that cannot be switched off.
+Enable [change requests](/concepts/change-requests) on production environments so enabling a flag requires human approval regardless of what any agent does.
 
 ## Tool reference
 
