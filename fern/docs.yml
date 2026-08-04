@@ -275,6 +275,10 @@ navigation:
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
                     slug: integrate/jira-cloud-plugin-usage
 
+              - page: ServiceNow
+                availability: beta
+                path: pages/integrate/servicenow.mdx
+                slug: integrate/servicenow
               - page: Slack
                 path: pages/integrate/slack-app.mdx
                 slug: integrate/slack
@@ -734,6 +738,14 @@ navigation:
             path: pages/sdks/frontend/svelte.mdx
           - page: Vue
             path: pages/sdks/frontend/vue.mdx
+
+      - section: OpenFeature providers
+        skip-slug: true
+        contents:
+          - page: Node.js
+            path: pages/sdks/openfeature/node.mdx
+          - page: Ruby
+            path: pages/sdks/openfeature/ruby.mdx
 
       - section: Community SDKs
         collapsed: true

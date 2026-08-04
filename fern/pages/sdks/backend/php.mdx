@@ -5,7 +5,7 @@ og:title: PHP SDK
 description: Set up the Unleash PHP SDK to evaluate feature flags with context, variants, caching, bootstrap, custom strategies, and metrics.
 keywords: [unleash, php, sdk, feature flags, feature toggles]
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: July 28, 2026
 ---
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="PHP" />
@@ -485,7 +485,7 @@ $bootstrapJsonSerializable = new class implements JsonSerializable {
     public function jsonSerialize(): array {
         // TODO: Implement jsonSerialize() method.
     }
-}
+};
 
 // now assign them to the builder, note that each withBootstrap* method call overrides the bootstrap
 

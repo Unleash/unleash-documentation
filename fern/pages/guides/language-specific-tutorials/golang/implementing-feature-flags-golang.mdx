@@ -6,7 +6,7 @@ keywords: implement, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "How to Implement Feature Flags in Go"
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: July 28, 2026
 ---
 
 Hello! In this tutorial we'll show you how to add feature flags to your Go app, using [Unleash](https://www.getunleash.io/) and the official [Unleash Go SDK](/sdks/go). With Unleash, an open-source feature flag service, you can add feature flags to your application to release new features faster.
@@ -101,6 +101,7 @@ Next, let's make sure our setup is working. Make a call to the REST API to retri
 ```go
 package main
 
+import (
     "encoding/json"
     "fmt"
     "io"
@@ -145,6 +146,7 @@ Let's create a static feature flag, for now, just to test that we can call both 
 ```go
 package main
 
+import (
     "bytes"
     "encoding/json"
     "fmt"

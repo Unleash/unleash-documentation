@@ -6,7 +6,7 @@ keywords: sdk, client, library, backend, frontend, mobile, feature flags, evalua
 og:site_name: Unleash Documentation
 og:title: Unleash SDK Overview - Client Libraries for Feature Flags
 max-toc-depth: 3
-last-updated: June 9, 2026
+last-updated: July 31, 2026
 ---
 
 Unleash offers a number of client libraries (SDKs) designed to help you integrate Unleash into your applications. The SDKs provide an interface for fetching and evaluating feature flags.
@@ -62,12 +62,12 @@ The following tables show which features are supported by each backend SDK. Some
 #### Initialization
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| Async initialization | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Block until synchronized | ✅ | ✅ | ✅ | ⭕ | ⭕ | ✅ | ✅ | ⭕ |
-| Context provider | ✅ | N/A | N/A | N/A | N/A | ✅ | ✅ | N/A |
-| Global fallback function | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Async initialization | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | ✅ |
+| Block until synchronized | ✅ | ✅ | ✅ | ⭕ | ⭕ | ✅ | ✅ | ✅ |
+| Context provider | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| Global fallback function | ✅ | ✅ | ✅ | ✅ | ⭕ | ⭕ | ⭕ | ⭕ |
 | Flag Query: `namePrefix`, `tags` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| Flag Query: `project_name` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | ⭕ |
+| Flag Query: `project_name` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 #### Custom headers
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
@@ -79,9 +79,9 @@ The following tables show which features are supported by each backend SDK. Some
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Gradual rollout](/concepts/activation-strategies) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Gradual rollout with custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
+| [Gradual rollout with custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (0.16.0) |
 | [IP](/concepts/activation-strategies#ips), [hostname](/concepts/activation-strategies#hosts) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [IP](/concepts/activation-strategies#ips) with CIDR syntax | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ | ✅ | ✅ |
+| [IP](/concepts/activation-strategies#ips) with CIDR syntax | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (5.0.0) | ✅ | ✅ |
 
 #### Custom strategies
 All backend SDKs have basic support.
@@ -91,7 +91,7 @@ All backend SDKs have support for the basic operators (`IN`, `NOT_IN`).
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Advanced operators](/concepts/activation-strategies#advanced-operators) | ✅ (5.1) | ✅ (3.12) | ✅ (3.3) | ✅ (5.1) | ✅ (4.2) | ✅ (2.1) | ✅ (1.3.1) | ⭕ |
+| [Advanced operators](/concepts/activation-strategies#advanced-operators) | ✅ (5.1) | ✅ (3.12) | ✅ (3.3) | ✅ (5.1) | ✅ (4.2) | ✅ (2.1) | ✅ (1.3.1) | ✅ (0.16.0) |
 
 
 #### Unleash context
@@ -108,7 +108,7 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Strategy variants](/concepts/strategy-variants) and [custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭕ |
+| [Strategy variants](/concepts/strategy-variants) and [custom stickiness](/concepts/stickiness#custom-stickiness) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (0.16.0) |
 
 
 #### Local backup
@@ -121,7 +121,7 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Usage metrics | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | [Impression data](/concepts/impression-data) | ✅ | ✅ | ✅ | ✅ | ⭕ | ✅  | ✅ | ⭕ |
-| [Impact metrics](/concepts/impact-metrics) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅  | ⭕ | ⭕ |
+| [Impact metrics](/concepts/impact-metrics) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅  | ❌ | ⭕ |
 
 #### Bootstrap
 | Capability | [Java](/sdks/java) | [Node.js](/sdks/node) | [Go](/sdks/go) | [Python](/sdks/python) | [Ruby](/sdks/ruby) | [.NET](/sdks/dotnet) | [PHP](/sdks/php) | [Rust](/sdks/rust) |
@@ -142,6 +142,21 @@ Static fields (`environment`, `appName`), defined fields, and custom properties 
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Default refresh interval | 60s | 30s | 15s | 30s | 30s | 30s | 30s | 30s | 30s |
 | Default metrics interval | 60s | 30s | 30s | 60s | 60s | 60s | 60s | 60s | 60s |
+
+## OpenFeature providers
+
+Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. In OpenFeature, a provider is the component that connects the OpenFeature SDK to a flag management system. The Unleash providers translate OpenFeature API calls into Unleash SDK operations: Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
+
+OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics), including the [safeguards](/concepts/impact-metrics#configure-safeguards) that depend on them. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
+
+Unleash maintains the following OpenFeature providers:
+
+-   [Node.js provider](/sdks/openfeature/node)
+-   [PHP provider](https://github.com/Unleash/unleash-openfeature-php-provider)
+-   [Python provider](https://github.com/Unleash/unleash-openfeature-python-provider)
+-   [Ruby provider](/sdks/openfeature/ruby)
+-   [Rust provider](https://github.com/Unleash/unleash-openfeature-rust-provider)
+-   [Swift provider](https://github.com/Unleash/unleash-openfeature-swift-provider)
 
 ## Community SDKs
 

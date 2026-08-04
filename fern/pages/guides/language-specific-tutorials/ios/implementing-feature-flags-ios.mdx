@@ -6,6 +6,7 @@ keywords: implement, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "How to Implement Feature Flags in iOS"
 max-toc-depth: 3
+last-updated: July 28, 2026
 ---
 
 iOS is a mobile operating system developed by Apple for their mostly used mobile device: the iPhone. [Swift](https://www.swift.org/) is a programming language designed for Apple iOS devices. Unleash offers an [iOS SDK](/sdks/ios) for connecting SwiftUI with your iOS application to use feature flags. We will be using the open-source iOS Swift project called [Open Meteo](https://github.com/ighiba/open-meteo)!
@@ -158,7 +159,8 @@ Navigate to the `OpenMeteo/AppDelegate` file in your XCode workspace.
 At the top of the file, add these two import lines:
 
 ```swift
-
+import UIKit
+import UnleashProxyClientSwift
 ```
 
 Inside the `AppDelegate` class, add this code snippet:

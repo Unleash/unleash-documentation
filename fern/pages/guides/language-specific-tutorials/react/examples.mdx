@@ -6,6 +6,7 @@ keywords: react, feature, flag, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "React Feature Flag Examples"
 max-toc-depth: 3
+last-updated: July 28, 2026
 ---
 
 In our [React tutorial](/guides/implement-feature-flags-in-react), we implemented a simple on/off feature flag. In the real world, many feature flag use cases have more nuance than this. This document will walk you through some common examples of using feature flags in React with some of those more advanced use cases in mind.
@@ -219,7 +220,7 @@ Announcement as AnnouncementsIcon,
 The full import line now looks like this:
 
 ```js
-
+import {
     Menu as MenuIcon,
     Notifications as NotificationsIcon,
     Announcement as AnnouncementsIcon,
@@ -232,7 +233,7 @@ Unleash has a built-in React SDK hook called [useVariant](/sdks/react#check-vari
 Next, import the `useVariant` hook from the React SDK:
 
 ```js
-
+import { useVariant } from "@unleash/proxy-client-react";
 ```
 
 `useVariant` returns the name of the specific flag variant your user experiences, if it’s enabled, and if the overarching feature flag is enabled as well.
@@ -306,7 +307,7 @@ Next, let’s configure our React app to capture the impression events that are 
 In `NavBar.tsx`, pull in `useUnleashClient`. Our updated import line should look like this:
 
 ```js
-
+import {
     useFlag,
     useVariant,
     useUnleashClient,
@@ -343,7 +344,7 @@ Our flag impression data is now being logged!
 
 In your browser, you can view the output for `isEnabled`:
 
-```js
+```json
 {
     "eventType": "isEnabled",
     "eventId": "b4455218-4a88-43aa-8712-b99186f46548",
@@ -360,7 +361,7 @@ In your browser, you can view the output for `isEnabled`:
 
 And the console.log for `getVariant` returns:
 
-```js
+```json
 {
     "eventType": "getVariant",
     "eventId": "c41aa58b-d2c7-45cf-b668-7267f465e01a",
@@ -489,7 +490,7 @@ Here’s how this can be done via our API:
 
     And the required body field object would look like this:
 
-    ```js
+    ```json
     {
     "description": "Controls disabling of the comments section in case of an incident",
     "type": "kill-switch",
@@ -528,7 +529,7 @@ To take full advantage of our React SDK, we’ve compiled a list of the most com
 ### `useFlag` example
 
 ```js
-const newFeature = useFlag(“newFeatureFlag”);
+const newFeature = useFlag("newFeatureFlag");
 
 // output
 true
@@ -537,10 +538,10 @@ true
 ### `useVariant` example
 
 ```js
-const variant = useVariant(“newFeatureFlag”);
+const variant = useVariant("newFeatureFlag");
 
 // output
-{ enabled: true, feature_enabled: true, name: “newVariant” }
+{ enabled: true, feature_enabled: true, name: "newVariant" }
 ```
 
 ### `useUnleashClient` example
@@ -550,14 +551,14 @@ const unleashClient = useUnleashClient();
 
 unleashClient.start();
 
-unleashClient.on(“ready”, () => {
-const impressionEnabled = unleashClient.isEnabled(“newFeatureFlag”);
-	// do something here
+unleashClient.on("ready", () => {
+    const impressionEnabled = unleashClient.isEnabled("newFeatureFlag");
+    // do something here
 });
 
-unleashClient.on(“impression”, (events) => {
-	console.log(events);
-	// do something with impression data here
+unleashClient.on("impression", (events) => {
+    console.log(events);
+    // do something with impression data here
 });
 ```
 
