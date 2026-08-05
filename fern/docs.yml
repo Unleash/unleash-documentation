@@ -750,8 +750,10 @@ navigation:
         skip-slug: true
         contents:
           - page: Node.js
+            availability: beta
             path: pages/sdks/openfeature/node.mdx
           - page: Ruby
+            availability: beta
             path: pages/sdks/openfeature/ruby.mdx
 
       - section: Community SDKs

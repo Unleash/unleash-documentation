@@ -5,7 +5,7 @@ keywords: unleash context, context fields, custom context fields, static fields,
 og:site_name: Unleash Documentation
 og:title: Unleash Context for Feature Flag Evaluation
 max-toc-depth: 3
-last-updated: April 9, 2026
+last-updated: August 5, 2026
 ---
 
 The **Unleash context** contains information related to the current feature flag request. Unleash uses this context to evaluate [activation strategies](activation-strategies) and [strategy constraints](/concepts/activation-strategies#constraints) and to calculate [flag stickiness](/concepts/stickiness). The Unleash Context is an important feature of all the [Unleash client SDKs](/sdks).
@@ -82,6 +82,14 @@ To add a project-level context field in the Admin UI, do the following:
 </Tabs>
 
 Once created, you can modify any aspect of a field's definition—except its name. You can create as many custom context fields as you need.
+
+### Clone a context field
+
+<Button small outlined className="version-button" href="/support/availability">v8.1</Button>
+
+You can clone an existing context field instead of retyping its definition. This is useful when you want to recover from a typo in a context field name, since names cannot be changed after creation, or when you want to create a similar field without re-entering a long list of legal values.
+
+To clone a context field, open the context field list, either globally under **Configure** > **Context fields** or in a project under **Settings** > **Context fields**, and select **Clone** on the field you want to copy. This opens the create form pre-filled with the source field's description, legal values, and stickiness setting. The name is pre-filled as `<source-name>_clone`, so you can correct it before saving.
 
 ### Legal values
 
