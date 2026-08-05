@@ -308,6 +308,8 @@ navigation:
                 path: pages/ai-coding-assistants/opencode.mdx
               - page: OpenAI Codex
                 path: pages/ai-coding-assistants/codex.mdx
+              - page: Google Gemini and Antigravity
+                path: pages/ai-coding-assistants/gemini-antigravity.mdx
 
           - page: Developer Toolbar
             path: pages/integrate/toolbar.mdx

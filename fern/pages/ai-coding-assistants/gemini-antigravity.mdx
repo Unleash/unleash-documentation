@@ -1,0 +1,606 @@
+---
+title: Integrate Unleash with Google Gemini and Antigravity
+og:site_name: Unleash Documentation
+og:title: Integrate Unleash with Google Gemini and Antigravity for AI-powered feature flag management
+description: Configure the Unleash MCP server to automate feature flag management in Google Antigravity (desktop app and CLI) and Gemini Code Assist.
+keywords: antigravity, google antigravity, gemini, gemini cli, gemini code assist, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
+max-toc-depth: 3
+slug: integrate/gemini-antigravity
+last-updated: August 5, 2026
+---
+
+The [Unleash MCP server](/integrate/mcp) connects Google's agentic coding tools to your Unleash instance, enabling AI-assisted feature flag management.
+You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from within the agent.
+
+Google's current agentic platform is [Antigravity](https://antigravity.google/), the successor to Gemini CLI. It supports MCP across two local surfaces that share one engine and configuration:
+
+- **Antigravity desktop app** — The flagship "agent control tower," where you launch and supervise many agents in parallel
+- **Antigravity CLI** — The same engine in the terminal, run with the `agy` command
+
+Antigravity governs the agent while it writes code, through approval modes, a sandbox, a Human-in-the-Loop review pane, and hooks. Feature flags govern the code after it ships, through progressive rollout and instant rollback. The idea is to package your Unleash integration once, enforce which tools agents may use, and let the flag decide what actually reaches production.
+
+If your team is still on Gemini Code Assist or Gemini CLI under a paid license, that setup remains supported. See [Gemini Code Assist and Gemini CLI](#gemini-code-assist-and-gemini-cli) below.
+
+<Info>
+Antigravity is Google's newest platform and it ships new versions almost every week. The configuration and commands here are verified against v2.4.2 of the desktop app and v1.1.7 of the CLI. If a detail looks different in your build, check the [Antigravity docs](https://antigravity.google/docs) for the current behavior.
+</Info>
+
+<Note>
+This guide covers the **local** Unleash MCP server, a stdio process that runs in the Antigravity desktop app and CLI. It is the simplest setup and the focus of this page.
+
+Unleash also offers a [remote MCP server](/integrate/mcp#remote-mcp-server) (Streamable HTTP, available on Enterprise plans), which matters for Antigravity managed agents that run server-side in a network-isolated sandbox that cannot reach a local stdio server. In that case, configure the remote server with a `serverUrl` (see [Managed agents](#managed-agents-and-the-remote-server)), make your Unleash host reachable, and allow write methods (POST, PATCH, DELETE) so flag changes work.
+</Note>
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+- Node.js 18 or later: The MCP server is distributed as an npm package
+- Antigravity: The [desktop app or the CLI](https://antigravity.google/download))
+- A signed-in Antigravity session: Sign in with your Google account, or use Cloud OAuth against a Gemini Enterprise Agent Platform project for enterprise
+- An Unleash instance: Cloud or self-hosted, with API access enabled
+- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT): With permissions to create and manage feature flags
+
+<Warning>
+You must sign in before the agent can call MCP tools. You can add the server and inspect the configuration before signing in, but the first tool call in an unauthenticated session prompts you to log in through Google. Sign in first.
+</Warning>
+
+## Install the MCP server
+
+Antigravity stores MCP configuration in a dedicated `mcp_config.json` file. The desktop app and the CLI read the same configuration, so you set up the server once.
+
+<Steps>
+
+<Step title="Create a credentials file">
+
+Store your Unleash credentials in a centralized file and source it from your shell profile:
+
+```bash
+mkdir -p ~/.unleash
+cat > ~/.unleash/mcp.env << 'EOF'
+UNLEASH_BASE_URL=https://your-instance.getunleash.io
+UNLEASH_PAT=your-personal-access-token
+UNLEASH_DEFAULT_PROJECT=default
+EOF
+chmod 600 ~/.unleash/mcp.env
+```
+
+Add to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+# Unleash MCP credentials
+if [ -f ~/.unleash/mcp.env ]; then
+  source ~/.unleash/mcp.env
+  export UNLEASH_BASE_URL UNLEASH_PAT UNLEASH_DEFAULT_PROJECT
+fi
+```
+
+Restart your terminal or run `source ~/.zshrc` to load the variables.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNLEASH_BASE_URL` | Your Unleash instance URL, without a trailing `/api`. | Yes |
+| `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
+| `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+
+</Step>
+
+<Step title="Add the server to mcp_config.json">
+
+Edit the global MCP configuration at `~/.gemini/config/mcp_config.json` and add the Unleash server:
+
+```json title="~/.gemini/config/mcp_config.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "env": {
+        "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "${UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
+      }
+    }
+  }
+}
+```
+
+In the desktop app, you can also add the server through the built-in MCP Store UI instead of editing the file. Both surfaces use the same configuration.
+
+<Note>
+Antigravity uses a `mcpServers` object (the same shape as Gemini CLI and Claude Code).
+The `command` is a string and `args` is an array. Use the `${VAR}` brace form in `env` and make sure the variables are exported in your shell.
+Avoid the no-brace `$VAR` form and bash-style defaults like `${VAR:-default}`, which are not evaluated.
+
+To scope the server to a single team or workspace, put the same block in a workspace `.agents/mcp_config.json` or in a plugin's `plugins/<name>/mcp_config.json`.
+</Note>
+
+</Step>
+
+<Step title="Verify the installation">
+
+Start an Antigravity session (desktop or CLI) and run the `/mcp` command, which lists configured MCP servers and their tools:
+
+```text
+/mcp
+```
+
+The `unleash` server appears with its tools once you are signed in. You can also ask the agent, "What Unleash MCP tools are available?" to confirm which tools are discovered.
+
+</Step>
+
+</Steps>
+
+## Approval and oversight model
+
+Antigravity enforces an authoring-time boundary that also governs how MCP tool calls run. The controls differ slightly between the two surfaces.
+
+### In the CLI
+
+The CLI gates agent actions through permission modes. Documented values include `always-proceed`, `agent-decides`, and `asks-for-review`, with stricter modes like `request-review` and `strict`. Useful flags:
+
+- `--mode` sets the execution mode for the session (either `accept-edits` or `plan`)
+- `--sandbox` runs with terminal restrictions
+- `--dangerously-skip-permissions` auto-approves every tool request (reserve for isolated environments)
+
+Keep a prompting mode for writes so you review the flag name, environment, or rollout before a write like `create_flag` or `toggle_flag_environment` runs.
+
+### In the desktop app
+
+The desktop app applies the same gate through a Human-in-the-Loop review pane.
+As an agent works, it produces **Artifacts** (plans, task lists, walkthroughs, and browser recordings) that you review and comment on inline before it proceeds.
+
+Desktop review can be relaxed to proceed automatically, which is convenient but removes the human gate.
+Treat local review as an authoring-time convenience, and rely on the feature flag (and, at enterprise scale, Cloud IAM) as the boundary that cannot be switched off.
+Enable [change requests](/concepts/change-requests) on production environments so enabling a flag requires human approval regardless of what any agent does.
+
+## Tool reference
+
+The Unleash MCP server exposes the following tools.
+
+<StickyTable>
+| Tool | Description | When to use |
+|------|-------------|-------------|
+| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
+| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
+| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
+| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
+| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
+| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
+| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
+| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
+| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
+| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
+| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+</StickyTable>
+
+## Workflows
+
+The Unleash MCP server supports these core workflows: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [discover and audit flags](#discover-and-audit-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
+
+### Evaluate and wrap code in feature flags
+
+Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
+
+<Steps>
+
+<Step title="Evaluate the change">
+Tell the agent what you are working on:
+
+```text
+Evaluate whether the Stripe payment integration should be behind a feature flag.
+The change modifies the checkout service and handles credit card processing.
+```
+
+The agent calls `evaluate_change` and returns a recommendation with a suggested flag name.
+</Step>
+
+<Step title="Check for duplicates">
+The agent automatically calls `detect_flag` to search for existing flags.
+If a suitable flag exists, the agent suggests reusing it instead of creating a duplicate.
+</Step>
+
+<Step title="Create the flag">
+If no suitable flag exists:
+
+```text
+Create a release flag for the Stripe payment integration.
+```
+
+The agent calls `create_flag`. In a prompting mode, you approve the action after reviewing the flag name and type. The flag is created in Unleash, disabled by default.
+</Step>
+
+<Step title="Wrap the code">
+Generate framework-specific guard code:
+
+```text
+Wrap the Stripe checkout handler with the stripe-payment-integration flag.
+This is a Node.js Express application.
+```
+
+The agent calls `wrap_change` and returns code like this:
+
+```javascript title="checkout.js" {6}
+const { isEnabled } = require('unleash-client');
+
+app.post('/checkout', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (isEnabled('stripe-payment-integration', context)) {
+    // New Stripe payment flow
+    const result = await stripeService.processPayment(req.body);
+    return res.json(result);
+  } else {
+    // Existing payment flow
+    const result = await legacyPaymentService.process(req.body);
+    return res.json(result);
+  }
+});
+```
+</Step>
+
+</Steps>
+
+### Discover and audit flags
+
+Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
+
+<Steps>
+<Step title="List available projects (optional)">
+If you don't already know the target project, the agent calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
+</Step>
+
+<Step title="List active flags">
+The agent calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only. Results are paginated with `offset`, `limit`, and `order`; the agent fetches additional pages automatically when a project has many flags.
+</Step>
+
+<Step title="List archived flags">
+For a full audit, the agent calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
+</Step>
+
+<Step title="Cross-reference with the codebase">
+The agent compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
+</Step>
+</Steps>
+
+### Manage rollouts across environments
+
+Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
+
+<Tabs>
+<Tab title="Check flag state">
+```text
+What is the current state and rollout strategies for stripe-payment-integration?
+```
+
+The agent calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
+</Tab>
+
+<Tab title="Enable in staging">
+```text
+Enable stripe-payment-integration in the staging environment.
+```
+
+The agent calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production. In a prompting mode, you approve the change after reviewing the flag name and environment.
+</Tab>
+
+</Tabs>
+
+<Warning>
+AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
+</Warning>
+
+### Clean up after rollout
+
+Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
+
+```text
+Clean up the stripe-payment-integration flag. The feature is fully rolled out.
+```
+
+The agent calls `cleanup_flag` and returns:
+
+- All files and line numbers where the flag is used
+- Which code path to preserve (the "enabled" branch)
+- Suggestions for tests to run after removal
+
+Review the list, remove the conditional branches, and delete the flag from Unleash.
+
+<Tip>
+Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent [technical debt](/concepts/technical-debt).
+</Tip>
+
+## Package the integration as a plugin
+
+Antigravity plugins (the successor to Gemini CLI extensions) bundle an MCP server, context files, skills, and hooks into one installable unit. Instead of asking every developer to edit `mcp_config.json` by hand, a platform team can publish one Unleash plugin and have everyone install the same governed setup.
+
+A plugin declares its MCP servers in `plugins/<name>/mcp_config.json` and can carry a `GEMINI.md` or `AGENTS.md` context file, skills, and a `hooks.json`. Manage plugins with the CLI:
+
+```bash
+agy plugin install <source>     # install a plugin from a path or marketplace
+agy plugin list                 # list installed plugins
+agy plugin import gemini        # import an existing Gemini CLI setup
+agy plugin import claude        # import an existing Claude Code plugin
+```
+
+<Tip>
+If you already maintain a Claude Code plugin or a Gemini CLI setup for Unleash, `agy plugin import` converts it into an Antigravity plugin, bringing across skills and the MCP server configuration. Review the imported `mcp_config.json` afterward and replace any bash-style `${VAR:-default}` defaults with a plain `${VAR}` or a literal value.
+</Tip>
+
+## Govern flag writes with hooks
+
+Hooks are shell scripts that Antigravity runs automatically at set points in an agent's execution, and they make a strong deterministic guardrail for flag writes. A `PreToolUse` hook runs before a tool call, inspects the tool name and arguments, and returns a decision of `allow`, `deny`, or `ask`. Because it fires on every matching call regardless of the agent's approval mode, you can require human sign-off for flag mutations that no prompt wording can bypass.
+
+Hooks are defined in a `hooks.json` file, either globally (`~/.gemini/config/hooks.json`), per workspace (`.agents/hooks.json`), or inside a plugin (`plugins/<name>/hooks.json`). Use a `matcher` to target the write tools:
+
+```json title="~/.gemini/config/hooks.json"
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "create_flag|toggle_flag_environment|set_flag_rollout|remove_flag_strategy",
+        "command": "~/.unleash/confirm-flag-write.sh"
+      }
+    ]
+  }
+}
+```
+
+The script reads the tool call as JSON on standard input and writes a JSON decision (`allow`, `deny`, or `ask`) to standard output. Use it to always require confirmation, block writes to specific environments, or log every flag mutation for audit.
+
+<Note>
+Hook event names and the exact `hooks.json` schema are evolving. Check the [Antigravity hooks documentation](https://antigravity.google/docs/hooks) for the current event list (`PreToolUse`, `PostToolUse`, `PreInvocation`, `PostInvocation`, `Stop`) and field names before relying on a specific format.
+</Note>
+
+## Context file templates
+
+Antigravity reads `GEMINI.md` and `AGENTS.md` files for project instructions (no rename needed), along with rules under `.agents/rules/`. Store your [FeatureOps](https://featureops.io/) policies there so the agent considers feature flags automatically in every session. A plugin can ship its own context file so the policy travels with the package.
+
+```markdown title="AGENTS.md"
+# Feature Flag Conventions
+
+When making changes to this codebase, follow these feature flag practices:
+
+1. **Always evaluate risk** – Before implementing high-risk changes (payments,
+   authentication, data migrations, external integrations), use the Unleash MCP
+   server to evaluate whether a feature flag is needed.
+
+2. **Naming conventions** – Use the format `{domain}-{feature}-{variant}`.
+   Examples: `checkout-stripe-integration`, `auth-sso-google`, `api-rate-limiting`.
+
+3. **Flag types**:
+   - `release` – For gradual feature rollouts
+   - `experiment` – For A/B tests and experiments
+   - `operational` – For system behavior toggles
+   - `kill-switch` – For emergency shutdowns
+   - `permission` – For role-based access
+
+4. **Prefer reuse** – Before creating a new flag, check if a similar flag already
+   exists using the detect_flag tool.
+
+5. **Clean up after rollout** – Once a feature is fully released (100% rollout for
+   2+ weeks), use cleanup_flag to remove dead code.
+
+## Unleash MCP Server
+
+This project uses the Unleash MCP server for feature flag management. Approve write
+operations after reviewing the arguments.
+
+Available tools: evaluate_change, detect_flag, create_flag, wrap_change,
+list_projects, list_flags, get_flag_state, set_flag_rollout,
+toggle_flag_environment, remove_flag_strategy, cleanup_flag.
+```
+
+## Enterprise governance
+
+Enterprises run Antigravity through the [Gemini Enterprise Agent Platform](https://cloud.google.com/blog/topics/developers-practitioners/io26-news-for-agent-developers-on-google-cloud). Developers connect the desktop app and the CLI to a Google Cloud project with Cloud OAuth and an Agent Platform Project ID and region. Agent inference then runs inside your own cloud boundary, with regional endpoints and Google Cloud's standard data protections.
+
+MCP tool use is governed by Google Cloud IAM, so you enforce the approved path centrally rather than per machine:
+
+- **Grant access deliberately** — The `roles/mcp.toolUser` role controls who and what can call MCP tools.
+- **Allowlist tools** — IAM Deny policies on `mcp.googleapis.com/tools.call` let you permit the vetted Unleash tools and block others, filtered by tool name, read-only status, service, or OAuth client.
+- **Secure the deployment** — Agent Identity, Agent Gateway, Agent Security, and Agent Registry govern how agents authenticate and connect.
+
+This pairs with Unleash's own governance. The MCP server inherits the PAT's permissions and cannot exceed them, so scope the token tightly. Enable [change requests](/concepts/change-requests) on production so enabling a flag requires human approval regardless of what any agent requests. Antigravity governs how the agent runs and which tools it can reach; Unleash governs how the release ships.
+
+<Note>
+Enterprise deployment supports the Antigravity desktop app and CLI. The standalone Antigravity IDE is not a supported enterprise surface. Some Agent Platform MCP governance is still rolling out, so confirm current capabilities for your project.
+</Note>
+
+### Managed agents and the remote server
+
+Antigravity can run managed agents server-side, each in its own isolated, network-restricted sandbox. Those sandboxes cannot reach a local stdio server, so for flag operations inside a managed agent, use the [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) with the `serverUrl` field:
+
+```json title="~/.gemini/config/mcp_config.json"
+{
+  "mcpServers": {
+    "unleash-remote": {
+      "serverUrl": "https://your-instance.getunleash.io/api/admin/mcp",
+      "headers": { "Authorization": "${UNLEASH_PAT}" }
+    }
+  }
+}
+```
+
+Your Unleash instance exposes this endpoint at `/api/admin/mcp` once you enable it under **Admin settings > Remote MCP server**. Pass your PAT as the raw `Authorization` header value, with no `Bearer` prefix. Antigravity uses `serverUrl` for remote servers (Gemini CLI used `url`). Make the host reachable, allow write methods, and verify the authentication flow works in a headless environment. For everyday work in the desktop app and CLI, the local stdio server is simpler.
+
+## Gemini Code Assist and Gemini CLI
+
+The move from Gemini CLI to Antigravity is a transition, not a hard cutover. On June 18, 2026, Gemini CLI and the Gemini Code Assist IDE extensions stopped serving the free, Google AI Pro, and Ultra tiers, and Gemini Code Assist for GitHub stopped accepting new installations. Access under a paid **Gemini Code Assist Standard or Enterprise** license remains unchanged, so those teams can keep using Gemini CLI and Code Assist today.
+
+In that setup, configure the Unleash MCP server in `~/.gemini/settings.json` under a `mcpServers` key (Gemini CLI supports both `$VAR` and `${VAR}` expansion there):
+
+```json title="~/.gemini/settings.json"
+{
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest"],
+      "env": {
+        "UNLEASH_BASE_URL": "${UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "${UNLEASH_PAT}",
+        "UNLEASH_DEFAULT_PROJECT": "${UNLEASH_DEFAULT_PROJECT}"
+      }
+    }
+  }
+}
+```
+
+When you move to Antigravity, the MCP configuration moves to `mcp_config.json`, and you can bring your existing setup across with `agy plugin import gemini`. The Unleash tools and workflows are identical on both.
+
+## Prompt patterns
+
+The following prompt patterns help you use the MCP tools effectively.
+
+<Accordion title="Evaluate and create a flag">
+**Intent:** Determine if a change requires a feature flag, then create and wrap it.
+
+**Prompt:**
+```text
+Evaluate whether the [description of change] should be behind a feature flag.
+The change modifies [component/service].
+```
+
+**Expected behavior:** The agent calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed. It prompts for approval before each write.
+</Accordion>
+
+<Accordion title="Detect and reuse existing flags">
+**Intent:** Avoid duplicate flags when similar functionality exists.
+
+**Prompt:**
+```text
+Before creating a new flag for [feature], check if a similar flag already exists
+and suggest reusing it if appropriate.
+```
+
+**Expected behavior:** The agent calls `detect_flag` and presents matches with confidence levels.
+</Accordion>
+
+<Accordion title="Toggle or check flag state">
+**Intent:** Enable, disable, or query a flag in a specific environment.
+
+**Prompts:**
+```text
+Enable [flagName] in the staging environment.
+```
+```text
+What is the current state and rollout strategies for [flagName]?
+```
+
+**Expected behavior:** The agent calls `toggle_flag_environment` or `get_flag_state`. Writes go through the review gate.
+</Accordion>
+
+<Accordion title="Clean up a flag">
+**Intent:** Safely remove flagged code and delete unused flags.
+
+**Prompts:**
+```text
+Clean up the [flagName] flag now that the feature has fully shipped.
+```
+```text
+Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
+```
+
+**Expected behavior:** The agent calls `cleanup_flag` and provides removal instructions.
+</Accordion>
+
+<Accordion title="Discover and audit flags">
+**Intent:** Take inventory of existing flags and identify cleanup candidates.
+
+**Prompts:**
+```text
+List all feature flags in the [projectId] project and identify any that should be cleaned up.
+```
+```text
+Run a flag audit: list all projects, then check for flags at 100% rollout for more than 14 days.
+```
+
+**Expected behavior:** The agent calls `list_projects` (if no project is specified), then `list_flags` for active and archived flags. It cross-references results against code and reports cleanup candidates.
+</Accordion>
+
+<Accordion title="Policy-driven evaluation with a context file">
+**Intent:** Automatically evaluate code changes based on encoded policies.
+
+**Trigger:** A `GEMINI.md` or `AGENTS.md` file instructs the agent to evaluate risk for high-risk domains.
+
+**Expected behavior:** When you describe a change in a covered domain (for example authentication), the agent calls `evaluate_change` on its own and proposes a flag that follows the documented naming convention, without being asked each time.
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="The agent asks me to log in before every tool call">
+Antigravity requires a signed-in session before it can call MCP tools. Sign in with your Google account, or use Cloud OAuth against your Gemini Enterprise Agent Platform project. You can add and inspect the server configuration before signing in, but tool calls need authentication.
+</Accordion>
+
+<Accordion title="MCP server not appearing in Antigravity">
+- Verify the file is `~/.gemini/config/mcp_config.json` (global) or a workspace `.agents/mcp_config.json`
+- Confirm the root key is `mcpServers`, `command` is a string, and `args` is an array
+- Run `/mcp` in a session to check the server status
+- In the desktop app, check the MCP Store UI to confirm the server is enabled
+- Restart Antigravity after making changes
+</Accordion>
+
+<Accordion title="Environment variables not applied">
+- Use the `${VAR}` brace form in `env` and make sure the variables are exported in your shell
+- Do not use the no-brace `$VAR` form; it has a [known expansion bug](https://github.com/github/github-mcp-server/issues/2418)
+- Do not use bash-style defaults like `${UNLEASH_DEFAULT_PROJECT:-default}`; they are not evaluated. Use a plain `${VAR}` or a literal value instead
+</Accordion>
+
+<Accordion title="Authentication or API errors">
+- Confirm your Unleash PAT is valid and has not expired
+- Check that the PAT has permissions to create and manage feature flags
+- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end (the server appends it, and a trailing `/api` produces doubled `/api/api/` paths)
+- Test directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/api/admin/projects"`
+</Accordion>
+
+<Accordion title="My imported plugin's hooks did not carry over">
+`agy plugin import` brings across skills and the MCP server, but hooks are wired only when the source ships a recognized `hooks.json`. A bare `hooks/` folder of examples is copied as files but not registered. Add a `hooks.json` (see [Govern flag writes with hooks](#govern-flag-writes-with-hooks)) to wire them.
+</Accordion>
+
+<Accordion title="Node.js not found">
+Local servers using npx require Node.js 18+. Verify with `node --version`. If Node.js is installed but not found by Antigravity, check that it inherits your shell PATH.
+</Accordion>
+
+<Accordion title="A managed or cloud agent cannot reach Unleash">
+Managed agents run in isolated, network-restricted sandboxes and cannot run a local stdio server. Use the [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) with the `serverUrl` field, make your Unleash host reachable, and allow write methods. For everyday work, run flag operations in the desktop app or CLI instead.
+</Accordion>
+
+## Best practices
+
+Follow these guidelines for effective feature flag management with Antigravity.
+
+<CardGroup cols={2}>
+<Card title="Keep humans in the loop" icon="user-check">
+Use a prompting approval mode for writes, and keep the desktop review pane on. Review the flag name and environment before `create_flag` or `toggle_flag_environment` runs.
+</Card>
+
+<Card title="Gate writes with hooks" icon="shield-halved">
+Add a `PreToolUse` hook matched to the write tools so flag mutations always require confirmation, regardless of the agent's approval mode.
+</Card>
+
+<Card title="Package the integration once" icon="box-archive">
+Publish one Antigravity plugin with the Unleash MCP server and your FeatureOps context, so every developer installs the same governed setup.
+</Card>
+
+<Card title="Define naming conventions" icon="tag">
+Establish organization-wide standards for flag names (e.g., `domain-feature-variant`) and types. Encode these in a context file so the agent applies them automatically.
+</Card>
+
+<Card title="Prevent duplication" icon="clone">
+Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across services.
+</Card>
+
+<Card title="Enforce policy org-wide" icon="building-shield">
+On the Gemini Enterprise Agent Platform, use Cloud IAM (`roles/mcp.toolUser` and Deny policies) to allowlist the Unleash tools and block unvetted servers.
+</Card>
+</CardGroup>
+
+## Related resources
+
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Google Antigravity documentation](https://antigravity.google/docs)
+- [Antigravity MCP configuration](https://antigravity.google/docs/mcp)
+- [Antigravity hooks](https://antigravity.google/docs/hooks)
+- [Gemini Enterprise Agent Platform](https://cloud.google.com/blog/topics/developers-practitioners/io26-news-for-agent-developers-on-google-cloud)
+- [Impact Metrics](/concepts/impact-metrics)
+- [Unleash architecture overview](/get-started/unleash-overview)
