@@ -1,0 +1,34 @@
+---
+description: Review Unleash v8.1.0 release notes, covering an improved projects overview, streamlined flag lifecycle and archive views, context field cloning, impact metric creation from the UI, a new help menu, the ServiceNow integration in beta, and OpenFeature providers in beta.
+tags: ["Unleash", "SDKs"]
+---
+
+# Unleash v8.1.0
+
+## Improved projects overview
+
+The projects page now gives you a quicker overview of the status of your projects. Project cards surface anything that needs your attention, such as pending change requests, remaining setup steps, flags that are ready to be cleaned up, and safeguards that have been triggered, so you can act without opening each project.
+
+## Streamlined flag lifecycle and archive views
+
+It is now easier to follow how flags move through their entire [lifecycle](/concepts/feature-flags#feature-flag-lifecycle). You can switch between the different lifecycle phases, including archived flags, in one cohesive view instead of navigating to several places to find flags in different phases.
+
+## Clone context fields
+
+You can now [clone a context field](/concepts/unleash-context#clone-a-context-field) from the context field list, both in the global admin view and in project settings. Cloning opens the create form pre-filled with the source field's description, legal values, and stickiness, so you can quickly recover from a typo in a context field name or create a similar field without retyping a long list of legal values.
+
+## Create impact metrics from the UI
+
+You can now [create an impact metric directly in the Admin UI](/concepts/impact-metrics#create-a-metric-from-the-ui). On the feature flag page, open the **Add impact metric** dialog from the impact metric banner. Previously, metrics could only be defined in code through an SDK.
+
+## New help menu
+
+The top menu has a new help menu that gathers useful links in one place: the [Unleash Learning Lab](/learning-lab/introduction), what is new in Unleash, documentation, GitHub, feedback, and the Slack community. Several of these links previously lived in the footer and are now easily accessible from anywhere in the Admin UI.
+
+## ServiceNow integration in beta
+
+The new [ServiceNow integration](/integrate/servicenow) automatically tracks the state of your Unleash [change requests](/concepts/change-requests) in ServiceNow, giving you an audit trail of changes that are created, approved, and applied in Unleash.
+
+## OpenFeature providers in beta
+
+We released [OpenFeature providers](/sdks#openfeature-providers) that connect the OpenFeature SDK to Unleash. This lets you evaluate your feature flags through the vendor-neutral [OpenFeature](https://openfeature.dev/) API while continuing to manage them in Unleash.

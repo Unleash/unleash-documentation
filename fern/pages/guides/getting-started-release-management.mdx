@@ -75,6 +75,8 @@ Once started, Unleash will automatically advance through the milestones based on
 
 Automated rollouts are powerful, but you want to make sure you can stop them if something goes wrong. [Impact metrics](/concepts/impact-metrics) allow you to track application-level data and use it to control your release.
 
+You can define a metric in your application code using the Unleash SDK, or [create it directly in the Admin UI](/concepts/impact-metrics#create-a-metric-from-the-ui). Either way, your application records the metric values through the SDK.
+
 In your application code, define and record metrics using the Unleash SDK:
 
 ```javascript
