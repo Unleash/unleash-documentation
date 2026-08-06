@@ -6,7 +6,7 @@ og:title: Developer Toolbar
 keywords: developer toolbar, feature flags, debugging, local development, testing, overrides
 max-toc-depth: 3
 slug: integrate/toolbar
-last-updated: June 29, 2026
+last-updated: August 6, 2026
 ---
 
 The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you override feature flag values and context properties at runtime without making server changes. It's designed for local development and testing workflows where you need to quickly test different flag configurations or context values.
@@ -23,6 +23,8 @@ The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you ove
 - **Framework support**: Works with React, Next.js, Vue, Angular, and JavaScript
 - **SSR support**: Cookie-based state sync for server-side rendering in Next.js
 - **Movable and dismissible**: Drag the floating icon to any window edge, minimize it to the icon, or hide it entirely until the next page refresh
+- **Keyboard support**: Open and close the toolbar with a configurable shortcut, operate every control from the keyboard, and dismiss it with `Esc`
+- **Screen reader support**: Landmark, tab, and radio group semantics, labeled controls, and visible focus indicators
 - **Custom banner**: Show an optional message (with an optional link) to clarify the toolbar's scope for your team
 
 <Warning>
@@ -341,12 +343,16 @@ import '@unleash/toolbar/toolbar.css';
 | `position` | `'top-left'` \| `'top-right'` \| `'bottom-left'` \| `'bottom-right'` \| `'left'` \| `'right'` | `'bottom-right'` | Starting toolbar position. Once the user drags the toolbar, the dragged position takes over. |
 | `draggable` | `boolean` | `true` | Allow dragging the floating icon to any window edge. The chosen position is persisted. |
 | `initiallyVisible` | `boolean` | `false` | Whether the toolbar panel is open on load. |
+| `showToggleButton` | `boolean` | `true` | Render the floating icon when the panel is collapsed. Set to `false` for a shortcut-driven setup where the toolbar renders nothing until it's opened. |
+| `shortcut` | `string` \| `false` | `'mod+shift+f'` | Keyboard shortcut that opens the panel, focuses it when it's already open, and minimizes it when pressed from inside. `mod` is Cmd on macOS and Ctrl elsewhere. Set to `false` to register no global key listener. |
+| `focusOnOpen` | `'panel'` \| `'search'` \| `'context'` | `'panel'` | Where to place focus when the panel opens. |
+| `closeOnOutsideClick` | `boolean` | `false` | Minimize the panel when a click lands outside it. Off by default so that clicking around your app doesn't dismiss the panel. |
 | `banner` | `string` | - | Optional message shown as a banner below the header. Useful for clarifying the toolbar's scope to your team. Empty by default. |
 | `bannerLink` | `string` | - | Optional URL shown as a link next to the banner message. Only rendered when `banner` is also set. Opens in a new tab. |
 | `bannerLinkText` | `string` | `'Read more'` | Text for the banner link. Only used when `bannerLink` is set. |
 | `sortAlphabetically` | `boolean` | `false` | Sort flags alphabetically instead of by evaluation order. |
 | `themePreset` | `'light'` \| `'dark'` | `'light'` | Color theme preset. |
-| `theme` | `object` | - | Custom theme with `primaryColor`, `backgroundColor`, `textColor`, `borderColor`, `fontFamily`. |
+| `theme` | `object` | - | Custom theme with `primaryColor`, `backgroundColor`, `textColor`, `borderColor`, `fontFamily`, `focusColor`. |
 | `container` | `HTMLElement` | `document.body` | DOM element to render the toolbar into. |
 | `enableCookieSync` | `boolean` | `false` | Enable cookie sync for SSR frameworks like Next.js. |
 
@@ -359,7 +365,7 @@ import '@unleash/toolbar/toolbar.css';
 ### Moving and hiding the toolbar
 
 - **Move it**: Drag the floating icon to any window edge. It snaps to the nearest edge and remembers its position across reloads. Set `draggable: false` to disable dragging and keep the configured `position`.
-- **Minimize it**: Click the minimize (`_`) button in the panel header to collapse the panel back to the floating icon.
+- **Minimize it**: Click the minimize (`_`) button in the panel header, or press `Esc` while focus is inside the panel, to collapse the panel back to the floating icon. `Esc` also returns focus to wherever you opened the panel from.
 - **Hide it completely**: Click the close (`×`) button to hide both the panel and the icon. This is temporary; the toolbar reappears (minimized) after a page refresh.
 
 ### Adding a banner
@@ -374,6 +380,88 @@ initUnleashToolbar(client, {
 });
 ```
 
+## Keyboard and accessibility
+
+The toolbar is fully operable from the keyboard.
+
+### Keyboard shortcuts
+
+To open the toolbar panel, or move focus into it when it's already open:
+
+- **Windows/Linux**: `Ctrl + Shift + F`
+- **macOS**: `Cmd + Shift + F`
+
+Pressing the same shortcut again from inside the panel minimizes it.
+
+Once the panel is open:
+
+| Key | Action |
+|-----|--------|
+| `Esc` | Minimize, handing focus back to where you opened the panel from |
+| `Tab` / `Shift + Tab` | Move between controls; off either end, focus returns to the page where you left it |
+| `←` `→` | Switch tabs, or change a flag between off, default, and on |
+
+Use the `shortcut` option to rebind the shortcut if it conflicts with one in your app, or set it to `false` to register no global key listener:
+
+```javascript
+initUnleashToolbar(client, {
+  shortcut: 'mod+shift+u', // mod is Cmd on macOS, Ctrl elsewhere
+});
+```
+
+### Shortcut-driven setup
+
+To render nothing until the toolbar is summoned, and open it with focus already in the flag search box:
+
+```javascript
+initUnleashToolbar(client, {
+  showToggleButton: false,
+  focusOnOpen: 'search',
+});
+```
+
+The toolbar stays mounted while closed. It's hidden with `display: none`, so there's no re-initialization cost when it reopens, and it stays out of both the tab order and the accessibility tree while hidden.
+
+<Warning>
+With both `showToggleButton: false` and `shortcut: false`, users have no way to open the toolbar; only the programmatic API can. Keep at least one of them enabled.
+</Warning>
+
+### Focus behavior
+
+The panel isn't modal. The page underneath stays interactive, is never marked `inert`, and focus is never trapped, since watching your app react to a flag change is the point of the tool and keyboard users need to be able to get back out to it.
+
+When you open the panel from the keyboard, focus lands on the panel itself rather than on a control, so screen readers announce the region and its name. The panel also draws a focus ring so that sighted keyboard users can see that focus has left the page. The ring stays off when the panel is opened by clicking the floating icon.
+
+From there, focus is tethered to wherever you summoned the panel from:
+
+- `Tab` off the last control, or `Shift + Tab` off the first, returns focus to the element you opened the panel from and leaves the panel open. The next `Tab` continues through your page from that point.
+- The shortcut is the way back in. Pressed from the page while the panel is open, it pulls focus into the panel instead of closing it. Pressed from inside the panel, it minimizes.
+- `Esc` minimizes and hands focus back to the same element, or to the floating icon if the icon is what opened the panel.
+
+If there's no element to return to, because the panel was opened by clicking the icon or the original element has been removed from the page, `Tab` follows the browser's normal order.
+
+Calling `hide()` from your own code only moves focus if the toolbar currently holds it, so hiding the toolbar programmatically never interrupts a user who is working in your app.
+
+### Screen reader support
+
+- The panel is a labeled `region` landmark, so assistive technology can jump straight to it regardless of where the toolbar sits in the tab order.
+- Tabs follow the WAI-ARIA tabs pattern, with arrow-key navigation and a single tab stop.
+- Each flag's off/default/on control is a `radiogroup` labeled with the flag name, so assistive technology reports which state is in effect. The group is a single tab stop, so you can move past a flag with one `Tab` press instead of three.
+- Icon-only controls have visually hidden text labels rather than relying on tooltips.
+- Animations are suppressed when the user prefers reduced motion.
+
+### Focus ring color
+
+The keyboard focus ring follows `themePreset` automatically, and both presets meet the 3:1 contrast ratio that WCAG requires of non-text indicators. Controls on the colored header use a white ring instead, since `primaryColor` is already required to be dark enough for the header's white text.
+
+Set `theme.focusColor` only if a custom `backgroundColor` leaves the default ring hard to see, for example a dark background while staying on the `light` preset:
+
+```javascript
+initUnleashToolbar(client, {
+  theme: { backgroundColor: '#101010', textColor: '#f5f5f5', focusColor: '#A9A6F5' },
+});
+```
+
 ## API reference
 
 Access the toolbar instance via `window.unleashToolbar`:
@@ -384,6 +472,12 @@ const toolbar = window.unleashToolbar;
 // Show/hide the toolbar panel
 toolbar.show();
 toolbar.hide();
+toolbar.toggle();
+
+// Open with focus on a specific control
+toolbar.show({ focus: 'search' });   // flag search box
+toolbar.show({ focus: 'context' });  // first Context field, switching tabs
+toolbar.show({ focus: 'panel' });    // the panel itself (default)
 
 // Get current state
 const state = toolbar.getState();
@@ -432,10 +526,12 @@ The toolbar is optimized for minimal impact:
 
 | Package | Size (gzipped) |
 |---------|----------------|
-| Core | ~9.5 KB |
+| Core | ~12 KB |
 | React wrapper | ~0.6 KB |
 | Next.js utilities | ~0.7 KB |
-| CSS | ~2.7 KB |
+| CSS | ~3 KB |
+
+Of the core bundle, only ~2.4 KB is the entry point. The panel UI (~9.6 KB) is a separate chunk loaded asynchronously, so it doesn't block your initial bundle.
 
 ## Requirements
 
@@ -467,4 +563,10 @@ The toolbar is optimized for minimal impact:
 
 <Accordion title="Hooks not re-rendering on override changes">
   The wrapped client emits `'update'` events when overrides change. If you're using a custom setup, make sure you're listening to these events and triggering re-renders.
+</Accordion>
+
+<Accordion title="Keyboard shortcut doesn't work or conflicts with my app">
+  The toolbar only reacts when the modifiers match exactly, so a shortcut like `Cmd + Alt + Shift + F` still reaches your app. If the default conflicts anyway, rebind it with `shortcut: 'mod+shift+u'`, or set `shortcut: false` to register no global key listener and open the toolbar through `toolbar.show()` instead.
+
+  If the shortcut does nothing at all, check that another handler on the page isn't calling `preventDefault()` on the keydown event before it reaches the toolbar.
 </Accordion>
