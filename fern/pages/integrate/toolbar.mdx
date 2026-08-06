@@ -446,7 +446,7 @@ Calling `hide()` from your own code only moves focus if the toolbar currently ho
 
 - The panel is a labeled `region` landmark, so assistive technology can jump straight to it regardless of where the toolbar sits in the tab order.
 - Tabs follow the WAI-ARIA tabs pattern, with arrow-key navigation and a single tab stop.
-- Each flag's off/default/on control is a `radiogroup` labeled with the flag name, so assistive technology reports which state is in effect. Its single tab stop also means passing a flag costs one `Tab` press instead of three.
+- Each flag's off/default/on control is a `radiogroup` labeled with the flag name, so assistive technology reports which state is in effect. The group is a single tab stop, so you can move past a flag with one `Tab` press instead of three.
 - Icon-only controls have visually hidden text labels rather than relying on tooltips.
 - Animations are suppressed when the user prefers reduced motion.
 
