@@ -24,7 +24,7 @@ The [Unleash Developer Toolbar](https://github.com/Unleash/toolbar) lets you ove
 - **SSR support**: Cookie-based state sync for server-side rendering in Next.js
 - **Movable and dismissible**: Drag the floating icon to any window edge, minimize it to the icon, or hide it entirely until the next page refresh
 - **Keyboard support**: Open and close the toolbar with a configurable shortcut, operate every control from the keyboard, and dismiss it with `Esc`
-- **Screen reader support**: Dialog, tab, and radio group semantics, labeled controls, and visible focus indicators
+- **Screen reader support**: Landmark, tab, and radio group semantics, labeled controls, and visible focus indicators
 - **Custom banner**: Show an optional message (with an optional link) to clarify the toolbar's scope for your team
 
 <Warning>
@@ -344,9 +344,8 @@ import '@unleash/toolbar/toolbar.css';
 | `draggable` | `boolean` | `true` | Allow dragging the floating icon to any window edge. The chosen position is persisted. |
 | `initiallyVisible` | `boolean` | `false` | Whether the toolbar panel is open on load. |
 | `showToggleButton` | `boolean` | `true` | Render the floating icon when the panel is collapsed. Set to `false` for a shortcut-driven setup where the toolbar renders nothing until it's opened. |
-| `shortcut` | `string` \| `false` | `'mod+shift+f'` | Keyboard shortcut that toggles the panel. `mod` is Cmd on macOS and Ctrl elsewhere. Set to `false` to register no global key listener. |
+| `shortcut` | `string` \| `false` | `'mod+shift+f'` | Keyboard shortcut that opens the panel, focuses it when it's already open, and minimizes it when pressed from inside. `mod` is Cmd on macOS and Ctrl elsewhere. Set to `false` to register no global key listener. |
 | `focusOnOpen` | `'panel'` \| `'search'` \| `'context'` | `'panel'` | Where to place focus when the panel opens. |
-| `trapFocus` | `boolean` | `true` | Keep `Tab` and `Shift + Tab` cycling inside the panel while it's open. |
 | `closeOnOutsideClick` | `boolean` | `false` | Minimize the panel when a click lands outside it. Off by default so that clicking around your app doesn't dismiss the panel. |
 | `banner` | `string` | - | Optional message shown as a banner below the header. Useful for clarifying the toolbar's scope to your team. Empty by default. |
 | `bannerLink` | `string` | - | Optional URL shown as a link next to the banner message. Only rendered when `banner` is also set. Opens in a new tab. |
@@ -366,7 +365,7 @@ import '@unleash/toolbar/toolbar.css';
 ### Moving and hiding the toolbar
 
 - **Move it**: Drag the floating icon to any window edge. It snaps to the nearest edge and remembers its position across reloads. Set `draggable: false` to disable dragging and keep the configured `position`.
-- **Minimize it**: Click the minimize (`_`) button in the panel header, or press `Esc` while focus is inside the panel, to collapse the panel back to the floating icon.
+- **Minimize it**: Click the minimize (`_`) button in the panel header, or press `Esc` while focus is inside the panel, to collapse the panel back to the floating icon. `Esc` also returns focus to wherever you opened the panel from.
 - **Hide it completely**: Click the close (`×`) button to hide both the panel and the icon. This is temporary; the toolbar reappears (minimized) after a page refresh.
 
 ### Adding a banner
@@ -387,17 +386,19 @@ The toolbar is fully operable from the keyboard.
 
 ### Keyboard shortcuts
 
-To toggle the toolbar panel open and closed:
+To open the toolbar panel, or move focus into it when it's already open:
 
 - **Windows/Linux**: `Ctrl + Shift + F`
 - **macOS**: `Cmd + Shift + F`
+
+Pressing the same shortcut again from inside the panel minimizes it.
 
 Once the panel is open:
 
 | Key | Action |
 |-----|--------|
-| `Esc` | Minimize to the floating icon |
-| `Tab` / `Shift + Tab` | Move between controls; cycles within the panel |
+| `Esc` | Minimize, handing focus back to where you opened the panel from |
+| `Tab` / `Shift + Tab` | Move between controls; off either end, focus returns to the page where you left it |
 | `←` `→` | Switch tabs, or change a flag between off, default, and on |
 
 Use the `shortcut` option to rebind the shortcut if it conflicts with one in your app, or set it to `false` to register no global key listener:
@@ -427,13 +428,23 @@ With both `showToggleButton: false` and `shortcut: false`, users have no way to 
 
 ### Focus behavior
 
-While the panel is open, `Tab` cycles within it instead of moving to the page behind. This is a soft trap: the page is never marked `inert` and the panel doesn't claim `aria-modal`, so mouse interaction with your app is unaffected. `Esc` releases the trap and returns focus to the floating icon, or to whatever held focus before if the icon isn't rendered. Set `trapFocus: false` to disable this.
+The panel isn't modal. The page underneath stays interactive, is never marked `inert`, and focus is never trapped, since watching your app react to a flag change is the point of the tool and keyboard users need to be able to get back out to it.
+
+When you open the panel from the keyboard, focus lands on the panel itself rather than on a control, so screen readers announce the region and its name. The panel also draws a focus ring so that sighted keyboard users can see that focus has left the page. The ring stays off when the panel is opened by clicking the floating icon.
+
+From there, focus is tethered to wherever you summoned the panel from:
+
+- `Tab` off the last control, or `Shift + Tab` off the first, returns focus to the element you opened the panel from and leaves the panel open. The next `Tab` continues through your page from that point.
+- The shortcut is the way back in. Pressed from the page while the panel is open, it pulls focus into the panel instead of closing it. Pressed from inside the panel, it minimizes.
+- `Esc` minimizes and hands focus back to the same element, or to the floating icon if the icon is what opened the panel.
+
+If there's no element to return to, because the panel was opened by clicking the icon or the original element has been removed from the page, `Tab` follows the browser's normal order.
 
 Calling `hide()` from your own code only moves focus if the toolbar currently holds it, so hiding the toolbar programmatically never interrupts a user who is working in your app.
 
 ### Screen reader support
 
-- The panel is a `dialog` labeled by its title.
+- The panel is a labeled `region` landmark, so assistive technology can jump straight to it regardless of where the toolbar sits in the tab order.
 - Tabs follow the WAI-ARIA tabs pattern, with arrow-key navigation and a single tab stop.
 - Each flag's off/default/on control is a `radiogroup` labeled with the flag name, so assistive technology reports which state is in effect. Its single tab stop also means passing a flag costs one `Tab` press instead of three.
 - Icon-only controls have visually hidden text labels rather than relying on tooltips.
