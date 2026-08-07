@@ -1,0 +1,184 @@
+# SDK code samples for the Client API entry endpoint. Samples appear only
+# here, where readers decide between hand-rolling an HTTP integration and
+# using an SDK; other endpoints keep their auto-generated HTTP snippets.
+# The Edge API reference (../edge-api/overrides.yml) carries copies of these
+# samples with the Edge base URL: when you edit a sample here, apply the
+# same change there.
+#
+# This file is deep-merged onto openapi.json at build time via the overrides
+# entry in generators.yml. CI overwrites openapi.json on every spec refresh
+# (scripts/fetch-openapi.mjs); never edit openapi.json by hand.
+#
+# A code sample whose language matches an auto-generated HTTP snippet
+# (javascript, python, java, go, ruby, php, csharp, swift) replaces that
+# snippet in the language dropdown; other languages (kotlin, dart, rust) get
+# their own dropdown entry. The language key (not sdk) is intentional: sdk is
+# only for Fern-generated SDKs, and the install field requires the language
+# key per Fern's extension docs.
+paths:
+  /api/client/features:
+    get:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: Node.js SDK
+              install: npm install unleash-client
+              code: |
+                import { initialize } from 'unleash-client';
+
+                const unleash = initialize({
+                  url: 'https://app.unleash-instance.example.com/api/',
+                  appName: 'my-app',
+                  customHeaders: { Authorization: '<your-backend-token>' },
+                });
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                unleash.on('ready', () => {
+                  const enabled = unleash.isEnabled('my-feature');
+                });
+
+            - language: python
+              name: Python SDK
+              install: pip install UnleashClient
+              code: |
+                from UnleashClient import UnleashClient
+
+                client = UnleashClient(
+                    url="https://app.unleash-instance.example.com/api/",
+                    app_name="my-app",
+                    custom_headers={'Authorization': '<your-backend-token>'})
+
+                client.initialize_client()
+
+                # The SDK fetches all feature flag configurations from this
+                # endpoint at startup and polls for updates in the background.
+                enabled = client.is_enabled("my-feature")
+
+            - language: java
+              name: Java SDK
+              install: implementation("io.getunleash:unleash-client-java:<version>")
+              code: |
+                UnleashConfig config = UnleashConfig.builder()
+                        .appName("my-app")
+                        .instanceId("my-instance")
+                        .unleashAPI("https://app.unleash-instance.example.com/api/")
+                        .apiKey("<your-backend-token>")
+                        .build();
+
+                Unleash unleash = new DefaultUnleash(config);
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                boolean enabled = unleash.isEnabled("my-feature");
+
+            - language: go
+              name: Go SDK
+              install: go get github.com/Unleash/unleash-go-sdk/v6@latest
+              code: |
+                package main
+
+                import (
+                    "net/http"
+
+                    unleash "github.com/Unleash/unleash-go-sdk/v6"
+                )
+
+                func main() {
+                    err := unleash.Initialize(
+                        unleash.WithAppName("my-app"),
+                        unleash.WithUrl("https://app.unleash-instance.example.com/api/"),
+                        unleash.WithCustomHeaders(http.Header{"Authorization": {"<your-backend-token>"}}),
+                    )
+                    if err != nil {
+                        panic(err)
+                    }
+                    defer unleash.Close()
+                    unleash.WaitForReady()
+
+                    // The SDK fetches all feature flag configurations from this
+                    // endpoint at startup and polls for updates in the background.
+                    enabled := unleash.IsEnabled("my-feature", unleash.FeatureOptions{})
+                }
+
+            - language: ruby
+              name: Ruby SDK
+              install: gem install unleash
+              code: |
+                require 'unleash'
+
+                @unleash = Unleash::Client.new(
+                  app_name: 'my-app',
+                  url: 'https://app.unleash-instance.example.com/api/',
+                  custom_http_headers: { 'Authorization': '<your-backend-token>' }
+                )
+
+                # The SDK fetches all feature flag configurations from this
+                # endpoint at startup and polls for updates in the background.
+                enabled = @unleash.is_enabled?('my-feature')
+
+            - language: php
+              name: PHP SDK
+              install: composer require unleash/client guzzlehttp/guzzle symfony/cache
+              code: |
+                use Unleash\Client\UnleashBuilder;
+
+                $unleash = UnleashBuilder::create()
+                    ->withAppName('my-app')
+                    ->withAppUrl('https://app.unleash-instance.example.com/api/')
+                    ->withInstanceId('my-instance')
+                    ->withHeader('Authorization', '<your-backend-token>')
+                    ->build();
+
+                // The SDK fetches feature flag configurations from this endpoint
+                // on demand and caches them. It does not poll in the background.
+                $enabled = $unleash->isEnabled('my-feature');
+
+            - language: csharp
+              name: .NET SDK
+              install: dotnet add package unleash.client
+              code: |
+                using Unleash;
+
+                var settings = new UnleashSettings()
+                {
+                    AppName = "my-app",
+                    UnleashApi = new Uri("https://app.unleash-instance.example.com/api/"),
+                    CustomHttpHeaders = new Dictionary<string, string>()
+                    {
+                        { "Authorization", "<your-backend-token>" }
+                    }
+                };
+
+                var unleash = new DefaultUnleash(settings);
+
+                // The SDK fetches all feature flag configurations from this
+                // endpoint at startup and polls for updates in the background.
+                var enabled = unleash.IsEnabled("my-feature");
+
+            - language: rust
+              name: Rust SDK
+              install: cargo add unleash-api-client
+              code: |
+                // The SDK reads its configuration from these environment variables:
+                // UNLEASH_API_URL=https://app.unleash-instance.example.com/api/
+                // UNLEASH_CLIENT_SECRET=<your-backend-token>
+                let config = EnvironmentConfig::from_env()?;
+                let client = Arc::new(
+                    client::ClientBuilder::default()
+                        .enable_string_features()
+                        .into_client::<UserFeatures>(
+                            &config.api_url,
+                            &config.app_name,
+                            &config.instance_id,
+                            config.secret,
+                        )?,
+                );
+                client.register().await?;
+
+                // The client does not poll on its own. Run the polling loop in a
+                // background task. The loop fetches feature flag configurations
+                // from this endpoint at the configured interval.
+                let poller = client.clone();
+                tokio::spawn(async move { poller.poll_for_updates().await });
+                let enabled = client.is_enabled_str("my-feature", None, false);

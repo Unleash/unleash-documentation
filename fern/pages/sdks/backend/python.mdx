@@ -5,7 +5,7 @@ og:title: Python SDK
 description: Set up the Unleash Python SDK to evaluate feature flags with context, variants, fallbacks, bootstrap, events, and custom cache.
 keywords: [unleash, python, sdk, feature flags, feature toggles]
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: August 4, 2026
 ---
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="Python" />
@@ -25,7 +25,7 @@ you have a [bootstrapped configuration](#bootstrap) or you use [fallbacks](#fall
 from UnleashClient import UnleashClient
 
 client = UnleashClient(
-    url="https:<YOUR-API-URL>",
+    url="https://<YOUR-API-URL>",
     app_name="my-python-app",
     custom_headers={'Authorization': '<API token>'})
 

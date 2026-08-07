@@ -681,11 +681,6 @@ navigation:
               - Unknown Flags
             contents: []
             skip-slug: true
-          - section: "Unstable"
-            referenced-packages:
-              - Unstable
-            contents: []
-            skip-slug: true
           - section: "Users"
             referenced-packages:
               - Users

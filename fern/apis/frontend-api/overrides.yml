@@ -1,0 +1,98 @@
+# SDK code samples for the Frontend API entry endpoint. Samples appear only
+# here, where readers decide between hand-rolling an HTTP integration and
+# using an SDK; other endpoints keep their auto-generated HTTP snippets.
+# The Edge API reference (../edge-api/overrides.yml) carries copies of these
+# samples with the Edge base URL: when you edit a sample here, apply the
+# same change there.
+#
+# This file is deep-merged onto openapi.json at build time via the overrides
+# entry in generators.yml. CI overwrites openapi.json on every spec refresh
+# (scripts/fetch-openapi.mjs); never edit openapi.json by hand.
+#
+# A code sample whose language matches an auto-generated HTTP snippet
+# (javascript, python, java, go, ruby, php, csharp, swift) replaces that
+# snippet in the language dropdown; other languages (kotlin, dart, rust) get
+# their own dropdown entry. The language key (not sdk) is intentional: sdk is
+# only for Fern-generated SDKs, and the install field requires the language
+# key per Fern's extension docs.
+paths:
+  /api/frontend:
+    get:
+      x-fern-examples:
+        - code-samples:
+            - language: javascript
+              name: JavaScript SDK
+              install: npm install unleash-proxy-client
+              code: |
+                import { UnleashClient } from 'unleash-proxy-client';
+
+                const unleash = new UnleashClient({
+                    url: 'https://app.unleash-instance.example.com/api/frontend',
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app',
+                });
+
+                unleash.start();
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                unleash.on('ready', () => {
+                  const enabled = unleash.isEnabled('my-feature');
+                });
+
+            - language: swift
+              name: iOS SDK
+              code: |
+                import UnleashProxyClientSwift
+
+                var unleash = UnleashProxyClientSwift.UnleashClient(
+                    unleashUrl: "https://app.unleash-instance.example.com/api/frontend",
+                    clientKey: "<your-frontend-token>",
+                    refreshInterval: 15,
+                    appName: "my-app"
+                )
+
+                unleash.start()
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                let enabled = unleash.isEnabled(name: "my-feature")
+
+            - language: kotlin
+              name: Android SDK
+              install: implementation("io.getunleash:unleash-android:<version>")
+              code: |
+                val unleash = DefaultUnleash(
+                    androidContext = applicationContext,
+                    unleashConfig = UnleashConfig.newBuilder(appName = "my-app")
+                        .proxyUrl("https://app.unleash-instance.example.com/api/frontend")
+                        .clientKey("<your-frontend-token>")
+                        .build()
+                )
+
+                unleash.start()
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                val enabled = unleash.isEnabled("my-feature")
+
+            - language: dart
+              name: Flutter SDK
+              install: flutter pub add unleash_proxy_client_flutter
+              code: |
+                import 'package:unleash_proxy_client_flutter/unleash_proxy_client_flutter.dart';
+
+                final unleash = UnleashClient(
+                    url: Uri.parse('https://app.unleash-instance.example.com/api/frontend'),
+                    clientKey: '<your-frontend-token>',
+                    appName: 'my-app');
+
+                unleash.start();
+
+                // The SDK fetches evaluated feature flags for the current
+                // context from this endpoint and refreshes them in the
+                // background.
+                final enabled = unleash.isEnabled('my-feature');
