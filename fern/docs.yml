@@ -747,6 +747,9 @@ navigation:
           - page: Node.js
             availability: beta
             path: pages/sdks/openfeature/node.mdx
+          - page: PHP
+            availability: beta
+            path: pages/sdks/openfeature/php.mdx
           - page: Ruby
             availability: beta
             path: pages/sdks/openfeature/ruby.mdx
