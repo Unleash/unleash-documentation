@@ -30,6 +30,8 @@ composer require unleash/openfeature-provider
 Create an `UnleashBuilder` with the same [options](/sdks/php#builder) you would use to configure the Unleash PHP SDK client, then pass it to an `UnleashFlagProvider` and register the provider with OpenFeature. The provider builds the Unleash client from the builder.
 
 ```php
+<?php
+
 use OpenFeature\OpenFeatureAPI;
 use Unleash\Client\UnleashBuilder;
 use Unleash\OpenFeature\Provider\UnleashFlagProvider;
@@ -50,6 +52,8 @@ To log provider diagnostics, such as discarded context fields, pass a [PSR-3](ht
 Build an OpenFeature client and evaluate flags through the OpenFeature API:
 
 ```php
+<?php
+
 use OpenFeature\implementation\flags\EvaluationContext;
 
 $client = OpenFeatureAPI::getInstance()->getClient();
