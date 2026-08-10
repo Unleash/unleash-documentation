@@ -1,0 +1,62 @@
+---
+title: Unleash Edge API overview
+slug: /api/edge-api-overview
+og:site_name: Unleash Documentation
+og:title: Unleash Edge API Overview - Unleash Documentation
+description: The Unleash Edge API exposes Client API and Frontend API compatible endpoints, letting SDKs connect to Edge for low-latency feature flag access.
+keywords: unleash edge api, edge, client api, frontend api, feature flags, api tokens, caching
+max-toc-depth: 3
+---
+
+[Unleash Edge](/unleash-edge) sits between your applications and your Unleash instance, exposing endpoints that are compatible with the [Client API](/api/client-api-overview) and the [Frontend API](/api/frontend-api-overview). SDKs connect to Edge instead of connecting directly to Unleash, which reduces latency and offloads traffic from your main instance.
+
+**Base paths**:
+
+- Client API endpoints: `<your-edge-url>/api/client`
+- Frontend API endpoints: `<your-edge-url>/api/frontend`
+
+**Primary use**: Serve cached flag configurations to [backend SDKs](/sdks#backend-sdks) for server-side evaluation, and evaluate flags on the Edge node for [frontend SDKs](/sdks#frontend-sdks) without sending user data upstream.
+
+Because the endpoints are API-compatible, you don't need to change your SDK code to use Edge: point the SDK at your Edge URL instead of your Unleash URL.
+
+## Authentication
+
+Use [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) for Client API endpoints and [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) for Frontend API endpoints. Edge validates tokens against your upstream Unleash instance, so the tokens must exist there.
+
+## Available endpoints
+
+### Client API endpoints
+
+Backend SDKs use these endpoints to fetch complete flag configurations for server-side evaluation.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/client/features` | GET/POST | Fetch all [feature flags](/concepts/feature-flags) and configurations from the Edge cache. |
+| `/api/client/features/{feature_name}` | GET | Fetch a single feature flag configuration. |
+| `/api/client/metrics` | POST | Report flag usage metrics. |
+| `/api/client/metrics/bulk` | POST | Report metrics in bulk, for example from a daisy-chained Edge instance. |
+| `/api/client/register` | POST | Register an SDK instance. |
+
+### Frontend API endpoints
+
+Frontend SDKs use these endpoints to fetch flags that Edge evaluates for a specific [Unleash Context](/concepts/unleash-context).
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/frontend` | GET/POST | Fetch enabled [feature flags](/concepts/feature-flags) for the provided context. |
+| `/api/frontend/all` | GET/POST | Fetch all feature flags for the provided context, including disabled ones. |
+| `/api/frontend/features/{feature_name}` | GET/POST | Fetch a single evaluated feature flag for the provided context. |
+| `/api/frontend/client/metrics` | POST | Report usage metrics. |
+| `/api/frontend/client/register` | POST | Register an SDK instance. |
+
+<Note>
+The Unleash Edge API documents the endpoints that Edge exposes to your SDKs. These are different from the endpoints that Edge calls back to your Unleash instance, such as token validation and metrics ingestion. Those endpoints live on your Unleash server and appear under the Unleash Edge section of the Admin API, for example [Register Edge observability metrics](/api/register-edge-observability-metrics).
+</Note>
+
+## Deploy and configure Edge
+
+To learn how Edge works and how to run it, see:
+
+- [Enterprise Edge overview](/unleash-edge) for architecture, hosting options, and streaming.
+- [Deploy Unleash Edge](/unleash-edge/deploy) for deployment guides.
+- [Configure Unleash Edge](/unleash-edge/configure) for configuration reference.

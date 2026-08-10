@@ -72,6 +72,8 @@ docker run -e DATABASE_HOST=mydbhost -e DATABASE_SSL=false ... unleashorg/unleas
 
 Unleash requires a PostgreSQL database to store its data. You must provide connection details using environment variables.
 
+PostgreSQL is the only supported database; MySQL and MariaDB are not supported. Managed PostgreSQL services, such as AWS RDS, Azure Database for PostgreSQL, or GCP Cloud SQL, are also supported. For the minimum PostgreSQL version required by each Unleash version, see [Upgrading Unleash](/deploy/upgrading-unleash).
+
 ### Database environment variables
 
 | Environment Variable                  | Default Value      | Description                                                                                                                                 |
@@ -239,6 +241,9 @@ If emails fail to send or contain errors:
 | `REQUEST_LOGGER_ENABLE`                           | `false`       | Set to `true` to enable logging of incoming request URLs and response codes.                                             |
 | `UNLEASH_RESPONSE_TIME_WITH_APP_NAME_KILL_SWITCH` | `false`       | Set to `true` to disable including the `appName` property in response time metrics (reduces cardinality if `appName` is variable). |
 | `DAILY_METRICS_STORAGE_DAYS` | `91` | Number of days to retain aggregated daily metrics data. |
+| `PROMETHEUS_API`                                  | none          | The base URL of a Prometheus-compatible query API. Used to populate the [Network view](/concepts/network-view#configure-a-data-source) dashboards. |
+
+Unleash exposes performance metrics in Prometheus format at `/internal-backstage/prometheus`. For a sample Prometheus scrape configuration, see [Network view](/concepts/network-view#configure-a-data-source).
 
 ### Feature and API behavior
 

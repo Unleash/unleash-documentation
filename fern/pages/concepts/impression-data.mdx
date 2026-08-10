@@ -116,3 +116,10 @@ unleash.on('impression', (event) => {
   console.log(event);
 });
 ```
+
+## Understand why a flag was enabled
+
+Unleash SDKs do not expose an evaluation reason API: `isEnabled` and `getVariant` return the result of the evaluation, but not which strategy or constraint produced it. If you need to understand why a flag evaluated the way it did, you have the following options:
+
+- Use the [Playground](/concepts/playground) to simulate a context and see detailed evaluation results, including which strategies and constraints matched. This is the best tool for debugging targeting rules.
+- Use impression data, as described on this page, to track that a flag was evaluated, with which context, and with what result.

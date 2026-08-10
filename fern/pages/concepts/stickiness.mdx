@@ -17,9 +17,13 @@ If both the user id and the session id is unavailable, the calculation returns a
 
 ## Consistency
 
-Because the number assigned to a user won't change, Unleash also guarantees that the a user will keep seeing the same features even if certain other parameters change.
+Because the number assigned to a user won't change, Unleash also guarantees that a user will keep seeing the same features even if certain other parameters change.
 
 For instance: When using the [gradual rollout activation strategy](/concepts/activation-strategies), any user whose number is less than or equal to the rollout percentage will see the feature. This means that the same users will keep seeing the feature even as you increase the percentage of your user base that sees the feature.
+
+The same logic applies when you decrease the rollout percentage: users whose number is above the new percentage stop seeing the feature, while users at or below it keep seeing it. Because the calculation is deterministic, increasing the percentage again brings back the same users. For example, if you roll out to 25%, reduce to 0%, and later return to 25%, the same set of users sees the feature again, as long as the strategy's `groupId` and the provided context stay the same.
+
+To reshuffle which users are included in a rollout, change the strategy's `groupId`. This changes the input to the stickiness calculation, so users are assigned new numbers.
 
 ## Custom stickiness
 

@@ -29,9 +29,9 @@ If a feature flag isn't being returned by the Frontend API or Edge, or if users 
 
 #### Check token access
 -   The token's access configuration is **immutable after creation** and defines which feature flags it can access. The format of the token indicates its scope:
-    -   **Access to all projects (current and future):** Tokens starting with `*:` (e.g., `*:production:xyz123etc...`) provide access to flags in the specified environment across all projects.
-    -   **Access to a discrete list of projects:** Tokens starting with `[]:` (e.g., `[]:production:xyz123etc...`) grant access to a specific subset of projects in the given environment. You can see which projects a token has access to on the API Tokens page in the Unleash admin UI.
-    -   **Single project access:** Tokens starting with a project name (e.g., `my_fullstack_app:production:xyz123etc...`) are restricted to that project and environment.
+    -   **Access to all projects (current and future):** Tokens starting with `*:` (e.g., `*:production.xyz123etc...`) provide access to flags in the specified environment across all projects.
+    -   **Access to a discrete list of projects:** Tokens starting with `[]:` (e.g., `[]:production.xyz123etc...`) grant access to a specific subset of projects in the given environment. You can see which projects a token has access to on the API Tokens page in the Unleash admin UI.
+    -   **Single project access:** Tokens starting with a project name (e.g., `my_fullstack_app:production.xyz123etc...`) are restricted to that project and environment.
 
 ### Context and stickiness
 
@@ -128,7 +128,7 @@ If you are using Unleash Edge, CORS headers are typically configured via command
 
 -   To allow a specific origin:
     ```bash
-    unleash-edge edge --cors-origin "[https://your-application.com](https://your-application.com)"
+    unleash-edge edge --cors-origin "https://your-application.com"
     ```
 -   You can specify multiple domains as a comma-separated list or by using the `--cors-origin` flag multiple times.
 -   Other CORS-related headers (e.g., `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`) can also be set via command-line arguments. Refer to the Unleash Edge deployment documentation for details.
@@ -137,6 +137,13 @@ If you are using Unleash Edge, CORS headers are typically configured via command
 
 You can use the `curl` command-line tool to inspect the response headers from your Unleash instance and verify the CORS configuration. Replace `<host>` and `<endpoint>` with your Unleash server URL and a relevant API endpoint (e.g., the frontend API endpoint).
 
+```bash
+curl -s -I -X OPTIONS "https://<host>/<endpoint>" \
+  -H "Origin: https://your-app.com" \
+  -H "Access-Control-Request-Method: GET"
+```
+
+Check the response for the `Access-Control-Allow-Origin` header. If it is missing or doesn't match your application's origin, revisit your CORS configuration.
 
 ## I don't see an Unleash feature in the Admin UI
 
