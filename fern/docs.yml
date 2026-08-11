@@ -750,6 +750,9 @@ navigation:
           - page: PHP
             availability: beta
             path: pages/sdks/openfeature/php.mdx
+          - page: Python
+            availability: beta
+            path: pages/sdks/openfeature/python.mdx
           - page: Ruby
             availability: beta
             path: pages/sdks/openfeature/ruby.mdx
