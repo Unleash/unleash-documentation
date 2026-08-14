@@ -20,16 +20,18 @@ The provider wraps the [Unleash Rust SDK](/sdks/rust) and uses the same backend 
 
 ## Installation
 
-Install the provider together with the OpenFeature Rust SDK and the Unleash Rust SDK. Your application imports `ClientBuilder` from the `unleash-api-client` crate to build the provider configuration.
+Install the provider together with the OpenFeature Rust SDK, the Unleash Rust SDK, and Tokio. Your application imports `ClientBuilder` from the `unleash-api-client` crate to build the provider configuration, and it needs Tokio as a direct dependency to run the async runtime with `#[tokio::main]`.
 
 ```bash
 cargo add unleash-openfeature-rust-provider open-feature unleash-api-client
+cargo add tokio --features macros,rt-multi-thread
 ```
 
-To use async-std instead of Tokio, disable the default features:
+To use async-std instead of Tokio, disable the provider's default features and add async-std as a direct dependency:
 
 ```bash
 cargo add unleash-openfeature-rust-provider --no-default-features --features async-std
+cargo add async-std --features attributes
 ```
 
 ## Configuration
