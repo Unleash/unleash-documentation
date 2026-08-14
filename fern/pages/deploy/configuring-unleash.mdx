@@ -72,7 +72,17 @@ docker run -e DATABASE_HOST=mydbhost -e DATABASE_SSL=false ... unleashorg/unleas
 
 Unleash requires a PostgreSQL database to store its data. You must provide connection details using environment variables.
 
-PostgreSQL is the only supported database; MySQL and MariaDB are not supported. Managed PostgreSQL services, such as AWS RDS, Azure Database for PostgreSQL, or GCP Cloud SQL, are also supported. For the minimum PostgreSQL version required by each Unleash version, see [Upgrading Unleash](/deploy/upgrading-unleash).
+PostgreSQL is the supported database. This includes managed PostgreSQL services, such as AWS RDS, Azure Database for PostgreSQL, and GCP Cloud SQL. MySQL and MariaDB are not officially supported.
+
+Each Unleash major version has a minimum supported PostgreSQL version:
+
+| Unleash version | Minimum PostgreSQL version |
+|-----------------|----------------------------|
+| 8.x             | 15                         |
+| 7.x             | 14                         |
+| 6.x             | 13                         |
+
+For details on upgrading between versions, see [Upgrading Unleash](/deploy/upgrading-unleash).
 
 ### Database environment variables
 

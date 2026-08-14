@@ -83,15 +83,13 @@ To delete a segment:
 ## Segment limits
 
 Segments are powerful but can become complex. Each constraint and value in a segment adds data that must be stored, synced, and evaluated at runtime.
-Keeping segments a manageable size ensures that evaluations stay lightweight and that your SDKs can respond instantly—even at scale.
+Keeping segments a manageable size ensures that evaluations stay lightweight and that your SDKs can respond instantly, even at scale.
 
-The combined number of values across all constraints in a single segment is limited by your plan:
+The following default [resource limits](/concepts/resource-limits) apply to segments:
 
-- [OSS](/support/availability#plans): up to 250 total values per instance.
-- [Enterprise](/support/availability#plans): up to 1,000 total values per instance.
-
-You can attach up to five segments to a single activation strategy. This limit applies per strategy, not per feature flag.
-If a flag includes two strategies, each one can have up to five segments.
+- A single segment can have up to 1,000 constraint values, combined across all its constraints.
+- A single activation strategy can have up to 5 segments. This limit applies per strategy, not per feature flag: if a flag includes two strategies, each one can have up to five segments.
+- An instance can have up to 300 segments.
 
 If you're self-hosting, you can [configure segment limits](/concepts/resource-limits) with environment variables.
 
@@ -99,3 +97,15 @@ If you're self-hosting, you can [configure segment limits](/concepts/resource-li
 
 Segments follow the same performance principles as individual constraints. When targeting large audiences or using many values, keep payloads small and rely on higher-level attributes instead of long inclusion lists.
 For practical guidance on optimizing performance, see [Using Unleash with large constraints](/guides/managing-constraints).
+
+## Manage segments with the Admin API
+
+You can manage segments programmatically using the segments endpoints of the Admin API. For example, to create a segment:
+
+<EndpointRequestSnippet endpoint="POST /api/admin/segments" />
+
+To list all segments:
+
+<EndpointRequestSnippet endpoint="GET /api/admin/segments" />
+
+You can also [update](/api/update-segment), [delete](/api/remove-segment), and [list the strategies that use](/api/get-strategies-by-segment-id) a segment.

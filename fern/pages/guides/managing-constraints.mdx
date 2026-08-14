@@ -30,6 +30,8 @@ As the number of elements in a constraint list (such as the number of unique use
 
 To fetch feature configuration, Unleash SDKs run a polling loop in the background. While this works well with normal-sized configurations, as you add more complex constraints, it can eventually overload your network and slow down your SDK. Additionally, as the number of SDKs connecting to your Unleash instance increases, the problem can become more pronounced, potentially impacting performance.
 
+This is also why Unleash caps the number of constraints per strategy and the number of values per constraint; see [Resource limits](/concepts/resource-limits) for the exact limits for your plan.
+
 In other words: it's not good.
 
 ## Rethinking your options

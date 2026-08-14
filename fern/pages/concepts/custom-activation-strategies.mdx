@@ -3,14 +3,14 @@ title: Custom activation strategies
 og:site_name: Unleash Documentation
 og:title: Custom activation strategies - Define your own activation strategies
 description: Custom activation strategies let you define your own activation strategies to use with Unleash. When the built-in activation strategies aren't enough, custom activation strategies provide the flexibility you need.
-keywords: custom strategies, activation strategies, deprecated, gradual rollout, constraints
+keywords: custom strategies, activation strategies, gradual rollout, constraints
 max-toc-depth: 3
 ---
 
-<Warning>
-Custom strategies are deprecated and may be removed in a future major version. We recommend not using custom strategies going forward and instead using the gradual rollout strategy with constraints.
-If you have a use case you can't solve without using custom strategies, please reach out to us.
-</Warning>
+<Note>
+Whenever possible, we recommend using a standard [gradual rollout](/concepts/activation-strategies#gradual-rollout) strategy with [strategy constraints](/concepts/activation-strategies#constraints) instead of defining a custom strategy. They offer similar flexibility without requiring custom code distribution within your SDKs, which becomes a maintenance burden as your SDKs and strategies evolve.
+If you have a use case you can't solve without custom strategies, please reach out to us.
+</Note>
 
 **Custom activation strategies** let you define your own activation strategies to use with Unleash. When the [built-in activation strategies](/concepts/activation-strategies) aren't enough, custom activation strategies are there to provide you with the flexibility you need.
 

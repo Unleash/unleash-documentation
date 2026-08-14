@@ -102,6 +102,25 @@ By defining the more restrictive strategy first, we ensure that all internal use
   ![strategy_variants example](/assets/strategy-variants-example.png)
 </Frame>
 
+## Client SDK support
+
+Strategy variants require Unleash 5.4 or later and the following minimum backend SDK versions:
+
+| SDK | Minimum version |
+|-----|-----------------|
+| [Java](/sdks/java) | 8.3.0 |
+| [Node.js](/sdks/node) | 4.1.0 |
+| [Go](/sdks/go) | 3.8.0 |
+| [Python](/sdks/python) | 5.8.0 |
+| [Ruby](/sdks/ruby) | 4.5.0 |
+| [.NET](/sdks/dotnet) | 3.3.0 |
+| [PHP](/sdks/php) | 1.13.0 |
+| [Rust](/sdks/rust) | 0.16.0 |
+
+Backend SDKs evaluate strategy variants locally. If an SDK version predates strategy variant support, it does not evaluate them and returns the [fallback variant](#fallback-variant).
+
+Frontend SDKs receive variants that the Unleash server, [Unleash Edge](/unleash-edge), or the [Frontend API](/concepts/front-end-api) has already evaluated, so they work with strategy variants without evaluating them locally.
+
 ## Environment-level variants
 
 [Environment-level variants](/concepts/feature-flag-variants) are deprecated. Use strategy variants instead.

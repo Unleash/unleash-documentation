@@ -15,13 +15,9 @@ Requires [SDK compatibility](/sdks#feature-compatibility-in-backend-sdks).
 Unleash can provide you with **impression data** about the flags in your application. Impression data contains information about a specific feature flag activation check: The client SDK will emit an **impression event** when it calls `isEnabled` or `getVariant`. Some front-end SDKs emit impression events only when a flag is enabled.
 
 <Warning>
-**Front-end SDKs and disabled flags**
+**Frontend SDKs and disabled flags**
 
-Older versions of the front-end SDKs and other SDKs that connect [Unleash Edge](/unleash-edge) or the [Unleash front-end API](/concepts/front-end-api) would **not** emit impression events when a flag is disabled.
-
-This is because impression data is a **per-flag** setting and the Proxy and front-end API only transmit information about flags that are enabled. As such, the SDK will never know that it should emit an impression event if a flag is disabled.
-
-Some of the front-end SDKs now include a include a configuration property that lets you turn on impression data for all flags regardless of whether they're enabled or not.
+Frontend SDKs receive only enabled flags from [Unleash Edge](/unleash-edge) or the [Frontend API](/concepts/front-end-api), so by default they don't emit impression events for disabled flags. Some frontend SDKs have a configuration option that turns on impression events for all flags; check your SDK's documentation.
 </Warning>
 
 Impression data was designed to make it easier for you to **collect analytics data**, **perform A/B tests**, and **enrich experiments** in your applications. It contains information about the feature flag and the related [Unleash Context](/concepts/unleash-context).

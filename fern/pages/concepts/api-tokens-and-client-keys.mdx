@@ -152,7 +152,11 @@ Requests with an expired token are rejected, so rotate tokens before they expire
 | [Personal access tokens](#personal-access-tokens) | Choose an expiration when creating the token: 7, 30, or 60 days, a custom date, or never. | Set the required `expiresAt` property with the [create personal access token](/api/create-pat) endpoint. |
 | [Service account tokens](#service-account-tokens) | Choose an expiration when creating the token: 7, 30, or 60 days, a custom date, or never. | Set the required `expiresAt` property with the [create service account token](/api/create-service-account-token) endpoint. |
 
+Rather than setting an expiration date, we recommend [rotating tokens](#rotate-a-token) on a regular schedule. This keeps token hygiene in your control without the risk of a token expiring unnoticed.
+
 A token's access configuration, that is its type, projects, and environment, cannot be changed after creation. Unleash does not rotate tokens automatically.
+
+### Rotate a token
 
 To rotate a token:
 

@@ -116,7 +116,7 @@ Next, decide the percentage of users to target for each variant, known as the va
 
 Unleash is built to give developers confidence in their ability to run A/B tests effectively. One critical component of implementing A/B testing strategies is maintaining a consistent experience for each user across multiple user sessions.
 
-For example, user `uuid1234` should be the target of `variantA` regardless of their session. The original subset of users that get `variantA` will continue to experience that variation of the feature over time. At Unleash, we call this [stickiness](/concepts/stickiness). You can define the parameter of stickiness in the gradual rollout form. By default, stickiness is calculated using the `userId` and `groupId`, falling back to the `sessionId` if the `userId` is unavailable.
+For example, user `uuid1234` should be the target of `variantA` regardless of their session. The original subset of users that get `variantA` will continue to experience that variation of the feature over time. At Unleash, we call this [stickiness](/concepts/stickiness). You can define the parameter of stickiness in the gradual rollout form. By default, stickiness is calculated from the `userId`, falling back to the `sessionId` if the `userId` is unavailable; the strategy's `groupId` is included as a grouping input so that each flag distributes users independently.
 
 ### Track A/B testing for your key performance metrics
 
@@ -132,6 +132,8 @@ Next, in your application code, use the SDK to capture the impression events as 
 Your client SDK will emit an impression event when it calls `isEnabled` or `getVariant`. Some front-end SDKs emit impression events only when a flag is enabled. You can define custom event types to track specific user actions. If you want to confirm that users from your A/B test have the new feature, Unleash will receive the `isEnabled` event. If you have created variants, the `getVariant` event type will be sent to Unleash.
 
 Strategy variants are meant to work with impression data. You get the name of the variant sent to your analytics tool, which allows you a better understanding of what happened, rather than seeing a simple true/false from your logs.
+
+You can also use [impact metrics](/concepts/impact-metrics) to correlate flag exposure with product and system metrics directly in Unleash, without sending impression events to an external analytics tool.
 
 The output from the impression data in your app may look like this code snippet:
 
