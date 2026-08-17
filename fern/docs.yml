@@ -756,6 +756,9 @@ navigation:
           - page: Ruby
             availability: beta
             path: pages/sdks/openfeature/ruby.mdx
+          - page: Rust
+            availability: beta
+            path: pages/sdks/openfeature/rust.mdx
           - page: Swift
             availability: beta
             path: pages/sdks/openfeature/swift.mdx

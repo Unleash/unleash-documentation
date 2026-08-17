@@ -1,0 +1,135 @@
+---
+title: Rust OpenFeature provider
+slug: /sdks/openfeature/rust
+og:site_name: Unleash
+og:title: Rust OpenFeature provider
+description: Set up the Unleash OpenFeature provider for Rust to evaluate feature flags through the OpenFeature API.
+keywords: [unleash, rust, openfeature, provider, sdk, feature flags]
+max-toc-depth: 3
+last-updated: August 17, 2026
+---
+
+The [Unleash OpenFeature Rust provider](https://github.com/Unleash/unleash-openfeature-rust-provider) lets Rust applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
+
+The provider wraps the [Unleash Rust SDK](/sdks/rust) and uses the same backend SDK behavior for polling, local evaluation, and metrics.
+
+## Requirements
+
+-   Rust 1.88 or later
+-   An async runtime. The provider supports Tokio by default and async-std through a feature flag.
+
+## Installation
+
+Install the provider together with the OpenFeature Rust SDK, the Unleash Rust SDK, and Tokio. Your application imports `ClientBuilder` from the `unleash-api-client` crate to build the provider configuration, and it needs Tokio as a direct dependency to run the async runtime with `#[tokio::main]`.
+
+```bash
+cargo add unleash-openfeature-rust-provider open-feature unleash-api-client
+cargo add tokio --features macros,rt-multi-thread
+```
+
+To use async-std instead of Tokio, disable the provider's default features and add async-std as a direct dependency:
+
+```bash
+cargo add unleash-openfeature-rust-provider --no-default-features --features async-std
+cargo add async-std --features attributes
+```
+
+## Configuration
+
+Create an `UnleashFlagProvider` from a `ClientBuilder`, your Unleash API URL, application name, instance ID, and API token, then initialize it and register it with OpenFeature. You can configure the `ClientBuilder` with the same [options](/sdks/rust#configuration) you would use with the Unleash Rust SDK client; the provider enables string feature lookup for you.
+
+```rust
+use open_feature::OpenFeature;
+use unleash_api_client::ClientBuilder;
+use unleash_openfeature_rust_provider::UnleashFlagProvider;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let provider = UnleashFlagProvider::new(
+        ClientBuilder::default(),
+        "<YOUR_UNLEASH_URL>/api",
+        "my-rust-app",
+        "my-rust-app-instance",
+        Some("<YOUR_API_TOKEN>".to_string()),
+    )?;
+    provider.initialize_client().await?;
+
+    let mut api = OpenFeature::singleton_mut().await;
+    api.set_provider(provider).await;
+
+    Ok(())
+}
+```
+
+`initialize_client` registers the client with your Unleash instance and starts polling for feature flag updates in the background. Registering the provider with `set_provider` also triggers initialization, but startup errors are only logged as warnings. Call `initialize_client` first to handle startup errors yourself; initialization is idempotent, so the second call does nothing.
+
+The initial flag fetch completes in the background. Until the first poll finishes, flags evaluate to `false` and variant evaluations return the default value.
+
+## Evaluate a flag
+
+Build an OpenFeature client and evaluate flags through the OpenFeature API:
+
+```rust
+use open_feature::EvaluationContext;
+
+let client = api.create_client();
+
+let context = EvaluationContext::default().with_targeting_key("user-123");
+
+let enabled = client
+    .get_bool_value("my-feature", Some(&context), None)
+    .await
+    .unwrap_or(false);
+```
+
+The provider supports all OpenFeature evaluation methods. Boolean evaluation uses the flag's enabled state and returns `false` if the flag doesn't exist. All other types resolve from the payload of the flag's [variant](/concepts/feature-flag-variants):
+
+-   String values accept `string` and `csv` payloads.
+-   Integer and float values accept `number` payloads.
+-   Object values accept `json` payloads. The payload must be a JSON object; top-level arrays and scalar values return the default value with a type mismatch error.
+
+If the flag is disabled, or the variant payload is missing, has a different type, or can't be parsed, the evaluation returns the default value. The detail methods, such as `get_string_details`, additionally report the assigned variant name.
+
+## Context mapping
+
+The provider maps the OpenFeature evaluation context to an [Unleash context](/concepts/unleash-context) before each evaluation.
+
+The following OpenFeature fields map directly to top-level Unleash context fields:
+
+-   `appName`
+-   `currentTime`
+-   `environment`
+-   `remoteAddress`
+-   `sessionId`
+-   `userId`
+
+If you set a targeting key, the provider maps it to `userId`. The targeting key takes precedence over a `userId` field set on the evaluation context.
+
+The `remoteAddress` value must be a valid IP address and the `currentTime` value must be a date-time value; the provider discards other values for these two fields.
+
+The provider adds all other scalar fields, such as strings, numbers, booleans, and date-time values, to the Unleash context [properties](/concepts/unleash-context#the-properties-field) as strings. It discards struct fields and logs each discarded field at debug level using the `log` crate.
+
+## Shutdown
+
+Shut down the provider to stop the background polling task:
+
+```rust
+provider.shutdown().await;
+```
+
+The OpenFeature Rust SDK takes ownership of the provider when you register it with `set_provider`, and the SDK's `shutdown` method drops registered providers without stopping their background tasks; the polling task then stops when your async runtime shuts down.
+
+## Example
+
+To try the provider against your Unleash instance, clone the [provider repository](https://github.com/Unleash/unleash-openfeature-rust-provider) and run the [boolean flag example](https://github.com/Unleash/unleash-openfeature-rust-provider/blob/main/examples/boolean_flag.rs) with your Unleash URL and API token:
+
+```bash
+export UNLEASH_API_URL='<YOUR_UNLEASH_URL>/api'
+export UNLEASH_APP_NAME=openfeature-example
+export UNLEASH_INSTANCE_ID=openfeature-example
+export UNLEASH_CLIENT_SECRET="$UNLEASH_API_KEY"
+
+cargo run --example boolean_flag -- \
+  --flag-key my-feature \
+  --targeting-key user-123
+```
