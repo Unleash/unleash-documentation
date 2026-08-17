@@ -827,7 +827,7 @@ navigation:
           - page: Using feature flags at scale
             path: pages/guides/best-practices-using-feature-flags-at-scale.mdx
             slug: best-practices-using-feature-flags-at-scale
-          - page: Migrating from homegrown feature management solutions
+          - page: Migrating to Unleash
             path: pages/guides/feature-flag-migration-best-practices.mdx
             slug: feature-flag-migration-best-practices
           - page: Managing large constraints
