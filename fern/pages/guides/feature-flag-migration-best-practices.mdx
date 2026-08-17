@@ -120,7 +120,7 @@ A wrapper, also called an abstraction layer or facade, is a small module in your
 </Frame>
 
 <Tip>
-If you want a standardized abstraction instead of a custom wrapper, [OpenFeature](https://openfeature.dev/) provides a vendor-neutral API with an [Unleash provider](/sdks#openfeature-providers) for several languages. Teams already using OpenFeature can switch backends by swapping the provider, with no changes to evaluation call sites. The OpenFeature Multi-Provider, available for select SDKs, can evaluate two providers behind one interface and compare their results, which gives you shadow evaluation with minimal custom code.
+If you want a standardized abstraction instead of a custom wrapper, [OpenFeature](https://openfeature.dev/) provides a vendor-neutral API with an [Unleash provider](/sdks#openfeature-providers) for several languages; see all [Unleash providers in the OpenFeature ecosystem](https://openfeature.dev/ecosystem?instant_search%5Bquery%5D=unleash). Teams already using OpenFeature can switch backends by swapping the provider, with no changes to evaluation call sites. The OpenFeature Multi-Provider, available for select SDKs, can evaluate two providers behind one interface and compare their results, which gives you shadow evaluation with minimal custom code.
 </Tip>
 
 ### Phase 4: Cut over
@@ -230,7 +230,7 @@ At the call-site level, the evaluation calls map as follows:
 | `client.stringVariation`, `numberVariation`, `jsonVariation` | `getVariant(key, context)`, then read the variant name and payload |
 | Context object passed per evaluation | [Unleash context](/concepts/unleash-context) passed per evaluation in backend SDKs, or set on the client in frontend SDKs |
 
-If your code already uses OpenFeature with the LaunchDarkly provider, you can keep your evaluation call sites unchanged and swap in the [Unleash OpenFeature provider](/sdks#openfeature-providers), adjusting only the provider initialization and context mapping.
+If your code already uses OpenFeature with the LaunchDarkly provider, you can keep your evaluation call sites unchanged and swap in the [Unleash OpenFeature provider](/sdks#openfeature-providers) for your language, listed in the [OpenFeature ecosystem](https://openfeature.dev/ecosystem?instant_search%5Bquery%5D=unleash), adjusting only the provider initialization and context mapping.
 
 ### Plan for behavioral differences
 
