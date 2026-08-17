@@ -759,6 +759,9 @@ navigation:
           - page: Rust
             availability: beta
             path: pages/sdks/openfeature/rust.mdx
+          - page: Swift
+            availability: beta
+            path: pages/sdks/openfeature/swift.mdx
 
       - section: Community SDKs
         collapsed: true
