@@ -117,7 +117,7 @@ Shut down the provider to stop the background polling task:
 provider.shutdown().await;
 ```
 
-The OpenFeature Rust SDK takes ownership of the provider when you register it with `set_provider`, and the SDK's `shutdown` method drops registered providers without stopping their background tasks; the polling task then stops when your async runtime shuts down. To stop polling explicitly, for example in tests, call `shutdown` on a provider you still own before registering it, or evaluate flags through the provider's resolver methods directly.
+The OpenFeature Rust SDK takes ownership of the provider when you register it with `set_provider`, and the SDK's `shutdown` method drops registered providers without stopping their background tasks; the polling task then stops when your async runtime shuts down.
 
 ## Example
 
