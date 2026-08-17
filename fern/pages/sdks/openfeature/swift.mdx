@@ -72,7 +72,7 @@ The provider supports all OpenFeature evaluation methods. Boolean evaluation use
 
 A missing flag, a disabled variant, or a variant without a payload returns the default value. A payload of the wrong type returns the default value with a type mismatch error, and a payload that can't be parsed returns the default value with a parse error.
 
-The detail methods, such as `getBooleanDetails`, additionally report the assigned variant name. The evaluation reason is always `UNKNOWN` because Unleash frontend SDKs don't report why a flag evaluated the way it did.
+ The detail methods, such as `getStringDetails`, also report the assigned variant name when the variant payload resolves successfully. The exception is boolean results, which never include a variant name because boolean evaluation only checks whether the flag is enabled. The evaluation reason is always `UNKNOWN` because Unleash SDKs don't report why a flag evaluated the way it did.
 
 ## Update the evaluation context
 
