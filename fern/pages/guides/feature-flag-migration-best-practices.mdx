@@ -1,187 +1,314 @@
 ---
-title: Best Practices for Migrating from a Homegrown Feature Management Solution
-description: Many large organizations have an existing feature management solution that they have outgrown and plan to migrate to a feature flag service.
-keywords: best, practices, migrating, feature flags, unleash
+title: Migrating to Unleash
+description: Learn how to plan and execute a migration to Unleash from LaunchDarkly, another feature flag provider, or a homegrown feature flag system.
+keywords: migration, migrate, launchdarkly, feature flags, unleash, homegrown
 og:site_name: "Unleash Documentation"
-og:title: "Best Practices for Migrating from a Homegrown Feature Management Solution"
+og:title: "Migrating to Unleash"
 max-toc-depth: 3
+last-updated: August 19, 2026
 ---
 
-Many large organizations have an existing feature management solution that they have outgrown and plan to migrate to a feature flag service.
+Learn how to plan and execute a migration to Unleash from LaunchDarkly, another feature flag provider, or a homegrown feature flag system.
 
-This guide outlines Best Practices for feature flag migrations. Approaching the migration from your current feature flag solution to Unleash the right way will save you time, money, and a lot of headaches.
+This guide is based on our experience helping [large organizations move to Unleash](https://www.getunleash.io/wayfair-feature-flag-case-study). The overall approach is the same regardless of what you are migrating from, so the first part of this guide applies to any source system. Later sections cover the specifics of migrating [from LaunchDarkly](#migrate-from-launchdarkly), [from a homegrown solution](#migrate-from-a-homegrown-solution), and [from other providers](#migrate-from-other-feature-flag-providers).
 
-Based on our work with organizations having millions of flags and thousands of users, there are five phases of a feature flag migration:
+We'll cover how to:
 
-1.  [Defining the scope of the feature flag migration](#defining-the-scope-of-the-feature-flag-migration)
-2.  [Make the business case for feature flag migration](#make-the-business-case-for-feature-flag-migration)
-3.  [Planning Feature Flag Migration](#planning-feature-flag-migration)
-4.  [Migration Execution](#migration-execution)
-5.  [Onboarding users](#onboarding-users)
+- Work through the five phases of a migration: [plan](#phase-1-plan), [pilot](#phase-2-pilot), [migrate](#phase-3-migrate), [cut over](#phase-4-cut-over), and [onboard](#phase-5-onboard).
+- [Accelerate the migration](#accelerate-the-migration-with-ai-and-automation) with AI coding assistants, the Unleash MCP server, and Terraform.
+- [Migrate from LaunchDarkly](#migrate-from-launchdarkly), including how LaunchDarkly concepts map to Unleash.
+- [Migrate from a homegrown solution](#migrate-from-a-homegrown-solution).
+- [Migrate from other feature flag providers](#migrate-from-other-feature-flag-providers).
 
-This guide provides a summary of each topic as well as a detailed [Feature Flag Migration template](https://docs.google.com/spreadsheets/d/1MKc95v7Tc-9tznWMDVSy2vvmVJTvOFLRVZpx1QrL-_U/edit#gid=996250264) that you can use to plan your migration.
+<Frame background="subtle">
+  ![The five phases of a feature flag migration: plan, pilot, migrate, cut over, and onboard](/assets/migration-phases.svg)
+</Frame>
 
-## Defining the scope of the feature flag migration
+## What a feature flag migration involves
 
-Scoping a feature flag migration properly is the most significant task you can do to ensure the success of your project.
+A feature flag migration has four workstreams. Sizing each of them early gives you a realistic project plan:
 
-Based on experiences working with dozens of large enterprises migrating homegrown systems to Unleash, we recommend two best practices when scoping your feature flag migration.
+<CardGroup cols={2}>
+  <Card title="Flag data" icon="fa-solid fa-flag">
+    Recreate the [flags](/concepts/feature-flags), [targeting rules](/concepts/activation-strategies), and [segments](/concepts/segments) you decide to keep in Unleash. This is usually smaller than it first appears, because most old flags should be removed rather than migrated.
+  </Card>
+  <Card title="Application code" icon="fa-solid fa-code">
+    Update your applications to evaluate flags using [Unleash SDKs](/sdks) instead of your current SDK or helper functions.
+  </Card>
+  <Card title="People and access" icon="fa-solid fa-users">
+    Set up [projects](/concepts/projects), [role-based access control](/concepts/rbac), and [single sign-on](/concepts/sso), and train your teams on the new workflows.
+  </Card>
+  <Card title="Integrations" icon="fa-solid fa-plug">
+    Reconnect downstream consumers of flag data, such as Jira, Datadog, Slack, or Microsoft Teams, using Unleash [integrations](/integrate).
+  </Card>
+</CardGroup>
 
-### 1- Separate the migration of old flags from the existing system from new flags created in Unleash.
+## The five migration phases
 
-The older the system, the more existing flags there are. It might take weeks or months to hunt down the developer responsible for an old flag in an obscure part of the code base. In the meantime, hundreds of developers are trying to create new flags today. By separating these concerns, you can get to the "happy end state" for your development team faster, and burn down your flag migrations over time.
+### Phase 1: Plan
 
-So you should end up with two separate tracks as part of your project scope.
+#### Define the scope
 
-1. Build the new platform around the "better" target state - ideal use cases and ways of working that enable greater levels of developer efficiency
+Scoping the migration correctly is the single most important factor for success. Two practices consistently make migrations faster and cheaper:
 
-In parallel, the second track:
+**Separate new flags from old flags.** Point all new flag creation at Unleash from day one, and treat the [migration of existing flags](#phase-3-migrate) as a separate track. If your current system supports it, disable the creation of new flags there to enforce the separation. This gets your teams to the improved end state immediately instead of blocking them on a long migration tail.
 
-2. Clean up stale feature flags in the current platform. You should decide strategically on what should be migrated and what should be cleaned up. Many old flags can simply be deleted rather than migrated.
+**Clean up instead of migrating.** Audit your existing flags and classify them as active, permanent, or stale. Stale flags should be [removed from code](/guides/manage-feature-flags-in-code#flag-cleanup-best-practices) and deleted, not migrated. Unleash helps you avoid accumulating new debt with [flag lifecycle tracking and health metrics](/concepts/technical-debt), but the cheapest flag to migrate is the one you delete.
 
-### 2- Do not make end-to-end app modernization a dependency of your feature flag migration
+<Warning>
+Avoid making the migration dependent on other initiatives. Teams sometimes couple a feature flag migration to a larger modernization effort, such as breaking a monolith into microservices. This slows both projects down. Enable Unleash for all codebases, including monoliths, independent of their modernization status.
+</Warning>
 
-Organizations who adopt feature flags see improvements in all key operational metrics for DevOps: Lead time to changes, mean-time-to-recovery, deployment frequency, and change failure rate. So it is natural as part of a feature flag migration to also improve other parts of the software development lifecycle. From the perspective of feature flag migration, this is a mistake.
+#### Design the target state
 
-Making feature flag migration dependent on breaking down mission-critical monolithic applications into microservices, for example, will slow down your feature flag migration.
+Decide how flags will be [organized](/guides/organize-feature-flags) before you move any data, because the structure drives access control:
 
-Rather, enable feature flags for all codebases, independent of your state of modernization. Even monolithic applications can benefit from feature flags in some instances. When this monolith is broken down, the accrued benefits will be even greater, and you will ship your new feature management system a lot faster.
+- **Projects and environments**: Choose an organizing principle for [projects](/concepts/projects), typically by team, application, or business domain. Unleash [environments](/concepts/environments) are defined once per instance and shared across projects, and a flag is a single entity across all environments with per-environment configuration.
+- **Naming conventions**: A migration is the best opportunity you will get to fix flag naming. Define conventions up front and enforce them with [naming patterns](/concepts/feature-flags#set-a-naming-pattern).
+- **Access control**: Map your current roles and permissions to Unleash [predefined or custom roles](/concepts/rbac), and plan [single sign-on](/concepts/sso) and [SCIM provisioning](/concepts/scim) so users onboard automatically.
+- **Hosting and architecture**: Decide between cloud-hosted, hybrid, and self-hosted Unleash based on your security and compliance requirements. See [hosting options](/deploy/hosting-options). If you serve flags to frontend applications or operate at high scale, plan for [Unleash Edge](/unleash-edge).
+- **Instance configuration as code**: The [Unleash Terraform provider](/integrate/terraform) can bootstrap projects, environments, API tokens, roles, and SSO configuration. It intentionally does not manage flags themselves.
 
-If you're using our [template](https://docs.google.com/spreadsheets/d/1MKc95v7Tc-9tznWMDVSy2vvmVJTvOFLRVZpx1QrL-_U/edit#gid=996250264), now fill in details about your project scope.
+If you are migrating a large volume of flags, review the [resource limits](/concepts/resource-limits) that apply to flags, strategies, and constraints.
 
-## Make the business case for feature flag migration
+#### Align stakeholders
 
-Once you have scoped your migration, you need to make a business case. Even the most well planned migrations take effort, meaning time, money, and energy dedicated to a project. If you don’t have the proper buy-in, you risk being under-resourced or worse, being unable to complete the migration at all.
+Even well-planned migrations need time, budget, and buy-in. Identify who administers the current system, who uses it day to day, and who signs off on security and change management. Involving these stakeholders early prevents delays from unforeseen approval requirements later.
 
-When building a business case, you want to be clear on what pain the feature flag migration is solving and the happy end state once the migration is complete.
+To structure the business case, be explicit about what pain the migration solves: Which practices around deployments, debugging, and rollbacks slow teams down today? What does "better" look like once the migration is complete?
 
-To structure your thinking, ask yourself:
+<Download src="../../assets/unleash-migration-checklist.pdf" filename="unleash-migration-checklist.pdf">
+  <Card title="Migration checklist" icon="fa-solid fa-download" iconPosition="left" />
+</Download>
 
--   What practices related to feature deployments, debugging and rollbacks are overburdening teams today and driving down productivity?
--   What specific deficiencies are there in the current platform
--   What business outcomes are you looking to drive?
--   After the migration, what does "better" look like?
+### Phase 2: Pilot
 
-If you're using our [template](https://docs.google.com/spreadsheets/d/1MKc95v7Tc-9tznWMDVSy2vvmVJTvOFLRVZpx1QrL-_U/edit#gid=996250264), now fill in details about your business case.
+Roll out Unleash to one or two teams first, matching the use cases of your current system, before opening it up to the whole organization. Use the pilot to validate the setup against your [security and compliance requirements](/guides/security-and-compliance) and to refine your [onboarding material](#phase-5-onboard).
 
-## Planning Feature Flag Migration
+<Tip>
+Create the pilot's flags, [activation strategies](/concepts/activation-strategies), and targeting rules from scratch in Unleash, then [export](/concepts/import-export) the configuration. The export gives you a working schema for the bulk import of active flags in the [migrate phase](#phase-3-migrate), and validates your project organization early, since projects and environments are the unit of import and export.
+</Tip>
 
-When planning your feature flag migration, it is essential to focus on four key areas:
+### Phase 3: Migrate
 
--   Use cases
--   Core feature flag setup
--   Key stakeholders
--   System architecture
+Migrate team by team or application by application rather than all at once, and use [AI and automation](#accelerate-the-migration-with-ai-and-automation) for the heavy lifting. For each group of flags:
 
-### Use Cases
+<Steps>
+  <Step>
+    Create any [custom context fields](/concepts/unleash-context#custom-context-fields) and [segments](/concepts/segments) the flags depend on.
+  </Step>
+  <Step>
+    Recreate the flags and their [targeting rules](/concepts/activation-strategies), either manually for small sets or scripted through the [Admin API](/api) for large ones. An [export](/concepts/import-export) of the configuration you built during the pilot serves as a schema for scripted bulk imports.
+  </Step>
+  <Step>
+    Verify the configuration in a non-production environment before enabling it in production.
+  </Step>
+</Steps>
 
-A key requirement is to understand how feature flags will be used so that you can set up the proper data model, user permissions, and system architecture.
+For moving configuration between Unleash instances or environments, for example from a proof-of-concept instance to production, use [import and export](/concepts/import-export).
 
-Below are some of the most common use cases for feature flags. Start by selecting those that are in scope for your initial rollout. It is common to start with some, but not all, of these and roll out the remaining in the future.
+#### Run both systems in parallel
 
-Use cases for feature flags:
+Keep your existing system running as the fallback while you migrate. Most teams wrap flag evaluation in a small abstraction layer, so each call site only changes once. During the transition, the wrapper can:
+
+- Evaluate both systems and return the old system's answer until you trust the new one.
+- Log any mismatches between the two results.
+- [Cut each flag or service over](#phase-4-cut-over) to Unleash once its mismatch rate reaches zero.
+
+<Accordion title="What does it mean to wrap flag evaluation?">
+A wrapper, also called an abstraction layer or facade, is a small module in your codebase that all application code calls to evaluate flags, instead of calling the flag SDK directly. For example, your code calls your own `isFeatureEnabled("checkout-redesign", context)` function, and only that function knows which flag system it talks to. Because call sites depend on your interface rather than a vendor SDK, you can switch the implementation from your old system to Unleash, or evaluate both during the transition, without touching application code. For recommended patterns, see [best practices for managing feature flags in code](/guides/manage-feature-flags-in-code).
+</Accordion>
+
+<Frame background="subtle">
+  ![An abstraction layer in your application evaluates both Unleash and the existing system during the migration](/assets/migration-parallel-run.svg)
+</Frame>
+
+<Tip>
+If you want a standardized abstraction instead of a custom wrapper, [OpenFeature](https://openfeature.dev/) provides a vendor-neutral API with an [Unleash provider](/sdks#openfeature-providers) for several languages; see all [Unleash providers in the OpenFeature ecosystem](https://openfeature.dev/ecosystem?instant_search%5Bquery%5D=unleash). Teams already using OpenFeature can switch backends by swapping the provider, with no changes to evaluation call sites. The OpenFeature Multi-Provider, available for select SDKs, can evaluate two providers behind one interface and compare their results, which gives you shadow evaluation with minimal custom code.
+</Tip>
+
+### Phase 4: Cut over
+
+Once a team or application is fully on Unleash:
+
+<Steps>
+  <Step>
+    Disable the creation of new flags in the old system, if not already done at the start of the migration, so engineers cannot fall back to it out of habit.
+  </Step>
+  <Step>
+    Monitor the old system for remaining evaluation traffic.
+  </Step>
+  <Step>
+    Remove the old SDKs and dependencies from your codebases.
+  </Step>
+  <Step>
+    Decommission the old system only when its evaluation traffic reaches zero.
+  </Step>
+</Steps>
+
+### Phase 5: Onboard
+
+Plan onboarding as part of the migration, not as an afterthought. Set up [single sign-on](/concepts/sso) and [SCIM provisioning](/concepts/scim) so joining is frictionless, and use [user management and access controls](/guides/user-management-access-controls) to give teams the right permissions from the start.
+
+Unleash Customer Success provides tailored training for teams new to Unleash or to feature flags in general. For self-paced learning, point your teams to the [Unleash Learning Lab](/learning-lab).
+
+## Accelerate the migration with AI and automation
+
+Unleash is API-first: everything you can do in the Admin UI is also available through the [Admin API](/api), so the entire data migration can be scripted end to end. If your current system supports exporting flag definitions, an AI assistant can help convert the export into the Unleash [import format](/concepts/import-export) or into Admin API calls. Review translated targeting rules and code-level rewrites before cutover.
+
+<CardGroup cols={2}>
+  <Card title="AI coding assistants" icon="fa-solid fa-wand-magic-sparkles">
+    Assistants such as [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), and [Cursor](/integrate/cursor) can help locate flag call sites, rewrite old SDK or helper calls to Unleash SDK calls, and identify dead flag code for cleanup. Review and test the resulting changes before cutover.
+  </Card>
+  <Card title="Unleash MCP server" icon="fa-solid fa-robot">
+    The [Unleash MCP server](/integrate/mcp) lets AI assistants work with Unleash directly. An assistant can create the flag in Unleash and rewrite its call sites in a single workflow, keeping flag definitions and code in sync as you migrate.
+  </Card>
+  <Card title="Admin API and service accounts" icon="fa-solid fa-key">
+    Give your migration scripts a dedicated identity with [service accounts](/concepts/service-accounts) and scoped [API tokens](/concepts/api-tokens-and-client-keys), so automated changes are auditable and independent of any individual user.
+  </Card>
+  <Card title="Terraform" icon="fa-solid fa-cubes">
+    The [Unleash Terraform provider](/integrate/terraform) codifies your instance setup: projects, environments, API tokens, roles, SSO, and context fields. Keep the configuration in version control and recreate identical setups across instances.
+  </Card>
+</CardGroup>
+
+## Migrate from LaunchDarkly
+
+Teams that move from LaunchDarkly to Unleash most often do so to reduce licensing costs, frequently combined with requirements for self-hosting and keeping user data within their own infrastructure. The five migration phases, from [planning](#phase-1-plan) to [onboarding](#phase-5-onboard), apply directly to LaunchDarkly migrations. This section covers how [LaunchDarkly concepts map to Unleash](#map-launchdarkly-concepts-to-unleash), how to [move your flag definitions](#move-your-flag-definitions), how to [update your application code](#update-your-application-code), and which [behavioral differences](#plan-for-behavioral-differences) to plan for.
+
+### Map LaunchDarkly concepts to Unleash
+
+<SearchableTable placeholder="Search concepts, for example segments or rollout">
+| LaunchDarkly | Unleash | Notes |
+|---|---|---|
+| Project | [Project](/concepts/projects) | Group flags by team, application, or business domain. |
+| Environment | [Environment](/concepts/environments) | Environments are defined at the instance level and shared across projects. A flag is one entity across all environments, with per-environment configuration. |
+| Boolean flag | [Feature flag](/concepts/feature-flags) | Unleash flags are enabled or disabled per environment through [activation strategies](/concepts/activation-strategies). |
+| Multivariate flag | [Strategy variants](/concepts/strategy-variants) | Variants carry weights and optional string, JSON, CSV, or number payloads. |
+| Targeting rule | [Activation strategy](/concepts/activation-strategies) with [constraints](/concepts/activation-strategies#constraints) | Strategies on a flag combine with OR; constraints within a strategy combine with AND. |
+| Individual targeting | Constraint on `userId` | Use an `IN` constraint on the `userId` context field. |
+| Rule-based segment | [Segment](/concepts/segments) | Reusable sets of constraints, global or project-scoped. |
+| List-based and synced segments | Custom [context field](/concepts/unleash-context#custom-context-fields) | Instead of maintaining large ID lists, compute membership in your own systems and pass it as a context field, for example `userTier` or `betaProgram`. |
+| Percentage rollout | [Gradual rollout](/guides/gradual-rollout) strategy | Assignment is kept consistent through [stickiness](/concepts/stickiness). |
+| Context, context kinds, multi-contexts | [Unleash context](/concepts/unleash-context) | Unleash uses a single flat context. Flatten attributes from different context kinds into custom context fields, for example `organization.tier` becomes `orgTier`. |
+| Prerequisites | [Flag dependencies](/concepts/feature-flags#feature-flag-dependencies) | A child flag has one parent, in the same project. LaunchDarkly flags with multiple prerequisites need restructuring. |
+| SDK key, mobile key, client-side ID | [API tokens](/concepts/api-tokens-and-client-keys) | Backend tokens for backend SDKs and frontend tokens for frontend SDKs, scoped to projects and environments. |
+| Relay Proxy | [Unleash Edge](/unleash-edge) | Edge caches flag configurations close to your applications and evaluates flags for frontend SDKs, so end-user context never leaves your infrastructure. |
+| Approvals | [Change requests](/concepts/change-requests) | Configured per project and environment, with required approvals before changes apply. |
+| Scheduled changes | Scheduled [change requests](/concepts/change-requests) | Approved change requests can be scheduled for later application. |
+| Experimentation | [Strategy variants](/concepts/strategy-variants) with [impression data](/concepts/impression-data) | Unleash supports [A/B testing](/guides/a-b-testing) through variants; analysis happens in your analytics platform, such as PostHog or Google Analytics, rather than a built-in statistics engine. |
+</SearchableTable>
 
--   Operational or Permission flags (also known as "Kill Switches")
--   Gradual rollouts
--   Canary releases
--   A/B testing / Experimentation
+### Move your flag definitions
 
-Core Feature Flag setup
-
-This planning phase is all about understanding the anatomy of the existing feature flag setup so it can be moved to Unleash.
-
-Key questions include:
-
--   How many flags are there?
--   How many are active?
--   Do the inactive flags need to be migrated, or can they be removed entirely, simplifying migration?
-
-Once you have an understanding of what needs to be migrated, you should plan for how flags will be organized in the future. Picking the right organizing principle is critical for access controls. Unleash supports Application, Project, Environment, and Role-based access, so pick the option that makes the most logical sense for your organization.
-
-Our experience tells us that organizing flags by the development teams that work on them is the best approach. For example:
-
--   By application or microservice
-    -   E.g. Shopping Cart, Website, Mobile app
--   By Projects
-    -   E.g. Logistics, Finance
--   By organization hierarchy
-    -   E.g. Frontend, backend, platform teams
-
-### Key stakeholders
-
-When planning your migration, it is important to understand who will be managing the feature flag system and who will be using the feature flag system on a day-to-day basis. Additionally, you need to know who will be responsible for key migration tasks.
-
-From our experience, looping all key stakeholders into the project early on means that all eventualities can be planned for in advance, reducing the risk of project implementation delays due to unforeseen sign-off requirements. Decision makers can help assign and gather resources needed for the migration, as well as advise on the correct business processes that need to be followed at the various project stages.
-
-**System Architecture**
-
-You will also need to plan how you set up Unleash itself as part of your migration planning process. Unleash is extremely flexible with lots of hosting and security configuration options to align with the unique requirements of large enterprises.
-
-### How is our current feature flag architecture set up?
-
-This part is key to understanding how Unleash needs to be implemented. This plays a part in resource planning for both personnel and infrastructure cost allocation. For instance
-
--   What languages and frameworks are our front end and backend using?
--   Where are our applications hosted?
--   Where are end users of the application based geographically?
-
-### Security and organizational policy requirements
-
-You will also want to pay attention to Security & Organisational Policy requirements.
-
-For example, do you need to keep sensitive context inside your firewall perimeter?
-
-Often the answer to this question defines whether you will run Unleash in a hosted, or self-hosted fashion.
-
-Many customers prefer a hosted solution if their security policy will allow it because it reduces overhead on SRE teams and infrastructure. Unleash offers a single-tenant hosted solution, so even security-conscious customers can sometimes opt for a hosted solution.
-
-If that is not an option, Unleash instances need to be managed by customer SRE / DevOps teams. If this is the direction you are going, you should plan for it in this phase of the project.
-
-Other areas of system architecture to investigate during the planning phase are:
-
--   Data protection
-    -   Do we have to comply with HIPPA, SOC-2, ISO 27001, GDPR, etc?
--   How do we authenticate and manage user access & RBAC/roles?
--   Do we have any Change Management policies we need to adhere to?
--   Do we consume feature flag data, such as events, in any other systems downstream?
-    -   For example, Jira Cloud for issue management, Datadog for real-time telemetry, Slack or Microsoft Teams for notifications or Google Analytics for user interactions.
-
-If you're using our [template](https://docs.google.com/spreadsheets/d/1MKc95v7Tc-9tznWMDVSy2vvmVJTvOFLRVZpx1QrL-_U/edit#gid=996250264), now fill in details about your project planning.
-
-## Migration Execution
-
-Now that we have completed the planning, below are some of our Best Practices for carrying out the migration based on our experience.
-
-First, it can help to break the migration down into an order of activities, for example:
-
--   **Minimum Viable Product (MVP) launch**
-    -   Platform implemented, passed security/change management requirements, and available for developer use
-    -   Rollout to the highest priority groups of users
-    -   Matching use cases of the legacy platform
-    -   Legacy system fallback available
--   **Medium-term**
-    -   Rollout to additional groups; adoption of further, less critical use cases
-    -   Sunset of legacy system
--   **Longer term**
-    -   Adoption of new use cases
-
-For each activity, plan for the Level of Effort (LoE), or the number of hours/days the task will take the assigned resource or group to fulfill.
-
-Next up is risk handling. **Are there any perceived risks to the timelines that could be addressed upfront?**
-
--   Have the teams involved with the migration committed to set hours for working the migration tasks upfront, have had migration project success criteria and their tasks communicated to them, and Q&A fulfilled?
--   How long are various sign-offs by any relevant groups expected to take?
-    -   E.g. Change Advisory Board, Security Controls, hardening checks, etc
-    -   Plan to exceed each team’s documentation requirements to ensure fewer Requests for Information
-
-Every step of the way, it can help to conduct reviews and look-backs at each rollout stage as well as what lies ahead.
-
-If you're using our [template](https://docs.google.com/spreadsheets/d/1MKc95v7Tc-9tznWMDVSy2vvmVJTvOFLRVZpx1QrL-_U/edit#gid=996250264), now fill in details about your project plan execution.
-
-## Onboarding users
-
-Finally, after the migration has been completed and everyone has celebrated, you need to onboard team members onto the platform.
-
-Unleash Customer Success is here to help, whether your developers are seasoned feature flag management experts or new to the concepts - we will deliver tailored, white-glove training to accommodate use cases and developer skill levels.
-
-In addition, for those who prefer a self-paced approach, a wealth of content is available on our [YouTube channel](https://www.youtube.com/channel/UCJjGVOc5QBbEje-r7nZEa4A), [website](https://www.getunleash.io/), and [documentation](https://docs.getunleash.io/) portal to get your teams going quickly.
+Unleash provides two ways to bring flag definitions in programmatically: the [Admin API](/api), which can create and configure every part of a flag, and the [import functionality](/concepts/import-export), which loads a JSON file of flags and their configuration per project and environment. A typical data migration uses them like this:
+
+<Steps>
+  <Step>
+    Export your flag and segment definitions as JSON using the [LaunchDarkly REST API](https://launchdarkly.com/docs/guides/api/rest-api).
+  </Step>
+  <Step>
+    Create [custom context fields](/concepts/unleash-context#custom-context-fields) and [segments](/concepts/segments) in Unleash first, since flag strategies reference them.
+  </Step>
+  <Step>
+    Recreate flags and their strategies through the [Admin API](/api), or transform the exported data into the [import format](/concepts/import-export) and import it per project and environment. Import files are limited to 500 kB, so batch large migrations.
+  </Step>
+</Steps>
+
+<Note>
+Targeting rules need the most attention in this step. Review each translated rule rather than trusting the script output, because rule semantics rarely map one-to-one between providers.
+</Note>
+
+### Update your application code
+
+The SDK architecture maps cleanly between the two systems:
+
+- LaunchDarkly server-side SDKs and [Unleash backend SDKs](/sdks#backend-sdks) both evaluate flags locally in your application.
+- LaunchDarkly client-side SDKs and [Unleash frontend SDKs](/sdks#frontend-sdks) both receive evaluated results, so no targeting rules or user data are exposed to the client.
+- One difference to plan for: LaunchDarkly SDKs stream updates from LaunchDarkly's service by default, while Unleash SDKs poll your Unleash instance or Edge at a configurable interval, with changes typically propagating within seconds. Unleash relies on polling by default because it is a more stable architecture, and you can enable [real-time streaming](/unleash-edge#real-time-updates-with-streaming) through Unleash Edge if you need it.
+
+At the call-site level, the evaluation calls map as follows:
+
+| LaunchDarkly | Unleash |
+|---|---|
+| `client.boolVariation(key, context, fallback)` | `isEnabled(key, context)` |
+| `client.stringVariation`, `numberVariation`, `jsonVariation` | `getVariant(key, context)`, then read the variant name and payload |
+| Context object passed per evaluation | [Unleash context](/concepts/unleash-context) passed per evaluation in backend SDKs, or set on the client in frontend SDKs |
+
+If your code already uses OpenFeature with the LaunchDarkly provider, you can keep your evaluation call sites unchanged and swap in the [Unleash OpenFeature provider](/sdks#openfeature-providers) for your language, listed in the [OpenFeature ecosystem](https://openfeature.dev/ecosystem?instant_search%5Bquery%5D=unleash), adjusting only the provider initialization and context mapping.
+
+### Plan for behavioral differences
+
+- **Flag names are unique per instance.** LaunchDarkly flag keys are unique per project; Unleash flag names are unique across the whole instance. If the same key exists in multiple LaunchDarkly projects, rename on migration, for example by prefixing with the project name.
+- **Percentage rollouts re-bucket on cutover.** LaunchDarkly and Unleash use different hashing algorithms to assign users to rollout buckets, so the users inside a 50% rollout will not be the same after migration. Where possible, migrate flags while they are at 0% or 100%, and cut partially rolled-out flags over at a natural boundary.
+- **Archived flags behave differently.** LaunchDarkly serves the in-code fallback value for archived flags. Archived Unleash flags are no longer exposed to SDKs, so evaluation returns `false` or your SDK-level default. Verify your defaults are safe before archiving migrated flags.
+- **Typed defaults move into code or variants.** LaunchDarkly stores per-flag default and off variations server-side. In Unleash, a disabled flag evaluates to `false`, and non-boolean defaults belong in your code or in variant payloads.
+
+## Migrate from a homegrown solution
+
+A homegrown feature flag system, also called an in-house or custom-built system, is one your organization developed itself: an internal flag service, a set of database tables, or configuration files read at startup. Replacing a homegrown system is among the most common migration paths to Unleash. Homegrown tools tend to reach their limits as organizations grow, so teams migrate for scalability, reliability, and to reduce the ongoing cost of maintaining an internal tool.
+
+<Note>
+For a real-world example, see how [Wayfair replaced its homegrown system with Unleash](https://www.getunleash.io/wayfair-feature-flag-case-study) at a third of the cost, or browse more [customer case studies](https://www.getunleash.io/case-studies).
+</Note>
+
+The migration follows the same five phases, from [planning](#phase-1-plan) to [onboarding](#phase-5-onboard), with a few specifics:
+
+- **You likely already have an abstraction layer.** Most homegrown systems are accessed through a small set of helper functions. Add Unleash behind those helpers, [evaluate both systems during the transition](#run-both-systems-in-parallel), and you avoid touching every call site twice.
+- **Inventory is the hard part.** Homegrown systems rarely track flag ownership or [lifecycle](/concepts/feature-flags#feature-flag-lifecycle). Budget time to identify the owner of each flag, and delete flags that remain unclaimed.
+- **Script the transfer.** Read your existing flag store directly and create the corresponding flags through the [Admin API](/api). Because homegrown flags are usually simple on/off switches, this translation is typically straightforward.
+- **Add capabilities after the migration.** Resist redesigning every flag with targeting rules and variants during the migration itself. Move flags over as they are, then adopt [activation strategies](/concepts/activation-strategies), [segments](/concepts/segments), [release management](/guides/getting-started-release-management), and other capabilities as teams need them.
+
+## Migrate from other feature flag providers
+
+The same [four workstreams](#what-a-feature-flag-migration-involves) and [five migration phases](#phase-1-plan) apply when migrating from providers such as Harness, Flagsmith, ConfigCat, or Optimizely:
+
+<Steps>
+  <Step>
+    Build a concept mapping first. Identify how the provider's targeting rules, segments, percentage rollouts, and multivariate flags translate to Unleash [activation strategies](/concepts/activation-strategies), [segments](/concepts/segments), and [strategy variants](/concepts/strategy-variants).
+  </Step>
+  <Step>
+    Export flag definitions through the provider's REST API and script the recreation through the Unleash [Admin API](/api).
+  </Step>
+  <Step>
+    Wrap evaluation calls, or use [OpenFeature](/sdks#openfeature-providers) if the provider supports it, run both systems in parallel, and cut over incrementally.
+  </Step>
+</Steps>
+
+Watch for the same [behavioral differences as with LaunchDarkly](#plan-for-behavioral-differences): rollout re-bucketing due to different hashing, flag naming rules, and fallback semantics for archived or missing flags.
+
+## Key takeaways
+
+- **Point new flags at Unleash from day one.** Separate the new-flag track from the migration of old flags so teams benefit immediately.
+
+- **Delete before you migrate.** Most long-lived systems are full of stale flags; cleaning them up shrinks the migration and the codebase.
+
+- **Design structure before moving data.** Projects, environments, naming conventions, and access control are much easier to get right up front.
+
+- **Migrate incrementally with a fallback.** Run both systems in parallel behind an abstraction layer, verify parity, and cut over team by team.
+
+- **Automate the mechanical work.** Unleash is API-first, so scripts, Terraform, and AI assistants using the Unleash MCP server can handle most of the data transfer and code changes.
+
+- **Decommission deliberately.** Freeze flag creation in the old system, wait for evaluation traffic to reach zero, then remove it.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="How do we migrate from LaunchDarkly to Unleash?">
+    Follow the [five migration phases](#the-five-migration-phases), then use the [LaunchDarkly section](#migrate-from-launchdarkly) of this guide for the specifics: [map LaunchDarkly concepts to Unleash](#map-launchdarkly-concepts-to-unleash), [move your flag definitions](#move-your-flag-definitions) using the LaunchDarkly REST API and the Unleash Admin API, [update your application code](#update-your-application-code), and plan for [behavioral differences](#plan-for-behavioral-differences) such as percentage rollouts re-bucketing.
+  </Accordion>
+  <Accordion title="Do we need to migrate all of our existing flags?">
+    No. [Audit your flags first](#define-the-scope) and migrate only those that are active or permanent. Stale flags should be removed from code and deleted. In mature systems, this is often a large share of the total, which significantly reduces the migration effort.
+  </Accordion>
+  <Accordion title="Can we run Unleash alongside our existing system during the migration?">
+    Yes, and you should. Keep the existing system as the authoritative fallback while you verify that Unleash returns the same results, then [cut over per flag, team, or service](#phase-4-cut-over). [Running two flag systems in parallel](#run-both-systems-in-parallel) is safe and common.
+  </Accordion>
+  <Accordion title="How do we transfer flag definitions from another provider?">
+    Export the definitions through the source provider's API, then recreate them through the Unleash [Admin API](/api) or transform them into the [import format](/concepts/import-export) and load them per project and environment. Always review the translated targeting rules manually, because rule semantics differ between providers.
+  </Accordion>
+  <Accordion title="Will the same users be in our percentage rollouts after migrating?">
+    No. Different providers use different hashing algorithms to assign users to rollout buckets, so a 50% rollout in your old system and a 50% rollout in Unleash contain different users. Plan cutover of partially rolled-out flags accordingly. Within Unleash, [stickiness](/concepts/stickiness) keeps assignments consistent.
+  </Accordion>
+  <Accordion title="How long does a migration take?">
+    It depends on the number of active flags, codebases, and teams involved. With incremental execution, individual teams are typically productive on Unleash within days, while the migration of legacy flags runs alongside normal work over weeks or months. The migration is complete when the old system serves no evaluation traffic.
+  </Accordion>
+</AccordionGroup>
