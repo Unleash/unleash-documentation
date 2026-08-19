@@ -1,0 +1,335 @@
+---
+title: Feature flags for cloud migrations and modernization
+description: "De-risk cloud migrations and modernization with feature flags: strangler fig routing, parallel runs, gradual cutover, instant rollback, and flag cleanup."
+keywords: migration, modernization, strangler fig, cutover, feature flags, unleash
+og:site_name: "Unleash Documentation"
+og:title: "Feature flags for cloud migrations and modernization"
+max-toc-depth: 3
+last-updated: August 19, 2026
+---
+
+Migrations and modernization projects are some of the riskiest work an engineering team takes on. Splitting a monolith into services, rewriting a frontend on a modern framework, moving a database, or shifting workloads to the cloud all share the same failure mode: a big-bang cutover where every user moves to the new system at once, and the only way back is a rollback deployment.
+
+Feature flags change the shape of that risk. Instead of one large, irreversible switch, a migration becomes a sequence of small, reversible, observable steps: move one capability, expose it to a small cohort, compare it against the legacy path, expand when the data says it's safe, and retreat in seconds when it isn't.
+
+This guide is a deep dive into that use case:
+
+- [Why migrations need runtime control](#why-migrations-need-runtime-control), even with a strong CI/CD pipeline.
+- [Four migration patterns](#four-patterns-for-incremental-migration) built on feature flags: strangler fig, branch by abstraction, parallel run, and expand and contract.
+- [Running the cutover](#running-the-cutover) with progressive exposure, stickiness, instant rollback, and validation.
+- [Where to evaluate flags](#where-to-evaluate-flags) in your architecture.
+- [Governance during cutover](#approvals-and-audit-trails-during-cutover) and [finishing the migration](#finishing-the-migration) without flag debt.
+
+## Why migrations need runtime control
+
+A mature CI/CD pipeline gets code into production safely. That is necessary for a migration, but it isn't sufficient, because the pipeline controls **deployment** and a migration's real risk lives in **exposure**: which users hit the new system, for which capabilities, at what moment.
+
+Consider what a strong pipeline gives you during a cutover: if the new checkout service misbehaves, you can roll back the deployment in minutes. But a rollback reverts everything in that deployment, for everyone, and it takes a pipeline run to do it. A [feature flag](/concepts/feature-flags) retreats along a much narrower path: only the migrated capability reverts, only for the cohort exposed to it, and the change takes effect in seconds without a deployment.
+
+<Note>
+GitHub describes this distinction in [their feature flag write-up](https://github.blog/2021-04-27-ship-code-faster-safer-feature-flags/): disabling a change takes seconds, where a rollback deployment takes minutes.
+</Note>
+
+Two properties of migrations make this runtime control essential rather than nice to have:
+
+- **Migrations run for months or years.** Martin Fowler's core argument for [incremental replacement](https://martinfowler.com/bliki/StranglerFigApplication.html) is that replacing a serious system takes a long time, and users can't wait for new features while it happens. Old and new systems coexist in production for the whole duration, so you need a way to decide, per request, which one serves.
+- **The blast radius of a coupled release is the whole feature.** Without runtime control, each migrated component is released the moment it deploys. Every user is exposed at once, deployment risk and release risk compound, and teams respond by batching changes into larger, riskier releases. Flags decouple the two, so you can deploy continuously and [release deliberately](/concepts/release-management-overview).
+
+### Where flags apply across migration types
+
+Not every migration needs the same amount of runtime control. Using the framing of the [AWS migration strategies](https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html), often called the 7 Rs, the deeper the change, the more central flags become:
+
+| Migration type | Role of feature flags |
+|---|---|
+| Rehost, or lift and shift | Limited. Traffic moves at the DNS or load balancer level. A kill switch around the cutover still shortens recovery time. |
+| Replatform | Useful. Flag the switch between old and new infrastructure dependencies, such as a self-hosted database versus a managed service, or one queue or cache backend versus another. |
+| Refactor and re-architect | Essential. Every decomposed service, rewritten frontend route, and migrated data model is a cutover you can gate, ramp, and reverse independently. |
+
+The rest of this guide focuses on the refactor and re-architect end of the spectrum: monolith decomposition, frontend rewrites, database migrations, and provider swaps.
+
+## Four patterns for incremental migration
+
+These four patterns come from years of industry practice with large-scale migrations. Feature flags are the runtime mechanism that makes each of them operable in production:
+
+<CardGroup cols={2}>
+  <Card title="Strangler fig" icon="fa-solid fa-shuffle" href="#strangler-fig">
+    Route each request to the legacy or the new system from an interception layer, and control the routing decision with a flag.
+  </Card>
+  <Card title="Branch by abstraction" icon="fa-solid fa-code-branch" href="#branch-by-abstraction">
+    Replace components you can't route around by switching implementations behind an abstraction, on trunk, at runtime.
+  </Card>
+  <Card title="Parallel run" icon="fa-solid fa-flask" href="#parallel-run">
+    Run the old and new paths side by side on production traffic, serve the old answer, and record every mismatch.
+  </Card>
+  <Card title="Expand and contract" icon="fa-solid fa-database" href="#expand-and-contract">
+    Migrate data by supporting both schemas at once, switching reads and writes gradually, then removing the old path.
+  </Card>
+</CardGroup>
+
+### Strangler fig
+
+The [strangler fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) builds the new system around the edges of the old one, capability by capability, until the old system can be decommissioned. An interception layer, described by [AWS](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/strangler-fig.html) and [Azure](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig) as a proxy or facade, sits in front of the legacy system and routes each request to either the legacy or the new implementation. Users keep using the same interface and are unaware a migration is in progress.
+
+<Frame background="subtle">
+  ![An interception layer evaluates a feature flag per request and routes 10% of users to the new service and 90% to the legacy monolith](/assets/migration-strangler-fig.svg)
+</Frame>
+
+The cloud providers describe the interception layer abstractly. A feature flag is the concrete routing decision inside it. Instead of hardcoding which routes have migrated, the interception layer evaluates a flag per request:
+
+```js
+import { initialize } from 'unleash-client';
+
+const unleash = initialize({
+  url: 'https://YOUR-API-URL',
+  appName: 'api-gateway',
+  customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+});
+
+app.get('/invoices/:id', async (req, res) => {
+  const context = { userId: req.user.id };
+
+  if (unleash.isEnabled('invoices-service-migration', context)) {
+    return res.json(await invoicesService.getInvoice(req.params.id));
+  }
+  return res.json(await legacyMonolith.getInvoice(req.params.id));
+});
+```
+
+Because the decision is a flag rather than code, you control it at runtime: enable the new service for internal users using a [constraint](/concepts/activation-strategies#constraints), ramp it to 5% of traffic with a [gradual rollout](/guides/gradual-rollout), or send everyone back to the monolith without touching the interception layer's code or redeploying it.
+
+<Tip>
+Give each strangled capability its own flag, with a shared [naming pattern](/concepts/feature-flags#set-a-naming-pattern) such as `<service>-migration`. One flag per migrated route or service keeps the blast radius of any single change small and lets capabilities progress at different speeds. If some capabilities can only migrate after others, [flag dependencies](/concepts/feature-flags#feature-flag-dependencies) make that ordering explicit.
+</Tip>
+
+### Branch by abstraction
+
+Some components can't be routed around at the request level: a persistence layer, a payment integration, an internal library used by thousands of call sites. [Branch by abstraction](https://martinfowler.com/bliki/BranchByAbstraction.html) is the in-code equivalent of the strangler fig:
+
+<Steps>
+  <Step>
+    Introduce an abstraction over the component you're replacing, and route all callers through it.
+  </Step>
+  <Step>
+    Build the new implementation behind the same abstraction, integrating continuously on trunk while the flag keeps it dark.
+  </Step>
+  <Step>
+    Switch consumers from the old implementation to the new one with the flag, [environment](/concepts/environments) by environment, then cohort by cohort.
+  </Step>
+  <Step>
+    Remove the old implementation, [archive the flag](/concepts/feature-flags#archive-a-feature-flag), and optionally remove the abstraction.
+  </Step>
+</Steps>
+
+The key property, in [Paul Hammant's original description](https://paulhammant.com/blog/branch_by_abstraction.html), is that the application builds and runs correctly at all times. There is no long-lived migration branch drifting away from trunk; both implementations live in the main codebase, and the flag decides which one executes. This makes the pattern a natural fit for [trunk-based development](/guides/trunk-based-development): the migration ships continuously as small, integrated changes, and testing the new implementation in development and staging never requires exposing it to users in production.
+
+### Parallel run
+
+Before you trust the new implementation with real traffic, run both implementations side by side and compare their answers. In a parallel run, every request executes the legacy path and the new path, the user always receives the legacy result, and the system records any mismatch between the two.
+
+GitHub built [Scientist](https://github.blog/developer-skills/application-development/scientist/) for exactly this, and used it to rewrite their permissions system: the old code was the control, the new code was the candidate, and the experiment compared results and timing on production traffic without users ever seeing the candidate's output. Their reasoning applies to any migration: how the system behaves with production data as the input is the only true test. Stripe used the same technique, verifying reads against both data stores during their [subscriptions data migration](https://stripe.com/blog/online-migrations) before switching read paths.
+
+A feature flag controls the experiment itself: whether the candidate path runs at all, and for what percentage of requests. Start the parallel run at 1% of traffic to bound the extra load, ramp it up as mismatches get fixed, and kill it instantly if the candidate path causes latency or errors. Report the mismatch count as an [impact metric](/concepts/impact-metrics) so the comparison is visible next to the flag that controls it.
+
+<Warning>
+Parallel runs are only safe around code that doesn't change data. Running two write paths against production produces duplicate side effects. For writes, use the [expand and contract pattern](#expand-and-contract) instead.
+</Warning>
+
+<Note>
+A closely related technique, [dark launching](https://martinfowler.com/bliki/DarkLaunching.html), exercises a new backend from production traffic before any user-facing feature exists, primarily to validate performance and capacity. Flag-gate the dark calls the same way, so you can dial load up and down at runtime.
+</Note>
+
+### Expand and contract
+
+Data migrations can't flip back and forth freely, so they follow the [expand and contract pattern](https://martinfowler.com/bliki/ParallelChange.html), also called parallel change: expand the system to support the old and new schemas simultaneously, migrate consumers incrementally, then contract by removing the old path.
+
+Stripe's [online migration of hundreds of millions of subscription records](https://stripe.com/blog/online-migrations) is the canonical worked example, and it maps directly onto flags:
+
+<Steps>
+  <Step title="Dual writing">
+    Write to both the old and new data stores, and backfill existing data. A flag gates the new write path so you can enable it gradually and disable it instantly if it misbehaves.
+  </Step>
+  <Step title="Change read paths">
+    Read from the new store, verified by a [parallel run](#parallel-run) against the old one. A flag switches reads per service or per percentage of requests.
+  </Step>
+  <Step title="Change write paths">
+    Make the new store the source of truth, incrementally, behind a flag. This is the step to protect with [change requests](/concepts/change-requests) in production.
+  </Step>
+  <Step title="Remove old data">
+    Stop writing to the legacy store and clean it up, after final verification.
+  </Step>
+</Steps>
+
+Each phase transition is a runtime decision rather than a deployment, which means each one can be made gradually and reversed cheaply until the final contract step. Azure's guidance on [strangling a database](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig) makes the same point from the other direction: rollback stays possible until you decommission the legacy data, so removing it should be a deliberate final step taken only after the new system is validated.
+
+## Running the cutover
+
+The patterns above define what a migration step looks like. Running one well is a discipline of progressive exposure: expand the audience in stages, keep each user's experience consistent, watch the data, and keep an instant way back.
+
+### Progressive exposure
+
+Microsoft's [safe deployment practices](https://learn.microsoft.com/en-us/devops/operate/safe-deployment-practices) describe progressive exposure as releasing first to the audience with the highest tolerance for risk, then widening in rings, with enough bake time at each ring to surface latent problems. For a migration cutover, a typical ladder looks like this:
+
+<Steps>
+  <Step title="Internal users">
+    Enable the flag for your own team using a [constraint](/concepts/activation-strategies#constraints) on user ID or email domain, or a [custom context field](/concepts/unleash-context#custom-context-fields). Your team exercises the migrated path in production before any customer does.
+  </Step>
+  <Step title="An opt-in or beta cohort">
+    Widen to a [segment](/concepts/segments) of users who expect rough edges and give feedback.
+  </Step>
+  <Step title="A percentage ramp">
+    Use a [gradual rollout](/guides/gradual-rollout) to move through 5%, 25%, 50%, and 100%, with bake time at each step that includes a peak-traffic period.
+  </Step>
+</Steps>
+
+<Frame background="subtle">
+  ![A progressive exposure ladder from internal users and a beta segment through a gradual rollout to 100%, with safeguards pausing the release if metrics cross a threshold](/assets/migration-progressive-exposure.svg)
+</Frame>
+
+In Unleash, [release templates](/concepts/release-templates) turn this ladder into a reusable, multi-milestone release plan. Each milestone defines its own [activation strategies](/concepts/activation-strategies), and progression between milestones can happen on a timer or be gated on [impact metrics](/concepts/impact-metrics). Since a large migration repeats the same cutover ceremony for every capability, defining the ladder once as a template and applying it to each migration flag keeps every cutover consistent.
+
+This is also the practice at the companies that publish their migration playbooks. Uber's payments-platform migration ramped from internal employees to 0.25%, 1%, 5%, and finally 100% of users, [one payment method at a time](https://www.uber.com/blog/migrating-functionality-between-production-systems/), with dashboards comparing business metrics at every step.
+
+<Tip>
+Before enabling a strategy, use the [playground](/concepts/playground) to check how it evaluates for specific users and context values, so you know exactly who lands in each cohort before any traffic moves.
+</Tip>
+
+### Keep users on one side with stickiness
+
+During normal feature rollouts, an inconsistent experience is annoying. During a migration it is dangerous: a user who flaps between the legacy and new systems mid-session can hit mismatched caches, half-migrated state, or dual-written data that hasn't been verified yet.
+
+Unleash's gradual rollout strategy computes a hash of a [stickiness](/concepts/stickiness) field, such as user ID or session ID, so the same user always lands on the same side of the flag at a given rollout percentage, across requests, sessions, and services. When you increase the percentage, users only ever move from legacy to new, never back and forth. Pass the same [Unleash context](/concepts/unleash-context) fields at every evaluation point so the hash is computed on the same input everywhere.
+
+<Tip>
+Deterministic assignment has a second benefit: when something looks wrong for a specific user, you know which system served them, and you can reproduce it by [testing that user's context in the playground](/concepts/playground).
+</Tip>
+
+### Roll back in seconds without redeploying
+
+Every migration flag doubles as a [kill switch](/concepts/feature-flags#feature-flag-types) for its capability. When the new path degrades, turning the flag off returns traffic to the legacy path in seconds. Nothing is deployed, the rest of the release is untouched, and the blast radius is exactly the cohort that was exposed.
+
+You can automate the retreat, because humans watching graphs are not a sufficiently reliable rollback mechanism, as Google's SRE experience with [canary evaluation](https://sre.google/workbook/canarying-releases/) puts it:
+
+<CardGroup cols={2}>
+  <Card title="Safeguards" icon="fa-solid fa-shield-halved">
+    [Safeguards](/concepts/impact-metrics#configure-safeguards) monitor Prometheus-compatible metrics during a release plan and automatically pause the rollout, or disable the environment, when a metric crosses a threshold, such as an error-rate spike on the migrated path.
+  </Card>
+  <Card title="Signals and actions" icon="fa-solid fa-bolt">
+    [Signals](/concepts/signals) let external systems call into Unleash, and [actions](/concepts/actions) respond by changing flag state. An alert from your monitoring system, a failed load test, or a CI/CD pipeline can disable a migrated path without waiting for a human.
+  </Card>
+</CardGroup>
+
+### Validate the new system with real traffic
+
+A migration has two questions to answer, and rollback safety only covers the first one. *Does the new system work?* And, just as important for a rewrite: *is the new system right?* A rewritten flow can be technically flawless and still lose to the legacy version on task completion, latency, or user behavior.
+
+Progressive exposure gives you the apparatus to answer both with evidence instead of opinion, because at every rollout percentage you have two live populations to compare: users on the legacy path and users on the new one. Compare them deliberately:
+
+<CardGroup cols={3}>
+  <Card title="Engineering signals" icon="fa-solid fa-gauge-high">
+    Error rates, latency percentiles, and resource usage for the new path versus the old, using [impact metrics](/concepts/impact-metrics) reported from your SDKs or your existing Prometheus-compatible metrics.
+  </Card>
+  <Card title="Behavioral signals" icon="fa-solid fa-chart-line">
+    Conversion, task completion, and engagement, using [impression data](/concepts/impression-data) or your analytics pipeline keyed on flag exposure.
+  </Card>
+  <Card title="Correctness signals" icon="fa-solid fa-check-double">
+    Mismatch counts from [parallel runs](#parallel-run), which should be at zero before a read or write path switches over.
+  </Card>
+</CardGroup>
+
+Define the success criteria before the ramp starts, and make widening the rollout conditional on meeting them. This turns each migration step into a checkpoint where the team learns whether they built the right thing while the audience is still small and the retreat is still cheap. If you want to compare two candidate implementations rather than legacy versus new, [strategy variants](/concepts/strategy-variants) support a proper [A/B test](/guides/a-b-testing) within the migrated cohort.
+
+## Where to evaluate flags
+
+A migration cuts across every layer of the stack, and the right evaluation point differs by layer.
+
+### At the routing layer
+
+Route-level cutovers, the strangler fig's home ground, belong in whatever intercepts requests first: an API gateway, a reverse proxy, a BFF, or framework middleware. Unleash [backend SDKs](/sdks) evaluate flags locally against a cached copy of the flag configuration, so adding a flag check to the hot routing path costs sub-millisecond, in-process work rather than a network call per request. If Unleash is briefly unreachable, the SDK keeps evaluating on its last-known configuration, so your routing layer never gains a runtime dependency on the flag system's availability.
+
+### In backend services
+
+Inside services, flags gate the seams created by [branch by abstraction](#branch-by-abstraction), [parallel runs](#parallel-run), and [expand and contract](#expand-and-contract). Use the [backend SDKs](/sdks) with the same [context](/concepts/unleash-context) fields as the routing layer so [stickiness](/concepts/stickiness) holds across service boundaries. When many services evaluate the same migration flags, or you run at the edge, [Unleash Edge](/unleash-edge) provides a caching evaluation layer close to your services.
+
+### In the frontend
+
+Frontend rewrites carry an extra subtlety: in a browser bundle, a feature flag hides UI, but it does not remove code.
+
+<Warning>
+If the legacy and rewritten versions of a page are both compiled into the client bundle and a flag chooses between them at render time, every user downloads both versions, and the flagged-off implementation is visible to anyone who reads the shipped JavaScript. For a migration, where both implementations are substantial, split the two paths into separate chunks with your bundler's dynamic imports so a user only downloads the path the flag selects.
+</Warning>
+
+Evaluating on the server avoids the problem entirely. When a server-rendered application, including React Server Components and similar architectures, evaluates the migration flag server-side, only the rendered path's output reaches the browser, and the losing implementation never ships to the client. Server-side evaluation also keeps evaluation context, such as user IDs, [out of the browser](/guides/feature-flag-best-practices) entirely. For flags that must be evaluated client-side, the [frontend SDKs](/sdks#frontend-sdks) evaluate against the [Frontend API](/concepts/front-end-api) or [Unleash Edge](/unleash-edge), which return only the evaluated result for that user rather than the full flag configuration.
+
+## Approvals and audit trails during cutover
+
+Migration cutovers are exactly the production changes that deserve scrutiny: they move real users onto new infrastructure, and during [expand and contract](#expand-and-contract) phases they change where data is written. The governance goal is to add that scrutiny without adding drag for developers, and environment-scoped controls are how you get both. Development and staging environments stay unrestricted, so the checks exist only where exposure is real.
+
+<CardGroup cols={2}>
+  <Card title="Change requests" icon="fa-solid fa-user-check">
+    With [change requests](/concepts/change-requests) enabled on the production environment, a developer drafts the flag change, a reviewer approves it, and only then does it apply.
+  </Card>
+  <Card title="Scheduled changes" icon="fa-solid fa-clock">
+    Approved changes can be [scheduled](/concepts/change-requests#scheduled-change-requests) for a specific time, such as a low-traffic window for a write-path switch.
+  </Card>
+  <Card title="Scoped permissions" icon="fa-solid fa-lock">
+    [Role-based access control](/concepts/rbac) scopes who can change what, per [project](/concepts/projects) and per [environment](/concepts/environments).
+  </Card>
+  <Card title="Audit trail" icon="fa-solid fa-list-check">
+    The [event log](/concepts/events) records every flag change with who, what, and when, which turns "what was the rollout state when the incident started" into a query instead of an archaeology exercise.
+  </Card>
+</CardGroup>
+
+For the broader compliance picture, including SSO, SCIM, and audit requirements, see [security and compliance](/guides/security-and-compliance).
+
+## Finishing the migration
+
+A migration isn't done when the new system serves 100% of traffic. It's done when the legacy path, and the flags that guarded it, are gone.
+
+### Make the final cutover deliberate
+
+Keeping the retreat open forever has its own cost. Uber's migration guide makes the point sharply: [options to roll back to the legacy system will likely be misused, preventing the migration from ever completing](https://www.uber.com/blog/migrating-functionality-between-production-systems/). While a capability ramps, the flag and the legacy path are safety equipment. Once the new path has held at 100% through its bake period and the success criteria are met, schedule the contract step: remove the legacy code path, decommission legacy data, and [archive the flag](/concepts/feature-flags#archive-a-feature-flag). Treat that as a planned milestone of the migration, not cleanup that happens if someone finds time.
+
+### Clean up migration flags
+
+Migration flags are scaffolding, and long-running migrations accumulate them quickly. [Pete Hodgson's advice](https://martinfowler.com/articles/feature-toggles.html) is to treat flags as inventory with a carrying cost.
+
+<Warning>
+Stale migration flags are worse than clutter. The industry's canonical incident, [Knight Capital's $460 million loss in 45 minutes](https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/), began with a flag being repurposed while a server still ran the dormant code path it used to control. Two rules follow directly: never repurpose a flag, and remove the dead path when the flag retires.
+</Warning>
+
+Unleash tracks each flag's [lifecycle stage](/concepts/feature-flags#feature-flag-lifecycle) and surfaces [technical debt](/concepts/technical-debt), including flags that have been fully rolled out but never archived, so the contract phase of every capability shows up as a visible, assignable piece of work. Set an [expected lifetime](/concepts/feature-flags#configure-expected-lifetime) when you create each migration flag, create the removal task at the same time, and follow the [flag cleanup best practices](/guides/manage-feature-flags-in-code#flag-cleanup-best-practices) to remove dead code paths. Expect the flag count to trend down as the migration progresses. A migration that only ever adds flags is a migration that isn't finishing.
+
+## Pattern quick reference
+
+| Migration scenario | Pattern | Flag setup |
+|---|---|---|
+| Move a route or capability out of a monolith | [Strangler fig](#strangler-fig) | One flag per capability in the interception layer, [gradual rollout](/guides/gradual-rollout) with [stickiness](/concepts/stickiness) |
+| Replace a library, integration, or internal component | [Branch by abstraction](#branch-by-abstraction) | One flag switching implementations behind an abstraction, enabled per [environment](/concepts/environments) first |
+| Verify a rewritten read path against production | [Parallel run](#parallel-run) | One flag controlling the experiment, ramped by percentage of requests |
+| Migrate a database or data model | [Expand and contract](#expand-and-contract) | One flag per phase transition: dual write, read switch, write switch |
+| Protect any cutover moment | Kill switch | The migration flag itself, plus [safeguards](/concepts/impact-metrics#configure-safeguards) for automatic pauses |
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Do we need a separate flag for every migrated capability?">
+    Yes. One flag per route, service, or component keeps the blast radius of any change small, lets capabilities ramp independently, and makes cleanup tractable because each flag maps to one removable code path. Use a [naming pattern](/concepts/feature-flags#set-a-naming-pattern) so migration flags are easy to find, and [projects](/concepts/projects) or [tags](/concepts/feature-flags#tags) to group them.
+  </Accordion>
+  <Accordion title="How long should migration flags live?">
+    As long as their capability is ramping, and no longer. Migration flags are release flags with an unusually long tail, so set an [expected lifetime](/concepts/feature-flags#configure-expected-lifetime) up front and watch the [technical debt view](/concepts/technical-debt) for flags that have completed rollout but haven't been [archived](/concepts/feature-flags#archive-a-feature-flag).
+  </Accordion>
+  <Accordion title="Can we use feature flags for database migrations?">
+    Yes, with the [expand and contract pattern](#expand-and-contract): flags gate the dual-write, read-switch, and write-switch transitions rather than the schema change itself. The final removal of legacy data is the one step a flag can't reverse, so take it only after verification.
+  </Accordion>
+  <Accordion title="What happens if Unleash is unavailable during the cutover?">
+    [Backend SDKs](/sdks) evaluate flags locally and keep serving the last-known configuration if Unleash is unreachable, so traffic keeps flowing to whichever side of the cutover each user was already on. For frontend and edge evaluation, [Unleash Edge](/unleash-edge) provides the same resilience close to your users.
+  </Accordion>
+</AccordionGroup>
+
+## Additional resources
+
+- [How to perform a gradual rollout](/guides/gradual-rollout)
+- [Release templates](/concepts/release-templates) and [impact metrics](/concepts/impact-metrics)
+- [Trunk-based development](/guides/trunk-based-development)
+- [Building and scaling feature flag systems](/guides/feature-flag-best-practices)
+- [Managing feature flags in code](/guides/manage-feature-flags-in-code)

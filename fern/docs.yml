@@ -833,6 +833,9 @@ navigation:
           - page: Using feature flags at scale
             path: pages/guides/best-practices-using-feature-flags-at-scale.mdx
             slug: best-practices-using-feature-flags-at-scale
+          - page: Feature flags for migrations and modernization
+            path: pages/guides/feature-flags-for-migrations.mdx
+            slug: feature-flags-for-migrations
           - page: Migrating to Unleash
             path: pages/guides/feature-flag-migration-best-practices.mdx
             slug: feature-flag-migration-best-practices
