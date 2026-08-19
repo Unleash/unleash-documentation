@@ -74,12 +74,12 @@ The [strangler fig pattern](https://martinfowler.com/bliki/StranglerFigApplicati
   ![An interception layer evaluates a feature flag per request and routes 10% of users to the new service and 90% to the legacy monolith](/assets/migration-strangler-fig.svg)
 </Frame>
 
-The cloud providers describe the interception layer abstractly. A feature flag is the concrete routing decision inside it. Instead of hardcoding which routes have migrated, the interception layer evaluates a flag per request:
+The cloud providers describe the interception layer abstractly. A feature flag is the concrete routing decision inside it. Instead of hardcoding which routes have migrated, the interception layer evaluates a flag per request. Using [`startUnleash`](/sdks/node#synchronous-initialization) waits for the SDK to synchronize before serving traffic, so routing decisions never run on an empty flag configuration:
 
 ```js
-import { initialize } from 'unleash-client';
+import { startUnleash } from 'unleash-client';
 
-const unleash = initialize({
+const unleash = await startUnleash({
   url: 'https://YOUR-API-URL',
   appName: 'api-gateway',
   customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
@@ -197,7 +197,7 @@ Before enabling a strategy, use the [playground](/concepts/playground) to check 
 
 During normal feature rollouts, an inconsistent experience is annoying. During a migration it is dangerous: a user who flaps between the legacy and new systems mid-session can hit mismatched caches, half-migrated state, or dual-written data that hasn't been verified yet.
 
-Unleash's gradual rollout strategy computes a hash of a [stickiness](/concepts/stickiness) field, such as user ID or session ID, so the same user always lands on the same side of the flag at a given rollout percentage, across requests, sessions, and services. When you increase the percentage, users only ever move from legacy to new, never back and forth. Pass the same [Unleash context](/concepts/unleash-context) fields at every evaluation point so the hash is computed on the same input everywhere.
+Unleash's gradual rollout strategy computes a hash of a [stickiness](/concepts/stickiness) field, so a user's assignment at a given rollout percentage is deterministic. For a migration, make that field a stable identifier such as user ID, which keeps the same user on the same side of the flag across requests, sessions, and services. Session ID works for anonymous traffic, but its guarantee only lasts as long as the session, so switch to user ID as soon as one is available. When you increase the percentage, users only ever move from legacy to new, never back and forth. Pass the same [Unleash context](/concepts/unleash-context) fields at every evaluation point so the hash is computed on the same input everywhere.
 
 <Tip>
 Deterministic assignment has a second benefit: when something looks wrong for a specific user, you know which system served them, and you can reproduce it by [testing that user's context in the playground](/concepts/playground).
@@ -322,7 +322,7 @@ Unleash tracks each flag's [lifecycle stage](/concepts/feature-flags#feature-fla
     Yes, with the [expand and contract pattern](#expand-and-contract): flags gate the dual-write, read-switch, and write-switch transitions rather than the schema change itself. The final removal of legacy data is the one step a flag can't reverse, so take it only after verification.
   </Accordion>
   <Accordion title="What happens if Unleash is unavailable during the cutover?">
-    [Backend SDKs](/sdks) evaluate flags locally and keep serving the last-known configuration if Unleash is unreachable, so traffic keeps flowing to whichever side of the cutover each user was already on. For frontend and edge evaluation, [Unleash Edge](/unleash-edge) provides the same resilience close to your users.
+    [Backend SDKs](/sdks) evaluate flags locally and keep serving the last-known configuration if Unleash is unreachable, so traffic keeps flowing to whichever side of the cutover each user was already on. For frontend and edge evaluation, [Unleash Edge](/unleash-edge) serves evaluations from memory close to your users. Configure a [persistence layer](/unleash-edge/deploy#production-deployment), such as Redis or S3, so an Edge instance that restarts while the upstream is unavailable can reload valid flag data on startup.
   </Accordion>
 </AccordionGroup>
 
