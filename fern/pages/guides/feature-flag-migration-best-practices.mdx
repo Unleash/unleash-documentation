@@ -85,6 +85,10 @@ To structure the business case, be explicit about what pain the migration solves
 
 Roll out Unleash to one or two teams first, matching the use cases of your current system, before opening it up to the whole organization. Use the pilot to validate the setup against your [security and compliance requirements](/guides/security-and-compliance) and to refine your [onboarding material](#phase-5-onboard).
 
+<Tip>
+Create the pilot's flags, [activation strategies](/concepts/activation-strategies), and targeting rules from scratch in Unleash, then [export](/concepts/import-export) the configuration. The export gives you a working schema for the bulk import of active flags in the [migrate phase](#phase-3-migrate), and validates your project organization early, since projects and environments are the unit of import and export.
+</Tip>
+
 ### Phase 3: Migrate
 
 Migrate team by team or application by application rather than all at once, and use [AI and automation](#accelerate-the-migration-with-ai-and-automation) for the heavy lifting. For each group of flags:
@@ -94,7 +98,7 @@ Migrate team by team or application by application rather than all at once, and 
     Create any [custom context fields](/concepts/unleash-context#custom-context-fields) and [segments](/concepts/segments) the flags depend on.
   </Step>
   <Step>
-    Recreate the flags and their [targeting rules](/concepts/activation-strategies), either manually for small sets or scripted through the [Admin API](/api) for large ones.
+    Recreate the flags and their [targeting rules](/concepts/activation-strategies), either manually for small sets or scripted through the [Admin API](/api) for large ones. An [export](/concepts/import-export) of the configuration you built during the pilot serves as a schema for scripted bulk imports.
   </Step>
   <Step>
     Verify the configuration in a non-production environment before enabling it in production.
