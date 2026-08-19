@@ -246,10 +246,40 @@ variant = client.get_variant("my-flag")
 #     "name": "variant1",
 #     "payload": {"type": "string", "value": "val1"},
 #     "enabled": True,
+#     "feature_enabled": True,
 # }
 ```
 
-If the flag is disabled or has no variants, `get_variant` returns the disabled variant, with `name` set to `disabled` and `enabled` set to `False`.
+The SDK can return two forms of the disabled variant. In both cases, `name` is `disabled` and `enabled` is `False`:
+
+<Tabs>
+<Tab title="Flag disabled or not found">
+
+```python
+{
+    "name": "disabled",
+    "enabled": False,
+    "feature_enabled": False,
+}
+```
+
+</Tab>
+<Tab title="Flag enabled, no variant resolved">
+
+The flag is enabled but no variant applies, for example when the flag has no variants configured:
+
+```python
+{
+    "name": "disabled",
+    "enabled": False,
+    "feature_enabled": True,
+}
+```
+
+</Tab>
+</Tabs>
+
+Use `feature_enabled` when you need the flag's state alongside the variant result, without a separate `is_enabled` call.
 
 ### Fallback function
 
@@ -284,6 +314,12 @@ app_context = {
 client.is_enabled("my-flag", app_context)
 client.get_variant("my-flag", app_context)
 ```
+
+The SDK enriches the context automatically before evaluation:
+
+- `appName` and `environment` are set from the client configuration.
+- `currentTime` is set to the current UTC time when you don't provide it, so date-based constraints work without extra setup.
+- Any top-level key that isn't a standard context field is moved into `properties`. Passing `{"custom-property": "some-value"}` at the top level is equivalent to nesting it under `properties`.
 
 Context values can be any type that has a `__str__` implementation. Explicitly supported types are:
 
@@ -545,7 +581,10 @@ from UnleashClient.cache import FileCache
 from UnleashClient import UnleashClient
 
 cache = FileCache("my-cache")
-cache.bootstrap_from_url("https://your-server/bootstrap.json")
+cache.bootstrap_from_url(
+    "https://your-server/bootstrap.json",
+    headers={"Authorization": "<token>"},
+)
 
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
@@ -554,6 +593,8 @@ client = UnleashClient(
     cache=cache,
 )
 ```
+
+The `headers` argument is optional; use it when the bootstrap URL requires authentication. You can also set `request_timeout`, in seconds, for the bootstrap request.
 </Tab>
 </Tabs>
 
