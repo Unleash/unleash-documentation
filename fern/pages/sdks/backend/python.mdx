@@ -10,6 +10,8 @@ last-updated: August 18, 2026
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="Python" />
 
+The SDK includes two clients: `UnleashClient` for synchronous applications and `AsyncUnleashClient`, an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. Both expose the same API for evaluating flags; they differ only in how you initialize and stop them.
+
 ## Requirements
 
 - Python 3.8 or later
@@ -27,6 +29,11 @@ pip install UnleashClient
 <Markdown src="/snippets/sdks/backend-singleton-warning.mdx" />
 
 <Markdown src="/snippets/sdks/backend-connection.mdx" />
+
+Flag checks are regular synchronous methods on both clients, because evaluation happens locally against the SDK's cached configuration and performs no I/O. Only the async client's lifecycle methods are coroutines. The async client communicates with Unleash using [aiohttp](https://docs.aiohttp.org/), which is installed as a dependency of the SDK.
+
+<Tabs>
+<Tab title="Sync">
 
 ```python
 from UnleashClient import UnleashClient
@@ -50,6 +57,35 @@ with UnleashClient(
 ) as client:
     client.is_enabled("my-flag")
 ```
+
+</Tab>
+<Tab title="Async">
+
+```python
+from UnleashClient import AsyncUnleashClient
+
+client = AsyncUnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+)
+
+await client.initialize_client()
+```
+
+You can also use the client as an async context manager, which initializes the client on entry and shuts it down on exit:
+
+```python
+async with AsyncUnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+) as client:
+    client.is_enabled("my-flag")
+```
+
+</Tab>
+</Tabs>
 
 ### Check if the SDK is ready
 
@@ -81,32 +117,9 @@ client = UnleashClient(
 client.initialize_client()
 ```
 
-## Async client
-
-`AsyncUnleashClient` is an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. It communicates with Unleash using [aiohttp](https://docs.aiohttp.org/), which is installed as a dependency of the SDK. The client accepts the same [configuration options](#configuration-options) as `UnleashClient`, except `scheduler`, `scheduler_executor`, and `multiple_instance_mode`.
-
-Use it as an async context manager, or call its lifecycle methods directly:
-
-```python
-from UnleashClient import AsyncUnleashClient
-
-async def main():
-    async with AsyncUnleashClient(
-        url="https://<your-unleash-instance>/api",
-        app_name="my-python-app",
-        custom_headers={"Authorization": "<your-backend-token>"},
-    ) as client:
-        if client.is_enabled("my-flag"):
-            ...
-```
-
-To manage the lifecycle yourself, call `await client.initialize_client()` at startup and `await client.destroy()` at shutdown.
-
-Flag checks are regular synchronous methods on both clients, because evaluation happens locally against the SDK's cached configuration and performs no I/O. Only the lifecycle methods are coroutines.
-
 ## Configuration options
 
-The `UnleashClient` constructor supports the following parameters:
+Both client constructors support the following parameters. `AsyncUnleashClient` accepts the same parameters as `UnleashClient`, except `scheduler`, `scheduler_executor`, and `multiple_instance_mode`.
 
 <ParamField path="url" type="str" required={true}>
   URL of your Unleash or Unleash Edge API, for example `https://<your-unleash-instance>/api`.
@@ -287,9 +300,22 @@ Gradual rollout strategies require you to pass either a `userId` or a `sessionId
 
 Call `destroy()` to shut down the SDK and flush any pending metrics to Unleash. If you use the client as a context manager, this happens automatically on exit.
 
+<Tabs>
+<Tab title="Sync">
+
 ```python
 client.destroy()
 ```
+
+</Tab>
+<Tab title="Async">
+
+```python
+await client.destroy()
+```
+
+</Tab>
+</Tabs>
 
 A destroyed client cannot be reinitialized. Create a new instance if you need to reconnect.
 
