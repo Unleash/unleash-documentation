@@ -83,9 +83,7 @@ client.initialize_client()
 
 ## Async client
 
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
-
-`AsyncUnleashClient` is an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. It accepts the same [configuration options](#configuration-options) as `UnleashClient`, except `scheduler`, `scheduler_executor`, and `multiple_instance_mode`.
+`AsyncUnleashClient` is an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. It communicates with Unleash using [aiohttp](https://docs.aiohttp.org/), which is installed as a dependency of the SDK. The client accepts the same [configuration options](#configuration-options) as `UnleashClient`, except `scheduler`, `scheduler_executor`, and `multiple_instance_mode`.
 
 Use it as an async context manager, or call its lifecycle methods directly:
 
