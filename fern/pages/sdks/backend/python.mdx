@@ -5,12 +5,12 @@ og:title: Python SDK
 description: Integrate feature flags in your Python applications using the Unleash Python SDK.
 keywords: [unleash, python, sdk, feature flags, feature toggles, asyncio]
 max-toc-depth: 3
-last-updated: August 19, 2026
+last-updated: August 20, 2026
 ---
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="Python" />
 
-The SDK includes two clients: `UnleashClient` for synchronous applications and `AsyncUnleashClient`, an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. Both expose the same API for evaluating flags; they differ only in how you initialize and stop them.
+The SDK includes two clients: `UnleashClient` for synchronous applications and `AsyncUnleashClient`, an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. Both expose the same API for evaluating flags; they differ in how you initialize and stop them.
 
 ## Requirements
 
@@ -89,7 +89,9 @@ async with AsyncUnleashClient(
 
 ### Check if the SDK is ready
 
-Until the SDK has synchronized with Unleash, all flags evaluate to `false` and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant), unless you have a [bootstrapped configuration](#bootstrap) or use a [fallback function](#fallback-function).
+Once initialized but not yet synchronized with Unleash, all flags evaluate to `false` and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant), unless you have a [bootstrapped configuration](#bootstrap) or use a [fallback function](#fallback-function).
+
+Always initialize the client before evaluating flags. Calling `is_enabled` or `get_variant` on a client that has never been initialized has no guaranteed behavior.
 
 Use the `is_initialized` property to check whether the SDK has loaded flag configuration, or subscribe to the `READY` [event](#events) to get notified when the SDK first loads flags from the Unleash server or the local cache.
 
@@ -106,6 +108,9 @@ By default, the SDK polls Unleash at a fixed interval. Streaming mode receives f
 
 Streaming requires [Unleash Enterprise Edge](/unleash-edge). To enable it, point `url` at your Enterprise Edge instance, provide a valid backend token, and set `experimental_mode` to streaming:
 
+<Tabs>
+<Tab title="Sync">
+
 ```python
 client = UnleashClient(
     url="https://<your-edge-instance>/api",
@@ -117,9 +122,26 @@ client = UnleashClient(
 client.initialize_client()
 ```
 
+</Tab>
+<Tab title="Async">
+
+```python
+client = AsyncUnleashClient(
+    url="https://<your-edge-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+    experimental_mode={"type": "streaming"},
+)
+
+await client.initialize_client()
+```
+
+</Tab>
+</Tabs>
+
 ## Configuration options
 
-Both client constructors support the following parameters. `AsyncUnleashClient` accepts the same parameters as `UnleashClient`, except `scheduler`, `scheduler_executor`, and `multiple_instance_mode`.
+Both client constructors support the following parameters. Parameters marked "Sync client only" apply only to `UnleashClient`.
 
 <ParamField path="url" type="str" required={true}>
   URL of your Unleash or Unleash Edge API, for example `https://<your-unleash-instance>/api`.
@@ -166,7 +188,7 @@ Both client constructors support the following parameters. `AsyncUnleashClient` 
 </ParamField>
 
 <ParamField path="custom_options" type="dict" default="None">
-  Extra options passed to the underlying [HTTP requests](https://requests.readthedocs.io/en/latest/api/#main-interface), for example to skip SSL verification.
+  Extra options passed to the underlying [HTTP requests](https://requests.readthedocs.io/en/latest/api/#main-interface), for example to skip SSL verification. Sync client only.
 </ParamField>
 
 <ParamField path="request_timeout" type="int" default="30">
@@ -198,11 +220,11 @@ Both client constructors support the following parameters. `AsyncUnleashClient` 
 </ParamField>
 
 <ParamField path="scheduler" type="BaseScheduler" default="None">
-  Custom APScheduler instance. Use this to customize job stores or executors. When unset, the SDK creates its own scheduler.
+  Custom APScheduler instance. Use this to customize job stores or executors. When unset, the SDK creates its own scheduler. Sync client only.
 </ParamField>
 
 <ParamField path="scheduler_executor" type="str" default="None">
-  Name of the APScheduler executor to use with a custom scheduler.
+  Name of the APScheduler executor to use with a custom scheduler. Sync client only.
 </ParamField>
 
 <ParamField path="multiple_instance_mode" type="InstanceAllowType" default="WARN">
@@ -296,6 +318,8 @@ The fallback function must accept the feature name and context as positional arg
 
 The client evaluates the fallback function if the feature flag is not found or if an exception occurs during evaluation. If the fallback function itself raises an exception, `is_enabled` returns `False` and logs a warning.
 
+The fallback function runs as part of flag evaluation, so keep it fast: its runtime adds directly to every `is_enabled` call that invokes it.
+
 ## Unleash context
 
 <Markdown src="/snippets/sdks/unleash-context-intro.mdx" />
@@ -370,6 +394,9 @@ class ActiveForEmailStrategy:
 
 Once you've defined your strategy, register it when you initialize the client. The key must exactly match the strategy name in Unleash:
 
+<Tabs>
+<Tab title="Sync">
+
 ```python
 # Requires a custom strategy defined in Unleash called 'EmailStrategy'
 my_custom_strategies = {
@@ -384,13 +411,33 @@ client = UnleashClient(
 )
 ```
 
+</Tab>
+<Tab title="Async">
+
+```python
+# Requires a custom strategy defined in Unleash called 'EmailStrategy'
+my_custom_strategies = {
+    "EmailStrategy": ActiveForEmailStrategy()
+}
+
+client = AsyncUnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+    custom_strategies=my_custom_strategies,
+)
+```
+
+</Tab>
+</Tabs>
+
 ## Events
 
 To subscribe to SDK events, provide an `event_callback` function when you initialize the client. The callback receives a single event object.
 
 | Event type | Description |
 |------------|-------------|
-| `READY` | The SDK loaded feature flags from the Unleash server or the local cache. Emitted once. |
+| `READY` | The SDK loaded feature flags from the Unleash server or the local cache. Emitted at least once. |
 | `FETCHED` | A new version of the feature flags was fetched from the server. The event includes a `features` property with all flags returned by that fetch. |
 | `FEATURE_FLAG` | A flag with [impression data](/concepts/impression-data) enabled was evaluated with `is_enabled`. |
 | `VARIANT` | A flag with impression data enabled was evaluated with `get_variant`. |
@@ -405,6 +452,9 @@ Set `event_callback` when you construct the client; reassigning it afterwards ha
 <Note>
 The SDK does not include a built-in event bus. The example below uses [Blinker](https://pypi.org/project/blinker/) to send signals.
 </Note>
+
+<Tabs>
+<Tab title="Sync">
 
 ```python
 from blinker import signal
@@ -433,6 +483,39 @@ client.initialize_client()
 client.is_enabled("my-flag")
 ```
 
+</Tab>
+<Tab title="Async">
+
+```python
+from blinker import signal
+from UnleashClient import AsyncUnleashClient
+from UnleashClient.events import UnleashEvent, UnleashEventType
+
+send_data = signal('send-data')
+
+@send_data.connect
+def receive_data(sender, **kw):
+    if kw["data"].event_type == UnleashEventType.READY:
+        print("SDK is ready: flags loaded from Unleash or local cache")
+    elif kw["data"].event_type == UnleashEventType.FETCHED:
+        print("Fetched new feature flags:", kw["data"].features)
+
+def example_callback(event: UnleashEvent):
+    send_data.send('anonymous', data=event)
+
+client = AsyncUnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+    event_callback=example_callback,
+)
+await client.initialize_client()
+client.is_enabled("my-flag")
+```
+
+</Tab>
+</Tabs>
+
 ### Impression data
 
 <Markdown src="/snippets/sdks/impression-data-intro.mdx" />
@@ -457,6 +540,9 @@ The SDK automatically attaches `appName` and `environment` labels to all impact 
 
 Define and record metrics through the client's `impact_metrics` property:
 
+<Tabs>
+<Tab title="Sync">
+
 ```python
 from UnleashClient import UnleashClient
 
@@ -480,6 +566,36 @@ client.impact_metrics.define_histogram(
 )
 client.impact_metrics.observe_histogram("request_time_ms", 125)
 ```
+
+</Tab>
+<Tab title="Async">
+
+```python
+from UnleashClient import AsyncUnleashClient
+
+client = AsyncUnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+)
+await client.initialize_client()
+
+client.impact_metrics.define_counter("request_count", "Total number of HTTP requests")
+client.impact_metrics.increment_counter("request_count")
+
+client.impact_metrics.define_gauge("active_users", "Current number of active users")
+client.impact_metrics.update_gauge("active_users", 42)
+
+client.impact_metrics.define_histogram(
+    "request_time_ms",
+    "Request processing time in milliseconds",
+    buckets=[50, 100, 200, 500, 1000],
+)
+client.impact_metrics.observe_histogram("request_time_ms", 125)
+```
+
+</Tab>
+</Tabs>
 
 ### Metric types
 
@@ -528,9 +644,9 @@ By default, the SDK fetches your feature flags from the Unleash API at startup. 
 
 1. Create a `FileCache`, or your own `BaseCache` implementation.
 2. Pre-seed it with feature flags using `bootstrap_from_dict`, `bootstrap_from_file`, or `bootstrap_from_url`.
-3. Pass the cache to the `UnleashClient` constructor.
+3. Pass the cache to the client constructor.
 
-A bootstrapped client can evaluate flags immediately, before its first fetch from Unleash completes.
+A bootstrapped client can evaluate flags immediately, before its first fetch from Unleash completes. The examples below use the sync client; the `cache` argument works the same with `AsyncUnleashClient`.
 
 <Tabs>
 <Tab title="Dictionary">
@@ -638,7 +754,7 @@ class CustomCache(BaseCache):
         return self._cache.delete()
 ```
 
-Pass your cache instance to the client with the `cache` argument:
+Pass your cache instance to either client with the `cache` argument:
 
 ```python
 client = UnleashClient(
