@@ -294,6 +294,14 @@ body:has(.landing-page) .fern-card:hover {
     border-color: #374151;
 }
 
+/* Fern renders the Card lightModeColor prop as an inline style on .card-icon and
+   never emits darkModeColor for custom SVG icons, so the light-mode color sticks in
+   dark mode. Inline styles can only be beaten with !important. var(--color-white) is
+   what Fern's .text-body resolves to in dark mode, so the icons match the card title. */
+.dark .fern-card .card-icon {
+    color: var(--color-white) !important;
+}
+
 body:has(.landing-page) .fern-card::after {
     content: '';
     position: absolute;

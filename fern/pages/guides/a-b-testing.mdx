@@ -116,7 +116,9 @@ Next, decide the percentage of users to target for each variant, known as the va
 
 Unleash is built to give developers confidence in their ability to run A/B tests effectively. One critical component of implementing A/B testing strategies is maintaining a consistent experience for each user across multiple user sessions.
 
-For example, user `uuid1234` should be the target of `variantA` regardless of their session. The original subset of users that get `variantA` will continue to experience that variation of the feature over time. At Unleash, we call this [stickiness](/concepts/stickiness). You can define the parameter of stickiness in the gradual rollout form. By default, stickiness is calculated from the `userId`, falling back to the `sessionId` if the `userId` is unavailable; the strategy's `groupId` is included as a grouping input so that each flag distributes users independently.
+For example, user `uuid1234` should be the target of `variantA` regardless of their session. The original subset of users that get `variantA` will continue to experience that variation of the feature over time. At Unleash, we call this [stickiness](/concepts/stickiness). You can define the parameter of stickiness in the gradual rollout form.
+
+By default, Unleash calculates stickiness from the `userId` context field and falls back to the `sessionId` if the `userId` is unavailable. The strategy's `groupId` is also part of the calculation, so each flag distributes users independently.
 
 ### Track A/B testing for your key performance metrics
 

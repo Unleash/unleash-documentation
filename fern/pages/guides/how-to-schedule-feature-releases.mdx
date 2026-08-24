@@ -82,18 +82,17 @@ As an alternative to date constraints, you can use [scheduled change requests](/
 
 ## Frequently asked questions
 
-### Can I schedule a recurring release?
-
-Date constraints define one-time windows. To implement a recurring schedule, such as making a feature available every day between 09:00 and 17:00 or only on weekdays, use an external scheduler that updates the flag through the Admin API, or a [custom context field](/concepts/unleash-context#custom-context-fields), such as `hourOfDay` or `dayOfWeek`, that your application sets and your strategy constrains on. See [Limitations and alternatives](#limitations-and-alternatives).
-
-### What time zone do date constraints use?
-
-Date constraint values are absolute points in time, stored in [RFC 3339 format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.8) with a time zone offset. Unleash compares the value against the `currentTime` context field as absolute times, so the result does not depend on the time zone of the Unleash server or of the application evaluating the flag.
-
-### Can I schedule a feature to turn off?
-
-Yes. Use a `DATE_BEFORE` constraint to keep a strategy active only until a specific time, or use a [scheduled change request](/concepts/change-requests#scheduled-change-requests) to disable the flag at a specific time.
-
-### Can I schedule changes other than enabling a feature?
-
-Yes. [Scheduled change requests](/concepts/change-requests#scheduled-change-requests) can apply any flag configuration change at a scheduled time, such as updating a strategy or archiving a flag.
+<AccordionGroup>
+  <Accordion title="Can I schedule a recurring release?">
+    Date constraints define one-time windows. To implement a recurring schedule, such as making a feature available every day between 09:00 and 17:00 or only on weekdays, use an external scheduler that updates the flag through the Admin API, or a [custom context field](/concepts/unleash-context#custom-context-fields), such as `hourOfDay` or `dayOfWeek`, that your application sets and your strategy constrains on. See [Limitations and alternatives](#limitations-and-alternatives).
+  </Accordion>
+  <Accordion title="What time zone do date constraints use?">
+    Date constraint values are absolute points in time, stored in [RFC 3339 format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.8) with a time zone offset. Unleash compares the value against the `currentTime` context field as absolute times, so the result does not depend on the time zone of the Unleash server or of the application evaluating the flag.
+  </Accordion>
+  <Accordion title="Can I schedule a feature to turn off?">
+    Yes. Use a `DATE_BEFORE` constraint to keep a strategy active only until a specific time, or use a [scheduled change request](/concepts/change-requests#scheduled-change-requests) to disable the flag at a specific time.
+  </Accordion>
+  <Accordion title="Can I schedule changes other than enabling a feature?">
+    Yes. [Scheduled change requests](/concepts/change-requests#scheduled-change-requests) can apply any flag configuration change at a scheduled time, such as updating a strategy or archiving a flag.
+  </Accordion>
+</AccordionGroup>

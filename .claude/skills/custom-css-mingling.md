@@ -57,6 +57,12 @@ Fern uses `.dark` / `.light` classes on `<html>`. Always use:
 
 Never use `html[data-theme="dark"]`, `html.dark`, or `html:not([data-theme="dark"])`.
 
+## Known exceptions to the no-!important rule
+
+Specificity cannot beat inline styles, so `!important` is allowed only against styles Fern inlines into elements:
+
+- `.dark .fern-card .card-icon` — Fern renders the Card `lightModeColor` prop as an inline `style="color:..."` and never emits `darkModeColor` for custom SVG icons, so the dark-mode override needs `!important`. Icons use `var(--color-white)`, which is what Fern's `.text-body` resolves to in dark mode (`.text-body:is(.dark,.dark *)`), so they always match the card title text. Note: `--color-black`/`--color-white` are static constants, not theme-aware; Fern flips between them with `.dark`-scoped rules.
+
 ## Breakpoints
 
 Fern's key breakpoint is **1024px** — the sidebar collapses and header tabs become a dropdown panel. This is where the mountain backdrop and z-index strategy also adapts. Below **768px**, we reset custom gap/padding on `main` and let Fern handle layout.
