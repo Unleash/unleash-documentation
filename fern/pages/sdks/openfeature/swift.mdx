@@ -1,0 +1,123 @@
+---
+title: Swift OpenFeature provider
+slug: /sdks/openfeature/swift
+og:site_name: Unleash
+og:title: Swift OpenFeature provider
+description: Set up the Unleash OpenFeature provider for Swift to evaluate feature flags through the OpenFeature API.
+keywords: [unleash, swift, ios, openfeature, provider, sdk, feature flags]
+max-toc-depth: 3
+last-updated: August 17, 2026
+---
+
+The [Unleash OpenFeature Swift provider](https://github.com/Unleash/unleash-openfeature-swift-provider) lets Swift applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
+
+The provider wraps the [Unleash iOS SDK](/sdks/ios) and uses the same frontend SDK behavior for fetching evaluated flags, polling, and metrics. Because the iOS SDK is a frontend SDK, this is a static-context provider: you set the evaluation context once on the OpenFeature API instead of passing it per evaluation, and context changes trigger a refetch of the flag configuration from Unleash.
+
+## Requirements
+
+-   iOS 15, macOS 12, tvOS 15, or watchOS 8 or later
+-   Swift 6.0 or later
+
+## Installation
+
+Add the provider package with Swift Package Manager. The package depends on the OpenFeature Swift SDK and the Unleash iOS SDK, so you don't need to add them separately.
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/Unleash/unleash-openfeature-swift-provider", from: "0.1.0"),
+]
+```
+
+In Xcode, select **File > Add Package Dependencies** and enter the repository URL.
+
+## Configuration
+
+Create an `UnleashProvider` with an `UnleashProviderConfig`, then register it with OpenFeature. The provider builds and owns the Unleash client. Connect to the Frontend API or Unleash Edge with a frontend token.
+
+```swift
+import OpenFeature
+import UnleashOpenFeatureSwiftProvider
+
+let provider = try UnleashProvider(config: UnleashProviderConfig(
+    unleashUrl: "<YOUR_UNLEASH_URL>/api/frontend",
+    clientKey: "<YOUR_FRONTEND_API_TOKEN>",
+    appName: "my-ios-app"
+))
+
+await OpenFeatureAPI.shared.setProviderAndWait(
+    provider: provider,
+    initialContext: ImmutableContext(targetingKey: "user-123")
+)
+```
+
+`setProviderAndWait` starts the Unleash client, fetches the flag configuration for the initial context, and waits for the fetch to complete before the provider is registered for use. After startup, the SDK continues polling for flag updates in the background.
+
+The configuration also accepts the `refreshInterval`, `metricsInterval`, `disableMetrics`, `environment`, `bootstrap`, `customHeaders`, and `pollerSession` options, which behave like the corresponding Unleash iOS SDK [options](/sdks/ios#configuration-options). Setting `refreshInterval` to `0` disables polling after the initial fetch.
+
+## Evaluate a flag
+
+Build an OpenFeature client and evaluate flags through the OpenFeature API:
+
+```swift
+let client = OpenFeatureAPI.shared.getClient()
+
+let enabled = client.getBooleanValue(key: "my-feature", defaultValue: false)
+```
+
+The provider supports all OpenFeature evaluation methods. Boolean evaluation uses the flag's enabled state and returns `false` if the flag doesn't exist, regardless of the default value you supply. All other types resolve from the payload of the flag's [variant](/concepts/feature-flag-variants):
+
+-   String values accept `string` and `csv` payloads.
+-   Integer and double values accept `number` payloads.
+-   Object values accept `json` payloads.
+
+A missing flag, a disabled variant, or a variant without a payload returns the default value. A payload of the wrong type returns the default value with a type mismatch error, and a payload that can't be parsed returns the default value with a parse error.
+
+ The detail methods, such as `getStringDetails`, also report the assigned variant name when the variant payload resolves successfully. The exception is boolean results, which never include a variant name because boolean evaluation only checks whether the flag is enabled. The evaluation reason is always `UNKNOWN` because Unleash SDKs don't report why a flag evaluated the way it did.
+
+## Update the evaluation context
+
+The provider ignores the per-evaluation context parameter. To change the context, update it on the OpenFeature API; the Unleash client then refetches the flag configuration for the new context:
+
+```swift
+await OpenFeatureAPI.shared.setEvaluationContextAndWait(
+    evaluationContext: ImmutableContext(
+        targetingKey: "user-456",
+        structure: ImmutableStructure(attributes: ["plan": .string("pro")])
+    )
+)
+```
+
+## Context mapping
+
+The provider maps the OpenFeature evaluation context to an [Unleash context](/concepts/unleash-context).
+
+If you set a targeting key, the provider maps it to `userId`. The targeting key takes precedence over a `userId` attribute set on the evaluation context. Attributes named after top-level Unleash context fields, such as `sessionId` and `remoteAddress`, map to those fields.
+
+The provider adds all other scalar attributes, such as strings, numbers, booleans, and date values, to the Unleash context [properties](/concepts/unleash-context#the-properties-field) as strings; dates use ISO 8601 format. It discards list and structure attributes. The `appName` and `environment` fields come from the provider configuration and can't be set through the evaluation context.
+
+## Shutdown
+
+The OpenFeature Swift SDK has no provider shutdown hook, so stop the Unleash client explicitly when you no longer need the provider:
+
+```swift
+provider.onClose()
+OpenFeatureAPI.shared.clearProvider()
+```
+
+`onClose` stops flag polling and metrics reporting and is idempotent. The provider doesn't support re-initialization after shutdown; create a new provider instead.
+
+## Provider events
+
+The provider doesn't define events of its own. The OpenFeature Swift SDK emits the provider lifecycle events, such as `ready`, `error`, `reconciling`, and `contextChanged`, around initialization and context changes.
+
+## Example
+
+To try the provider against your Unleash instance, clone the [provider repository](https://github.com/Unleash/unleash-openfeature-swift-provider) and run the [boolean flag example](https://github.com/Unleash/unleash-openfeature-swift-provider/blob/main/Examples/BooleanFlagExample/main.swift) with your Frontend API URL and token:
+
+```bash
+swift run boolean-flag-example \
+  --url '<YOUR_UNLEASH_URL>/api/frontend' \
+  --api-key "$UNLEASH_FRONTEND_TOKEN" \
+  --flag-key my-feature \
+  --targeting-key user-123
+```

@@ -758,9 +758,18 @@ navigation:
           - page: PHP
             availability: beta
             path: pages/sdks/openfeature/php.mdx
+          - page: Python
+            availability: beta
+            path: pages/sdks/openfeature/python.mdx
           - page: Ruby
             availability: beta
             path: pages/sdks/openfeature/ruby.mdx
+          - page: Rust
+            availability: beta
+            path: pages/sdks/openfeature/rust.mdx
+          - page: Swift
+            availability: beta
+            path: pages/sdks/openfeature/swift.mdx
 
       - section: Community SDKs
         collapsed: true
@@ -832,7 +841,10 @@ navigation:
           - page: Using feature flags at scale
             path: pages/guides/best-practices-using-feature-flags-at-scale.mdx
             slug: best-practices-using-feature-flags-at-scale
-          - page: Migrating from homegrown feature management solutions
+          - page: Feature flags for migrations and modernization
+            path: pages/guides/feature-flags-for-migrations.mdx
+            slug: feature-flags-for-migrations
+          - page: Migrating to Unleash
             path: pages/guides/feature-flag-migration-best-practices.mdx
             slug: feature-flag-migration-best-practices
           - page: Managing large constraints
