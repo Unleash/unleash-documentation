@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="480" viewBox="0 0 1280 480" fill="none" role="img" aria-label="Stickiness calculation: Unleash selects the userId or sessionId context field, combines it with the strategy's groupId, and hashes the result with MurmurHash to a number between 0 and 100.">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="450" viewBox="0 0 1280 450" fill="none" role="img" aria-label="Stickiness calculation: Unleash selects the userId or sessionId context field, combines it with the strategy's groupId, and hashes the result with MurmurHash to a number between 0 and 100.">
   <defs>
     <style>
       @font-face {
@@ -8,12 +8,12 @@
       }
       text { font-family: 'Sen', 'Helvetica Neue', Arial, sans-serif; }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0L10 5L0 10z" fill="#817AFE"/>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M2 1 L9 5 L2 9" fill="none" stroke="#817AFE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
   </defs>
 
-  <rect width="1280" height="480" rx="12" fill="#F7F7FA"/>
+  <rect width="1280" height="450" rx="12" fill="#F7F7FA"/>
 
   <!-- Unleash context -->
   <rect x="60" y="60" width="380" height="210" rx="10" fill="#FFFFFF" stroke="#DCDAE7"/>
@@ -22,17 +22,17 @@
   <circle cx="94" cy="145" r="13" fill="#817AFE"/>
   <text x="94" y="151" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
   <text x="120" y="152" font-size="22" font-weight="700" fill="#1A1924">userId</text>
-  <text x="420" y="151" font-size="18" fill="#6E6D76" text-anchor="end">used first</text>
+  <text x="420" y="151" font-size="18" fill="#6E6D76" text-anchor="end">Used first</text>
 
   <circle cx="94" cy="190" r="13" fill="#817AFE"/>
   <text x="94" y="196" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
   <text x="120" y="197" font-size="22" font-weight="700" fill="#1A1924">sessionId</text>
-  <text x="420" y="196" font-size="18" fill="#6E6D76" text-anchor="end">fallback</text>
+  <text x="420" y="196" font-size="18" fill="#6E6D76" text-anchor="end">Fallback</text>
 
   <circle cx="94" cy="235" r="13" fill="#A9A7B4"/>
   <text x="94" y="241" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
-  <text x="120" y="242" font-size="22" fill="#6E6D76">random</text>
-  <text x="420" y="241" font-size="18" fill="#6E6D76" text-anchor="end">no stickiness</text>
+  <text x="120" y="242" font-size="22" fill="#6E6D76">Random</text>
+  <text x="420" y="241" font-size="18" fill="#6E6D76" text-anchor="end">No stickiness</text>
 
   <!-- Activation strategy -->
   <rect x="60" y="310" width="380" height="110" rx="10" fill="#FFFFFF" stroke="#DCDAE7"/>
@@ -40,26 +40,25 @@
   <circle cx="94" cy="390" r="13" fill="#817AFE"/>
   <text x="94" y="396" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">+</text>
   <text x="120" y="397" font-size="22" font-weight="700" fill="#1A1924">groupId</text>
-  <text x="420" y="396" font-size="18" fill="#6E6D76" text-anchor="end">grouping input</text>
+  <text x="420" y="396" font-size="18" fill="#6E6D76" text-anchor="end">Grouping input</text>
 
   <!-- converging arrows -->
   <path d="M442 165 C 490 165, 492 218, 509 231" stroke="#817AFE" stroke-width="2.5" marker-end="url(#arrow)"/>
   <path d="M442 365 C 490 365, 492 262, 509 249" stroke="#817AFE" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <circle cx="530" cy="240" r="17" fill="#F1F0FE" stroke="#817AFE" stroke-width="2"/>
-  <text x="530" y="248" font-size="24" font-weight="700" fill="#817AFE" text-anchor="middle">+</text>
+  <circle cx="530" cy="240" r="17" fill="#817AFE"/>
+  <text x="530" y="248" font-size="24" font-weight="700" fill="#FFFFFF" text-anchor="middle">+</text>
   <path d="M547 240 H 598" stroke="#817AFE" stroke-width="2.5" marker-end="url(#arrow)"/>
 
   <!-- MurmurHash -->
   <rect x="610" y="185" width="230" height="110" rx="10" fill="#817AFE"/>
   <text x="725" y="235" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">MurmurHash</text>
-  <text x="725" y="264" font-size="18" fill="#FFFFFF" opacity="0.85" text-anchor="middle">hash function</text>
+  <text x="725" y="264" font-size="18" fill="#FFFFFF" opacity="0.85" text-anchor="middle">Hash function</text>
 
   <path d="M840 240 H 948" stroke="#817AFE" stroke-width="2.5" marker-end="url(#arrow)"/>
 
   <!-- result -->
   <rect x="960" y="185" width="260" height="110" rx="10" fill="#FFFFFF" stroke="#DCDAE7"/>
   <text x="1090" y="237" font-size="32" font-weight="800" fill="#817AFE" text-anchor="middle">0&#8211;100</text>
-  <text x="1090" y="266" font-size="18" fill="#6E6D76" text-anchor="middle">deterministic result</text>
+  <text x="1090" y="266" font-size="18" fill="#6E6D76" text-anchor="middle">Deterministic result</text>
 
-  <text x="640" y="458" font-size="19" fill="#6E6D76" text-anchor="middle">The same user gets the same number for the same flag, every time.</text>
 </svg>

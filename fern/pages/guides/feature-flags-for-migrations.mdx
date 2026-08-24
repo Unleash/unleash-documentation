@@ -70,9 +70,7 @@ These four patterns come from years of industry practice with large-scale migrat
 
 The [strangler fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) builds the new system around the edges of the old one, capability by capability, until the old system can be decommissioned. An interception layer, described by [AWS](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/strangler-fig.html) and [Azure](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig) as a proxy or facade, sits in front of the legacy system and routes each request to either the legacy or the new implementation. Users keep using the same interface and are unaware a migration is in progress.
 
-<Frame background="subtle">
-  ![An interception layer evaluates a feature flag per request and routes 10% of users to the new service and 90% to the legacy monolith](/assets/migration-strangler-fig.svg)
-</Frame>
+![An interception layer evaluates a feature flag per request and routes 10% of users to the new service and 90% to the legacy monolith](/assets/migration-strangler-fig.svg)
 
 The cloud providers describe the interception layer abstractly. A feature flag is the concrete routing decision inside it. Instead of hardcoding which routes have migrated, the interception layer evaluates a flag per request. Using [`startUnleash`](/sdks/node#synchronous-initialization) waits for the SDK to synchronize before serving traffic, so routing decisions never run on an empty flag configuration:
 
@@ -181,9 +179,7 @@ Microsoft's [safe deployment practices](https://learn.microsoft.com/en-us/devops
   </Step>
 </Steps>
 
-<Frame background="subtle">
-  ![A progressive exposure ladder from internal users and a beta segment through a gradual rollout to 100%, with safeguards pausing the release if metrics cross a threshold](/assets/migration-progressive-exposure.svg)
-</Frame>
+![A progressive exposure ladder from internal users and a beta segment through a gradual rollout to 100% of users](/assets/migration-progressive-exposure.svg)
 
 In Unleash, [release templates](/concepts/release-templates) turn this ladder into a reusable, multi-milestone release plan. Each milestone defines its own [activation strategies](/concepts/activation-strategies), and progression between milestones can happen on a timer or be gated on [impact metrics](/concepts/impact-metrics). Since a large migration repeats the same cutover ceremony for every capability, defining the ladder once as a template and applying it to each migration flag keeps every cutover consistent.
 
