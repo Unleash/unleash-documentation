@@ -1028,8 +1028,8 @@ navbar-links:
       
 colors:
   accent-primary:
-    dark: "#817afe"
-    light: "#817afe"
+    dark: "#a39dfe"
+    light: "#7770fe"
   background:
     dark: "#1A1924"
     light: "#EAEAED"
