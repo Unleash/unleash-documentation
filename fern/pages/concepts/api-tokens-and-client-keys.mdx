@@ -5,6 +5,7 @@ og:title: API tokens and client keys - Authenticate SDKs and integrations with U
 description: Unleash uses API keys to facilitate communication between consuming clients such as SDKs, Unleash Edge, or other tools and automation.
 keywords: api tokens, client keys, authentication, backend tokens, frontend tokens, personal access tokens
 max-toc-depth: 3
+last-updated: August 25, 2026
 ---
 
 ## Overview
@@ -140,6 +141,36 @@ Depending on your [permissions](#api-token-permissions), you can create API toke
 - **Admin settings > Service accounts > New service account**: for creating a service account and assigning a token.
 - **Settings > API access** inside a project: for project-specific backend or frontend tokens; permitted for project Members or users with a [corresponding root role](#api-token-permissions).
 - **Profile > View profile settings > Personal API tokens**: for [personal access tokens](#personal-access-tokens).
+
+## Token expiry and rotation
+
+Requests with an expired token are rejected, so rotate tokens before they expire. How you set a token's expiration date depends on the token type:
+
+| Token type | Admin UI | Admin API |
+|------------|----------|-----------|
+| [Backend](#backend-tokens) and [frontend](#frontend-tokens) tokens | By default, tokens are created without an expiration. | Set the optional `expiresAt` property with the [create API token](/api/create-api-token) or [create project API token](/api/create-project-api-token) endpoint, or add an expiration date to an existing token with the [update API token](/api/update-api-token) endpoint. |
+| [Personal access tokens](#personal-access-tokens) | Choose an expiration when creating the token: 7, 30, or 60 days, a custom date, or never. | Set the required `expiresAt` property with the [create personal access token](/api/create-pat) endpoint. |
+| [Service account tokens](#service-account-tokens) | Choose an expiration when creating the token: 7, 30, or 60 days, a custom date, or never. | Set the required `expiresAt` property with the [create service account token](/api/create-service-account-token) endpoint. |
+
+<Note>
+For [backend](#backend-tokens) and [frontend](#frontend-tokens) tokens, we recommend [rotating tokens](#rotate-a-token) on a regular schedule rather than setting an expiration date. This keeps token hygiene in your control without the risk of a token expiring unnoticed.
+</Note>
+
+A token's access configuration, that is its type, projects, and environment, cannot be changed after creation. Unleash does not rotate tokens automatically.
+
+### Rotate a token
+
+To rotate a token:
+
+1. Create a new token with the same type, project, and environment scope.
+2. Update your SDKs and integrations to use the new token.
+3. Delete the old token once nothing is using it.
+
+### Expiration notifications
+
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span> <Button small outlined className="version-button" href="/support/availability">v8.1</Button>
+
+Unleash notifies you before a [service account token](/concepts/service-accounts) or [personal access token](#personal-access-tokens) expires. The token's creator receives an email ahead of the expiration date, giving you time to rotate the token before your automations and integrations lose access.
 
 ## Connect a frontend SDK to Unleash using Edge
 

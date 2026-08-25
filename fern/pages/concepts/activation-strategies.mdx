@@ -5,7 +5,7 @@ og:title: Activation strategies - Control feature flag targeting and rollouts
 description: Activation strategies determine who should get a feature. They allow you to enable and disable features for certain users without having to redeploy your application.
 keywords: activation strategies, gradual rollout, constraints, targeting, feature flags
 max-toc-depth: 3
-last-updated: August 7, 2026
+last-updated: August 25, 2026
 ---
 
 ## Overview
@@ -40,7 +40,9 @@ Segmentation and constraints allow you to define conditions for your activation 
 
 Constraints are conditional rules that determine whether a strategy applies, based on fields from the [Unleash context](/concepts/unleash-context). Constraints can reference both [standard context fields](/concepts/unleash-context#overview) and [custom context fields](/concepts/unleash-context#custom-context-fields).
 
-An activation strategy can have as many constraints as needed. When an activation strategy has multiple constraints, then every constraint must be evaluated to true for the strategy to be evaluated. This behavior is equivalent to the AND logical operator.
+When an activation strategy has multiple constraints, then every constraint must be evaluated to true for the strategy to be evaluated. This behavior is equivalent to the AND logical operator.
+
+The number of constraints per strategy and the number of values per constraint are limited by your plan; see [Resource limits](/concepts/resource-limits) for the exact limits. If you need to target a large audience, avoid long value lists and use higher-level attributes instead; see [Managing constraints](/guides/managing-constraints) for practical guidance.
 
 You can use [Playground](/concepts/playground) to experiment with different strategy and constraint configurations and how they would evaluate in a given context.
 

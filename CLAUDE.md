@@ -97,8 +97,13 @@ The Unleash OpenAPI spec is split into 3 domains to keep the API reference navig
 - Sentence-case headings: "Getting started", not "Getting Started"
 - No emojis, no marketing language
 - Short paragraphs, use line breaks and headings for readability
+- FAQ sections use `<AccordionGroup>` with one `<Accordion title="Question?">` per question, under a "Frequently asked questions" heading; never bolded questions or h3-per-question
 - Use ordered lists for sequences, unordered for non-sequential items
 
 ## Custom CSS
 
 CSS architecture, specificity strategy, breakpoints, and dark mode conventions are documented in the `/custom-css-mingling` skill (`.claude/skills/custom-css-mingling.md`). Use that skill when working on styling.
+
+## SVG diagrams
+
+Brand colors, typography, and style rules for hand-authored documentation diagrams are documented in the `/svg-diagrams` skill (`.claude/skills/svg-diagrams.md`). Use that skill when creating or editing SVG diagrams in `fern/assets/`.

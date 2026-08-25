@@ -5,6 +5,7 @@ keywords: strategy variants, variants, ab testing, multivariate testing, variant
 og:site_name: Unleash Documentation
 og:title: Strategy Variants for A/B and Multivariate Testing
 max-toc-depth: 3
+last-updated: August 25, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v5.4</Button>
@@ -70,11 +71,11 @@ In the Admin UI, go to the feature flag you'd like to define variants for and do
 
 1. Select the environment you want to configure and click **Add strategy**.
 2. Select your desired [strategy type](/concepts/activation-strategies#strategy-types) and click **Configure**.
-2. Go to the **Variants** tab and click **Add variant**.
-3. Enter the variant name and an optional payload.
-4. Optionally, click **Add variant** again to add more variants.
-5. Toggle **Custom percentage** for [fixed weights](#weight-type), if required.
-6. Click **Save strategy**.
+3. Go to the **Variants** tab and click **Add variant**.
+4. Enter the variant name and an optional payload.
+5. Optionally, click **Add variant** again to add more variants.
+6. Toggle **Custom percentage** for [fixed weights](#weight-type), if required.
+7. Click **Save strategy**.
 
 ## Fallback variant
 
@@ -100,6 +101,14 @@ By defining the more restrictive strategy first, we ensure that all internal use
 <Frame background="subtle">
   ![strategy_variants example](/assets/strategy-variants-example.png)
 </Frame>
+
+## Client SDK support
+
+Strategy variants require Unleash 5.4 or later. For the minimum version of each backend SDK, see the [SDK compatibility table](/sdks#strategy-variants).
+
+Backend SDKs evaluate strategy variants locally. If an SDK version predates strategy variant support, it does not evaluate them and returns the [fallback variant](#fallback-variant).
+
+Frontend SDKs receive variants that the Unleash server, [Unleash Edge](/unleash-edge), or the [Frontend API](/concepts/front-end-api) has already evaluated, so they work with strategy variants without evaluating them locally.
 
 ## Environment-level variants
 

@@ -5,7 +5,7 @@ keywords: migration, migrate, launchdarkly, feature flags, unleash, homegrown
 og:site_name: "Unleash Documentation"
 og:title: "Migrating to Unleash"
 max-toc-depth: 3
-last-updated: August 19, 2026
+last-updated: August 25, 2026
 ---
 
 Learn how to plan and execute a migration to Unleash from LaunchDarkly, another feature flag provider, or a homegrown feature flag system.
@@ -20,9 +20,7 @@ We'll cover how to:
 - [Migrate from a homegrown solution](#migrate-from-a-homegrown-solution).
 - [Migrate from other feature flag providers](#migrate-from-other-feature-flag-providers).
 
-<Frame background="subtle">
-  ![The five phases of a feature flag migration: plan, pilot, migrate, cut over, and onboard](/assets/migration-phases.svg)
-</Frame>
+![The five phases of a feature flag migration: plan, pilot, migrate, cut over, and onboard](/assets/migration-phases.svg)
 
 ## What a feature flag migration involves
 
@@ -119,9 +117,7 @@ Keep your existing system running as the fallback while you migrate. Most teams 
 A wrapper, also called an abstraction layer or facade, is a small module in your codebase that all application code calls to evaluate flags, instead of calling the flag SDK directly. For example, your code calls your own `isFeatureEnabled("checkout-redesign", context)` function, and only that function knows which flag system it talks to. Because call sites depend on your interface rather than a vendor SDK, you can switch the implementation from your old system to Unleash, or evaluate both during the transition, without touching application code. For recommended patterns, see [best practices for managing feature flags in code](/guides/manage-feature-flags-in-code).
 </Accordion>
 
-<Frame background="subtle">
-  ![An abstraction layer in your application evaluates both Unleash and the existing system during the migration](/assets/migration-parallel-run.svg)
-</Frame>
+![An abstraction layer in your application evaluates both Unleash and the existing system during the migration](/assets/migration-parallel-run.svg)
 
 <Tip>
 If you want a standardized abstraction instead of a custom wrapper, [OpenFeature](https://openfeature.dev/) provides a vendor-neutral API with an [Unleash provider](/sdks#openfeature-providers) for several languages; see all [Unleash providers in the OpenFeature ecosystem](https://openfeature.dev/ecosystem?instant_search%5Bquery%5D=unleash). Teams already using OpenFeature can switch backends by swapping the provider, with no changes to evaluation call sites. The OpenFeature Multi-Provider, available for select SDKs, can evaluate two providers behind one interface and compare their results, which gives you shadow evaluation with minimal custom code.

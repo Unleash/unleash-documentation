@@ -5,7 +5,7 @@ keywords: schedule, feature releases, strategy constraints, date constraints, un
 og:site_name: "Unleash Documentation"
 og:title: "Schedule feature releases"
 max-toc-depth: 3
-last-updated: July 28, 2026
+last-updated: August 25, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v4.16</Button>
@@ -67,3 +67,32 @@ POST api/admin/projects/<project-id>/features/environments/<environment>/strateg
 ```
 
 The `"operator"` property in the code sample can be replaced with [any of the other date and time-based operators](/concepts/activation-strategies#date-and-time-operators) according to your needs.
+
+## Limitations and alternatives
+
+Date and time constraints define one-time windows. Unleash evaluates them against the `currentTime` [context field](/concepts/unleash-context), which holds a complete timestamp and defaults to the time of evaluation. For example, you can:
+
+- Release a feature at a specific date and time with a `DATE_AFTER` constraint.
+- Make a feature available during one limited period by combining a `DATE_AFTER` and a `DATE_BEFORE` constraint in the same strategy.
+- Cover several distinct periods by adding one strategy per period, each with its own pair of date constraints; the flag activates if any strategy matches.
+
+Recurring schedules cannot be expressed with date constraints, because the date and time operators compare complete timestamps rather than parts of them. This includes rules such as every day between 09:00 and 17:00, on weekdays only, or during the same week every year. To implement a recurring schedule, use an external scheduler that updates the flag through the Admin API, or define a [custom context field](/concepts/unleash-context#custom-context-fields), such as `hourOfDay` or `dayOfWeek`, that your application sets and your strategy constrains on.
+
+As an alternative to date constraints, you can use [scheduled change requests](/concepts/change-requests#scheduled-change-requests) to apply any flag change at a specific point in time. For multi-phase releases, [release templates](/concepts/release-templates) let you predefine each phase of a rollout as a milestone and move through the phases without reconfiguring strategies by hand.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can I schedule a recurring release?">
+    Date constraints define one-time windows. To implement a recurring schedule, such as making a feature available every day between 09:00 and 17:00 or only on weekdays, use an external scheduler that updates the flag through the Admin API, or a [custom context field](/concepts/unleash-context#custom-context-fields), such as `hourOfDay` or `dayOfWeek`, that your application sets and your strategy constrains on. See [Limitations and alternatives](#limitations-and-alternatives).
+  </Accordion>
+  <Accordion title="What time zone do date constraints use?">
+    Date constraint values are absolute points in time, stored in [RFC 3339 format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.8) with a time zone offset. Unleash compares the value against the `currentTime` context field as absolute times, so the result does not depend on the time zone of the Unleash server or of the application evaluating the flag.
+  </Accordion>
+  <Accordion title="Can I schedule a feature to turn off?">
+    Yes. Use a `DATE_BEFORE` constraint to keep a strategy active only until a specific time, or use a [scheduled change request](/concepts/change-requests#scheduled-change-requests) to disable the flag at a specific time.
+  </Accordion>
+  <Accordion title="Can I schedule changes other than enabling a feature?">
+    Yes. [Scheduled change requests](/concepts/change-requests#scheduled-change-requests) can apply any flag configuration change at a scheduled time, such as updating a strategy or archiving a flag.
+  </Accordion>
+</AccordionGroup>

@@ -5,7 +5,7 @@ og:title: Webhook
 description: "Set up Unleash webhooks to send feature flag, project, environment, and change events to external tools with headers and retries."
 max-toc-depth: 2
 slug: integrate/webhook
-last-updated: May 11, 2026
+last-updated: August 25, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v3.11</Button>
@@ -61,9 +61,9 @@ Unleash Webhook integration takes the following parameters.
 
 **Content-Type** Used to set the content-type header used when unleash performs an HTTP POST to the defined endpoint.
 
-**Body template** Used to override the body template used by Unleash when performing the HTTP POST. You may format you message using a [Mustache template](https://mustache.github.io). You will have the Unleash event format available in the rendering context:
+**Body template** Used to override the body template used by Unleash when performing the HTTP POST. You may format your message using a [Mustache template](https://mustache.github.io). You will have the Unleash event format available in the rendering context:
 
-<EndpointRequestSnippet endpoint="GET /api/admin/events" />
+<EndpointResponseSnippet endpoint="GET /api/admin/events" />
 
 Example:
 
@@ -78,7 +78,7 @@ Example:
 
 If you don't specify anything Unleash will use the Unleash event format:
 
-<EndpointRequestSnippet endpoint="GET /api/admin/events" />
+<EndpointResponseSnippet endpoint="GET /api/admin/events" />
 
 #### Custom SSL certificates
 

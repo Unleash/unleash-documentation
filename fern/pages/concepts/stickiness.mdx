@@ -5,21 +5,45 @@ keywords: stickiness, user consistency, hashing, gradual rollout, custom stickin
 og:site_name: Unleash Documentation
 og:title: Stickiness for Consistent User Experiences
 max-toc-depth: 3
+last-updated: August 25, 2026
 ---
 
 _Stickiness_ is how Unleash guarantees that the same user gets the same features every time. Stickiness is useful in any scenario where you want to either show a feature to only a subset of users or give users a variant of a feature.
 
 ## Calculation
 
-By default, Unleash calculates stickiness based on the user id and the group id. If the user id is unavailable, it falls back to using the session id instead. It hashes these values to a number between 0 and 100 using the [MurmurHash hash function](https://en.wikipedia.org/wiki/MurmurHash). This number is what determines whether a user will see a specific feature or variant. Because the process is deterministic, the same user will always get the same number.
+To calculate stickiness, Unleash hashes a context field together with the strategy's `groupId` into a number between 0 and 100 using the [MurmurHash hash function](https://en.wikipedia.org/wiki/MurmurHash). This number determines whether a user sees a specific feature or variant. Because the process is deterministic, the same input always produces the same number.
 
-If both the user id and the session id is unavailable, the calculation returns a random value and stickiness is not guaranteed.
+![Diagram of the stickiness calculation: Unleash selects the userId or sessionId context field, combines it with the strategy's groupId, and hashes the result with MurmurHash to a number between 0 and 100.](/assets/stickiness-calculation.svg)
+
+### Context field selection
+
+By default, Unleash uses the first of these context fields that is available:
+
+1. `userId`
+2. `sessionId`
+
+If neither field is available, the calculation returns a random number and stickiness is not guaranteed.
+
+### Group ID
+
+Unleash combines the selected context field with the strategy's `groupId` before hashing. By default, the `groupId` is the name of the feature flag, giving each flag its own independent distribution, so the same user can fall inside the rollout for one flag and outside it for another. You can set the same `groupId` on multiple flags to correlate their rollouts. You can also use the `groupId` as a stickiness reset mechanism: changing it changes the hash input, so all users are reassigned; see [Reshuffling users](#reshuffling-users).
 
 ## Consistency
 
-Because the number assigned to a user won't change, Unleash also guarantees that the a user will keep seeing the same features even if certain other parameters change.
+Because the number assigned to a user won't change, Unleash also guarantees that a user will keep seeing the same features even if certain other parameters change.
 
-For instance: When using the [gradual rollout activation strategy](/concepts/activation-strategies), any user whose number is less than or equal to the rollout percentage will see the feature. This means that the same users will keep seeing the feature even as you increase the percentage of your user base that sees the feature.
+### Changing the rollout percentage
+
+When using the [gradual rollout activation strategy](/concepts/activation-strategies), any user whose number is less than or equal to the rollout percentage sees the feature:
+
+- **Increasing the percentage** keeps existing users in the rollout and adds new ones.
+- **Decreasing the percentage** removes users whose number is above the new percentage; users at or below it keep seeing the feature.
+- **Returning to a previous percentage** brings back the same users. For example, if you roll out to 25%, reduce to 0%, and later return to 25%, the same set of users sees the feature again, as long as the strategy's `groupId` and the provided context stay the same.
+
+### Reshuffling users
+
+To reshuffle which users are included in a rollout, change the strategy's `groupId`. This changes the input to the stickiness calculation, so users are assigned new numbers.
 
 ## Custom stickiness
 

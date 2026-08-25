@@ -5,6 +5,7 @@ keywords: segments, strategy constraints, feature flags, activation strategies, 
 og:site_name: Unleash Documentation
 og:title: Segments for Reusable Strategy Constraints
 max-toc-depth: 3
+last-updated: August 25, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v5.5</Button>
@@ -44,7 +45,7 @@ To create a segment:
    - Select a **predefined context field** (for example, `userId`, `appName`, `region`) or create a new one.
    - Choose an **operator** (for example, `is one of` or `starts with`).
    - Select one or more **values**.
-7. Click **Create segment**.
+6. Click **Create segment**.
 
 <Frame background="subtle">
   ![Go to configure and select segments to manage your segments.](/assets/segments.png)
@@ -69,7 +70,7 @@ If a segment is referenced in an open [change requests](/concepts/change-request
 
 If a segment is used by an archived feature flag, you can still delete it. Deleting the segment removes it from the archived flag's strategies.
 
-Before you begin, make sure you that have [permissions](/concepts/rbac) to manage segments in your project. If your project requires [change requests](/concepts/change-requests#change-requests-for-segments), deleting segments also need to go through the same approval process.
+Before you begin, make sure that you have [permissions](/concepts/rbac) to manage segments in your project. If your project requires [change requests](/concepts/change-requests#change-requests-for-segments), deleting segments also needs to go through the same approval process.
 
 To delete a segment:
 
@@ -82,15 +83,13 @@ To delete a segment:
 ## Segment limits
 
 Segments are powerful but can become complex. Each constraint and value in a segment adds data that must be stored, synced, and evaluated at runtime.
-Keeping segments a manageable size ensures that evaluations stay lightweight and that your SDKs can respond instantly—even at scale.
+Keeping segments a manageable size ensures that evaluations stay lightweight and that your SDKs can respond instantly, even at scale.
 
-The combined number of values across all constraints in a single segment is limited by your plan:
+The following default [resource limits](/concepts/resource-limits) apply to segments:
 
-- [OSS](/support/availability#plans): up to 250 total values per instance.
-- [Enterprise](/support/availability#plans): up to 1,000 total values per instance.
-
-You can attach up to five segments to a single activation strategy. This limit applies per strategy, not per feature flag.
-If a flag includes two strategies, each one can have up to five segments.
+- A single segment can have up to 1,000 constraint values, combined across all its constraints.
+- A single activation strategy can have up to 5 segments. This limit applies per strategy, not per feature flag: if a flag includes two strategies, each one can have up to five segments.
+- An instance can have up to 300 segments.
 
 If you're self-hosting, you can [configure segment limits](/concepts/resource-limits) with environment variables.
 
@@ -98,3 +97,15 @@ If you're self-hosting, you can [configure segment limits](/concepts/resource-li
 
 Segments follow the same performance principles as individual constraints. When targeting large audiences or using many values, keep payloads small and rely on higher-level attributes instead of long inclusion lists.
 For practical guidance on optimizing performance, see [Using Unleash with large constraints](/guides/managing-constraints).
+
+## Manage segments with the Admin API
+
+You can manage segments programmatically using the segments endpoints of the Admin API. For example, to create a segment:
+
+<EndpointRequestSnippet endpoint="POST /api/admin/segments" />
+
+To list all segments:
+
+<EndpointRequestSnippet endpoint="GET /api/admin/segments" />
+
+You can also [update](/api/update-segment), [delete](/api/remove-segment), and [list the strategies that use](/api/get-strategies-by-segment-id) a segment.

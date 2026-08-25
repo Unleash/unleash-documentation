@@ -1,10 +1,11 @@
 ---
 title: Troubleshooting
 description: Guide to troubleshooting common Unleash feature flag issues including flags not being returned, users not being exposed, A/B test issues, and CORS errors.
-keywords: ["troubleshooting", "feature flags", "debugging", "CORS", "API tokens", "stickiness", "variants", "A/B testing"]
+keywords: ["troubleshooting", "feature flags", "debugging", "CORS", "API tokens", "401", "403", "authentication errors", "stickiness", "variants", "A/B testing"]
 og:site_name: Unleash Documentation
 og:title: Troubleshooting
 max-toc-depth: 2
+last-updated: August 25, 2026
 ---
 
 This guide helps you troubleshoot various situations you might encounter when working with Unleash feature flags, including flags not being returned, users not being exposed as expected, unexpected A/B test results, and CORS errors.
@@ -29,9 +30,9 @@ If a feature flag isn't being returned by the Frontend API or Edge, or if users 
 
 #### Check token access
 -   The token's access configuration is **immutable after creation** and defines which feature flags it can access. The format of the token indicates its scope:
-    -   **Access to all projects (current and future):** Tokens starting with `*:` (e.g., `*:production:xyz123etc...`) provide access to flags in the specified environment across all projects.
-    -   **Access to a discrete list of projects:** Tokens starting with `[]:` (e.g., `[]:production:xyz123etc...`) grant access to a specific subset of projects in the given environment. You can see which projects a token has access to on the API Tokens page in the Unleash admin UI.
-    -   **Single project access:** Tokens starting with a project name (e.g., `my_fullstack_app:production:xyz123etc...`) are restricted to that project and environment.
+    -   **Access to all projects (current and future):** Tokens starting with `*:` (e.g., `*:production.xyz123etc...`) provide access to flags in the specified environment across all projects.
+    -   **Access to a discrete list of projects:** Tokens starting with `[]:` (e.g., `[]:production.xyz123etc...`) grant access to a specific subset of projects in the given environment. You can see which projects a token has access to on the API Tokens page in the Unleash admin UI.
+    -   **Single project access:** Tokens starting with a project name (e.g., `my_fullstack_app:production.xyz123etc...`) are restricted to that project and environment.
 
 ### Context and stickiness
 
@@ -62,6 +63,44 @@ If you need to know about a flag regardless of whether it's "on" or "off" for a 
     ![Using enabled and disabled variants with constraints](/assets/enabled-disabled-variants-complex.png)
     </Frame>
     *This flag returns an "enabled" variant for clients with a specific `semver` and performs a percentage split for the remaining clients.*
+
+## I get a 401 or 403 error from the API
+
+A `401 Unauthorized` response means the request could not be authenticated. A `403 Forbidden` response usually means the token was recognized but is not allowed to do what it asked; some APIs also return `403` for invalid or wrong-type tokens. Work through the following checks to identify the cause.
+
+#### Check the Authorization header
+
+Pass the API token directly in the `Authorization` header, without a `Bearer` prefix:
+
+```bash
+curl -H "Authorization: <your-token>" https://<your-unleash-url>/api/client/features
+```
+
+A missing header, or a header your proxy strips or rewrites, results in a `401` error.
+
+#### Match the token type to the API
+
+Each API accepts one token type, and a valid token of the wrong type is rejected:
+
+| API | Endpoint prefix | Required token type |
+|-----|-----------------|---------------------|
+| Client API | `/api/client` | [Backend token](/concepts/api-tokens-and-client-keys#backend-tokens) |
+| Frontend API | `/api/frontend` | [Frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens) |
+| Admin API | `/api/admin` | [Personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) or [service account token](/concepts/api-tokens-and-client-keys#service-account-tokens) |
+
+The Frontend API returns the same `403` response whether the token is malformed, deleted, expired, or of the wrong type, so the status code alone does not tell you which of these applies. Verify each in turn: the token is a frontend token, it still exists in **Admin settings > Access control > API access**, and its project and environment scope covers the flags you are requesting.
+
+#### Check the token scope and expiry
+
+A token only accesses the projects and environment it was created for, and this scope is immutable; see [Check token access](#check-token-access) for how to read the scope from the token format. Requests with an expired token are rejected; see [token expiry and rotation](/concepts/api-tokens-and-client-keys#token-expiry-and-rotation).
+
+#### Check for change requests on write operations
+
+If Admin API write operations return `403` in a specific environment, check whether that environment requires [change requests](/concepts/change-requests). Environments with change requests enabled reject direct configuration changes; submit the change as a change request instead.
+
+#### Check Unleash Edge token configuration
+
+When connecting through [Unleash Edge](/unleash-edge) in edge mode, standard tokens are validated against the upstream Unleash instance and must be within the scopes Edge is configured to serve. If you use [pre-trusted tokens](/unleash-edge/deploy#pre-trusted-tokens), confirm that the token is explicitly configured and covered by a standard backend token for the same environment. In [offline mode](/unleash-edge/configure#offline-mode), confirm that the token is included in the client or frontend tokens configured at startup; these tokens do not need to exist in Unleash.
 
 ## My A/B tests are producing unexpected results
 
@@ -128,7 +167,7 @@ If you are using Unleash Edge, CORS headers are typically configured via command
 
 -   To allow a specific origin:
     ```bash
-    unleash-edge edge --cors-origin "[https://your-application.com](https://your-application.com)"
+    unleash-edge edge --cors-origin "https://your-application.com"
     ```
 -   You can specify multiple domains as a comma-separated list or by using the `--cors-origin` flag multiple times.
 -   Other CORS-related headers (e.g., `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`) can also be set via command-line arguments. Refer to the Unleash Edge deployment documentation for details.
@@ -137,6 +176,14 @@ If you are using Unleash Edge, CORS headers are typically configured via command
 
 You can use the `curl` command-line tool to inspect the response headers from your Unleash instance and verify the CORS configuration. Replace `<host>` and `<endpoint>` with your Unleash server URL and a relevant API endpoint (e.g., the frontend API endpoint).
 
+```bash
+curl -s -I -X OPTIONS "https://<host>/<endpoint>" \
+  -H "Origin: https://your-app.com" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: Authorization"
+```
+
+Check the response for the `Access-Control-Allow-Origin` header. If it is missing or doesn't match your application's origin, revisit your CORS configuration. Also check that the `Access-Control-Allow-Headers` header includes `authorization`; without it, the browser's preflight fails even when the origin is allowed.
 
 ## I don't see an Unleash feature in the Admin UI
 

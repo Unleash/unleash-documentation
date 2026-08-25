@@ -1,339 +1,149 @@
 ---
-title: Implement trunk-based development using feature flags
-description: "Implement trunk-based development with Unleash feature flags: merge faster, keep trunk deployable, control rollouts, and roll back safely."
-keywords: implement, trunk, based, feature flags, unleash
+title: Trunk-based development with feature flags
+slug: /guides/trunk-based-development
+description: "Implement trunk-based development with Unleash feature flags: merge to trunk daily, keep unfinished work hidden in production, and release with a gradual rollout."
+keywords: trunk-based development, feature flags, continuous integration, branching strategy, unleash
 og:site_name: "Unleash Documentation"
-og:title: "Implement trunk-based development using feature flags"
+og:title: "Trunk-based development with feature flags"
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: August 25, 2026
 ---
 
-Developers are increasingly adopting trunk-based development to accelerate software delivery and improve efficiency and reliability. A key principle of trunk-based development is merging code into the main branch (aka "trunk") as quickly as possible. This practice reduces the complexity of long-lived feature branches, minimizes merge conflicts, and ensures that teams can continuously integrate and test their code. However, it also means unfinished or experimental features may exist in production. This is where feature flags become essential.
+In [trunk-based development](https://trunkbaseddevelopment.com/), developers collaborate on a single branch, the trunk, and merge small changes into it at least once a day. Branches, where they exist at all, live for hours rather than weeks. [DORA's research](https://dora.dev/capabilities/trunk-based-development/) associates this way of working with higher software delivery performance: teams that keep three or fewer active branches and merge to trunk daily ship faster and more reliably than teams that batch work into long-lived branches.
 
-Unleash provides a powerful mechanism for safely managing and controlling these features in production, enabling enterprises to deliver software faster and with greater reliability. Effective feature flag management ensures that trunk-based development supports continuous delivery without compromising stability. In this tutorial, we’ll use Unleash to manage trunk-based development in your codebase.
+Merging daily has an unavoidable consequence: unfinished features land on the trunk, and with continuous delivery they land in production. [Feature flags](/concepts/feature-flags) are what make that safe. A flag keeps the unfinished code path hidden until the feature is ready, so the trunk stays releasable at every commit and the release becomes a separate, controlled decision.
 
-## How to implement trunk-based development with feature flags
+This guide covers:
 
-To follow along with this tutorial, you need access to an Unleash instance to create and manage feature flags. Head over to our [Quick Start documentation](/get-started/quickstart) for options, including running locally or using an [Unleash SaaS instance](https://www.getunleash.io/pricing).
+- [Why teams move to trunk-based development](#why-teams-move-to-trunk-based-development) and the two common ways to practice it.
+- [How feature flags hide unfinished work](#hide-unfinished-work-with-feature-flags) and decouple deployment from release.
+- [The workflow with Unleash](#implement-the-workflow-with-unleash), from creating a release flag to rolling the feature out.
+- [Practices that keep the trunk releasable](#keep-the-trunk-releasable), [instant rollback](#roll-back-in-seconds-without-reverting-commits), and [retiring flags](#retire-flags-when-the-rollout-is-done) once features are fully rolled out.
 
-With Unleash set up, you can use your application to talk to Unleash through one of our [SDKs](/sdks).
+## Why teams move to trunk-based development
 
-In this tutorial, you will:
+Integration pain scales with branch lifetime. A branch that lives for weeks drifts away from the code everyone else is changing, so it ends in a large, conflict-prone merge that is hard to review and hard to test. Teams compensate with integration phases and code freezes, which slow delivery further. Trunk-based development removes the problem at its source: changes integrate continuously, so no branch ever drifts far enough to make merging risky.
 
-1. [Explore different trunk-based development strategies](#choose-the-right-trunk-based-development-strategy-for-your-team)
-2. [Create feature flags for incomplete features](#create-feature-flags-for-incomplete-features)
-3. [Control feature rollouts](#control-feature-rollouts)
-4. [Simplify rollbacks with Unleash](#simplify-rollbacks)
-5. [Archive and remove feature flags](#archive-and-remove-feature-flags)
+![Comparison of long-lived feature branches, which diverge for weeks and merge back in one large, high-risk merge, with trunk-based development, where small branches merge back into the trunk within a day.](/assets/trunk-based-development-branching.svg)
 
-## Choose the right trunk-based development strategy for your team
+There are two common ways to practice it, and Unleash supports both:
 
-There is no one-size-fits-all approach to implementing trunk-based development. Different teams may benefit from varying strategies based on their needs, project complexity, and development culture.
+<CardGroup cols={2}>
+  <Card title="Commit straight to trunk" icon="fa-solid fa-code-commit">
+    The smallest teams commit directly to the trunk, using pair programming or synchronous review instead of pull requests. This maximizes integration frequency and suits teams with strong test automation.
+  </Card>
+  <Card title="Short-lived branches" icon="fa-solid fa-code-branch">
+    Most teams branch for code review and CI checks, then merge within a day. The branch exists so a pull request can run its checks, not so work can accumulate on it.
+  </Card>
+</CardGroup>
 
-In this section, we'll explore the common trunk-based development strategies and their trade-offs to help you choose the best approach for your organization.
+Either way, the definition of done for a merge is the same: the trunk builds, passes its tests, and could be released. What trunk-based development deliberately gives up is the ability to hide unfinished work on a branch. That job moves to feature flags.
 
-### Merge every commit
+## Hide unfinished work with feature flags
 
-The most straightforward approach to trunk-based development is merging every commit directly into the main branch. This strategy maximizes the rate of continuous integration and delivery, as changes are integrated into the trunk as soon as they are ready.
+A feature rarely fits into a single day-sized merge, so on any given day the trunk contains features that are partly built. There are structural ways to keep them invisible: build the backend first and add the user interface as the final piece, which Martin Fowler calls a [keystone interface](https://martinfowler.com/bliki/KeystoneInterface.html), or swap implementations behind an abstraction using [branch by abstraction](https://martinfowler.com/bliki/BranchByAbstraction.html).
 
-**Advantages**:
+A feature flag generalizes both techniques and adds something they can't provide: runtime control. The unfinished code path merges and deploys with the flag off, and nobody can reach it. When the feature is complete, you release it by changing the flag, not by deploying code. [GitHub's feature flag write-up](https://github.blog/2021-04-27-ship-code-faster-safer-feature-flags/) describes the payoff: disabling a change takes seconds, where a rollback deployment takes minutes.
 
--   Rapid feedback loops and quicker issue resolution
--   Reduced risk of large, complex merges
--   Small, frequent commits
+![Timeline for the new-checkout-flow feature: its code ships in increments through continuous deployments with the flag off, and after the feature is complete, the flag rolls it out from 1% to 100% of users.](/assets/trunk-based-development-deploy-release.svg)
 
-**Challenges**:
+This separation of deployment from release is what makes trunk-based development sustainable in production. Deployment becomes routine and low-stakes because unreleased code changes nothing for users. Release becomes deliberate and reversible because it happens at runtime, per [environment](/concepts/environments) and per audience, under your control in Unleash.
 
--   Reviewing the code can become more challenging
--   Potential for more frequent build breaks and test failures
--   Increased need for effective merging strategies
--   Requirement for robust automated testing and CI/CD pipelines
+## Implement the workflow with Unleash
 
-### Merge at set intervals
+To follow this workflow you need an Unleash instance and an application connected through one of the [SDKs](/sdks). See the [quickstart](/get-started/quickstart) for setup options.
 
-Another common strategy is to merge changes into the trunk at regular, predefined intervals, such as daily or before the end of each work day. This approach offers a balance between frequent integration and managing work-in-progress.
+<Steps>
+  <Step title="Create a release flag before writing code">
+    In the Unleash Admin UI, open your project, click **New feature flag**, and choose the release [flag type](/concepts/feature-flags#feature-flag-types). Creating the flag first means the very first slice of the feature can merge behind it.
 
-**Advantages**:
+    Give the flag a name that follows your project's [naming pattern](/concepts/feature-flags#set-a-naming-pattern), and use the description and [tags](/concepts/feature-flags#tags) to record who owns it and which ticket or feature it belongs to. Release flags are meant to be short-lived, and Unleash tracks each flag against its [expected lifetime](/concepts/feature-flags#feature-flag-lifecycle), so this metadata is what makes cleanup easy later.
+  </Step>
+  <Step title="Guard the new code path">
+    Wrap the feature at a single seam, such as the function that chooses between the old and new behavior, rather than scattering flag checks through the code:
 
--   Improved control over the integration process
--   Reduced risk of breaking the build
--   Easier to manage and identify integration issues
+    ```js
+    import { startUnleash } from 'unleash-client';
 
-**Challenges**:
+    const unleash = await startUnleash({
+      url: 'https://YOUR-API-URL',
+      appName: 'my-web-application',
+      customHeaders: { Authorization: '<YOUR_API_TOKEN>' },
+    });
 
--   Longer feedback loops compared to merging every commit
--   Potential for larger, more complex merges
--   Requires discipline to adhere to the defined merge cadence
+    function processCheckout(cart, user) {
+      if (unleash.isEnabled('new-checkout-flow', { userId: user.id })) {
+        // Merged and deployed, but hidden in production until the flag is enabled
+        return newCheckoutFlow(cart);
+      }
+      return currentCheckoutFlow(cart);
+    }
+    ```
 
-### Tradeoffs of short-lived feature branches
+    With the flag off in production, `newCheckoutFlow` can be merged in any state of completeness, as long as it compiles and its tests pass.
+  </Step>
+  <Step title="Merge small slices at least daily">
+    Break the feature into merges of a day or less. Each merge must leave the trunk green: it builds, passes CI, and is releasable, because the incomplete feature is unreachable behind the flag. This is the discipline that replaces the isolation a long-lived branch used to provide.
+  </Step>
+  <Step title="Test the feature before release">
+    Enable the flag in your development and testing [environments](/concepts/environments) while keeping it off in production. The same trunk, deployed everywhere, behaves differently per environment based on flag state, so you can exercise the feature end to end without exposing it to users. Use the [playground](/concepts/playground) to check exactly how the flag evaluates for a given context before you change anything in production.
+  </Step>
+  <Step title="Release with a gradual rollout">
+    When the feature is complete, release it in stages instead of all at once: enable it for your own team first with a [constraint](/concepts/activation-strategies#constraints) on user ID or email domain, then ramp through a [gradual rollout](/guides/gradual-rollout) to 100%. [Stickiness](/concepts/stickiness) keeps each user on the same side of the flag as the percentage grows. If your team repeats the same release ladder for every feature, define it once as a [release template](/concepts/release-templates) and apply it to each flag.
+  </Step>
+</Steps>
 
-In trunk-based development, it is possible to use short-lived feature branches, which enable teams to implement code review processes without the burden of maintaining long-running branches, which can become increasingly difficult to manage over time.
+## Keep the trunk releasable
 
-**Advantages**:
+The workflow only holds up if the trunk stays trustworthy. The [practices DORA identifies](https://dora.dev/capabilities/trunk-based-development/) for successful trunk-based development are the same ones that make flag-guarded merging safe:
 
--   Frequent integration back to trunk significantly reduces the likelihood and complexity of merge conflicts, as changes are merged before they can diverge too far from the main codebase
--   Maintains the core benefits of trunk-based development - such as rapid iteration and continuous integration - while still allowing developers to work in isolation when needed.
+- **Fast, automated builds and tests on every merge.** A build that takes minutes, not hours, is what makes merging several times a day practical.
+- **Small batches, reviewed quickly.** A diff produced in a few hours is reviewed in minutes. Waiting a day for review reintroduces the long-lived branch through the back door.
+- **No code freezes.** If a change isn't ready to be seen, that's a flag decision, not a reason to stop integrating.
+- **As few flags per feature as possible.** One flag guarding one seam is easy to reason about and easy to remove. If one feature seems to need many flags, that's usually a sign to split the feature. For managing flags across many teams, see [best practices for feature flags at scale](/guides/best-practices-using-feature-flags-at-scale).
 
-**Challenges**:
+## Roll back in seconds without reverting commits
 
--   Maintaining the discipline required to keep branches truly short-lived. Teams must develop the skill of breaking down work into small, mergeable units.
--   Demands a robust testing and CI/CD pipeline to ensure that frequent merges don't compromise code quality or stability. Teams must invest in automated testing and deployment infrastructure to support rapid integration cycles.
+When a released feature misbehaves, the flag is the retreat. Turning it off in the production environment returns every user to the previous code path in seconds, with no revert commit, no rollback deployment, and no impact on the other changes that shipped alongside it. The blast radius is exactly one feature.
 
-Keep in mind that a feature is often cleaved up into pieces that span many short-lived branches. A feature flag prevents an incomplete feature being exposed before it's done.
+You can automate the retreat as well. [Safeguards](/concepts/impact-metrics#configure-safeguards) monitor your metrics during a release plan and pause the rollout automatically when a threshold is crossed, and [signals](/concepts/signals) with [actions](/concepts/actions) let your monitoring or CI systems disable a flag without waiting for a human.
 
-> We definitely branch off to work on features, but we’ll rarely finish a whole feature in a single branch.
-> I try to aim for not having branches live more than a day with active development.
-> At that point, you're more likely for to break something and it’s harder for developers to review them properly.
-> Ideally, it’s a couple hours worth of work at most.
-> Of course there’s exceptions, but we like doing things in small chunks.
-> — _Thomas Heartman, Engineer, Unleash_
+## Retire flags when the rollout is done
 
-Regardless of the specific strategy, Unleash feature flag management capabilities are designed to support a wide range of trunk-based development styles, empowering you to implement the best strategy for your teams.
-
-### Microservices vs. monoliths
-
-The underlying application architecture can also influence the optimal trunk-based development strategy. Teams working on monolithic applications may find more success with less frequent merges, while those working on microservices may benefit from a more continuous integration approach.
-
-**Monolithic applications**:
-
--   Larger, more tightly coupled codebase
--   Merging at set intervals (for example, daily) may be more suitable to manage integration complexity
--   Increased emphasis on rigorous testing and staged deployments
-
-**Microservices**:
-
--   Smaller, more loosely coupled services
--   Merging every commit is often more feasible due to reduced integration challenges
--   Enables more independent development and deployment of individual services
-
-> Having a monolith can be better because it reduces latency between network calls in comparison to microservices.
-> But if there isn’t a centralized team that truly manages the monolithic code, it can be difficult."
->
-> — _Jeanette Pranin, Sr. Software Engineer, Fabric_
-
-## Create feature flags for incomplete features
-
-Some of the most appropriate feature candidates for trunk-based development are features with significant user impact that require thorough testing.
-
-In trunk-based development, developers merge incomplete code into the main branch. Unleash feature flags allow this to happen safely by keeping the feature hidden or disabled, ensuring the trunk remains in a releasable state. The flag starts as “off” in production while the feature is incomplete. The flag can be on in development and/or a testing environment until the feature is complete and ready to go live in production for all users.
-
-To demonstrate this, let's create a flag that wraps around an incomplete feature in our application code. After that, we’ll explore rollout strategies and how they are configured in Unleash to enable trunk-based development.
-
-In the Unleash Admin UI, open a project and click **New feature flag**.
-
-<Frame background="subtle">
-  ![Create a new feature flag in the Unleash Admin UI.](/assets/use-case-new-flag.png)
-</Frame>
-
-Next, name the new feature flag. The purpose of this flag is to manage the deployment of a new or incomplete feature. Therefore, the flag we are creating is considered a Release flag type. While release flags are invaluable, they should be short-lived to prevent codebase complexity and technical debt accumulation. Later in the tutorial, we will cover when to remove and archive these flags.
-
-<Frame background="subtle">
-  ![Create a feature flag by filling out the form fields.](/assets/use-case-create-tbd-flag.png)
-</Frame>
-
-Once you have completed the form, click **Create feature flag**.
-
-Once your flag is created, you can build a feature in your application code while keeping it hidden in production.
-
-### Effectively manage your feature flag and code
-
-When implementing trunk-based development with Unleash, it's crucial to have a well-structured process for managing your feature flags and the associated code. This ensures the trunk remains in a deployable state while allowing teams to work independently on different features.
-
-Here is an example of wrapping code in a feature flag using JavaScript and our SDK:
-
-```javascript
-// Import the Unleash client
-
-// Initialize the Unleash client with your configuration
-initialize({
-  appName: 'my-web-application',
-  url: 'https://your-unleash-instance.com/client/features',
-  instanceId: 'unique-client-identifier'
-});
-
-// Example of a feature flag-wrapped checkout process
-function processCheckout(cart) {
-  // Check if the new checkout flow is enabled
-  if (isEnabled('new-checkout-flow')) {
-    // New checkout implementation
-    return advancedCheckoutProcess(cart);
-  } else {
-    // Original checkout implementation
-    return standardCheckoutProcess(cart);
-  }
-}
-
-// Advanced checkout process (new feature)
-function advancedCheckoutProcess(cart) {
-  // Implement the new, more sophisticated checkout flow
-  console.log('Using advanced checkout process');
-
-  // Add new features like:
-  // - Enhanced payment options
-  // - Detailed order preview
-  // - Advanced shipping calculations
-  return {
-    status: 'success',
-    orderDetails: /* new implementation */
-  };
-}
-
-// Standard checkout process (existing implementation)
-function standardCheckoutProcess(cart) {
-  // Existing checkout logic
-  console.log('Using standard checkout process');
-  return {
-    status: 'success',
-    orderDetails: /* existing implementation */
-  };
-}
-
-// Example usage
-function handleCheckout(cart) {
-  try {
-    const checkoutResult = processCheckout(cart);
-    return checkoutResult;
-  } catch (error) {
-    // Fallback mechanism
-    console.error('Checkout failed', error);
-    return standardCheckoutProcess(cart);
-  }
-}
-```
-
-### Key aspects of feature flag implementation in code
-
-1. Conditional Feature Activation: The `isEnabled('new-checkout-flow')` check allows the team to control feature visibility without changing the code deployment.
-2. Easy Rollback: If issues are detected, simply turning off the flag in Unleash immediately reverts to the standard checkout process.
-3. Trunk-Based Development Support:
-    - Developers can merge the new checkout code into the main branch
-    - The feature remains hidden behind the flag
-    - Team can test the new implementation in different environments
-    - Gradual rollout is possible by adjusting flag configurations
-4. Fallback Mechanism: The code includes a fallback to the standard process, ensuring system reliability even if the new feature encounters issues.
-
-This approach embodies the core principles of trunk-based development and feature flag usage:
-
--   Keeping the trunk always deployable
--   Controlled feature rollout
--   Minimal risk during new feature introduction
--   Test new features in production
--   Quickly disable problematic features
-
-### Establish consistent naming conventions
-
-Develop clear and [consistent naming patterns](/concepts/feature-flags#set-a-naming-pattern) for your feature flags. This will help maintain clarity and make it easier to understand the purpose and context of each flag. Some recommended elements to include in your flag names:
-
--   The feature or functionality the flag is associated with
--   The environment or user segment the flag is intended for (e.g., "mobile_users")
--   A short, descriptive prefix (for example, "ff\*", "feat\_"). For example: `feat_new_dashboard_beta`.
-
-### Leverage tagging and flag descriptions
-
-In addition to meaningful names, apply relevant [tags](/concepts/feature-flags#tags) and descriptions to your feature flags in Unleash. This metadata can include information such as:
-
--   The team or product area responsible for the flag
--   The release timeline or planned retirement date
--   Associated Jira tickets or GitHub issues
--   Relevant documentation or context
-
-Tagging and descriptive flags make it easier to search, filter, and manage your feature flags, especially as the number of flags grows.
-
-Click **Create new tag** in the Unleash Admin UI to add these details to your feature flag.
-
-<Frame background="subtle">
-  ![Create a tag with relevant data to better organize your feature flags. A modal will pop up to name and save as many tags as you need.](/assets/use-case-tbd-tagging.png)
-</Frame>
-
-To add descriptions to your flag, go to your flag settings and edit the description field with relevant, useful information.
-
-<Frame background="subtle">
-  ![In your flag settings form, there is an optional description field for adding more details about the flag you're creating.](/assets/use-case-tbd-edit-flag.png)
-</Frame>
-
-### Keep the trunk deployable
-
-The trunk should always be deployable, enabling teams to accelerate release cycles and respond quickly to market demands.
-
-To keep the trunk in a deployable state, keep the flag off in your production environment. The code for your feature should be wrapped in your flag and, therefore, not executable in production, even though the code will be deployed frequently. This ensures users do not have access to the feature before its official release. Additionally, this promotes collaboration by allowing teams to work independently on different features without interference.
-
-To test your incomplete feature, enable the flag in the development environment in the Unleash Admin UI. In some cases, you may also find it valuable to enable the flag in a testing/QA environment. Unleash environment-specific flag configurations make it easy to manage these different states across your [environments](/concepts/environments). You can quickly toggle flags on or off for specific environments, ensuring the trunk remains deployable in production while enabling active development and testing in other contexts. Use the default production environment toggle in Unleash to enable your flag when you’re ready to make your feature available.
-
-<Note>
-  Depending on the size and scope of a feature you’re developing, you may need more than one flag. Generally, we recommend creating as few flags as possible per feature, as making too many flags associated with one feature can become more complex to manage over time with trunk-based development. Our documentation on [best practices for feature flags at scale](/guides/best-practices-using-feature-flags-at-scale) provides more concrete details on large-scale feature flag management.
-</Note>
-
-### Automate flag lifecycle management
-
-As your codebase and development processes mature, consider automating key aspects of feature flag management. This can include:
-
--   Automated flag archiving and removal: Set rules to automatically archive or remove flags that have been inactive for a certain period, reducing technical debt.
--   Integration with your CI/CD pipelines: Automatically create, update, or toggle flags as part of your deployment workflows, ensuring flags stay in sync with the codebase.
--   Reporting and analytics: Generate regular reports on flag usage, performance, and health to proactively identify opportunities for optimization.
-
-Automation helps maintain a clean, well-organized feature flag landscape, even as your organization scales its trunk-based development practices. Learn more about [feature flag lifecycles](/concepts/feature-flags#feature-flag-lifecycle) and how to implement this process using Unleash into your workflow.
-
-## Control feature rollouts
-
-Once a feature is complete, feature flags enable controlled rollouts. You can gradually expose the feature to users, starting with specific groups or environments, without needing to redeploy the code.
-
-For trunk-based development, you can create a gradual rollout strategy to:
-
--   Determine the percentage of users exposed to the new feature
--   Determine the percentage of users that get exposed to each version of the feature
--   Release on a per-customer basis
--   Release to the general user base
-
-To target users accordingly, let's create an [activation strategy](/concepts/activation-strategies). This Unleash concept defines who will be exposed to a particular flag. With Unleash, you can define a gradual rollout strategy to enable a feature only for a specified audience, depending on the parameters under which you would like to release a feature.
-
-<Frame background="subtle">
-  ![Add a strategy to configure a release process for your flag.](/assets/use-case-tbd-add-strategy.png)
-</Frame>
-
-Next, let's create a new activation strategy and configure the rollout percentage so only a certain portion of your users are targeted. For example, you can adjust the dial so that 35% of all users are targeted. The remaining percentage of users will not experience any variation of the new feature. Adjust the rollout dial to set the percentage of users the feature targets, or keep it at 100% to target all users.
-
-To define more granular conditions for your feature beyond the rollout percentage, you can use [strategy variants](/concepts/strategy-variants) and [constraints](/concepts/activation-strategies#constraints).
-
-## Simplify rollbacks
-
-In trunk-based development, the ability to quickly roll back a feature can mean the difference between a minor hiccup and a major service disruption.
-
-When issues are detected, Unleash makes it easy to quickly roll back a problematic feature by simply turning off the corresponding feature flag in your production environment. This allows development teams to address problems swiftly without the need for complex rollback procedures or full code deployments.
-
-### The one-click rollback process
-
-Imagine you've just rolled out a new checkout process. Shortly after launch, you detect performance issues or unexpected user behavior. To mitigate this issue, the process to roll back is straightforward:
-
-1. Go to the Unleash Admin UI
-2. Find the feature flag for the feature you want to roll back
-3. Toggle the flag to the "off" position in the production environment
-
-Instantly, the feature is disabled for all users without requiring a new code deployment, complex rollback procedures, or downtime for your application.
-
-### Why simple rollbacks matter for development teams
-
-This simple rollback mechanism provides many critical benefits:
-
--   Immediate risk mitigation
--   Minimal disruption to ongoing development
--   Reduced operational overhead
--   Enhanced ability to experiment and innovate
-
-You can simply turn off the feature flag in Unleash, immediately reverting to the previous stable version of the feature.
-
-### Best practices for rollbacks
-
-To maximize the effectiveness of feature flag rollbacks:
-
--   Always have a feature flag prepared before launching new functionality
--   Ensure your feature flags wrap complete, identifiable units of functionality
--   Train your team on the rollback process
--   Set up monitoring to quickly detect potential issues
-
-## Archive and remove feature flags
-
-Once a feature is fully rolled out and stable, the feature flag should be archived or removed. This reduces technical debt in the codebase and prevents unnecessary complexity.
-
-As your codebase and feature set grow over time, it's important to maintain visibility into your feature flag usage and lifecycle. Regularly review which flags are active, which environments they are enabled in, and when they were last modified.
-
-Unleash provides reporting and analytics capabilities to help you monitor your feature flag landscape. This allows you to identify obsolete or unused flags, and plan for their eventual archival or removal, keeping your codebase clean and manageable.
+A release flag has done its job once the feature has held at 100% and you no longer need the option to turn it off. Leaving it in place after that is unmanaged technical debt: every stale flag is a dead branch in the code and an if statement someone eventually misreads. Unleash surfaces cleanup candidates through the [feature flag lifecycle](/concepts/feature-flags#feature-flag-lifecycle), which highlights flags that have completed their rollout but haven't been archived.
+
+To clean up a release flag safely:
+
+1. Confirm the feature is stable at 100% rollout and you no longer need the ability to turn it off quickly.
+2. Remove the flag check from your code, keeping only the new code path, and deploy that change.
+3. [Archive the flag](/concepts/feature-flags#archive-a-feature-flag) in Unleash. Archiving keeps the flag's history, and you can revive it later if needed.
+
+<Warning>
+Remove the flag from your code before archiving it. If you archive a flag that is still referenced in code, `isEnabled` calls for it return the fallback value, which can silently switch users back to the old code path.
+</Warning>
+
+Make cleanup part of the feature's definition of done, for example by creating the removal task at the moment a flag reaches 100% rollout. A trunk-based team creates flags constantly, so retiring them at the same rate is what keeps the codebase simple.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="How does code review work without long-lived branches?">
+    Review still happens, it just happens fast and on small diffs. Most teams use short-lived branches with pull requests: the branch exists for hours, CI runs on it, a teammate reviews it the same day, and it merges. Teams that commit straight to trunk use pair programming or synchronous review instead. What trunk-based development rules out is review latency measured in days, because a branch waiting for review is a branch drifting from trunk.
+  </Accordion>
+  <Accordion title="Does every change need a feature flag?">
+    No. Flags are for work that is user-visible and incomplete across merges, or that you want to release gradually or be able to turn off. Small refactors, bug fixes, and changes that are complete within a single merge go straight to trunk without a flag. Creating flags only where they earn their keep is what keeps flag cleanup manageable.
+  </Accordion>
+  <Accordion title="What if a feature takes weeks to build?">
+    Build it as a sequence of small, flag-guarded merges rather than on a long-lived branch. The flag keeps the accumulating feature hidden in production the whole time, and each slice still integrates daily with everyone else's work. Techniques like the [keystone interface](https://martinfowler.com/bliki/KeystoneInterface.html), where the user interface lands last, reduce how much of the feature ever needs to be reachable while unfinished.
+  </Accordion>
+  <Accordion title="Do we still need release branches?">
+    Teams practicing continuous delivery typically release straight from trunk and fix forward, using flags for anything that needs to be withheld or withdrawn. If your process requires release branches, for example for versioned or packaged software, [trunk-based development allows them](https://trunkbaseddevelopment.com/) as short-lived, cut-just-in-time branches that are never merged back into. Feature flags reduce how often you need one, because withholding a feature no longer requires excluding its code from the release.
+  </Accordion>
+</AccordionGroup>
+
+## Additional resources
+
+- [How to perform a gradual rollout](/guides/gradual-rollout)
+- [Feature flag best practices](/guides/feature-flag-best-practices)
+- [Managing feature flags in code](/guides/manage-feature-flags-in-code)
+- [Best practices for feature flags at scale](/guides/best-practices-using-feature-flags-at-scale)

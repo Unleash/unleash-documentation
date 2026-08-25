@@ -365,6 +365,8 @@ navigation:
         api-name: client-api
         skip-slug: true
         layout:
+          - page: Client API overview
+            path: pages/apis/client-api-overview.mdx
           - section: "Feature flags"
             skip-slug: true
             contents:
@@ -385,6 +387,8 @@ navigation:
         api-name: frontend-api
         skip-slug: true
         layout:
+          - page: Frontend API overview
+            path: pages/apis/frontend-api-overview.mdx
           - section: "Feature flags"
             skip-slug: true
             contents:
@@ -403,6 +407,8 @@ navigation:
         api-name: edge-api
         skip-slug: true
         layout:
+          - page: Unleash Edge API overview
+            path: pages/apis/edge-api-overview.mdx
           - section: "Client API"
             skip-slug: true
             contents:
@@ -429,6 +435,8 @@ navigation:
         skip-slug: true
         display-errors: true
         layout:
+          - page: Admin API overview
+            path: pages/apis/admin-api-overview.mdx
           - section: "Addons"
             referenced-packages:
               - Addons
@@ -1032,8 +1040,8 @@ navbar-links:
       
 colors:
   accent-primary:
-    dark: "#817afe"
-    light: "#817afe"
+    dark: "#a39dfe"
+    light: "#7770fe"
   background:
     dark: "#1A1924"
     light: "#EAEAED"
