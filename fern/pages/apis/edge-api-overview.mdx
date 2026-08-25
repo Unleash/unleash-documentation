@@ -24,7 +24,7 @@ Because the endpoints are API-compatible, you don't need to change your SDK code
 
 ## Authentication
 
-Use [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) for Client API endpoints and [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) for Frontend API endpoints. Edge validates tokens against your upstream Unleash instance, so the tokens must exist there.
+Use [backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) for Client API endpoints and [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) for Frontend API endpoints. In edge mode, Edge validates standard tokens against your upstream Unleash instance, so the tokens must exist there; [pre-trusted tokens](/unleash-edge/deploy#pre-trusted-tokens) are the exception. In [offline mode](/unleash-edge/configure#offline-mode), Edge validates requests against the client and frontend tokens configured at startup, which do not need to exist in Unleash.
 
 ## Available endpoints
 

@@ -118,7 +118,7 @@ Unleash is built to give developers confidence in their ability to run A/B tests
 
 For example, user `uuid1234` should be the target of `variantA` regardless of their session. The original subset of users that get `variantA` will continue to experience that variation of the feature over time. At Unleash, we call this [stickiness](/concepts/stickiness). You can define the parameter of stickiness in the gradual rollout form.
 
-By default, Unleash calculates stickiness from the `userId` context field and falls back to the `sessionId` if the `userId` is unavailable. The strategy's `groupId` is also part of the calculation, so each flag distributes users independently.
+By default, Unleash calculates stickiness from the `userId` context field and falls back to the `sessionId` if the `userId` is unavailable. The strategy's `groupId` is also part of the calculation. It defaults to the feature flag name, giving each flag an independent distribution; assigning the same `groupId` to multiple flags correlates their rollouts.
 
 ### Track A/B testing for your key performance metrics
 
@@ -135,7 +135,7 @@ Your client SDK will emit an impression event when it calls `isEnabled` or `getV
 
 Strategy variants are meant to work with impression data. You get the name of the variant sent to your analytics tool, which allows you a better understanding of what happened, rather than seeing a simple true/false from your logs.
 
-You can also use [impact metrics](/concepts/impact-metrics) to correlate flag exposure with product and system metrics directly in Unleash, without sending impression events to an external analytics tool.
+You can also use [impact metrics](/concepts/impact-metrics) to monitor aggregate product and system metrics during a rollout and automate [safeguards](/concepts/impact-metrics#configure-safeguards). To attribute outcomes to individual flag or variant exposure in an A/B test, send impression events to an analytics tool.
 
 The output from the impression data in your app may look like this code snippet:
 

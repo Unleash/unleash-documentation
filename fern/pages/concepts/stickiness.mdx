@@ -27,7 +27,7 @@ If neither field is available, the calculation returns a random number and stick
 
 ### Group ID
 
-Unleash combines the selected context field with the strategy's `groupId` before hashing. The `groupId` acts as a grouping input: it gives each flag its own independent distribution, so the same user can fall inside the rollout for one flag and outside it for another.
+Unleash combines the selected context field with the strategy's `groupId` before hashing. By default, the `groupId` is the name of the feature flag, giving each flag its own independent distribution, so the same user can fall inside the rollout for one flag and outside it for another. You can set the same `groupId` on multiple flags to correlate their rollouts. You can also use the `groupId` as a stickiness reset mechanism: changing it changes the hash input, so all users are reassigned; see [Reshuffling users](#reshuffling-users).
 
 ## Consistency
 

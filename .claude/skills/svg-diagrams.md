@@ -8,7 +8,7 @@ These are the SVG diagram colors. Each color must mean one thing consistently ac
 
 | Color | Hex | Use for |
 |-------|-----|---------|
-| Purple | `#817AFE` | Accent and hero elements: the main line or curve the diagram is about, trunk lines. Matches the site accent in `docs.yml`. |
+| Purple | `#817AFE` | Accent and hero elements: the main line or curve the diagram is about, trunk lines. This is the fixed diagram accent; the site itself uses separate light- and dark-mode accent values in `docs.yml`. |
 | Orange | `#EB5600` | Bad or warning only: risks, failures, anti-patterns. Never for neutral emphasis. |
 | Highlight green | `#A0E3AB` | Positive highlight fills: chips, badges, the elements the diagram singles out. |
 | Dark green | `#1A4049` | Text on highlight green fills; pairs with `#A0E3AB`. Not for outlines, it reads as navy blue at stroke widths. |

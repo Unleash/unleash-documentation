@@ -66,7 +66,7 @@ If you need to know about a flag regardless of whether it's "on" or "off" for a 
 
 ## I get a 401 or 403 error from the API
 
-A `401 Unauthorized` response means Unleash could not authenticate the request; a `403 Forbidden` response means the token was recognized but is not allowed to do what it asked. Work through the following checks.
+A `401 Unauthorized` response means the request could not be authenticated. A `403 Forbidden` response usually means the token was recognized but is not allowed to do what it asked; some APIs also return `403` for invalid or wrong-type tokens. Work through the following checks to identify the cause.
 
 #### Check the Authorization header
 
@@ -98,9 +98,9 @@ A token only accesses the projects and environment it was created for, and this 
 
 If Admin API write operations return `403` in a specific environment, check whether that environment requires [change requests](/concepts/change-requests). Environments with change requests enabled reject direct configuration changes; submit the change as a change request instead.
 
-#### Check Unleash Edge token scopes
+#### Check Unleash Edge token configuration
 
-When connecting through [Unleash Edge](/unleash-edge), Edge validates tokens against its upstream Unleash instance. A token that does not exist upstream, or that is outside the scopes your Edge instance is configured to serve, is rejected even if it looks well-formed.
+When connecting through [Unleash Edge](/unleash-edge) in edge mode, standard tokens are validated against the upstream Unleash instance and must be within the scopes Edge is configured to serve. If you use [pre-trusted tokens](/unleash-edge/deploy#pre-trusted-tokens), confirm that the token is explicitly configured and covered by a standard backend token for the same environment. In [offline mode](/unleash-edge/configure#offline-mode), confirm that the token is included in the client or frontend tokens configured at startup; these tokens do not need to exist in Unleash.
 
 ## My A/B tests are producing unexpected results
 
@@ -179,10 +179,11 @@ You can use the `curl` command-line tool to inspect the response headers from yo
 ```bash
 curl -s -I -X OPTIONS "https://<host>/<endpoint>" \
   -H "Origin: https://your-app.com" \
-  -H "Access-Control-Request-Method: GET"
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: Authorization"
 ```
 
-Check the response for the `Access-Control-Allow-Origin` header. If it is missing or doesn't match your application's origin, revisit your CORS configuration.
+Check the response for the `Access-Control-Allow-Origin` header. If it is missing or doesn't match your application's origin, revisit your CORS configuration. Also check that the `Access-Control-Allow-Headers` header includes `authorization`; without it, the browser's preflight fails even when the origin is allowed.
 
 ## I don't see an Unleash feature in the Admin UI
 
