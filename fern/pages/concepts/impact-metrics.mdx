@@ -5,7 +5,7 @@ og:title: Impact metrics - Track application-level time-series metrics in Unleas
 description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
 keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
-last-updated: August 5, 2026
+last-updated: September 1, 2026
 ---
 
 ## Overview
@@ -129,6 +129,10 @@ Creating a metric in the UI only defines it. To record values for the metric, in
 Unleash Edge forwards [internal metrics](#internal-metrics) received from SDKs to the Unleash API. The origin label appears as `origin=Edge`. Daisy-chaining Edge instances is not supported.
 
 If an Edge instance accumulates a large batch of metrics due to a temporary network disconnect, it sends them as a single bulk request upon reconnection. This appears as a spike in your counter graphs rather than a smooth distribution over time. This is expected behavior.
+
+### Data retention
+
+Internal impact metrics data is retained for **6 months**. Data older than 6 months is automatically deleted. External metrics are not stored in Unleash, so this limit does not apply to them.
 
 ## Connect external metrics
 
