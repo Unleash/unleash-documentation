@@ -173,7 +173,7 @@ Pass these options to `initialize`, `startUnleash`, or the `Unleash` constructor
 </ParamField>
 
 <ParamField path="repository" type="RepositoryInterface">
-  Custom repository implementation to manage the underlying data layer.
+  Custom repository implementation to manage the underlying data layer. Your repository must emit a `ready` event after the client has been constructed. See the [custom repository example](https://github.com/Unleash/unleash-client-node/blob/main/examples/custom_repository.js).
 </ParamField>
 
 <ParamField path="storageProvider" type="StorageProvider">
@@ -198,6 +198,10 @@ Pass these options to `initialize`, `startUnleash`, or the `Unleash` constructor
 
 <ParamField path="skipInstanceCountWarning" type="boolean" default="false">
   Suppresses the warning emitted when more than 10 SDK instances are created.
+</ParamField>
+
+<ParamField path="experimentalMode" type="Mode" default="{ type: 'polling', format: 'full' }">
+  Experimental. Controls how the SDK receives flag updates. Set `{ type: 'polling', format: 'delta' }` to fetch only changes instead of the full configuration, or `{ type: 'streaming' }` to receive updates over server-sent events. Streaming requires a server that supports it, such as [Unleash Edge](/unleash-edge/configure#synchronization-and-polling) with streaming enabled. If the streaming connection degrades, the SDK falls back to polling and reconnects automatically.
 </ParamField>
 
 ## Check flags
@@ -226,7 +230,7 @@ unleash.isEnabled(name, context?, fallback?);
 | `context` | `Context` | Optional [Unleash context](#unleash-context) for this evaluation. |
 | `fallback` | `boolean` or `(name, context) => boolean` | Value or function used when the flag cannot be resolved. Defaults to `false`. |
 
-The fallback applies when the SDK cannot resolve the flag — for example, before initial synchronization or when the flag does not exist. Pass a boolean for a static default, or a function for per-call logic:
+The fallback applies when the SDK cannot resolve the flag, for example, before initial synchronization or when the flag does not exist. Pass a boolean for a static default, or a function for per-call logic:
 
 ```js
 const enabled = unleash.isEnabled('my-feature', { userId: '123' }, (name, ctx) => {
@@ -265,7 +269,7 @@ The SDK can return two forms of the disabled variant:
 - Feature disabled or not found: `{ name: 'disabled', enabled: false, feature_enabled: false }`
 - Feature enabled but no variant resolved (for example, no variants configured): `{ name: 'disabled', enabled: false, feature_enabled: true }`
 
-In both cases, `name` is `'disabled'` and `enabled` is `false`. Use `feature_enabled` to distinguish the two. The returned object also includes a deprecated `featureEnabled` field for backwards compatibility — prefer `feature_enabled` in new code.
+In both cases, `name` is `'disabled'` and `enabled` is `false`. Use `feature_enabled` to distinguish the two. The returned object also includes a deprecated `featureEnabled` field for backwards compatibility. Prefer `feature_enabled` in new code.
 
 Example with a fallback variant:
 
@@ -307,12 +311,15 @@ For stable gradual rollout and stickiness, include at least `userId` or `session
 
 ## Stop the client
 
-Call `destroy` to shut down the client and stop polling. A destroyed client cannot be restarted.
+Call `destroyWithFlush` to send any pending metrics and then shut down the client, or `destroy` to shut down immediately. A destroyed client cannot be restarted.
 
 ```js
-import { destroy } from 'unleash-client';
-destroy();
+import { destroyWithFlush } from 'unleash-client';
+
+await destroyWithFlush();
 ```
+
+Both functions are also available as methods on the client instance. To send pending metrics without shutting down, call `flushMetrics`.
 
 ## Custom strategies
 
@@ -347,7 +354,7 @@ The Unleash client implements the EventEmitter interface and emits the following
 |---|---|---|
 | `ready` | - | The local cache is ready. The SDK may not have synchronized with the API yet. |
 | `synchronized` | - | The SDK has successfully synchronized with the Unleash API or been bootstrapped. |
-| `registered` | - | The SDK has registered with the Unleash API. |
+| `registered` | `object` data | The SDK has registered with the Unleash API. |
 | `sent` | `object` data | Metrics payload was sent to Unleash. |
 | `count` | `string` name, `boolean` enabled | A flag evaluation was counted for metrics. |
 | `warn` | `string` msg | The SDK emitted a warning. |
@@ -462,12 +469,13 @@ unleash.impactMetrics.updateGauge('active_users', 42);
 </Tab>
 <Tab title="Histogram">
 
-Histograms measure distributions such as latency and payload size.
+Histograms measure distributions such as latency and payload size. `defineHistogram` accepts an optional third argument with custom bucket boundaries.
 
 ```js
 unleash.impactMetrics.defineHistogram(
   'request_time_ms',
   'Request processing time in milliseconds',
+  [10, 50, 100, 250, 500, 1000],
 );
 unleash.impactMetrics.observeHistogram('request_time_ms', 125);
 ```
@@ -614,6 +622,12 @@ const featureToggleX = getFeatureToggleDefinition('app.ToggleX');
 const featureToggles = getFeatureToggleDefinitions();
 ```
 
+Pass `true` to `getFeatureToggleDefinitions` to include full segment data on each strategy:
+
+```js
+const featureTogglesWithSegments = getFeatureToggleDefinitions(true);
+```
+
 ## TypeScript: custom feature flag names
 
 You can use TypeScript module augmentation to provide type safety for your feature flag names. This catches flag name typos at compile time.
@@ -680,6 +694,13 @@ test('my-feature is enabled', async () => {
 ```
 
 Mock HTTP requests with [nock](https://github.com/nock/nock) to fully isolate tests from the network.
+
+## Migrating to v6
+
+When upgrading from v5:
+
+- The SDK generates `instanceId` automatically. You no longer need to set it, but you can still provide your own value to identify an instance.
+- The minimum supported Node.js version is 20 as of v6.9. Earlier v6 releases support Node.js 16 or later.
 
 ## Troubleshooting
 
