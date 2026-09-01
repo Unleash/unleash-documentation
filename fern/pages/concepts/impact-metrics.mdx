@@ -130,6 +130,10 @@ Unleash Edge forwards [internal metrics](#internal-metrics) received from SDKs t
 
 If an Edge instance accumulates a large batch of metrics due to a temporary network disconnect, it sends them as a single bulk request upon reconnection. This appears as a spike in your counter graphs rather than a smooth distribution over time. This is expected behavior.
 
+### Data retention
+
+Internal impact metrics data is retained for **6 months**. Data older than 6 months is automatically deleted. External metrics are not stored in Unleash, so this limit does not apply to them.
+
 ## Connect external metrics
 
 If you already collect metrics in Prometheus or VictoriaMetrics, you can connect your instance to Unleash and use those metrics in [charts](#create-charts) and [safeguards](#configure-safeguards) without re-instrumenting your application through the SDK.
