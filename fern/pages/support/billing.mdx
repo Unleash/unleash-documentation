@@ -96,10 +96,13 @@ Because flag evaluation is not metered, there is no cost incentive to limit how 
 <StickyTable>
 | Data | Open Source | Pay-as-you-go | Enterprise |
 |---|---|---|---|
-| [Feature flag metrics](/concepts/impact-metrics) | 90 days | 90 days | 90 days |
+| [Flag evaluation metrics](/concepts/insights#flag-evaluation-metrics) | 90 days | 90 days | 90 days |
+| [Impact metrics](/concepts/impact-metrics) | Not available | 6 months | 6 months |
 | [Audit log](/concepts/events#event-log) | Basic | Basic | Advanced, up to 2 years |
 | [Login history](/concepts/login-history) | Not available | Available | Available |
 </StickyTable>
+
+Impact metrics retention applies to internal metrics recorded through the SDK. External metrics are not stored in Unleash, so the limit does not apply to them.
 
 {/* TODO: Confirm audit log retention on pay-as-you-go. /pricing lists "Audit logs with up to
     2 years retention" in the shared Security & compliance block, but oss-comparison.mdx
