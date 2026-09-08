@@ -6,7 +6,7 @@ description: A Model Context Protocol (MCP) server that enables LLM-powered codi
 keywords: mcp, model context protocol, ai, llm, coding assistants, claude, feature flags, automation
 max-toc-depth: 3
 slug: integrate/mcp
-last-updated: June 15, 2026
+last-updated: September 8, 2026
 ---
 
 A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for managing [Unleash](https://www.getunleash.io/) feature flags. This server enables LLM-powered coding assistants to create and manage feature flags following Unleash best practices.
@@ -181,7 +181,7 @@ You can run the MCP server as a standalone process without cloning the repositor
 UNLEASH_BASE_URL={{your-instance-url}} \
 UNLEASH_PAT={{your-personal-access-token}} \
 UNLEASH_DEFAULT_PROJECT={{default_project_id}} \
-npx unleash-mcp --log-level debug
+npx @unleash/mcp@latest --log-level debug
 ```
 
 The CLI supports the same flags as the local build (for example, `--dry-run`, `--log-level`).
