@@ -5,7 +5,7 @@ og:title: API tokens and client keys - Authenticate SDKs and integrations with U
 description: Unleash uses API keys to facilitate communication between consuming clients such as SDKs, Unleash Edge, or other tools and automation.
 keywords: api tokens, client keys, authentication, backend tokens, frontend tokens, personal access tokens
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: September 9, 2026
 ---
 
 ## Overview
@@ -69,6 +69,32 @@ Admin tokens are deprecated. Use other token types:
 
 Admin tokens grant full read and write access to all resources in the Unleash server API. This includes all projects, all environments, and all [root resources](/concepts/rbac).
 
+## Secure token storage
+
+<Button small outlined className="version-button" href="/support/availability">v8.2</Button>
+
+Secure token storage prevents complete token values from being stored in the Unleash database. Instead, Unleash stores two values for each token:
+
+- A **selector**, which identifies the token's database record. The selector is included in the token so that Unleash can look up the correct record during authentication. It is not a secret.
+- A **verifier**, which Unleash derives from the complete token and uses to verify the credential. The verifier is stored in the database but is never included in the token or returned by the API.
+
+When Unleash receives a token, it extracts the selector, retrieves the corresponding verifier, and verifies the presented token. The complete token is only returned when you create it. Unleash cannot reconstruct it from the stored selector and verifier. Copy new tokens immediately and store them in a secure location, such as a secrets manager.
+
+<Note>
+Secure storage does not make [frontend tokens](#frontend-tokens) confidential. Frontend tokens remain safe to expose client-side because they only provide access to the Frontend API.
+</Note>
+
+In Unleash v8.2, secure storage is available as an opt-in feature. For self-hosted instances, set the environment variables that correspond to the token types you use and restart Unleash:
+
+| Environment variable | Token types |
+| --- | --- |
+| `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=true` | Backend, frontend, and deprecated admin tokens, including tokens created for Unleash Edge |
+| `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=true` | Personal access tokens and service account tokens |
+
+In Unleash v8.3, secure token storage is generally available and enabled by default. The environment variables are not required.
+
+The setting only affects tokens created after secure storage is enabled. Existing tokens continue to work in their legacy format. To ensure that complete token secrets are no longer stored in your database, [rotate](#rotate-a-token) any tokens created before you enabled secure storage.
+
 
 ## API token permissions
 
@@ -87,7 +113,39 @@ The following table provides a summary of what actions different roles can perfo
 
 ## API token format
 
-API tokens consist of three parts:
+You can identify whether a token uses secure storage from its format. Secure tokens include a `v2` marker, a selector, and a random secret segment.
+
+Backend and frontend tokens use this format:
+
+```
+{{projects}}:{{environment}}.v2_{{selector}}_{{secret}}
+```
+
+Personal access tokens and service account tokens use this format:
+
+```
+user:v2_{{selector}}_{{secret}}
+```
+
+The selector is a 22-character Base64 URL-encoded string. The random secret segment is a 43-character Base64 URL-encoded string. Treat the complete token, including its selector and secret segment, as the credential.
+
+For backend and frontend tokens, the project value can be one of:
+
+- A single project ID, for example, `default`: the token can only access that project.
+- `[]`: the token is valid for a specific set of projects. The project IDs are not shown in the token.
+- `*`: the token is valid for all current and future projects.
+
+The environment value is the name of an environment on your Unleash instance, such as `development`.
+
+For example, the shape of a secure backend token for the `new-checkout-flow` project in the `development` environment is:
+
+```
+new-checkout-flow:development.v2_{{selector}}_{{secret}}
+```
+
+### Legacy token format
+
+Tokens created before secure storage is enabled do not include the `v2` marker. Legacy backend and frontend tokens consist of three parts:
 
 1. Project information
 2. Environment
@@ -99,14 +157,9 @@ The parts are separated by two delimiters: a colon (`:`) between the projects an
 {{projects}}:{{environment}}.{{hash}}
 ```
 
-The project value of the token can be one of:
--   A single project ID, for example, `default`: when the token can only access a single project.
--   `[]`: when the token is valid for a specific set of projects. The list of projects is not shown in the token.
--   `*`: when the token is valid for all current and future projects.
+The project and environment value of the token follow the same rules as the secure tokens described above.
 
-The environment value of the token is the name of an environment on your Unleash instance, such as `development`. The hash is a 64-character-long hexadecimal string.
-
-Personal access tokens start with the string `user`, and do not contain additional project or environment information.
+The hash is a 64-character hexadecimal string. Legacy personal access tokens and service account tokens start with `user:` and do not contain project or environment information.
 
 Some example API tokens are:
 
@@ -122,13 +175,13 @@ Some example API tokens are:
     ```
     *:development.be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
     ```
--   A personal access token:
+-   A personal access token or service account token:
     ```
     user:be7536c3a160ff15e3a92da45de531dd54bc1ae15d8455c0476f086b
     ```
 
 
-Note, in Unleash v4.3 or less, API tokens are a 64-character-long hexadecimal string with no additional information. For example:
+In Unleash v4.3 or earlier, API tokens are a 64-character hexadecimal string with no additional information. For example:
 
 ```
 be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
