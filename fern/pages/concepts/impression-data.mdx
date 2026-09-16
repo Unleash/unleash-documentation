@@ -17,7 +17,7 @@ Unleash can provide you with **impression data** about the flags in your applica
 <Warning>
 **Frontend SDKs and disabled flags**
 
-Frontend SDKs receive only enabled flags from [Unleash Edge](/unleash-edge) or the [Frontend API](/concepts/front-end-api), so by default they don't emit impression events for disabled flags. Some frontend SDKs have a configuration option that turns on impression events for all flags; check your SDK's documentation.
+Frontend SDKs receive only enabled flags from [Unleash Edge](/unleash-edge) or the [Frontend API](/concepts/front-end-api), so by default they don't emit impression events for disabled flags. Some frontend SDKs have a configuration option that turns on impression events for all flags; check your SDK's documentation. For example, the [Android SDK](/sdks/android#impression-events) provides `forceImpressionData`.
 </Warning>
 
 Impression data was designed to make it easier for you to **collect analytics data**, **perform A/B tests**, and **enrich experiments** in your applications. It contains information about the feature flag and the related [Unleash Context](/concepts/unleash-context).

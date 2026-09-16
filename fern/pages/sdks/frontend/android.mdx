@@ -213,6 +213,43 @@ You can add or remove listeners at runtime with `addUnleashEventListener`/`remov
 For a complete working example, see the [sample app](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) and its [main activity](https://github.com/Unleash/unleash-android-sdk/blob/main/app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt), which demonstrates toggle state display and event listeners.
 </Tip>
 
+### Impression events
+
+The SDK emits an [impression event](/concepts/impression-data) every time you call `isEnabled` or `getVariant` for a flag that has impression data enabled. To track feature exposures, [enable impression data](/concepts/impression-data#enabling-impression-data) for the flags you want to track, then register an impression listener:
+
+```kotlin
+val impressionListener = object : UnleashImpressionEventListener {
+    override fun onImpression(event: ImpressionEvent) {
+        // Send impression data to your analytics tool
+        // event.featureName, event.enabled, event.variant, event.context, event.eventId
+    }
+}
+unleash.addUnleashEventListener(impressionListener)
+```
+
+`ImpressionEvent` contains the flag name (`featureName`), whether the flag was `enabled`, the [Unleash context](/concepts/unleash-context) used for the evaluation (`context`), and a unique `eventId`. The `variant` field holds the variant name for `getVariant` calls and is `null` for `isEnabled` calls.
+
+Like the other listeners, you can pass the impression listener to `unleash.start(eventListeners = listOf(impressionListener))` or to the `DefaultUnleash` constructor, and remove it at runtime with `removeUnleashEventListener`. Constructor-provided listeners only activate when you call `start()` unless you turn off delayed initialization; see [Initialization](#initialization).
+
+<Note>
+The SDK emits **one event per evaluation call**, with no deduplication per user or session. Ten `isEnabled` calls for the same flag produce ten impression events, so count distinct users or sessions in your analytics tool rather than raw event volume.
+</Note>
+
+Frontend SDKs only receive enabled flags, so by default the SDK doesn't emit impression events for flags that are disabled or missing from the local cache. To emit an event for every evaluation regardless of the per-flag setting, set `forceImpressionData` to `true` (it defaults to `false`):
+
+```kotlin
+val unleash = DefaultUnleash(
+    androidContext = applicationContext,
+    unleashConfig = UnleashConfig.newBuilder(appName = "test-android-app")
+        .proxyUrl("https://eu.app.unleash-hosted.com/demo/api/frontend")
+        .clientKey("<client-side SDK API key>")
+        .forceImpressionData(true)
+        .build()
+)
+```
+
+With `forceImpressionData` enabled, flags that are not in the local cache also emit an event, reported with `enabled = false`.
+
 
 ## Default behavior
 If you don't provide an initial state, Unleash will use the default behavior for feature flags with unknown state. This means that if a feature flag is not found in the list of flags, it will be disabled by default.
