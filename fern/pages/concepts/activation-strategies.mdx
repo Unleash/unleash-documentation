@@ -135,6 +135,64 @@ The value must start with and contain at least major, minor, and patch versions.
 | `SEMVER_LT` | The context field is strictly less than the provided value.    |
 | `SEMVER_LTE` | The context field is less than or equal to the provided value. |
 
+#### Regex operator
+
+The regex operator checks the context field against a regular expression. It only accepts a single value.
+
+| Operator | Description |
+|----------|-------------|
+| `REGEX`  | The context field matches the provided regular expression. |
+
+The operator is case-sensitive by default, and you can set it to be case-insensitive. The expression can match any part of the context field; use `^` and `$` to match the whole value. For example, `^user\d{3}$` matches `user123` but not `user12`.
+
+Lookaheads and backreferences are not supported. If the context field is missing, the constraint evaluates to false.
+
+<Accordion title="SDK requirements">
+
+The regex operator requires the following SDK versions or later. Frontend SDKs support it when connected to Unleash or Unleash Enterprise Edge.
+
+| SDK                     | Minimum version |
+|-------------------------|-----------------|
+| Node.js                 | 6.10.0          |
+| Java                    | 12.2.0          |
+| Ruby                    | 6.5.0           |
+| Python                  | 6.6.0           |
+| .NET                    | 6.1.0           |
+| Go                      | 6.2.0           |
+| Rust                    | 0.16.0          |
+| PHP                     | Not supported   |
+| Unleash Enterprise Edge | 20.1.9          |
+
+</Accordion>
+
+#### IP address operator
+
+The IP address operator checks whether the context field is an IP address within the provided values. Values can be single IP addresses, such as `192.168.1.10`, or IP ranges in [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation), such as `192.168.1.0/24`. Both IPv4 and IPv6 are supported. The operator accepts multiple values.
+
+| Operator  | Description |
+|-----------|-------------|
+| `IN_CIDR` | The context field is an IP address that matches any of the provided IP addresses or ranges. |
+
+The context field is typically `remoteAddress`. If the context field is missing, the constraint evaluates to false.
+
+<Accordion title="SDK requirements">
+
+The IP address operator requires the following SDK versions or later. Frontend SDKs support it when connected to Unleash or Unleash Enterprise Edge.
+
+| SDK                     | Minimum version |
+|-------------------------|-----------------|
+| Node.js                 | 6.11.0          |
+| Java                    | 12.3.0          |
+| Ruby                    | 6.7.1           |
+| Python                  | 6.7.0           |
+| .NET                    | 6.2.0           |
+| Go                      | 6.4.0           |
+| Rust                    | 0.16.0          |
+| PHP                     | Not supported   |
+| Unleash Enterprise Edge | 20.2.0          |
+
+</Accordion>
+
 ### Constraints best practices
 
 Backend SDKs fetch the full feature flag configuration associated with your API key from Unleash. You can use API keys scoped to specific projects or environments to optimize payload size.
