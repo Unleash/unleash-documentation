@@ -5,7 +5,7 @@ og:title: Activation strategies - Control feature flag targeting and rollouts
 description: Activation strategies determine who should get a feature. They allow you to enable and disable features for certain users without having to redeploy your application.
 keywords: activation strategies, gradual rollout, constraints, targeting, feature flags
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: September 25, 2026
 ---
 
 ## Overview
@@ -66,10 +66,11 @@ These parts turn the constraint into an expression that evaluates to true or fal
 | `userId`        | `STR_ENDS_WITH` | `@example.com, @mycompany.com` | Evaluates to `true` for users whose user IDs end with `@example.com` or `@mycompany.com`.                                                           |
 | `currentTime`   | `DATE_AFTER`    | `2022-06-05 21:43:22Z`         | Evaluates to `true` if the current time is after `2022-06-05 21:43:22Z`.                                                                            |
 | `plan` | `IN`       | `Premium`, `Plus`                         | Evaluates to `true` if the [custom context field](/concepts/unleash-context#custom-context-fields) `plan` is either 'Premium' or 'Plus'. |
+| `remoteAddress` | `IN_CIDR`  | `10.0.0.0/8, 192.168.1.10`     | Evaluates to `true` if the request comes from an IP address in the `10.0.0.0/8` range or from `192.168.1.10`.                                      |
 
 ### Constraint operators
 
-Constraint operators help you define the conditional statements that get evaluated as part of the constraint. [Basic operators](#basic-operators) are available in all versions and SDKs. All other operators require Unleash version 4.9+ and [SDK compatibility](/sdks#feature-compatibility-in-backend-sdks).
+Constraint operators help you define the conditional statements that get evaluated as part of the constraint. [Basic operators](#basic-operators) are available in all versions and SDKs. Numeric, date and time, string, and SemVer operators require Unleash version 4.9+. All advanced operators, including the [regex](#regex-operator) and [IP address](#ip-address-operator) operators, require [SDK compatibility](/sdks#strategy-constraints).
 
 All constraints can be negated. For example:
 
@@ -134,6 +135,32 @@ The value must start with and contain at least major, minor, and patch versions.
 | `SEMVER_GTE` | The context field is greater than or equal to the provided value. |
 | `SEMVER_LT` | The context field is strictly less than the provided value.    |
 | `SEMVER_LTE` | The context field is less than or equal to the provided value. |
+
+#### Regex operator
+
+The regex operator checks the context field against a regular expression. It only accepts a single value.
+
+| Operator | Description |
+|----------|-------------|
+| `REGEX`  | The context field matches the provided regular expression. |
+
+The operator is case-sensitive by default, and you can set it to be case-insensitive. The expression can match any part of the context field; use `^` and `$` to match the whole value. For example, `^user\d{3}$` matches `user123` but not `user12`.
+
+The operator doesn't support lookaheads or backreferences. If the context field is missing, the constraint evaluates to false.
+
+The regex operator requires Unleash Enterprise Edge 20.1.9 or later. Frontend SDKs support it when connected to Unleash or Unleash Enterprise Edge. For backend SDK support, see [SDK compatibility](/sdks#strategy-constraints).
+
+#### IP address operator
+
+The IP address operator checks whether the context field is an IP address within the provided values. Values can be single IP addresses, such as `192.168.1.10`, or IP ranges in [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation), such as `192.168.1.0/24`. Both IPv4 and IPv6 are supported. The operator accepts multiple values.
+
+| Operator  | Description |
+|-----------|-------------|
+| `IN_CIDR` | The context field is an IP address that matches any of the provided IP addresses or ranges. |
+
+The context field is typically `remoteAddress`. If the context field is missing, the constraint evaluates to false.
+
+The IP address operator requires Unleash Enterprise Edge 20.2.0 or later. Frontend SDKs support it when connected to Unleash or Unleash Enterprise Edge. For backend SDK support, see [SDK compatibility](/sdks#strategy-constraints).
 
 ### Constraints best practices
 
