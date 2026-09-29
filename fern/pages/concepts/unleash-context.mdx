@@ -5,7 +5,7 @@ keywords: unleash context, context fields, custom context fields, static fields,
 og:site_name: Unleash Documentation
 og:title: Unleash Context for Feature Flag Evaluation
 max-toc-depth: 3
-last-updated: August 5, 2026
+last-updated: September 29, 2026
 ---
 
 The **Unleash context** contains information related to the current feature flag request. Unleash uses this context to evaluate [activation strategies](activation-strategies) and [strategy constraints](/concepts/activation-strategies#constraints) and to calculate [flag stickiness](/concepts/stickiness). The Unleash Context is an important feature of all the [Unleash client SDKs](/sdks).
@@ -41,6 +41,13 @@ Some SDK implementations of the Unleash Context allow for the values in the `pro
 As an example: You've created a custom field called `groupId`. You know group IDs will always be numeric. You then create a constraint on a strategy that says the user must be in group `123456`. If you were to set the property `groupId` to the number `123456` in the `properties` field on the SDK side, the constraint check would fail, because in most languages the number `123456` is not equal to the string `123456` (i.e. `123456 != "123456"`).
 
 For operators that work on non-string types, such as numeric and datetime operators, these will convert the string value to the appropriate type before performing the comparison. This means that if you use a numeric greater than operator for the value `"5"`, it will convert that value to the number `5` before doing the comparison. If the value can't be converted, the constraint will fail.
+
+### The `remoteAddress` field
+
+The `remoteAddress` field holds an IP address, and it's the field to use with the [IP address constraint operator](/concepts/activation-strategies#ip-address-operator) and the [IPs strategy](/concepts/activation-strategies#ips). How it gets populated depends on the SDK:
+
+- **Backend SDKs**: Set `remoteAddress` in the Unleash context yourself, for example from the incoming request in a web application. The [PHP SDK](/sdks/php) falls back to the IP address of the incoming HTTP request when you don't set it.
+- **Frontend SDKs**: Unleash and Unleash Edge set `remoteAddress` to the IP address of the connection from the frontend SDK when the context doesn't already include one, so the field is populated for any frontend SDK.
 
 ## Custom context fields
 
