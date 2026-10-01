@@ -214,8 +214,8 @@ If emails fail to send or contain errors:
 | `UNLEASH_DEFAULT_ADMIN_USERNAME` | `admin`         | Sets the username for the initial admin user created on first startup.                                     |
 | `UNLEASH_DEFAULT_ADMIN_PASSWORD` | `unleash4all`   | Sets the password for the initial admin user. **Change this for any non-local setup.** |
 | `INIT_CLIENT_API_TOKENS`         | N/A             | Deprecated, use `INIT_BACKEND_API_TOKENS` instead.                   |
-| `INIT_BACKEND_API_TOKENS`        | N/A             | Comma-separated list of [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) to create on first startup (if no tokens exist in the database).                   |
-| `INIT_FRONTEND_API_TOKENS`       | N/A             | Comma-separated list of [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) to create on first startup (if no tokens exist in the database).                 |
+| `INIT_BACKEND_API_TOKENS`        | N/A             | Comma-separated list of [Backend tokens](/concepts/api-tokens-and-client-keys#backend-tokens) to create on first startup (if no tokens exist in the database). Unleash stores these tokens in the [legacy format](/concepts/api-tokens-and-client-keys#legacy-token-format), with their complete value, so use them for local development only. |
+| `INIT_FRONTEND_API_TOKENS`       | N/A             | Comma-separated list of [Frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) to create on first startup (if no tokens exist in the database). Unleash stores these tokens in the [legacy format](/concepts/api-tokens-and-client-keys#legacy-token-format), with their complete value, so use them for local development only. |
 
 ### Server behavior
 
