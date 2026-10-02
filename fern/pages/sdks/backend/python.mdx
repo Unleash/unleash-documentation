@@ -108,26 +108,46 @@ Once initialized but not yet synchronized with Unleash, all flags evaluate to `f
 
 Always initialize the client before evaluating flags. Calling `is_enabled` or `get_variant` on a client that has never been initialized has no guaranteed behavior.
 
-The two clients synchronize with Unleash at different points, so how you check for readiness differs:
+To know when flag configuration is available, subscribe to the `READY` [event](#events). The SDK emits it when it first loads flags from the Unleash server or the local cache. The `is_initialized` property only tells you that `initialize_client()` has completed, which can happen before any flags are loaded.
+
+The event callback runs on a background thread, and the two clients synchronize with Unleash at different points:
 
 <Tabs>
 <Tab title="Sync">
 
-In the default polling mode, `UnleashClient` fetches flag configuration from Unleash during `initialize_client()`, before the call returns. Use the `is_initialized` property to check whether the client has completed initialization:
+In the default polling mode, `UnleashClient` makes its first fetch during `initialize_client()`, before the call returns. If that fetch fails, the client keeps polling and emits `READY` once a fetch succeeds.
 
 ```python
-if client.is_initialized:
+import threading
+
+from UnleashClient import UnleashClient
+from UnleashClient.events import UnleashEvent, UnleashEventType
+
+ready = threading.Event()
+
+def on_event(event: UnleashEvent):
+    if event.event_type == UnleashEventType.READY:
+        ready.set()
+
+client = UnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<your-backend-token>"},
+    event_callback=on_event,
+)
+
+client.initialize_client()
+
+if ready.wait(timeout=5):
     enabled = client.is_enabled("my-flag")
 ```
-
-You can also subscribe to the `READY` [event](#events) to get notified when the SDK first loads flags from the Unleash server or the local cache.
 
 </Tab>
 <Tab title="Async">
 
 `AsyncUnleashClient` loads its cached configuration during `initialize_client()` and returns without waiting for Unleash. Its first fetch runs one `refresh_interval` later, which is 15 seconds by default. Until then, the client evaluates flags against its cached or [bootstrapped](#bootstrap) configuration, if one exists.
 
-Because `is_initialized` becomes `True` before the first fetch, subscribe to the `READY` [event](#events) to know when flag configuration is available. The SDK emits `READY` when it first loads flags from the Unleash server or the local cache. The event callback runs on a background thread, so use `call_soon_threadsafe` to signal the event loop:
+Use `call_soon_threadsafe` to signal the event loop from the callback:
 
 ```python
 import asyncio
@@ -274,7 +294,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 </ParamField>
 
 <ParamField path="event_callback" type="Callable" default="None">
-  Function that receives SDK [events](#events), including impression events. Called on a dedicated background thread.
+  Function that receives SDK [events](#events), including impression events. Called on a dedicated background thread. If you run under a WSGI server or in multiple processes, see [framework integration](#framework-integration).
 </ParamField>
 
 <ParamField path="experimental_mode" type="dict" default="None">
@@ -951,8 +971,8 @@ If `is_enabled` always returns `False`:
 - Confirm the flag exists and is enabled in the target environment.
 - Verify `url` points to your Unleash API base URL, for example `https://<your-unleash-instance>/api`.
 - Verify `custom_headers` includes a valid backend API token in `Authorization`.
-- Verify the SDK completed its initial sync: `is_initialized` is `True` or the `READY` event fired.
-- With `AsyncUnleashClient`, wait for the `READY` event. The first fetch runs one `refresh_interval` after `initialize_client()`.
+- Verify the SDK completed its initial sync by checking that the `READY` event fired. `is_initialized` being `True` only means that `initialize_client()` has completed.
+- With `AsyncUnleashClient`, allow for the first fetch, which runs one `refresh_interval` after `initialize_client()`.
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 
 </Accordion>
