@@ -6,7 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: cursor, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/cursor
-last-updated: June 8, 2026
+last-updated: October 2, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects Cursor to your Unleash instance, enabling AI-assisted feature flag management.
@@ -49,6 +49,7 @@ chmod 600 ~/.unleash/mcp.env
 | `UNLEASH_BASE_URL` | Your Unleash instance API URL. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback) without being prompted. `false` also hides the `send_feedback` tool. | No |
 
 Now configure your preferred interface:
 
@@ -219,7 +220,14 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
 </StickyTable>
+
+<Note>
+**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. The first time the assistant calls it, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. If Cursor cannot show the prompt, feedback stays disabled for the session and the question is asked again next time. To decide without a prompt, add `UNLEASH_MCP_SEND_FEEDBACK=true` or `UNLEASH_MCP_SEND_FEEDBACK=false` to your `envFile`, or set it in the `env` block of `.cursor/mcp.json`. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
+</Note>
 
 ## Workflows
 
@@ -830,6 +838,10 @@ Cloud Agents access MCP servers configured for the team. Ensure the Unleash MCP 
 
 <Accordion title="envFile vs env interpolation">
 Use `envFile` for simplicity. Use `${env:NAME}` interpolation if you need per-variable control or mixing environment sources. Don't use both for the same variable.
+</Accordion>
+
+<Accordion title="Feedback is disabled">
+The `send_feedback` tool returns this message when you declined consent, when the consent prompt could not be shown, or when `UNLEASH_MCP_SEND_FEEDBACK=false` is set. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK=true` to your `envFile` or to the `env` block of `.cursor/mcp.json`, then restart the server from Settings > Features > Model Context Protocol. To be asked again, delete `feedback_consent.json` from the MCP server's [configuration directory](/integrate/mcp#consent). Flag operations are not affected either way.
 </Accordion>
 
 ## Best practices

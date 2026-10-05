@@ -1,0 +1,26 @@
+---
+description: Review the Unleash MCP server v0.5.0 release notes, covering the new opt-in send_feedback tool, its consent flow and configuration, and the admin setting for the remote MCP server.
+tags: ["MCP server"]
+---
+
+# MCP server v0.5.0
+
+## Report problems with the MCP server through send_feedback
+
+The [Unleash MCP server](/integrate/mcp) now includes a `send_feedback` tool. When a tool call fails, a request is not supported, or a result is not what the assistant expected, the assistant can report it to Unleash so we can prioritize fixes and new tools. The tool is never called after a successful operation.
+
+With the local MCP server, feedback is opt-in. The first time the assistant calls the tool, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. OpenCode, Google Antigravity, and Gemini CLI don't display elicitation requests, so the MCP server doesn't prompt in these clients and feedback stays off unless you set `UNLEASH_MCP_SEND_FEEDBACK=true`. See [Clients without a consent prompt](/integrate/mcp#clients-without-a-consent-prompt). Reports contain only the issue type, tool name, a normalized error code, the MCP server version, the client name and version, and a short summary. They never include flag names, project IDs, code, URLs, or tokens, and they never carry your personal access token. For details, see [Send feedback](/integrate/mcp#send-feedback) and [Data and privacy](/privacy-and-compliance/data-privacy#mcp-server-feedback).
+
+## New configuration options
+
+Three optional environment variables control feedback:
+
+- `UNLEASH_MCP_SEND_FEEDBACK` grants or denies consent without a prompt. Set it to `true` to opt in from clients that don't display the consent prompt, or to `false` to hide the tool entirely, for example in centrally managed MCP configuration or for clients that do not support elicitation.
+- `UNLEASH_FEEDBACK_URL` overrides the Unleash-hosted endpoint that receives reports.
+- `UNLEASH_MCP_CONFIG_DIR` changes where the consent decision is stored.
+
+See [Configuration](/integrate/mcp#configuration).
+
+## Admin control for the remote MCP server
+
+The [remote MCP server](/integrate/mcp#remote-mcp-server) never prompts individual users. Instead, admins decide for the whole instance with the new **Send feedback from the Remote MCP Server to Unleash** setting under **Admin settings > Remote MCP server**. The setting is enabled by default, including on instances that have never saved it. Disable it to hide the `send_feedback` tool from remote clients. See [Feedback from the remote server](/integrate/mcp#feedback-from-the-remote-server).
