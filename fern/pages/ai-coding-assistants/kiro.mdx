@@ -6,7 +6,7 @@ description: Integrate Unleash with Kiro using MCP to create feature flags, wrap
 keywords: kiro, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/kiro
-last-updated: July 28, 2026
+last-updated: October 2, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects Kiro to your Unleash instance, enabling AI-assisted feature flag management.
@@ -72,6 +72,7 @@ source ~/.zshrc  # or ~/.bashrc
 | `UNLEASH_BASE_URL` | Your Unleash instance API URL. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback) without being prompted. `false` also hides the `send_feedback` tool. | No |
 
 Now configure your preferred interface:
 
@@ -232,6 +233,8 @@ Example with auto-approval for read-only tools:
 <Tip>
 Use `autoApprove` for the read-only tools that work in Kiro: `detect_flag` and `evaluate_change`.
 Keep write operations behind manual approval for safety, and disable tools that currently fail in Kiro due to `resource_link` responses (for example: `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy`).
+
+To stop Kiro from reporting problems to Unleash, add `send_feedback` to `disabledTools`. Setting `UNLEASH_MCP_SEND_FEEDBACK` to `"false"` in the `env` block has the same effect and also skips the consent prompt.
 </Tip>
 
 **Configuration scopes:**
@@ -301,7 +304,14 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
 </StickyTable>
+
+<Note>
+**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. The first time the assistant calls it, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. If Kiro cannot show the prompt, feedback stays disabled for the session and the question is asked again next time. To decide without a prompt, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` or `"false"` in the `env` block of `.kiro/settings/mcp.json`. Setting it to `"false"` hides the tool, so you do not need to list it in `disabledTools`. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
+</Note>
 
 <Warning>
 Kiro's MCP client does not currently render MCP `resource_link` responses. Calling `create_flag`, `get_flag_state`, `list_flags`, `list_projects`, `set_flag_rollout`, `toggle_flag_environment`, or `remove_flag_strategy` fails, though the operation may still succeed in Unleash.
@@ -951,6 +961,10 @@ If you see "Found unapproved environment variables in MCP config," Kiro requires
 
 <Accordion title="Workspace vs user config conflict">
 Workspace configuration (`.kiro/settings/mcp.json`) takes precedence over user configuration (`~/.kiro/settings/mcp.json`). If a server is disabled in workspace config, it remains disabled even if enabled in user config.
+</Accordion>
+
+<Accordion title="Feedback is disabled">
+The `send_feedback` tool returns this message when you declined consent, when the consent prompt could not be shown, or when `UNLEASH_MCP_SEND_FEEDBACK=false` is set. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` in the `env` block of `.kiro/settings/mcp.json`, approve the variable when prompted, and reconnect the server. To be asked again, delete `feedback_consent.json` from the MCP server's [configuration directory](/integrate/mcp#consent). Flag operations are not affected either way.
 </Accordion>
 
 ## Best practices

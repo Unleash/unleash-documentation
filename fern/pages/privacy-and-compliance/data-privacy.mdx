@@ -37,6 +37,20 @@ To improve Unleash, we collect anonymous usage statistics:
 
 All collected data is anonymous and limited to usage counts. This data helps us understand how features are used in Unleash, enabling us to prioritize important features and make informed decisions about deprecating features that are no longer relevant to our users.
 
+### MCP server feedback
+
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The [Unleash MCP server](/integrate/mcp) includes a `send_feedback` tool that lets an AI coding assistant report a failed tool call, an unsupported request, or an unexpected result to Unleash. With the local server, the tool is opt-in and sends nothing until you consent; you are asked once through your MCP client and the answer is stored on your machine. With the [remote MCP server](/integrate/mcp#remote-mcp-server), feedback is enabled by default and an admin can opt the whole instance out; individual users are never prompted.
+
+Each report contains only the following fields:
+- Issue type (`tool_error`, `unsupported_action`, or `unexpected_result`)
+- MCP tool name and a normalized error code, such as `HTTP_500`
+- MCP server version, and the name and version of the MCP client
+- A short summary written by the assistant
+
+Reports never include flag names, project IDs, code, URLs, tokens, or raw error messages. They are sent to an Unleash-hosted endpoint, not to your Unleash instance, and they never carry your personal access token. For details, see [Send feedback](/integrate/mcp#send-feedback).
+
 ## Manage data collection settings
 
 We recognize that privacy requirements differ across organizations. While the data collected by Unleash is limited and anonymous, we provide options to manage data collection settings:
@@ -48,3 +62,9 @@ Set the `CHECK_VERSION` environment variable to anything other than `true`, `t`,
 ### Disable feature telemetry
 
 Set the `SEND_TELEMETRY` environment variable to anything other than `true`, `t`, or `1` before starting Unleash. This disables feature telemetry while still allowing version tracking.
+
+### Disable MCP server feedback
+
+For the local MCP server, set `UNLEASH_MCP_SEND_FEEDBACK=false` in the MCP server's environment. This denies consent without a prompt and hides the `send_feedback` tool from the assistant. Organizations that distribute MCP configuration centrally can set the variable there for every developer.
+
+For the remote MCP server, disable **Send feedback from the Remote MCP Server to Unleash** under **Admin settings > Remote MCP server**. The setting is enabled by default, and an explicit opt-out is honored. The setting only takes effect while the remote MCP server is enabled.

@@ -6,7 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: codex, openai codex, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/codex
-last-updated: July 28, 2026
+last-updated: October 2, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects OpenAI Codex to your Unleash instance, enabling AI-assisted feature flag management.
@@ -81,6 +81,7 @@ Restart your terminal or run `source ~/.zshrc` to load the variables.
 | `UNLEASH_BASE_URL` | Your Unleash instance URL, without a trailing `/api`. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback) without being prompted. `false` also hides the `send_feedback` tool. | No |
 
 </Step>
 
@@ -194,7 +195,14 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
 </StickyTable>
+
+<Note>
+**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. The first time the assistant calls it, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. If Codex cannot show the prompt, feedback stays disabled for the session and the question is asked again next time. To decide without a prompt, pass `--env UNLEASH_MCP_SEND_FEEDBACK=true` or `--env UNLEASH_MCP_SEND_FEEDBACK=false` to `codex mcp add`, or add the variable to the `env` table in `~/.codex/config.toml`. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
+</Note>
 
 ## Workflows
 
@@ -524,6 +532,10 @@ Cloud sandboxes are network-isolated by default, and they cannot run a local std
 
 - Run flag operations in the CLI or IDE extension (recommended for most teams), then let cloud tasks open pull requests that ship behind the flags you created.
 - Use the [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) (Enterprise), which Codex connects to by `url`. Enable internet access for the cloud environment, add your Unleash host to the allowlist, and allow write methods (POST, PATCH, DELETE) so flag changes work. Verify the remote server's authentication flow works in a headless environment before relying on it.
+</Accordion>
+
+<Accordion title="Feedback is disabled">
+The `send_feedback` tool returns this message when you declined consent, when the consent prompt could not be shown, or when `UNLEASH_MCP_SEND_FEEDBACK=false` is set. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK = "true"` to the `env` table of `[mcp_servers.unleash]` in `~/.codex/config.toml` and restart Codex. To be asked again, delete `feedback_consent.json` from the MCP server's [configuration directory](/integrate/mcp#consent). Flag operations are not affected either way.
 </Accordion>
 
 ## Best practices

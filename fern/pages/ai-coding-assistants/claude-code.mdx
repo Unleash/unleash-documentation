@@ -6,7 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: claude code, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/claude-code
-last-updated: June 8, 2026
+last-updated: October 2, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects [Claude Code](https://claude.com/product/claude-code) to your Unleash instance, enabling AI-assisted feature flag management. You can evaluate code changes, create flags, generate wrapping code, manage rollouts, and clean up flags from your terminal or IDE.
@@ -70,6 +70,7 @@ source ~/.zshrc  # or ~/.bashrc
 | `UNLEASH_BASE_URL` | Your Unleash instance API URL. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback) without being prompted. `false` also hides the `send_feedback` tool. | No |
 
 ### Configure your interface
 
@@ -389,6 +390,13 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
+
+<Note>
+**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. The first time the assistant calls it, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. If Claude Code cannot show the prompt, feedback stays disabled for the session and the question is asked again next time. To decide without a prompt, pass `-e UNLEASH_MCP_SEND_FEEDBACK=true` or `-e UNLEASH_MCP_SEND_FEEDBACK=false` to `claude mcp add`, or add the variable to the `env` block of your `.mcp.json`. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
+</Note>
 
 ## Workflows
 
@@ -707,6 +715,8 @@ Deploy `managed-mcp.json` to system directories to control which MCP servers are
 
 When this file is present, users cannot add, modify, or use any MCP servers other than those defined in the file.
 
+To decide about [feedback reports](/integrate/mcp#send-feedback) for the whole organization, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false` in the Unleash server's `env` block in `managed-mcp.json`. With `false`, developers are never prompted and the `send_feedback` tool is hidden.
+
 ### Policy-based control
 
 Use `allowedMcpServers` and `deniedMcpServers` in managed settings to restrict which servers users can configure while still allowing some flexibility.
@@ -753,6 +763,10 @@ For WSL environments, use the standard Unix syntax.
 
 <Accordion title="Tool results truncated">
 Claude Code limits tool output size to prevent context overflow. If results appear truncated, use filters (such as specific projects or flag types) to reduce result size. For current limits, see the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
+</Accordion>
+
+<Accordion title="Feedback is disabled">
+The `send_feedback` tool returns this message when you declined consent, when the consent prompt could not be shown, or when `UNLEASH_MCP_SEND_FEEDBACK=false` is set. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK=true` in the `env` block of your `.mcp.json` or pass it with `-e` to `claude mcp add`. To be asked again, delete `feedback_consent.json` from the MCP server's [configuration directory](/integrate/mcp#consent). Flag operations are not affected either way.
 </Accordion>
 
 ## Best practices
