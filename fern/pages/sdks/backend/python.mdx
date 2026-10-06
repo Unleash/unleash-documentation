@@ -10,7 +10,7 @@ last-updated: October 2, 2026
 
 <Markdown src="/snippets/sdks/backend-intro.mdx" language="Python" />
 
-The SDK includes two clients: `UnleashClient` for synchronous applications and `AsyncUnleashClient`, an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. Both expose the same API for evaluating flags; they differ in how you initialize and stop them. The async client keeps flags up to date by polling. [Streaming](#streaming) is available with `UnleashClient`.
+The SDK includes two clients: `UnleashClient` for synchronous applications and `AsyncUnleashClient`, an asyncio-native client for applications built on frameworks such as FastAPI, Starlette, or aiohttp. Both expose the same API for evaluating flags; they differ in how you initialize and stop them.
 
 ## Requirements
 
@@ -29,6 +29,8 @@ pip install UnleashClient
 
 </Tab>
 <Tab title="Async">
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
 
 ```bash
 pip install "UnleashClient[async]"
@@ -76,6 +78,8 @@ with UnleashClient(
 </Tab>
 <Tab title="Async">
 
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
+
 ```python
 from UnleashClient import AsyncUnleashClient
 
@@ -106,26 +110,26 @@ async with AsyncUnleashClient(
 
 Once initialized but not yet synchronized with Unleash, all flags evaluate to `false` and variants resolve to the [disabled variant](/concepts/feature-flag-variants#the-disabled-variant), unless you have a [bootstrapped configuration](#bootstrap) or use a [fallback function](#fallback-function).
 
-Always initialize the client before evaluating flags. Calling `is_enabled` or `get_variant` on a client that has never been initialized has no guaranteed behavior.
+Initialize the client before calling `is_enabled` or `get_variant`. Flag evaluation is only supported after initialization.
 
 To know when flag configuration is available, subscribe to the `READY` [event](#events). The SDK emits it when it first loads flags from the Unleash server or the local cache. The `is_initialized` property only tells you that `initialize_client()` has completed, which can happen before any flags are loaded.
 
-The event callback runs on a background thread, and the two clients synchronize with Unleash at different points:
+The event callback runs on a background thread:
 
 <Tabs>
 <Tab title="Sync">
 
-In the default polling mode, `UnleashClient` makes its first fetch during `initialize_client()`, before the call returns. If that fetch fails, the client keeps polling and emits `READY` once a fetch succeeds.
+`UnleashClient` makes its first fetch during `initialize_client()`, before the call returns. If that fetch fails, the client keeps polling and emits `READY` once a fetch succeeds.
 
 ```python
 import threading
 
 from UnleashClient import UnleashClient
-from UnleashClient.events import UnleashEvent, UnleashEventType
+from UnleashClient.events import BaseEvent, UnleashEventType
 
 ready = threading.Event()
 
-def on_event(event: UnleashEvent):
+def on_event(event: BaseEvent) -> None:
     if event.event_type == UnleashEventType.READY:
         ready.set()
 
@@ -145,61 +149,47 @@ if ready.wait(timeout=5):
 </Tab>
 <Tab title="Async">
 
-`AsyncUnleashClient` loads its cached configuration during `initialize_client()` and returns without waiting for Unleash. Its first fetch runs one `refresh_interval` later, which is 15 seconds by default. Until then, the client evaluates flags against its cached or [bootstrapped](#bootstrap) configuration, if one exists.
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
 
-Use `call_soon_threadsafe` to signal the event loop from the callback:
+Because the callback runs on a thread, bridge it to the event loop with a thread-safe primitive such as the `Event` from [aiologic](https://pypi.org/project/aiologic/):
 
 ```python
 import asyncio
 
+from aiologic import Event
+
 from UnleashClient import AsyncUnleashClient
-from UnleashClient.events import UnleashEvent, UnleashEventType
+from UnleashClient.events import BaseEvent, UnleashEventType
 
-ready = asyncio.Event()
-loop = asyncio.get_running_loop()
 
-def on_event(event: UnleashEvent):
-    if event.event_type == UnleashEventType.READY:
-        loop.call_soon_threadsafe(ready.set)
+async def main() -> None:
+    ready = Event()
 
-client = AsyncUnleashClient(
-    url="https://<your-unleash-instance>/api",
-    app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
-    event_callback=on_event,
-)
+    def on_event(event: BaseEvent) -> None:
+        if event.event_type == UnleashEventType.READY:
+            ready.set()
 
-await client.initialize_client()
-await asyncio.wait_for(ready.wait(), timeout=30)
+    client = AsyncUnleashClient(
+        url="https://<your-unleash-instance>/api",
+        app_name="my-python-app",
+        custom_headers={"Authorization": "<your-backend-token>"},
+        event_callback=on_event,
+    )
 
-enabled = client.is_enabled("my-flag")
+    await client.initialize_client()
+
+    if not await ready.with_(timeout=30):
+        raise TimeoutError("Unleash did not signal READY within 30 seconds")
+
+    enabled = client.is_enabled("my-flag")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
-
-The timeout keeps your application from waiting indefinitely if Unleash is unreachable and the cache is empty.
 
 </Tab>
 </Tabs>
-
-### Streaming
-
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
-
-By default, the SDK polls Unleash at a fixed interval. Streaming mode receives flag updates in real time using server-sent events, reducing the delay between a change in Unleash and the SDK applying the updated configuration.
-
-Streaming requires [Unleash Enterprise Edge](/unleash-edge). To enable it, point `url` at your Enterprise Edge instance, provide a valid backend token, and set `experimental_mode` to streaming:
-
-```python
-client = UnleashClient(
-    url="https://<your-edge-instance>/api",
-    app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
-    experimental_mode={"type": "streaming"},
-)
-
-client.initialize_client()
-```
-
-Streaming is available with `UnleashClient`. `AsyncUnleashClient` always uses polling.
 
 ## Configuration options
 
@@ -269,8 +259,8 @@ Both client constructors support the following parameters. Parameters marked "Sy
   Location of the on-disk cache. When unset, the cache library determines the location.
 </ParamField>
 
-<ParamField path="project_name" type="str" default="None">
-  Restricts flag fetches to a single project. Prefer using a [project-scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
+<ParamField path="project_name" type="str" default="None" deprecated={true}>
+  Restricts flag fetches to a single project. Deprecated; use a [project-scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
 </ParamField>
 
 <ParamField path="verbose_log_level" type="int" default="30">
@@ -295,10 +285,6 @@ Both client constructors support the following parameters. Parameters marked "Sy
 
 <ParamField path="event_callback" type="Callable" default="None">
   Function that receives SDK [events](#events), including impression events. Called on a dedicated background thread. If you run under a WSGI server or in multiple processes, see [framework integration](#framework-integration).
-</ParamField>
-
-<ParamField path="experimental_mode" type="dict" default="None">
-  Connection mode: `{"type": "polling"}` or `{"type": "streaming"}`. See [streaming](#streaming). Sync client only.
 </ParamField>
 
 <ParamField path="sdk_flavor" type="str" default="None">
@@ -364,6 +350,8 @@ The flag is enabled but no variant applies, for example when the flag has no var
 </Tabs>
 
 Use `feature_enabled` when you need the flag's state alongside the variant result, without a separate `is_enabled` call.
+
+The `enabled: False` field marks the result as the SDK's default disabled variant. This distinguishes it from a real variant that happens to be named `disabled`, which the SDK returns with `enabled: True`.
 
 ### Fallback function
 
@@ -432,6 +420,8 @@ client.destroy()
 </Tab>
 <Tab title="Async">
 
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
+
 ```python
 await client.destroy()
 ```
@@ -475,6 +465,8 @@ client = UnleashClient(
 
 </Tab>
 <Tab title="Async">
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
 
 ```python
 # Requires a custom strategy defined in Unleash called 'EmailStrategy'
@@ -549,6 +541,8 @@ client.is_enabled("my-flag")
 
 </Tab>
 <Tab title="Async">
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
 
 ```python
 from blinker import signal
@@ -633,6 +627,8 @@ client.impact_metrics.observe_histogram("request_time_ms", 125)
 
 </Tab>
 <Tab title="Async">
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v6.9.0+</Button>
 
 ```python
 from UnleashClient import AsyncUnleashClient
@@ -836,20 +832,20 @@ client = UnleashClient(
 
 ## Framework integration
 
-The SDK runs background jobs to keep feature flags in sync with the Unleash server. Some runtime environments, like WSGI servers and Celery workers, need extra setup to make sure the SDK works correctly.
+`UnleashClient` runs background threads to poll for feature flags and send metrics, and both clients deliver [events](#events) on a background thread. Some runtime environments, like WSGI servers and Celery workers, restrict threads or spawn new processes, and need extra setup to make sure the SDK works correctly.
 
 ### WSGI
 
 When using WSGI servers, for example with Flask or Django apps, be aware that:
 
-- Many WSGI setups disable threading by default. The SDK needs threads to poll for updates in the background, so set `enable-threads` in your WSGI config.
+- Many WSGI setups disable threading by default, so set `enable-threads` in your WSGI config. Without it, `UnleashClient` cannot poll for updates in the background, and neither client can deliver events to your callback.
 - When running under uWSGI with multiple processes using the `--processes` option, you may need to enable the `lazy-apps` option. This ensures each process gets a fresh SDK instance.
 
 See [The Art of Graceful Reloading](https://uwsgi-docs.readthedocs.io/en/latest/articles/TheArtOfGracefulReloading.html#preforking-vs-lazy-apps-vs-lazy) for more details.
 
 ### Celery
 
-When using the SDK in Celery tasks, initialize it inside the `worker_process_init` event. Otherwise, the worker may run but won't poll for feature flag updates.
+When using the SDK in Celery tasks, initialize it inside the `worker_process_init` event. Otherwise, the worker may run but won't poll for feature flag updates or receive event updates.
 
 ```python
 from UnleashClient import UnleashClient
@@ -868,16 +864,15 @@ def configure_workers(sender=None, conf=None, **kwargs):
 
 ### Multi-process setups
 
-In multi-process setups where one process keeps the on-disk cache fresh, other processes can call `initialize_client(fetch_toggles=False)`. The client then reads flag configuration from the cache instead of polling the Unleash API.
+When each new process creates its own client, every process runs an independent poll cycle. With many short-lived processes, this wastes system resources and counts against your Unleash usage.
+
+To avoid this, set up a leader and follower pattern: one process keeps the on-disk cache fresh, and the other processes call `initialize_client(fetch_toggles=False)`. These clients then read flag configuration from the cache instead of polling the Unleash API.
 
 This mode is available with `UnleashClient`. `AsyncUnleashClient` accepts the `fetch_toggles` argument for compatibility and always polls.
 
 ## Unit testing
 
 To test code that depends on feature flags without a running Unleash instance, bootstrap a cache with the flag state you want and turn off all network activity:
-
-<Tabs>
-<Tab title="Sync">
 
 ```python
 from UnleashClient import UnleashClient
@@ -912,50 +907,7 @@ def test_my_feature(tmp_path):
     client.destroy()
 ```
 
-With `fetch_toggles=False`, the client loads flags from the cache only, so tests are deterministic and make no network requests.
-
-</Tab>
-<Tab title="Async">
-
-```python
-import pytest
-from UnleashClient import AsyncUnleashClient
-from UnleashClient.cache import FileCache
-
-def make_test_client(cache_dir: str) -> AsyncUnleashClient:
-    cache = FileCache("test-cache", directory=cache_dir)
-    cache.bootstrap_from_dict({
-        "version": 2,
-        "features": [
-            {
-                "name": "my-flag",
-                "enabled": True,
-                "strategies": [{"name": "default"}],
-            }
-        ]
-    })
-
-    return AsyncUnleashClient(
-        url="http://localhost:4242/api",
-        app_name="test-app",
-        disable_metrics=True,
-        disable_registration=True,
-        refresh_interval=3600,
-        cache=cache,
-    )
-
-@pytest.mark.asyncio
-async def test_my_feature(tmp_path):
-    async with make_test_client(str(tmp_path)) as client:
-        assert client.is_enabled("my-flag")
-```
-
-`AsyncUnleashClient` always polls, so set `refresh_interval` to a value longer than your test run. The client loads flags from the bootstrapped cache during `initialize_client()` and the first poll never runs, so tests are deterministic and make no network requests.
-
-The example uses [pytest-asyncio](https://pypi.org/project/pytest-asyncio/) to run the async test.
-
-</Tab>
-</Tabs>
+With `fetch_toggles=False`, the client loads flags from the cache only, so tests are deterministic and make no network requests. This approach uses `UnleashClient`, because `fetch_toggles=False` is specific to the sync client.
 
 ## Migrating to v6
 
@@ -972,7 +924,6 @@ If `is_enabled` always returns `False`:
 - Verify `url` points to your Unleash API base URL, for example `https://<your-unleash-instance>/api`.
 - Verify `custom_headers` includes a valid backend API token in `Authorization`.
 - Verify the SDK completed its initial sync by checking that the `READY` event fired. `is_initialized` being `True` only means that `initialize_client()` has completed.
-- With `AsyncUnleashClient`, allow for the first fetch, which runs one `refresh_interval` after `initialize_client()`.
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 
 </Accordion>
