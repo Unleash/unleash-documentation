@@ -38,7 +38,7 @@ First, create a shared credentials file that works across all environments:
 UNLEASH_BASE_URL={{UNLEASH_BASE_URL}}
 UNLEASH_PAT={{UNLEASH_PAT}}
 UNLEASH_DEFAULT_PROJECT={{UNLEASH_DEFAULT_PROJECT}}
-# Optional: true or false to opt in to or out of feedback reports without a prompt
+# Optional: set to true or false to opt in to or out of feedback reports without a consent prompt
 # UNLEASH_MCP_SEND_FEEDBACK=false
 ```
 
@@ -336,14 +336,18 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
-| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
+| `send_feedback` | Sends [feedback reports](#feedback-reports) to Unleash about failed tool calls, unsupported requests, and unexpected results. | Automatically, after a failed or unsupported request |
 </StickyTable>
 
-<Note>
-**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+### Feedback reports
 
-`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. The first time the assistant calls it, the MCP server asks for your consent through an MCP elicitation prompt and remembers your answer, so you are asked only once. If your IDE cannot show the prompt, feedback stays disabled for the session and the question is asked again next time. To decide without a prompt, add `UNLEASH_MCP_SEND_FEEDBACK=true` or `UNLEASH_MCP_SEND_FEEDBACK=false` to `~/.unleash/mcp.env`, or set it alongside the other variables where `envFile` is not supported. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
-</Note>
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+When you opt in, the Unleash MCP server shares anonymous diagnostic [feedback reports](/integrate/mcp#send-feedback) with Unleash to help improve the MCP server. The assistant sends a report automatically when a tool call fails, when a result isn't what it expected, or when you ask for something the MCP server can't do yet.
+
+In VS Code and JetBrains IDEs, Copilot shows a consent prompt in the chat the first time the assistant tries to send a report. The MCP server saves whether you opted in or out, so you see the prompt only once.
+
+To opt in or out in Visual Studio, Eclipse, or Xcode, or to skip the prompt, add `UNLEASH_MCP_SEND_FEEDBACK=true` or `UNLEASH_MCP_SEND_FEEDBACK=false` to `~/.unleash/mcp.env`. In IDEs that don't support `envFile`, set the variable with your other Unleash variables. To learn what a report contains, see [What is recorded](/integrate/mcp#what-is-recorded).
 
 ## Workflows
 
@@ -628,7 +632,7 @@ Some IDEs (JetBrains, Visual Studio) do not support the `envFile` property. In t
 </Accordion>
 
 <Accordion title="Feedback is disabled">
-The `send_feedback` tool returns this message when you declined consent, when the consent prompt could not be shown, or when `UNLEASH_MCP_SEND_FEEDBACK=false` is set. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK=true` to `~/.unleash/mcp.env` (or to the IDE's MCP `env` configuration where `envFile` is not supported) and restart the server. To be asked again, delete `feedback_consent.json` from the MCP server's [configuration directory](/integrate/mcp#consent). Flag operations are not affected either way.
+`send_feedback` returns this message if you declined the consent prompt, if your IDE couldn't show it, or if `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK=true` to `~/.unleash/mcp.env` and restart the server. In IDEs that don't support `envFile`, add the variable to the IDE's MCP `env` configuration instead. To see the consent prompt again, delete `feedback_consent.json` from the [configuration directory](/integrate/mcp#consent). Feedback settings don't affect flag operations.
 </Accordion>
 
 ## Best practices

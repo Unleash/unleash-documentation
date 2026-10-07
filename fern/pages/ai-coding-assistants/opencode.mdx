@@ -70,7 +70,7 @@ To opt in to [feedback reports](/integrate/mcp#send-feedback), also add `UNLEASH
 | `UNLEASH_BASE_URL` | Your Unleash instance URL. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
-| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback). The MCP server does not show the consent prompt in OpenCode, so this variable is the only way to opt in. `false` also hides the `send_feedback` tool. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` to opt in to [feedback reports](/integrate/mcp#send-feedback). With `false`, the assistant doesn't see the `send_feedback` tool. | No |
 
 </Step>
 
@@ -151,14 +151,18 @@ The Unleash MCP server exposes several tools. The following table summarizes eac
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
-| `send_feedback` | Reports tool failures and unsupported requests to Unleash. Called automatically by the assistant. | Used automatically after a tool error or an unsupported request. |
+| `send_feedback` | Sends [feedback reports](#feedback-reports) to Unleash about failed tool calls, unsupported requests, and unexpected results. | Automatically, after a failed or unsupported request |
 </StickyTable>
 
-<Note>
-**Feedback reports** <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+### Feedback reports
 
-`send_feedback` is available in `@unleash/mcp` 0.5.0 and later and sends nothing until you opt in. OpenCode doesn't display [MCP elicitation](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation) requests, so the MCP server doesn't ask for your consent and feedback stays off. See [Clients without a consent prompt](/integrate/mcp#clients-without-a-consent-prompt). To opt in, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` in the `environment` block of `opencode.json`. To opt out explicitly and hide the tool from the assistant, set it to `"false"`. Reports contain only the issue type, tool name, normalized error code, MCP server version, client name and version, and a short summary. See [Send feedback](/integrate/mcp#send-feedback).
-</Note>
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+When you opt in, the Unleash MCP server shares anonymous diagnostic [feedback reports](/integrate/mcp#send-feedback) with Unleash to help improve the MCP server. The assistant sends a report automatically when a tool call fails, when a result isn't what it expected, or when you ask for something the MCP server can't do yet.
+
+To opt in, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` in the `environment` block of `opencode.json`. OpenCode doesn't show consent prompts, so feedback reports stay off until you set the variable. To learn more, see [Clients without a consent prompt](/integrate/mcp#clients-without-a-consent-prompt).
+
+To hide the `send_feedback` tool from the assistant, set the variable to `"false"`. To learn what a report contains, see [What is recorded](/integrate/mcp#what-is-recorded).
 
 ## Workflows
 
@@ -879,7 +883,7 @@ If you have many MCP servers configured, their tool descriptions may exceed the 
 </Accordion>
 
 <Accordion title="Feedback is disabled">
-OpenCode doesn't display MCP elicitation requests, so the MCP server doesn't ask for consent and the `send_feedback` tool returns this message unless you opt in through the environment. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` in the `environment` block of `opencode.json` and restart OpenCode. Flag operations are not affected either way.
+`send_feedback` returns this message until you opt in, because OpenCode doesn't show consent prompts. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK` to `"true"` in the `environment` block of `opencode.json` and restart OpenCode. Feedback settings don't affect flag operations.
 </Accordion>
 
 ## Best practices
