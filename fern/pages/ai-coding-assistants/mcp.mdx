@@ -306,23 +306,35 @@ Only enable the remote MCP server if your organization allows the [OAuth 2.0 Dyn
 
 ### Connect a client
 
-Point your MCP client at the endpoint shown in **Admin settings > Remote MCP server**. You don't need an OAuth client ID or client secret. MCP clients register themselves through Dynamic Client Registration the first time they connect.
+Point your MCP client at the endpoint shown in **Admin settings > Remote MCP server**. You don't need an OAuth client ID or client secret. MCP clients register themselves with your instance the first time they connect.
 
-Then authenticate with one of the following options:
+Authenticate with one of the following options. Browser login is the recommended option for developers. Use a personal access token or a service account token when your client can't complete a browser login, or when the MCP client should act as a service account rather than a user.
 
 <Tabs>
 <Tab title="Browser login">
 
-Exchange your current Unleash login session for a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) that is valid for 24 hours. The MCP client completes this flow in your browser and uses the issued PAT to call the endpoint.
+Use this option if you are a developer connecting your own coding assistant.
 
-To use this option, leave any client ID and client secret fields empty and log in when your browser opens.
+Configure your client without a token. When the client first connects, it opens your browser so you can log in to Unleash with your usual credentials. Unleash then issues a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) that is valid for 24 hours, and your client uses it for all MCP requests. The token has the same permissions as your user. After 24 hours, log in again to get a new token.
 
-The remote MCP server only accepts localhost callback URLs, so this option works with command-line clients such as Claude Code, but not with hosted clients such as Claude Desktop or Claude on the web.
+Leave any client ID and client secret fields in your client empty.
+
+Unleash only redirects back to localhost after login, so this option works with command-line clients such as Claude Code, but not with hosted clients such as Claude Desktop or Claude on the web.
+
+For example, in Claude Code:
+
+```bash
+claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mcp
+```
+
+Then run `/mcp` in Claude Code and select **unleash** to log in.
 
 </Tab>
 <Tab title="Personal access token">
 
-Send a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) you have already created in the `Authorization` header. The MCP client skips the browser login flow and acts with your permissions.
+Use this option if your client can't open a browser to log in, or if you want to control the token's lifetime yourself.
+
+Create a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) in Unleash and configure your client to send it in the `Authorization` header. The client has the same permissions as your user. The token stays valid until the expiry date you set, so store it as you would any other secret.
 
 For example, in Claude Code:
 
@@ -334,7 +346,9 @@ claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mc
 </Tab>
 <Tab title="Service account token">
 
-Send a [service account token](/concepts/api-tokens-and-client-keys#service-account-tokens) in the `Authorization` header. The MCP client skips the browser login flow and acts with the service account's permissions. Changes appear in the [event log](/concepts/events#event-log) under the service account.
+Use this option if the MCP client should act as a [service account](/concepts/service-accounts) rather than a user, for example in a shared or automated setup.
+
+Create a service account token in Unleash and configure your client to send it in the `Authorization` header. The client has the permissions of the service account's role, and changes appear in the [event log](/concepts/events#event-log) under the service account. The token stays valid until the expiry date you set, so store it as you would any other secret.
 
 For example, in Claude Code:
 
@@ -344,7 +358,7 @@ claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mc
 ```
 
 <Tip>
-Give the service account only the [role](/concepts/rbac) its MCP client needs. Service account tokens remain valid until the expiry date you set, so store them as you would any other secret.
+Assign the service account only the [role](/concepts/rbac) your MCP client needs.
 </Tip>
 
 </Tab>
