@@ -351,7 +351,9 @@ navigation:
           - page: Compare Unleash OSS and Unleash Enterprise
             slug: support/oss-comparison
             path: pages/support/oss-comparison.mdx
-
+          - page: Plans and billing
+            slug: support/billing
+            path: pages/support/billing.mdx
           - page: Contribute to Unleash
             slug: contributing
             path: pages/contribute.mdx
