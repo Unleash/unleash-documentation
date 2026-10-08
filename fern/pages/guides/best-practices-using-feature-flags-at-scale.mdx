@@ -5,7 +5,7 @@ keywords: feature, flag, management, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Feature flag management: Best practices"
 max-toc-depth: 2
-last-updated: May 19, 2026
+last-updated: September 4, 2026
 ---
 
 You've probably heard someone say, “A feature flag is just an if statement.” And in simple cases, that's true. But when your organization has thousands of developers managing hundreds of [feature flags](/what-is-a-feature-flag)—with complex targeting rules, audit trails, and dozens of microservices—those if statements get complicated fast. Especially if you don't [set things up properly from the start](/guides/user-management-access-controls).
@@ -237,7 +237,7 @@ Modern applications are composed of multiple services with many complex dependen
 
 Just because a user doesn't normally work with a flag doesn't mean they won't need to find it. However, you don't need to show every flag by default—especially those outside a user's main scope. What matters is that all flags are searchable. When someone searches for a flag, they should be able to view its configuration and ownership, so they can request access or submit a [change request](/concepts/change-requests) if needed.
 
-<EndpointRequestSnippet endpoint="GET /api/admin/features" />
+<EndpointRequestSnippet endpoint="GET /api/admin/search/features" />
 
 This is why feature flag systems should be [open by default](/guides/feature-flag-best-practices#5-choose-open-by-default).
 

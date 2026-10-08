@@ -6,7 +6,7 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: codex, openai codex, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation
 max-toc-depth: 3
 slug: integrate/codex
-last-updated: July 28, 2026
+last-updated: October 7, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects OpenAI Codex to your Unleash instance, enabling AI-assisted feature flag management.
@@ -81,6 +81,7 @@ Restart your terminal or run `source ~/.zshrc` to load the variables.
 | `UNLEASH_BASE_URL` | Your Unleash instance URL, without a trailing `/api`. | Yes |
 | `UNLEASH_PAT` | A personal access token with flag creation permissions. | Yes |
 | `UNLEASH_DEFAULT_PROJECT` | The default project for flag operations. If omitted, you must specify `projectId` in each tool call. | No |
+| `UNLEASH_MCP_SEND_FEEDBACK` | Set to `true` or `false` to opt in to or out of [feedback reports](/integrate/mcp#send-feedback) without a consent prompt. With `false`, the assistant doesn't see the `send_feedback` tool. | No |
 
 </Step>
 
@@ -194,7 +195,23 @@ The Unleash MCP server exposes the following tools.
 | `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
 | `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
 | `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
+| `send_feedback` | Sends [feedback reports](#feedback-reports) to Unleash about failed tool calls, unsupported requests, and unexpected results. | Automatically, after a failed or unsupported request |
 </StickyTable>
+
+### Feedback reports
+
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+When you opt in, the Unleash MCP server shares anonymous diagnostic [feedback reports](/integrate/mcp#send-feedback) with Unleash to help improve the MCP server. The assistant sends a report automatically when a tool call fails, when a result isn't what it expected, or when you ask for something the MCP server can't do yet.
+
+The first time the assistant tries to send a report, Codex shows a consent prompt with the default `on-request` approval policy. The MCP server saves whether you opted in or out, so you see the prompt only once.
+
+With the following approval policies, Codex accepts or declines the consent prompt for you, and the MCP server saves that choice:
+
+- `approval_policy = "never"`
+- A granular approval policy that sets `mcp_elicitations = false`
+
+To make the decision yourself with these policies, or to skip the prompt, pass `--env UNLEASH_MCP_SEND_FEEDBACK=true` or `--env UNLEASH_MCP_SEND_FEEDBACK=false` to `codex mcp add`, or add the variable to the `env` table in `~/.codex/config.toml`. To learn what a report contains, see [What is recorded](/integrate/mcp#what-is-recorded).
 
 ## Workflows
 
@@ -524,6 +541,10 @@ Cloud sandboxes are network-isolated by default, and they cannot run a local std
 
 - Run flag operations in the CLI or IDE extension (recommended for most teams), then let cloud tasks open pull requests that ship behind the flags you created.
 - Use the [remote Unleash MCP server](/integrate/mcp#remote-mcp-server) (Enterprise), which Codex connects to by `url`. Enable internet access for the cloud environment, add your Unleash host to the allowlist, and allow write methods (POST, PATCH, DELETE) so flag changes work. Verify the remote server's authentication flow works in a headless environment before relying on it.
+</Accordion>
+
+<Accordion title="Feedback is disabled">
+`send_feedback` returns this message if you declined the consent prompt, if Codex declined it for you, or if `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK = "true"` to the `env` table of `[mcp_servers.unleash]` in `~/.codex/config.toml` and restart Codex. To see the consent prompt again, delete `feedback_consent.json` from the [configuration directory](/integrate/mcp#consent). Feedback settings don't affect flag operations.
 </Accordion>
 
 ## Best practices
