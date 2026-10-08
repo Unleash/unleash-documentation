@@ -1,0 +1,154 @@
+---
+title: EU AI Act compliance for feature flags
+description: Map EU AI Act high-risk requirements to Unleash Enterprise controls for risk management, audit logs, human oversight, kill switches, and monitoring.
+keywords: [EU AI Act, Regulation (EU) 2024/1689, AI compliance, high-risk AI systems, AI governance, human oversight, kill switch, audit logs, feature flags, Unleash Enterprise]
+og:site_name: Unleash
+og:title: EU AI Act compliance for feature flags
+max-toc-depth: 2
+last-updated: October 8, 2026
+---
+
+## Overview
+
+The [EU AI Act](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) (Regulation (EU) 2024/1689) requires providers and deployers of high-risk AI systems to manage risk continuously, keep records of how a system behaved and who changed it, keep humans able to intervene, and monitor systems after release. When you control AI behavior through feature flags, Unleash supplies runtime controls and evidence that support these obligations: approval before changes reach production, an attributable audit trail of configuration changes, progressive rollout with automatic safeguards, and a kill switch that works without a redeployment.
+
+This guide outlines how [Unleash Enterprise](https://www.getunleash.io/pricing) features align with the operational requirements of the AI Act. For a summary of all frameworks, see the [compliance overview](/privacy-and-compliance/compliance-overview).
+
+## Key dates
+
+The AI Act entered into force on August 1, 2024. Following the Digital Omnibus on AI (Regulation (EU) 2026/1744), the main application dates are the following:
+
+<StickyTable>
+| Date | What applies |
+|------|--------------|
+| February 2, 2025 | Prohibited AI practices (Article 5) and AI literacy obligations (Article 4). |
+| August 2, 2025 | Obligations for general-purpose AI models (Articles 51 to 56). |
+| August 2, 2026 | Transparency obligations for certain AI systems (Article 50), with a grace period until December 2, 2026 for marking synthetic content under Article 50(2). |
+| December 2, 2026 | The additional Article 5 prohibition introduced by the Digital Omnibus. |
+| December 2, 2027 | Requirements and obligations for high-risk AI systems listed in Annex III: stand-alone systems in areas such as employment, credit, education, and essential services. |
+| August 2, 2028 | Requirements for high-risk AI systems that are safety components of regulated products (Annex I). |
+</StickyTable>
+
+Confirm dates and scope with your legal counsel. The mappings on this page focus on the high-risk requirements in Chapter III, because these are the obligations that depend on runtime controls.
+
+## How Unleash features map to EU AI Act requirements
+
+The AI Act describes outcomes rather than technical controls. Each of the following tables cites the article and the specific requirement, then describes the Unleash feature that supports it.
+
+Unleash provides controls and evidence for the parts of each requirement that concern the runtime configuration of an AI system. You meet the rest of each requirement through your own processes and the other tools in your AI stack. Where that boundary matters, the table says so.
+
+### Risk management and testing
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 9(2) Risk management system | Providers must run a continuous, iterative risk management process across the lifecycle of a high-risk AI system, including adopting measures to address identified risks. | [Release templates](/concepts/release-templates) standardize how AI features move through milestones, such as internal users, a small percentage, and full release, so that exposure increases only after you review each stage. [Segments](/concepts/segments) and strategy constraints limit which users or regions are exposed to a new model, prompt, or parameter set. When you hold model names, prompts, and parameters in [strategy variants](/concepts/strategy-variants) rather than in code, you can apply a risk measure, such as a stricter threshold or a safer prompt, at runtime without a deployment. |
+| Article 9(6) to 9(8) Testing | High-risk AI systems must be tested against predefined metrics throughout development and before being placed on the market, including, where appropriate, testing in real-world conditions. | Unleash supports the staged and real-world portion of this testing. Gradual rollout strategies and strategy variants expose a new AI configuration to a controlled share of traffic, such as an allow-list of your own internal teams for QA before any customer is exposed. [Impact metrics](/concepts/impact-metrics) connect error rates, latency, and custom quality scores to the flag, so you measure results against the thresholds you define. Pre-market testing and the choice of metrics remain part of your own test procedures. |
+| Article 9(5) Risk mitigation | Residual risks must be reduced through adequate design and, where appropriate, mitigation and control measures. | Every AI behavior behind a flag has a kill switch. Disabling a flag or an [environment](/concepts/environments) stops the behavior across all connected applications without a deployment. Release plan safeguards can pause a rollout automatically when an impact metric crosses a threshold. |
+</StickyTable>
+
+### Record-keeping and traceability
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 12(1) Automatic recording of events | High-risk AI systems must technically allow the automatic recording of events (logs) of the system's functioning over its lifetime. | Article 12 concerns the operational logs of the AI system itself, which your application or observability platform produces. Unleash complements those logs with an automatic, attributable record of the configuration that governed the system at any point in time. The [event log](/concepts/events#event-log) records every change: who made it (`createdBy`, `createdByUserId`, and IP address), when (`createdAt`), and, where the event type supplies them, the previous state (`preData`) and the new state (`data`). [Change requests](/concepts/change-requests) record who proposed, approved, and applied each change. |
+| Article 12(2) Traceability | Logging must enable traceability of the system's functioning appropriate to its intended purpose, including identifying situations that may present a risk. | You can search events by project, environment, flag, and user in the Admin UI and through the [Events API](/api/search-events), and export them as CSV or JSON. The [ServiceNow integration](/integrate/servicenow) mirrors each change request into ServiceNow as a standard change, so flag changes appear in the same IT service management (ITSM) record as the rest of your change management. Because flag evaluation happens in your SDK, your application can record the flag name, variant, and evaluation context alongside each inference. When it does, you can trace an individual AI output back to the exact configuration, approval, and rollout stage that produced it. |
+| Article 26(6) Deployers must keep logs | Deployers must keep the logs automatically generated by a high-risk AI system for at least six months, insofar as the logs are under their control. | The six-month obligation applies to the AI system's own logs. For the configuration record that accompanies them, event log data stays in your Unleash instance, or in your own infrastructure when self-hosted. You can export it to your security information and event management (SIEM) system or data warehouse on whatever retention schedule you apply to the system logs. Unleash retains [internal impact metrics](/concepts/impact-metrics#internal-metrics) for six months. [External metrics](/concepts/impact-metrics#external-metrics) stay in your Prometheus or VictoriaMetrics instance. |
+| Article 11 and Annex IV Technical documentation | Technical documentation must describe the system, its design, data, validation, risk management, and the versions and changes made over its lifetime. | Unleash supports the change-history and configuration portions of this documentation. The [export](/concepts/import-export) functionality maintains point-in-time snapshots of flag configuration. The [Terraform provider](/integrate/terraform) keeps instance configuration, such as projects, environments, and roles, as reviewable code in version control alongside the model and application code. The provider does not manage feature flags; the event log and configuration exports cover the history of flag changes. |
+</StickyTable>
+
+### Human oversight
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 14(1) and 14(2) Effective oversight | High-risk AI systems must be designed so that natural persons can oversee them during use, with the aim of preventing or minimizing risks. | Change requests enforce the four-eyes principle: reviewers approve changes to AI behavior in a production environment before they take effect, with up to 10 required approvers. You can schedule approved changes for a maintenance window. When an overseer identifies a risk during use, they can disable the flag to stop the behavior immediately, as described for Article 14(4)(e). |
+| Article 14(4)(d) Decide not to use, disregard, or reverse | Overseers must be able to decide not to use the system, or to disregard, override, or reverse an individual output. | Unleash supports the "decide not to use" part of this requirement at the level of a system, segment, or individual user. You can turn flags off per environment, per segment, or for specific users, revert release plans to an earlier milestone, and use strategy variants to fall back to a previous prompt or model without a code change. Overriding or reversing a single output is a function of your application's design. |
+| Article 14(4)(e) Intervene or interrupt (the "stop" button) | Overseers must be able to intervene in the operation of the system or interrupt it through a stop button or similar procedure, bringing it to a halt in a safe state. | A flag provides the interruption mechanism. Disabling a flag or environment propagates to [SDKs](/sdks) on their next refresh interval. The [default refresh interval](/sdks#default-refresh-and-metrics-intervals) is 15 seconds for backend SDKs and between 15 and 60 seconds for frontend SDKs, depending on the SDK; you can configure it. [Unleash Enterprise Edge](/unleash-edge) polls the Unleash API at a fixed interval by default; with [streaming](/unleash-edge/configure-streaming) enabled, it receives changes in near real time. SDKs that connect through Edge receive the change on their next refresh after Edge has it. SDKs then evaluate the flag as disabled, and your application takes its disabled code path. You define and validate what that safe state is; Unleash makes it explicit and switchable. |
+| Article 26(2) Competent overseers | Deployers must assign human oversight to natural persons who have the necessary competence, training, and authority. | [Role-based access control](/concepts/rbac) (RBAC) with custom root and project roles, [single sign-on](/concepts/sso) (SSO) and [SCIM](/concepts/scim) group sync, and environment-level permissions support the assignment of authority. Only designated people can approve or apply changes to production AI behavior, and the record shows who they were. You establish competence and training through your own programs. |
+</StickyTable>
+
+### Accuracy, robustness, and cybersecurity
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 15(4) Resilience and fail-safe plans | High-risk AI systems must be resilient to errors and faults, including through technical redundancy, backup, or fail-safe plans. | [Unleash Enterprise Edge](/unleash-edge) caches flag configuration close to your applications and continues serving evaluations if the Unleash API is unreachable. Once initialized, SDKs keep their flag configuration in a local cache and continue evaluating flags if Unleash or Edge becomes unreachable. At startup, an SDK needs to fetch its configuration unless it supports and is configured for [bootstrapping](/sdks#bootstrap); without flag data, flags evaluate as disabled or to the default value defined in code. Configure bootstrapping and safe default values so that the AI system does not depend on Unleash availability at request time. |
+| Article 15(5) Cybersecurity | High-risk AI systems must be resilient to attempts by unauthorized third parties to alter their use, outputs, or performance, including AI-specific attacks such as data poisoning, model poisoning, adversarial inputs, and confidentiality attacks. | Unleash addresses one part of this requirement: unauthorized modification of the runtime configuration that controls the AI system. SSO with enforced multi-factor authentication (MFA), SCIM provisioning, RBAC, [service accounts](/concepts/service-accounts), scoped [API tokens](/concepts/api-tokens-and-client-keys), and IP allow-lists protect that control plane. The hosted service enforces TLS 1.2; for self-hosted deployments, TLS is configured in your own infrastructure. Unleash is SOC 2 Type II certified and provides [ISO 27001](/privacy-and-compliance/iso27001) and [FedRAMP](/privacy-and-compliance/fedramp) control mappings. Defenses against model-level and data-level attacks sit in your model and data pipeline, outside Unleash. |
+| Article 15(1) Consistent performance | High-risk AI systems must achieve appropriate accuracy and robustness and perform consistently throughout their lifecycle. | Impact metrics and release plan safeguards track accuracy and error signals per flag over time. [Signals and actions](/concepts/signals) can disable a flag automatically when an external monitoring system reports a regression. |
+</StickyTable>
+
+### Quality management and change control
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 17(1)(b) and 17(1)(c) Design control and quality assurance | Providers must have documented procedures for design control, verification, development, quality control, and quality assurance. | Release templates encode an approved rollout procedure that teams reuse rather than reinvent. Change requests make review a mandatory step in the procedure rather than a convention. Both provide evidence that your teams followed the documented procedure. |
+| Article 17(1)(d) Examination, test, and validation procedures | Procedures must be carried out before, during, and after development. | Separate environments, such as development, staging, and production, each with their own permissions and approval settings, support staged validation. Impact metrics validate behavior in production after release. |
+| Article 17(1)(k) Record keeping of documentation and information | Providers must keep systematic records of relevant documentation and information. | The event log, change request history, and configuration exports provide a retained record of who changed what, when, and with whose approval. [Login history](/concepts/login-history) adds authentication events; Unleash keeps them for 14 days, so download them periodically to retain them longer. |
+| Article 17(1)(h) Post-market monitoring system | The quality management system must include the post-market monitoring system described in Article 72. | See [Post-market monitoring and incident response](#post-market-monitoring-and-incident-response). |
+</StickyTable>
+
+### Post-market monitoring and incident response
+
+<StickyTable>
+| EU AI Act requirement | Description | Unleash feature |
+|-----------------------|-------------|-----------------|
+| Article 72(2) Post-market monitoring | Providers must actively and systematically collect, document, and analyze data on the performance of high-risk AI systems throughout their lifetime. | Impact metrics, including counters, gauges, and histograms with p50, p95, and p99 percentiles, attach production performance data to the flags that control AI behavior. You can filter metrics by application, environment, and custom label, and query them through the API to include them in your monitoring plan and reports. |
+| Article 26(5) Deployer monitoring | Deployers must monitor the operation of the system on the basis of the instructions for use and inform the provider or distributor of risks or serious incidents. | Flag-level usage and evaluation metrics show where and how often an AI feature is being exercised. Signals from your own monitoring stack can trigger actions in Unleash when operation deviates from expectations. |
+| Article 73 Serious incident reporting | Providers must report serious incidents to market surveillance authorities within defined time limits and perform investigations and corrective action. | When an incident occurs, the first corrective action is usually to switch the behavior off, which takes seconds with a flag. The event log then provides an exportable, timestamped timeline of every configuration change leading up to the incident, including the approvals that authorized it, to support the investigation and the report. |
+| Article 20 Corrective actions | Providers who consider that a system is not in conformity must immediately take the necessary corrective actions to bring it into conformity, withdraw it, disable it, or recall it. | Disabling a flag withdraws an AI behavior from all users at once, or from a specific segment, without a release cycle. You can roll back release plans to a prior milestone while you prepare the fix. |
+</StickyTable>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is Unleash certified or assessed against the EU AI Act?">
+No. The AI Act regulates AI systems and general-purpose AI models, and it does not provide a certification for tooling vendors. Unleash is a feature management and runtime control platform. It supplies controls and records that your compliance program can rely on, in the same way that it supplies application-level controls for [SOC 2](/privacy-and-compliance/soc2), [ISO 27001](/privacy-and-compliance/iso27001), and [FedRAMP](/privacy-and-compliance/fedramp). Unleash itself is SOC 2 Type II certified.
+</Accordion>
+
+<Accordion title="Does using Unleash make my AI system compliant?">
+No. Compliance is a property of your AI system and your organization's processes. Unleash makes several obligations easier to meet and easier to evidence: approval before change, attributable records of change, progressive release with safeguards, and immediate correction. Classification of your system, data governance, technical documentation, conformity assessment, and registration remain your responsibility.
+</Accordion>
+
+<Accordion title="Does the EU AI Act apply to feature flags?">
+Not directly. The Act applies to AI systems and their providers and deployers. Feature flags become relevant when they control how an AI system behaves in production. If a flag decides which model serves a request, which prompt is used, what confidence threshold applies, or which users receive an AI feature, then the governance around that flag is part of the governance of the AI system. That is where the controls described on this page apply.
+</Accordion>
+
+<Accordion title="Which Unleash plan do I need?">
+The controls that map most directly to the AI Act are [Enterprise features](/support/oss-comparison): change requests and approval workflows, custom roles and environment-level permissions, SSO and SCIM, more than two environments, release templates, impact metrics with safeguards, signals and actions, and Enterprise Edge. The event log, segments, strategy constraints, and the open-source SDKs are available in all editions.
+</Accordion>
+
+<Accordion title="Does Unleash log the inputs and outputs of my AI model?">
+No. Unleash logs configuration changes and, through impact metrics, aggregated performance data that your applications report. Handle inference logging in your application or observability platform. Because flag evaluation happens locally in your SDK, you can record the flag name, variant, and evaluation context alongside each inference in your own logs. This gives you traceability from an individual output back to the configuration that produced it.
+</Accordion>
+
+<Accordion title="Does Unleash process end-user personal data?">
+With backend SDKs and Unleash Edge, flags are evaluated locally and end-user data does not need to be sent to the central Unleash service. Frontend SDKs that call the Frontend API directly send evaluation context to the endpoint they connect to, which can be [Unleash Enterprise Edge](/unleash-edge) inside your own infrastructure. With a self-hosted Unleash instance, no end-user data leaves your infrastructure at all.
+
+This architecture can reduce the amount of end-user personal data that reaches Unleash and simplify parts of your data protection analysis for AI systems that process personal data. For more details, see [Data collection and privacy](/privacy-and-compliance/data-privacy).
+</Accordion>
+
+<Accordion title="Can I run Unleash within the EU, or fully within my own infrastructure?">
+Yes. Unleash Enterprise is [available as a hosted service](https://www.getunleash.io/pricing) with a choice of hosting region, including the EU. It's also available as a self-hosted deployment within your own network, including air-gapped environments. Self-hosting gives you direct control over where configuration, event logs, and metrics are stored, and over the retention policies applied to them.
+</Accordion>
+
+<Accordion title="Where can I get more detail for a questionnaire or an AI review board?">
+The Trust Center provides the SOC 2 Type II report, penetration test summaries, and security policies on request. For questions about how Unleash fits a specific AI governance program, [contact us](https://www.getunleash.io/plans/enterprise).
+</Accordion>
+</AccordionGroup>
+
+## Related resources
+
+- [Compliance overview](/privacy-and-compliance/compliance-overview)
+- [DORA compliance](/privacy-and-compliance/dora)
+- [SOC 2 compliance](/privacy-and-compliance/soc2)
+- [ISO/IEC 27001 compliance](/privacy-and-compliance/iso27001)
+- [FedRAMP compliance](/privacy-and-compliance/fedramp)
+- [Change requests](/concepts/change-requests)
+- [Event log](/concepts/events#event-log)
+- [Release templates](/concepts/release-templates)
+- [Impact metrics](/concepts/impact-metrics)
+- [Role-based access control](/concepts/rbac)
+- Full text of the regulation: [Regulation (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)

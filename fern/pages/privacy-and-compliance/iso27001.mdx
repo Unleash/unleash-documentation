@@ -5,7 +5,7 @@ keywords: [ISO 27001, compliance, security, RBAC, access control, feature flags,
 og:site_name: Unleash
 og:title: ISO/IEC 27001 compliance for feature flags
 max-toc-depth: 2
-last-updated: May 11, 2026
+last-updated: October 8, 2026
 ---
 
 ## Overview
@@ -17,6 +17,7 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 
 ## How Unleash features map to ISO 27001 controls
 
+<StickyTable>
 | ISO27001 Control                         | Control Description                                                                                                               | Unleash Feature                                                                                                        |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | 5.2 Information security roles and responsibilities | Information security roles and responsibilities should be defined and allocated according to the organization's needs.    | Unleash provides granular [role-based access control](/concepts/rbac) (RBAC) and [approval workflows](/concepts/change-requests) for state changes.                                              |
@@ -35,3 +36,4 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 | 8.14 Redundancy of information processing facilities | Information processing facilities should be implemented with redundancy sufficient to meet availability requirements.   | The hosted version of Unleash is a highly available platform with load balancing, and redundancy across multiple AWS availability zones. |
 | 8.15 Logging                                | Logs that record activities, exceptions, faults, and other relevant events should be produced, stored, protected, and analyzed. | Unleash provides complete [event logs](/concepts/events#event-log) and [access logs](/concepts/login-history) for all API and UI interactions.                                 |
 | 8.16 Monitoring activities                  | Networks, systems, and applications should be monitored for anomalous behavior, and appropriate actions taken to evaluate potential information security incidents. | The hosted version of Unleash provides network and application monitoring, intrusion detection, and diverse utilization alerts supported by an SRE team and a structured incident handling process. |
+</StickyTable>

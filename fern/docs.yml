@@ -337,6 +337,12 @@ navigation:
               - page: ISO27001
                 path: pages/privacy-and-compliance/iso27001.mdx
                 slug: iso27001
+              - page: DORA
+                path: pages/privacy-and-compliance/dora.mdx
+                slug: dora
+              - page: EU AI Act
+                path: pages/privacy-and-compliance/eu-ai-act.mdx
+                slug: eu-ai-act
 
       - section: Support and community
         skip-slug: true
