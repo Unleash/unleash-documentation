@@ -16,44 +16,55 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 
 ## Access Control
 
+<StickyTable>
 | **FedRAMP Control**                                                                                                           | **Unleash Feature**                                                                                                                                                                                                                                                                                                           |
 |-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [AC-02 Account Management](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AC-2) | Unleash uses [role-based access control](/concepts/rbac) (RBAC) with configurable permissions. In addition, you can integrate Unleash roles with other identity systems using [SCIM](/concepts/scim). You can control authorization at different levels with [single sign-on](/concepts/sso) (SSO) and [personal access tokens](/concepts/api-tokens-and-client-keys#personal-access-tokens). |
 | [AC-04 Information Flow Enforcement](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AC-4) | Unleash supports information flow control with architectural system components like [Unleash Edge](/unleash-edge), and configuration-level options like IP allow-lists.                                                                                                              |
 | [AC-06 Least Privilege](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AC-6) | Unleash provides granular [role-based access control](/concepts/rbac) (RBAC) with permissions configurable at the instance, project, and environment levels. Custom roles can be defined to enforce least-privilege access patterns. [Change requests](/concepts/change-requests) add approval workflows that prevent unauthorized modifications to production flag state. |
 | [AC-07 Unsuccessful Logon Attempts](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AC-7) | Unleash restricts user logins after 10 failed attempts.                                                                                                                                                                                                                                                                      |
+</StickyTable>
 
 ## Audit and Accountability
 
+<StickyTable>
 | **FedRAMP Control**                                                                                      | **Unleash Feature**                                                                                                                                                                                |
 |----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [AU-02 Event Logging](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AU-2)           | Unleash provides detailed [audit logs and event tracking](/concepts/events), accessible through the Admin UI or exportable for integration with other systems.                                      |
 | [AU-12 Audit Record Generation](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AU-12) | Unleash provides detailed [audit logs and event tracking](/concepts/events), accessible through the Admin UI or exportable for integration with other systems.                                      |
+</StickyTable>
 
 ## Security Assessment and Authorization
 
+<StickyTable>
 | **FedRAMP Control**                                                                             | **Unleash Feature**                                                                                                                       |
 |-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [CA-8 Penetration Testing](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=CA-8) | Unleash conducts annual penetration testing by external auditors; results are available upon [request](https://www.getunleash.io/plans/enterprise).                                                      |
+</StickyTable>
 
 ## Configuration Management
 
+<StickyTable>
 | **FedRAMP Control**                                                                                          | **Unleash Feature**                                                                                                                                          |
 |--------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [CM-02 Baseline Configuration](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=CM-2)         | Unleash provides [Export](/concepts/import-export) functionality that facilitates keeping a configuration snapshot of feature flags and related entities in the audit records. Instance-wide configurations, such as projects, users, and roles, can be managed and restored using the [Unleash Terraform provider](/integrate/terraform).                                           |
 | [CM-05 Access Restrictions for Change](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=CM-5) | Unleash provides advanced [role-based access control](/concepts/rbac) (RBAC) controls to implement logical access restrictions. [Change Requests](/concepts/change-requests) help you define and track approval flows. |
+</StickyTable>
 
 ## Identification and Authentication
 
+<StickyTable>
 | **FedRAMP Control**                                                                                                         | **Unleash Feature**                                                                                                      |
 |-----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | [IA-02 Identification and Authentication](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=IA-2) (Organizational Users)                | Unleash provides single sign-on (SSO) to enable customers to enforce multi-factor authentication (MFA) for all Unleash users. |
 | [IA-02 (01) Identification and Authentication](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=IA-2) (Organizational Users); Multi-factor Authentication to Privileged Accounts     | Unleash provides SSO to enable customers to enforce multi-factor authentication (MFA) for all Unleash users.              |
 | [IA-02 (02) Identification and Authentication](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=IA-2) (Organizational Users); Multi-factor Authentication to Non-privileged Accounts | Unleash provides SSO to enable customers to enforce multi-factor authentication (MFA) for all Unleash users.              |
 | [IA-02 (08) Identification and Authentication](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=IA-2) (Organizational Users); Access to Accounts — Replay Resistant                  | Unleash restricts user logins after 10 failed attempts.                                                                   |
+</StickyTable>
 
 ## System and Communications Protection
 
+<StickyTable>
 | **FedRAMP Control**                                                                                   | **Unleash Feature**                                                                                                         |
 |-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | [SC-07 Boundary Protection](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=SC-7) | [Unleash Edge](/unleash-edge) operates as a boundary component that controls information flow between applications and the Unleash API. IP allow-lists can restrict access to the Unleash instance. For self-hosted deployments, customers deploy Unleash within their network perimeter and control all boundary protections using their existing infrastructure. |
@@ -62,9 +73,12 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 | [SC-13 Cryptographic Protection](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=SC-13) | For self-hosted deployments, cryptographic protection is managed at the infrastructure layer. TLS termination and encryption happen at the level of infrastructure components (load balancers, reverse proxies, database connections). Unleash delegates all application-level cryptographic operations to the runtime's OpenSSL modules and uses FIPS-approved algorithms (for example, SHA-256 for hashing). Unleash supports deployment on FIPS-enabled operating systems and runtimes, including container images built on FIPS-enabled base images. Customers operating in FedRAMP environments achieve FIPS 140-2/140-3 compliance by configuring their infrastructure stack to use validated cryptographic modules. Unleash provides access to source code, enabling customers to build and verify the application within their certified environments. |
 | [SC-17 Public Key Infrastructure Certificates](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=SC-17)                              | Unleash uses PKI certificates issued by AWS and Google.                                                                    |
 | [SC-28 Protection of Information at Rest](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=SC-28) | Unleash stores feature flag configuration data in a PostgreSQL database. For self-hosted deployments, data-at-rest encryption is managed by the customer at the database and storage layer using their preferred encryption solution. |
+</StickyTable>
 
 ## System and Information Integrity
 
+<StickyTable>
 | **FedRAMP Control**                                                                                   | **Unleash Feature**                                                                                                         |
 |-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | [SI-07 Software, Firmware, and Information Integrity](https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=SI-7) | Unleash Enterprise is built on an open-source foundation, enabling customers to inspect and verify the integrity of the application code. Self-hosted customers can integrate Unleash deployments into their existing software integrity verification processes, including container image signing and supply chain security tooling. |
+</StickyTable>
