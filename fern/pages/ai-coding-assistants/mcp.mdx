@@ -6,7 +6,7 @@ description: A Model Context Protocol (MCP) server that enables LLM-powered codi
 keywords: mcp, model context protocol, ai, llm, coding assistants, claude, feature flags, automation
 max-toc-depth: 3
 slug: integrate/mcp
-last-updated: September 8, 2026
+last-updated: October 7, 2026
 ---
 
 A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for managing [Unleash](https://www.getunleash.io/) feature flags. This server enables LLM-powered coding assistants to create and manage feature flags following Unleash best practices.
@@ -23,6 +23,7 @@ Every tool falls into one of these use cases:
 | **Discover and audit** | `list_projects`, `list_flags` | List projects available to your token and the flags within a project (active or archived). Useful before creating flags and for periodic flag audits. |
 | **Manage rollouts** | `get_flag_state`, `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy` | Check flag state, configure rollout strategies, and enable or disable flags across environments. |
 | **Clean up after rollout** | `cleanup_flag` | Generate instructions for safely removing a flag from your codebase after rollout. |
+| **Send feedback** | `send_feedback` | Share anonymous diagnostic reports with Unleash to help improve the MCP server. The assistant sends these reports automatically. |
 
 See the [Tool reference](#tool-reference) section for detailed parameters and output for each tool.
 
@@ -167,6 +168,8 @@ codex mcp add unleash \
     -- npx -y @unleash/mcp@latest --log-level error
 ```
 
+To opt in to or out of [feedback reports](#send-feedback) without a consent prompt, add `--env UNLEASH_MCP_SEND_FEEDBACK=true` or `--env UNLEASH_MCP_SEND_FEEDBACK=false` to either command.
+
 For other agents, see the dedicated integration guides:
 
 - [Cursor](/integrate/cursor)
@@ -275,7 +278,7 @@ When enabled, your Unleash instance exposes an MCP endpoint at:
 https://<your-instance-url>/api/admin/mcp
 ```
 
-The remote MCP server exposes the same [tools](#tool-reference) as the local server.
+The remote MCP server exposes the same [tools](#tool-reference) as the local server. For [feedback reports](#send-feedback), an admin decides for the whole instance instead of each user opting in. See [Feedback from the remote server](#feedback-from-the-remote-server).
 
 ### Enable the remote MCP server
 
@@ -285,13 +288,15 @@ To enable the remote MCP server on your instance:
 <Tab title="Hosted">
 1. In the Admin UI, go to **Admin settings > Remote MCP server**.
 2. Toggle **Enable Remote MCP Server for this instance** to **Enabled**.
-3. Save the configuration.
+3. Optional: To turn off [feedback reports](#feedback-from-the-remote-server), toggle **Send feedback from the Remote MCP Server to Unleash** to **Disabled**.
+4. Save the configuration.
 </Tab>
 <Tab title="Self-hosted">
 1. Set the `UNLEASH_EXPERIMENTAL_REMOTE_MCP_SERVER=true` environment variable on your Unleash instance and restart it.
 2. In the Admin UI, go to **Admin settings > Remote MCP server**.
 3. Toggle **Enable Remote MCP Server for this instance** to **Enabled**.
-4. Save the configuration.
+4. Optional: To turn off [feedback reports](#feedback-from-the-remote-server), toggle **Send feedback from the Remote MCP Server to Unleash** to **Disabled**.
+5. Save the configuration.
 </Tab>
 </Tabs>
 
@@ -306,6 +311,16 @@ The remote MCP server authenticates requests using standard Unleash [personal ac
 ### Connect a client
 
 Once the remote MCP server is enabled, point your MCP client at the endpoint shown in **Admin settings > Remote MCP server** and complete the authentication flow in your browser to issue a PAT for the client.
+
+### Feedback from the remote server
+
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash/releases/tag/v8.3.0">v8.3</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+For the remote MCP server, an admin turns [feedback reports](#send-feedback) on or off for the whole instance. Users don't see a consent prompt.
+
+To change the setting, go to **Admin settings > Remote MCP server** and toggle **Send feedback from the Remote MCP Server to Unleash**. The setting is enabled by default, including on existing instances after you upgrade, and only takes effect while the remote MCP server is enabled.
+
+When the setting is enabled, the remote server shares the same anonymous diagnostic reports as the local server. See [What is recorded](#what-is-recorded). When the setting is disabled, remote clients don't see the `send_feedback` tool.
 
 ## Tool reference
 
@@ -656,6 +671,134 @@ Returns a comprehensive, markdown-formatted string that guides the user on how t
 [If-block, guard clause, hooks, ternary, etc.]
 ```
 
+### Send feedback
+
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The `send_feedback` tool shares anonymous diagnostic feedback reports with Unleash to help improve the MCP server. Unleash uses these reports to prioritize fixes and new tools.
+
+You don't call this tool yourself. The assistant calls it automatically.
+
+#### When to use
+
+The assistant sends a report before it replies to you in the following cases:
+
+- `tool_error`: A tool call returns an error.
+- `unsupported_action`: You ask for something the MCP server can't do yet.
+- `unexpected_result`: A tool call succeeds, but the result isn't what the assistant expected.
+
+The assistant doesn't send a report for authentication errors (HTTP 401 or 403), or when `send_feedback` itself fails.
+
+#### Consent
+
+The local MCP server sends feedback reports only after you opt in. The first time the assistant calls `send_feedback`, your client shows a consent prompt. What happens next depends on your response:
+
+- **You accept**: The MCP server sends the report and saves that you opted in. You don't see the prompt again.
+- **You decline**: The MCP server doesn't send the report and saves that you opted out. You don't see the prompt again.
+- **You cancel or don't respond within 60 seconds**: The MCP server doesn't send the report and doesn't save anything. You see the prompt again in your next session.
+
+In some clients, you don't see the consent prompt. See [Clients without a consent prompt](#clients-without-a-consent-prompt).
+
+The MCP server saves whether you opted in or out in a file named `feedback_consent.json`. All clients on your machine that show the consent prompt read this file, so you respond to the prompt only once. The file is in your platform's configuration directory:
+
+<Tabs>
+<Tab title="macOS">
+```text
+~/Library/Application Support/unleash-mcp/feedback_consent.json
+```
+
+If you set `XDG_CONFIG_HOME`, the file is in `$XDG_CONFIG_HOME/unleash-mcp/` instead.
+</Tab>
+<Tab title="Linux">
+```text
+~/.config/unleash-mcp/feedback_consent.json
+```
+
+If you set `XDG_CONFIG_HOME`, the file is in `$XDG_CONFIG_HOME/unleash-mcp/` instead.
+</Tab>
+<Tab title="Windows">
+```text
+%APPDATA%\unleash-mcp\feedback_consent.json
+```
+
+If `APPDATA` isn't set, the file is in `~\AppData\Roaming\unleash-mcp\`. If you set `XDG_CONFIG_HOME`, the file is in `$XDG_CONFIG_HOME/unleash-mcp/` instead.
+</Tab>
+</Tabs>
+
+To store the file in a different directory, set `UNLEASH_MCP_CONFIG_DIR`. To see the prompt again, delete the file.
+
+To skip the prompt, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false`. The variable takes precedence over `feedback_consent.json`. With `false`, the assistant doesn't see the `send_feedback` tool. Use the variable for CI and for centrally managed MCP configuration.
+
+The remote MCP server doesn't show a consent prompt. Instead, an admin turns feedback reports on or off for the whole instance. See [Feedback from the remote server](#feedback-from-the-remote-server).
+
+#### Clients without a consent prompt
+
+In the following clients, you don't see the consent prompt. To opt in or out, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false`.
+
+<Tabs>
+<Tab title="OpenCode">
+OpenCode accepts the consent prompt automatically, without showing it to you. Because the MCP server can't be sure that you opted in yourself, it doesn't request the prompt and ignores `feedback_consent.json`.
+
+Feedback reports stay off until you set `UNLEASH_MCP_SEND_FEEDBACK=true`. See [OpenCode](/integrate/opencode#feedback-reports).
+</Tab>
+<Tab title="Antigravity and Gemini CLI">
+Antigravity and Gemini CLI don't show you the consent prompt. The MCP server doesn't request the prompt and ignores `feedback_consent.json`.
+
+Feedback reports stay off until you set `UNLEASH_MCP_SEND_FEEDBACK=true`. See [Antigravity and Gemini CLI](/integrate/gemini-antigravity#feedback-reports).
+</Tab>
+<Tab title="Codex">
+Codex shows the consent prompt with the default `on-request` approval policy. With `approval_policy = "never"`, or a granular approval policy that sets `mcp_elicitations = false`, Codex accepts or declines the prompt for you, and the MCP server saves that choice in `feedback_consent.json`.
+
+To opt in or out yourself with these policies, set `UNLEASH_MCP_SEND_FEEDBACK`. See [Codex](/integrate/codex#feedback-reports).
+</Tab>
+<Tab title="Other clients">
+If your client doesn't report its name when it connects, the MCP server doesn't request the consent prompt and ignores `feedback_consent.json`.
+
+Feedback reports stay off until you set `UNLEASH_MCP_SEND_FEEDBACK=true`.
+</Tab>
+</Tabs>
+
+#### What is recorded
+
+Each report contains only the following fields:
+
+- Issue type, tool name, and normalized error code
+- MCP server version, client name, and client version
+- A short summary that the assistant writes
+
+The tool name and error code follow a fixed format, so they can't contain free text. The assistant is instructed to leave flag names, project IDs, code, URLs, and tokens out of the summary. Reports never include raw error messages or your personal access token.
+
+By default, reports go to Unleash, not to your Unleash instance. To send them to your own endpoint instead, see [Send reports to your own endpoint](#send-reports-to-your-own-endpoint). See also [Data and privacy](/privacy-and-compliance/data-privacy#mcp-server-feedback).
+
+#### Send reports to your own endpoint
+
+To collect feedback reports yourself instead of sending them to Unleash, set `UNLEASH_FEEDBACK_URL` to the base URL of your endpoint, for example `https://feedback.example.com`. The URL must start with `http://` or `https://`.
+
+The MCP server then sends each report as a `POST` request to `{UNLEASH_FEEDBACK_URL}/feedback` with a JSON body. The `areasForImprovement` field holds the report fields from [What is recorded](#what-is-recorded) as a JSON-encoded string:
+
+```json
+{
+  "category": "mcp",
+  "userType": null,
+  "difficultyScore": null,
+  "positive": null,
+  "areasForImprovement": "{\"issueType\":\"tool_error\",\"summary\":\"Setting the rollout failed with a server error.\",\"tool\":\"set_flag_rollout\",\"errorCode\":\"HTTP_500\",\"mcpVersion\":\"0.5.0\",\"client\":\"claude-code\",\"clientVersion\":\"2.1.80\"}"
+}
+```
+
+Reports sent to your own endpoint don't reach Unleash. Consent works the same way: the MCP server sends reports only after you opt in.
+
+#### Parameters
+
+- `issueType` (required): `tool_error`, `unsupported_action`, or `unexpected_result`.
+- `summary` (required): One or two sentences describing what went wrong or what was requested (maximum 500 characters).
+- `tool` (optional): Name of the MCP tool involved, for example `create_flag`. Omit for unsupported requests.
+- `errorCode` (optional): Normalized error code from the failed tool result, for example `HTTP_500` or `VALIDATION_ERROR`.
+
+#### Output
+
+Returns a confirmation that the report was sent, or would be sent in `--dry-run` mode. If you haven't opted in, returns a message that feedback is disabled. The structured content includes `success`, `sent`, `dryRun`, and `message`. If the MCP server can't save whether you opted in or out to `feedback_consent.json`, the result also includes a `warning`. In that case, your choice applies to the current session only, and you see the prompt again in your next session.
+
 ## Architecture
 
 The server follows a focused, purpose-driven design.
@@ -701,6 +844,7 @@ src/
 - **Error normalization**: All errors converted to `{code, message, hint}` format.
 - **Progress streaming**: Long-running operations provide visibility.
 - **Best practices integration**: Guidance from Unleash docs embedded in tool descriptions.
+- **Opt-in feedback**: The local server sends [feedback reports](#send-feedback) only after you opt in, and each report contains a fixed set of fields.
 
 ## Configuration
 
@@ -710,6 +854,9 @@ This section provides a quick reference for all configuration options.
 - `UNLEASH_BASE_URL`: Your Unleash instance URL (required).
 - `UNLEASH_PAT`: Personal access token (required).
 - `UNLEASH_DEFAULT_PROJECT`: The default project ID the MCP should use (optional).
+- `UNLEASH_MCP_SEND_FEEDBACK`: Set to `true` or `false` to opt in to or out of [feedback reports](#send-feedback) without a consent prompt (optional). Takes precedence over `feedback_consent.json`. With `false`, the assistant doesn't see the `send_feedback` tool.
+- `UNLEASH_FEEDBACK_URL`: Base URL of your own endpoint for feedback reports (optional). By default, reports go to Unleash. See [Send reports to your own endpoint](#send-reports-to-your-own-endpoint).
+- `UNLEASH_MCP_CONFIG_DIR`: Directory for `feedback_consent.json` (optional). Defaults to your platform's configuration directory. See [Consent](#consent).
 
 **CLI flags:**
 - `--dry-run`: Simulate operations without making actual API calls.
@@ -758,6 +905,8 @@ This server uses the Unleash Admin API. For complete API documentation, see:
 
 - `POST /api/admin/projects/{projectId}/features` - Create feature flag
 
+`send_feedback` doesn't call your Unleash instance. It sends reports to Unleash, or to `POST {UNLEASH_FEEDBACK_URL}/feedback` if you set [your own endpoint](#send-reports-to-your-own-endpoint).
+
 ## Troubleshooting
 
 ### Configuration issues
@@ -775,6 +924,12 @@ This server uses the Unleash Admin API. For complete API documentation, see:
 **Error: "HTTP_404"**: The project ID doesn't exist. Confirm the project ID in Unleash Admin UI.
 
 **Error: "HTTP_409"**: A flag with this name already exists in the project. Use a different name or reuse the existing flag.
+
+### Feedback issues
+
+**"Feedback is disabled"**: You declined the consent prompt, your client couldn't show it, or `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK=true`. To see the prompt again, delete `feedback_consent.json`. See [Consent](#consent).
+
+**Error: "Failed to connect to the Unleash feedback endpoint"**: The MCP server can't reach the address that receives feedback reports. Check your network connection. If you set `UNLEASH_FEEDBACK_URL`, check that the URL is correct. Flag operations aren't affected.
 
 ## License
 
