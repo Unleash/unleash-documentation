@@ -1,0 +1,115 @@
+---
+title: DORA compliance for feature flags
+description: Map DORA ICT risk requirements to Unleash Enterprise controls for change management, access control, logging, incident response, and exit planning.
+keywords: [DORA, Digital Operational Resilience Act, Regulation (EU) 2022/2554, ICT risk management, financial services, operational resilience, change management, third-party risk, feature flags, Unleash Enterprise]
+og:site_name: Unleash
+og:title: DORA compliance for feature flags
+max-toc-depth: 2
+last-updated: October 8, 2026
+---
+
+## Overview
+
+The [Digital Operational Resilience Act](https://eur-lex.europa.eu/eli/reg/2022/2554/oj) (DORA, Regulation (EU) 2022/2554) requires banks, insurers, investment firms, payment institutions, and other EU financial entities to manage information and communication technology (ICT) risk through documented controls. These controls cover change management, logging and access control, incident detection and response, resilience testing, and oversight of ICT third-party providers. The requirements apply to every ICT system that supports a financial entity's business, including the feature management platform that controls how its applications behave in production.
+
+This guide outlines how [Unleash Enterprise](https://www.getunleash.io/pricing) features align with DORA and its ICT risk management regulatory technical standards (RTS), [Commission Delegated Regulation (EU) 2024/1774](https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj). For a summary of all frameworks, see the [compliance overview](/privacy-and-compliance/compliance-overview).
+
+## How Unleash features map to DORA requirements
+
+DORA describes outcomes for the financial entity. Each of the following tables cites the DORA article or the RTS article, the specific requirement, and the Unleash feature that supports it.
+
+Unleash provides controls and evidence for the parts of each requirement that concern the feature management platform itself. You meet the rest through your own ICT risk management framework.
+
+### ICT change management
+
+| DORA requirement | Description | Unleash feature |
+|------------------|-------------|-----------------|
+| Article 9(4)(e) ICT change management | Financial entities must implement documented policies, procedures, and controls so that all changes to ICT systems, including software and security parameters, are recorded, tested, assessed, approved, implemented, and verified in a controlled manner. | [Change requests](/concepts/change-requests) make approval a mandatory step before any flag, strategy, or segment change takes effect in a protected environment, with up to 10 required approvers per project and environment. Each request records who proposed, reviewed, approved, and applied the change. You can schedule approved changes for a maintenance window. The [event log](/concepts/events#event-log) records every configuration change, so the full change history is available for audit. The [ServiceNow integration](/integrate/servicenow) mirrors each change request into ServiceNow as a standard change, so flag changes appear in the same IT service management (ITSM) record as the rest of your ICT change management. |
+| RTS Article 17 ICT change management procedures | Changes must be verified against security requirements, tested, approved by an appropriate function, and have fallback procedures and emergency change handling defined. | Separate [environments](/concepts/environments), such as development, staging, and production, with environment-specific permissions support testing before production. Flags provide the fallback: you can reverse a change by disabling the flag or reverting a [release plan](/concepts/release-templates) to an earlier milestone without a redeployment. Because you can hold configuration values in [strategy variants](/concepts/strategy-variants) rather than in code, you can apply a corrected parameter at runtime the same way. The [skip change requests](/concepts/rbac#environment-level-permissions) permission gives a controlled path for emergency changes that remains fully logged. |
+| RTS Article 16 Acquisition, development, and maintenance of ICT systems | Changes to ICT systems must be developed and deployed under controlled procedures, with production separated from development and testing. | [Release templates](/concepts/release-templates) standardize how you roll out a change across environments and audiences, so teams reuse the approved procedure rather than reinvent it. The [Terraform provider](/integrate/terraform) manages projects, environments, roles, and flags as code, so platform configuration goes through the same review and version control as application code. |
+
+### ICT risk management framework
+
+| DORA requirement | Description | Unleash feature |
+|------------------|-------------|-----------------|
+| Article 9(2) and 9(3) Protection and prevention | Financial entities must use ICT tools that ensure resilience, continuity, and availability, and that minimize the risk of unauthorized access, data loss, and technical flaws. | Flags decouple deployment from release, so you can switch off a defect in new code in seconds rather than roll it back through a release cycle. [Impact metrics](/concepts/impact-metrics) and release plan safeguards pause a rollout automatically when an error rate or latency threshold is crossed. [Segments](/concepts/segments) and strategy constraints limit the blast radius of any change to a defined population, including an allow-list of your own internal users for QA before any customer is exposed. |
+| Article 9(4)(c) and RTS Articles 20 and 21 Access control and identity management | Access rights must be granted on a need-to-know and least-privilege basis, reviewed regularly, and tied to managed identities. | [Role-based access control](/concepts/rbac) (RBAC) provides custom root and project roles and environment-level permissions. [Single sign-on](/concepts/sso) (SSO) with SAML and OIDC supports multi-factor authentication (MFA) enforced by your identity provider. [SCIM](/concepts/scim) provisioning and group sync automate joiner, mover, and leaver handling. [Service accounts](/concepts/service-accounts) and scoped [API tokens](/concepts/api-tokens-and-client-keys) separate machine access from human access. The same roles determine who can use the kill switch, so the ability to disable a feature in production is itself an access-controlled, logged action. |
+| Article 9(4)(d) Strong authentication | Financial entities must implement strong authentication mechanisms and protection of cryptographic keys. | SSO lets you enforce MFA for every Unleash user through [Okta](/single-sign-on/how-to-add-sso-open-id-connect#configure-the-okta-application), [Microsoft Entra ID](/single-sign-on/how-to-add-sso-azure-saml), [Keycloak](/single-sign-on/how-to-setup-sso-keycloak-group-sync), or any [SAML](/single-sign-on/how-to-add-sso-saml) or [OIDC](/single-sign-on/how-to-add-sso-open-id-connect) provider. Unleash restricts logins after 10 failed attempts. For self-hosted deployments, TLS termination and key management stay in your own infrastructure. |
+| RTS Article 12 Logging | Financial entities must log events related to access control, changes, and ICT operations, protect logs from tampering, and retain them for a period consistent with business and regulatory needs. | The event log records every change with the user (`createdBy`, `createdByUserId`, and IP address), timestamp, previous state (`preData`), and new state (`data`). [Login history](/concepts/login-history) records authentication events. You can search both in the Admin UI and through the API, and export them as CSV or JSON to your security information and event management (SIEM) system on your retention schedule. |
+| Article 7 and RTS Article 9 ICT systems and capacity | ICT systems must be reliable, have sufficient capacity, and be technologically resilient to handle peak demand. | [Unleash Enterprise Edge](/unleash-edge) serves flag evaluations from a local cache close to your applications, scales horizontally, and continues serving if the Unleash API is unavailable. Backend SDKs evaluate flags locally, so request volume to the platform is independent of application traffic. Traffic and connection statistics are available in the Admin UI. |
+| Article 12 Backup and restoration | Financial entities must have backup policies and restoration procedures and test them. | Hosted Unleash runs automated periodic backups across multiple availability zones. [Self-hosted deployments](/deploy/hosting-options#self-hosted) store all configuration in PostgreSQL, which you back up under your own policy, and the [export](/concepts/import-export) API provides point-in-time configuration snapshots. |
+
+### ICT-related incident management
+
+| DORA requirement | Description | Unleash feature |
+|------------------|-------------|-----------------|
+| Article 10 Detection | Financial entities must have mechanisms to promptly detect anomalous activities and ICT-related incidents. | Impact metrics attach error rates, latency, and custom measurements to the flags that control each feature. [Signals and actions](/concepts/signals) accept alerts from your monitoring stack and trigger actions in Unleash in response. |
+| Article 11(1) Response and recovery | Financial entities must have response and recovery plans that contain damage and prioritize the resumption of activities. | Disabling a flag or an environment withdraws the affected feature from all users at once, or from a specific segment, without a deployment. Signals and actions can disable a flag automatically when a monitoring system reports a regression, which shortens the time to contain an incident. |
+| Article 17 Incident management process | Financial entities must record all ICT-related incidents and establish root causes. | The event log provides an exportable, timestamped timeline of every configuration change before and during an incident, including the approvals that authorized each change. Use it in post-incident analysis and in the root cause record. |
+| Article 19 Reporting of major incidents | Major ICT-related incidents must be reported to the competent authority, including the initial notification, intermediate report, and final report with root cause analysis. | Event log and change request exports supply the change history that incident reports require. Unleash is SOC 2 Type II certified and provides its own incident response commitments to hosted customers through the Trust Center. |
+
+### Digital operational resilience testing
+
+| DORA requirement | Description | Unleash feature |
+|------------------|-------------|-----------------|
+| Articles 24 and 25 Testing program | Financial entities must test ICT systems regularly, including vulnerability assessments, scenario-based tests, and performance tests, and remediate findings. | Unleash undergoes annual third-party penetration testing, with results available through the Trust Center. Self-hosted customers can include Unleash in their own vulnerability scanning and testing program, and the open-source codebase allows direct code inspection. Flags also support scenario testing: you can expose a feature in production to an allow-listed internal audience only, with impact metrics recording the result, before wider release. |
+| Article 26 Threat-led penetration testing | Significant financial entities must perform threat-led penetration testing (TLPT) on live production systems supporting critical functions, with ICT third-party providers participating where their services are in scope. | For self-hosted deployments, Unleash sits inside your own perimeter, and you can include it in TLPT scope without third-party coordination. For hosted deployments, participation in TLPT is handled under the Enterprise agreement. |
+
+### ICT third-party risk
+
+| DORA requirement | Description | Unleash feature |
+|------------------|-------------|-----------------|
+| Article 28(1) and 28(4) Third-party risk and due diligence | ICT third-party risk is part of ICT risk. Before contracting, financial entities must assess criticality, concentration risk, and the provider's security posture. | The SOC 2 Type II report, penetration test summaries, 14 security policies, and the Unleash compliance mappings support due diligence. These include this page and the [SOC 2](/privacy-and-compliance/soc2), [ISO 27001](/privacy-and-compliance/iso27001), and [FedRAMP](/privacy-and-compliance/fedramp) mappings. Self-hosting removes the hosted service from the dependency entirely: the software runs in your infrastructure, under your controls. |
+| Article 28(3) Register of information | Financial entities must maintain a register of all contractual arrangements for ICT services, identifying those that support critical or important functions. | Unleash provides the information needed for a register entry on request through the Enterprise agreement: legal entity (Bricks Software AS), service description, hosting locations for the hosted service, and subcontractors. |
+| Article 28(8) Exit strategies | Financial entities must be able to exit an ICT arrangement without disrupting business, and must have documented and tested exit plans. | Unleash is built on an open-source core under the AGPLv3 license. Configuration is exportable through the [API](/api), [SDKs](/sdks) are open source, and the hosted and self-hosted editions run the same software. A migration from hosted to self-hosted, or away from Unleash entirely, does not require a rewrite of application code. Vendor lock-in and concentration risk are structurally lower than with a proprietary hosted-only platform. |
+| Article 30(2) and 30(3) Contractual provisions | Contracts must specify service locations, data protection, SLAs, audit and access rights, incident support, and termination and transition terms. | Enterprise agreements cover hosting region, SLAs, support, security commitments, and termination assistance. Self-hosted deployments keep all data within your own locations and under your own data protection controls. |
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is Unleash a critical ICT third-party provider under DORA?">
+No. The European Supervisory Authorities designate critical ICT third-party providers based on systemic importance across the EU financial sector. Unleash has not been designated. Whether Unleash supports a critical or important function for your organization is a determination you make under Article 28, and it depends on how your applications use feature flags.
+</Accordion>
+
+<Accordion title="Does DORA apply differently to hosted and self-hosted Unleash?">
+Yes. [Hosted Unleash](https://www.getunleash.io/pricing) is an ICT service provided by a third party, so it falls under the third-party risk requirements in Chapter V: due diligence, the register of information, contractual provisions, and exit planning.
+
+Self-hosted Unleash runs inside your own infrastructure. It's still software you license, but the operational controls, such as hosting, encryption, backups, network security, and log retention, are yours. This is why many financial entities in regulated jurisdictions choose to self-host.
+</Accordion>
+
+<Accordion title="Does Unleash support the four-eyes principle for production changes?">
+Yes. [Change requests](/concepts/change-requests) enforce review and approval before a change is applied to a protected environment. You can require between 1 and 10 approvers, restrict who can approve through custom roles, and require approval for flag changes, strategy changes, and segment changes. Unleash retains the full history of each change request in the [event log](/concepts/events).
+</Accordion>
+
+<Accordion title="Can Unleash stay available during an outage of the Unleash API or the network?">
+Yes. Backend [SDKs](/sdks) evaluate flags locally from cached configuration and fall back to defined defaults. [Unleash Enterprise Edge](/unleash-edge) adds a resilient caching layer that continues to serve evaluations and collect metrics while the API is unreachable. Unleash also supports fully air-gapped deployments.
+
+This architecture means the feature management layer does not become a single point of failure for your applications, which matters for the continuity requirements in Article 11.
+</Accordion>
+
+<Accordion title="Does Unleash process end-user personal data?">
+With backend SDKs and Unleash Edge, flags are evaluated locally and end-user data does not need to be sent to the central Unleash service. Frontend SDKs that call the Frontend API directly send evaluation context to the endpoint they connect to, which can be [Unleash Enterprise Edge](/unleash-edge) inside your own infrastructure. With a self-hosted Unleash instance, no end-user data leaves your infrastructure at all. For more details, see [Data collection and privacy](/privacy-and-compliance/data-privacy).
+</Accordion>
+
+<Accordion title="Which Unleash plan do I need?">
+The controls that map most directly to DORA are [Enterprise features](/support/oss-comparison): change requests and approval workflows, custom roles and environment-level permissions, SSO and SCIM, more than two environments, release templates, impact metrics with safeguards, signals and actions, login history, and Enterprise Edge. The event log, segments, strategy constraints, and the open-source SDKs are available in all editions.
+</Accordion>
+
+<Accordion title="Where can I get the documents my DORA assessment requires?">
+The Trust Center provides the SOC 2 Type II report, penetration test summaries, business continuity and disaster recovery policies, and security policies on request. For register of information details, subcontractor lists, and contractual terms, [contact us](https://www.getunleash.io/plans/enterprise).
+</Accordion>
+</AccordionGroup>
+
+## Related resources
+
+- [Compliance overview](/privacy-and-compliance/compliance-overview)
+- [EU AI Act compliance](/privacy-and-compliance/eu-ai-act)
+- [SOC 2 compliance](/privacy-and-compliance/soc2)
+- [ISO/IEC 27001 compliance](/privacy-and-compliance/iso27001)
+- [FedRAMP compliance](/privacy-and-compliance/fedramp)
+- [Change requests](/concepts/change-requests)
+- [Event log](/concepts/events#event-log)
+- [Role-based access control](/concepts/rbac)
+- [Unleash Enterprise Edge](/unleash-edge)
+- Full text of the regulation: [Regulation (EU) 2022/2554](https://eur-lex.europa.eu/eli/reg/2022/2554/oj)
+- ICT risk management RTS: [Commission Delegated Regulation (EU) 2024/1774](https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj)
