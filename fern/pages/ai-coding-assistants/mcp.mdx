@@ -6,7 +6,7 @@ description: A Model Context Protocol (MCP) server that enables LLM-powered codi
 keywords: mcp, model context protocol, ai, llm, coding assistants, claude, feature flags, automation
 max-toc-depth: 3
 slug: integrate/mcp
-last-updated: October 7, 2026
+last-updated: October 8, 2026
 ---
 
 A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for managing [Unleash](https://www.getunleash.io/) feature flags. This server enables LLM-powered coding assistants to create and manage feature flags following Unleash best practices.
@@ -304,13 +304,65 @@ To enable the remote MCP server on your instance:
 Only enable the remote MCP server if your organization allows the [OAuth 2.0 Dynamic Client Registration](https://datatracker.ietf.org/doc/html/rfc7591) (DCR) authorization workflow. DCR lets MCP clients self-register with your instance without prior administrator approval, which is required to support clients such as Claude Code that do not pre-register OAuth clients. Review your organization's policy before enabling this.
 </Warning>
 
-### Authentication
-
-The remote MCP server authenticates requests using standard Unleash [personal access tokens](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PATs). Once the remote MCP server is enabled, users can exchange their current login session for a PAT that is valid for 24 hours, and the MCP client uses that token to call the endpoint.
-
 ### Connect a client
 
-Once the remote MCP server is enabled, point your MCP client at the endpoint shown in **Admin settings > Remote MCP server** and complete the authentication flow in your browser to issue a PAT for the client.
+Point your MCP client at the endpoint shown in **Admin settings > Remote MCP server**. You don't need an OAuth client ID or client secret. MCP clients register themselves with your instance the first time they connect.
+
+Authenticate with one of the following options:
+
+<Tabs>
+<Tab title="Browser login">
+
+Use this option if you are a developer connecting your own coding assistant.
+
+Configure your client without a token. When the client first connects, it opens your browser so you can log in to Unleash with your usual credentials. Unleash then issues a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) that is valid for 24 hours, and your client uses it for all MCP requests. The token has the same permissions as your user. After 24 hours, log in again to get a new token.
+
+Leave any client ID and client secret fields in your client empty.
+
+Unleash only redirects back to localhost after login, so this option works with command-line clients such as Claude Code, but not with hosted clients such as Claude Desktop or Claude on the web.
+
+For example, in Claude Code:
+
+```bash
+claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mcp
+```
+
+Then run `/mcp` in Claude Code and select **unleash** to log in.
+
+</Tab>
+<Tab title="Personal access token">
+
+Use this option if your client can't open a browser to log in, or if you want to control the token's lifetime yourself.
+
+Create a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) in Unleash and configure your client to send it in the `Authorization` header. The client has the same permissions as your user. The token stays valid until the expiry date you set, so store it as you would any other secret.
+
+For example, in Claude Code:
+
+```bash
+claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mcp \
+    --header "Authorization: Bearer <your-personal-access-token>"
+```
+
+</Tab>
+<Tab title="Service account token">
+
+Use this option if the MCP client should act as a [service account](/concepts/service-accounts) rather than a user, for example in a shared or automated setup.
+
+Create a service account token in Unleash and configure your client to send it in the `Authorization` header. The client has the permissions of the service account's role, and changes appear in the [event log](/concepts/events#event-log) under the service account. The token stays valid until the expiry date you set, so store it as you would any other secret.
+
+For example, in Claude Code:
+
+```bash
+claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mcp \
+    --header "Authorization: Bearer <your-service-account-token>"
+```
+
+<Tip>
+Assign the service account only the [role](/concepts/rbac) your MCP client needs.
+</Tip>
+
+</Tab>
+</Tabs>
 
 ### Feedback from the remote server
 
@@ -801,42 +853,7 @@ Returns a confirmation that the report was sent, or would be sent in `--dry-run`
 
 ## Architecture
 
-The server follows a focused, purpose-driven design.
-
-### Structure
-
-```
-src/
-├── index.ts                     # Main server entry point
-├── config.ts                    # Configuration loading and validation
-├── context.ts                   # Shared runtime context
-├── unleash/
-│   └── client.ts                # Unleash Admin API client
-├── tools/
-│   ├── createFlag.ts            # create_flag tool
-│   ├── evaluateChange.ts        # evaluate_change tool
-│   ├── detectFlag.ts            # detect_flag tool
-│   └── wrapChange.ts            # wrap_change tool
-├── prompts/
-│   └── promptBuilder.ts         # Markdown formatting utilities
-├── evaluation/
-│   ├── riskPatterns.ts          # Risk assessment patterns
-│   └── flagDetectionPatterns.ts # Parent flag detection patterns
-├── detection/
-│   ├── flagDiscovery.ts         # Flag discovery strategies
-│   └── flagScoring.ts           # Scoring and ranking logic
-├── knowledge/
-│   └── unleashBestPractices.ts  # Best practices knowledge base
-├── templates/
-│   ├── languages.ts             # Language detection and metadata
-│   ├── wrapperTemplates.ts      # Code wrapping templates
-│   └── searchGuidance.ts        # Pattern search instructions
-└── utils/
-    ├── errors.ts                # Error normalization
-    └── streaming.ts             # Progress notifications
-```
-
-### Design principles
+The server follows a focused, purpose-driven design:
 
 - **Thin surface area**: Only the endpoints needed for the core capabilities.
 - **Purpose-driven**: Each module serves a specific, well-defined purpose.
