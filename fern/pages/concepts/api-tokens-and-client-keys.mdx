@@ -95,6 +95,21 @@ Secure storage does not make [frontend tokens](#frontend-tokens) confidential. F
 
 Tokens created in Unleash v8.2 or earlier use the [legacy format](#legacy-token-format), and Unleash stores their complete value. These tokens continue to work. To move to secure storage, [rotate](#rotate-a-token) them.
 
+<Accordion title="Upgrade to secure token storage" id="upgrade-to-secure-token-storage">
+
+Secure token storage is the default for all new tokens from Unleash v8.3. Unleash does not migrate existing tokens; tokens created before the upgrade keep working in the [legacy format](#legacy-token-format) until you delete them.
+
+To move all your tokens to secure storage:
+
+1. [Rotate](#rotate-a-token) each backend, frontend, personal access, and service account token created in v8.2 or earlier.
+2. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with tokens created in v8.3, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
+
+{/* TODO: verify against the v8.3 release before merging. Simon Hornby expects the UNLEASH_EXPERIMENTAL_SECURE_TOKEN and UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN variables to stay as an opt-out for a grace period; Gastón to confirm. Also confirm the process for hosted customers who want to opt out. */}
+
+If you need to keep creating tokens in the legacy format for a transition period, set `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=false` for backend, frontend, and admin tokens, or `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=false` for personal access and service account tokens, and restart Unleash. Existing secure tokens continue to work. For hosted instances, contact Unleash support.
+
+</Accordion>
+
 ## API token format
 
 Backend, frontend, and deprecated admin tokens consist of three parts:
@@ -105,10 +120,6 @@ Backend, frontend, and deprecated admin tokens consist of three parts:
 
 The parts are separated by two delimiters: a colon (`:`) between the projects and the environment, and a period (`.`) between the environment and the secret.
 
-```
-{{projects}}:{{environment}}.v2_{{selector}}_{{random}}
-```
-
 The project value can be one of:
 
 - A single project ID, for example, `default`: the token can only access that project.
@@ -117,9 +128,20 @@ The project value can be one of:
 
 The environment value is the name of an environment on your Unleash instance, such as `development`. Admin tokens use `*:*` as the project and environment value.
 
-The secret starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
+Personal access tokens and service account tokens start with `user:`, followed by the secret. They do not contain project or environment information.
 
-Personal access tokens and service account tokens start with `user:`, followed by the secret. They do not contain project or environment information:
+The format of the secret depends on when the token was created:
+
+<Tabs>
+<Tab title="v8.3 and later" id="v2-token-format">
+
+Tokens created in Unleash v8.3 or later use [secure storage](#how-unleash-stores-tokens). The secret starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
+
+```
+{{projects}}:{{environment}}.v2_{{selector}}_{{random}}
+```
+
+Personal access tokens and service account tokens use the same secret:
 
 ```
 user:v2_{{selector}}_{{random}}
@@ -144,9 +166,10 @@ Some example API tokens are:
     user:v2_nn1XkimQkV8SSoUPEeuE3Q_48zN1UZIx-IPXr3vMB-8DS1zC-6LoZHtn0ara9dLTP4
     ```
 
-### Legacy token format
+</Tab>
+<Tab title="v8.2 and earlier" id="legacy-token-format">
 
-Tokens created in Unleash v8.2 or earlier don't include the `v2_` marker. The secret is a 56-character hexadecimal string, and Unleash stores the complete token in its database. The project and environment values follow the same rules as the current format.
+Tokens created in Unleash v8.2 or earlier don't include the `v2_` marker. The secret is a 56-character hexadecimal string, and Unleash stores the complete token in its database.
 
 ```
 {{projects}}:{{environment}}.{{secret}}
@@ -165,6 +188,9 @@ user:be7536c3a160ff15e3a92da45de531dd54bc1ae15d8455c0476f086b
 ```
 
 In Unleash v4.3 or earlier, API tokens are a 56-character hexadecimal string with no additional information.
+
+</Tab>
+</Tabs>
 
 ## API token permissions
 
@@ -217,26 +243,13 @@ To rotate a token:
 2. Update your SDKs and integrations to use the new token.
 3. Delete the old token once nothing is using it.
 
-Rotating also moves a token to [secure storage](#how-unleash-stores-tokens): the new token uses the current format, and deleting the old token removes its complete value from the database.
+Rotating also moves a token to [secure storage](#how-unleash-stores-tokens): the new token starts with `v2_`, and deleting the old token removes its complete value from the database.
 
 ### Expiration notifications
 
 <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span> <Button small outlined className="version-button" href="/support/availability">v8.1</Button>
 
 Unleash notifies you before a [service account token](/concepts/service-accounts) or [personal access token](#personal-access-tokens) expires. The token's creator receives an email ahead of the expiration date, giving you time to rotate the token before your automations and integrations lose access.
-
-## Upgrade to secure token storage
-
-Secure token storage is the default for all new tokens from Unleash v8.3. Unleash does not migrate existing tokens; tokens created before the upgrade keep working in the [legacy format](#legacy-token-format) until you delete them.
-
-To move all your tokens to secure storage:
-
-1. [Rotate](#rotate-a-token) each backend, frontend, personal access, and service account token created in v8.2 or earlier.
-2. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with the current token format, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
-
-{/* TODO: verify against the v8.3 release before merging. Simon Hornby expects the UNLEASH_EXPERIMENTAL_SECURE_TOKEN and UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN variables to stay as an opt-out for a grace period; Gastón to confirm. Also confirm the process for hosted customers who want to opt out. */}
-
-If you need to keep creating tokens in the legacy format for a transition period, set `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=false` for backend, frontend, and admin tokens, or `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=false` for personal access and service account tokens, and restart Unleash. Existing secure tokens continue to work. For hosted instances, contact Unleash support.
 
 ## Connect a frontend SDK to Unleash using Edge
 
