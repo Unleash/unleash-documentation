@@ -1,0 +1,16 @@
+---
+description: Review Unleash v8.3.0 release notes, covering the new regex and IP address constraint operators.
+tags: ["Unleash", "SDKs"]
+---
+
+# Unleash v8.3.0
+
+## Regex and IP address constraint operators
+
+Two new [constraint operators](/concepts/activation-strategies#constraint-operators) give you more precise targeting in activation strategies and segments.
+
+The [regex operator](/concepts/activation-strategies#regex-operator) matches a context field against a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax), so you can target patterns such as ID formats, email domains, or application names that the other string operators can't express. You can test sample values against your expression in the Admin UI before you save.
+
+The [IP address operator](/concepts/activation-strategies#ip-address-operator) checks whether a context field, typically `remoteAddress`, falls within a list of IP addresses or CIDR ranges. Both IPv4 and IPv6 are supported.
+
+Both operators require an SDK version that supports them. See [SDK compatibility](/sdks#strategy-constraints) for the minimum version per SDK.
