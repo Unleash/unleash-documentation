@@ -62,7 +62,7 @@ You can configure the `UnleashConfig` with the same [options](/sdks/android#init
 Set `delayedInitialization(false)` in the configuration. The Unleash Android SDK only starts fetching flags when the client starts, and with the default `delayedInitialization` setting the client waits for an explicit `start()` call that the provider doesn't make. Without this setting, the provider doesn't fetch any flags and every evaluation returns `false` or the default value.
 </Note>
 
-`setProviderAndWait` registers the provider and applies the initial context, which triggers a flag fetch for that context. It doesn't wait for the fetch to complete, so evaluations made immediately after registration can return `false` or the default value until the flag configuration arrives. After that, the SDK continues polling for flag updates in the background.
+`setProviderAndWait` registers the provider and applies the initial context, but it doesn't trigger or await a fetch for that context. The next scheduled poll fetches flags for the new context, so evaluations made before then can return `false`, the default value, or values fetched for the previous context. After that, the SDK continues polling for flag updates in the background.
 
 ## Evaluate a flag
 
