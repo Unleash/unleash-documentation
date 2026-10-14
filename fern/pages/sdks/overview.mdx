@@ -6,7 +6,7 @@ keywords: sdk, client, library, backend, frontend, mobile, feature flags, evalua
 og:site_name: Unleash Documentation
 og:title: Unleash SDK Overview - Client Libraries for Feature Flags
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: October 14, 2026
 ---
 
 Unleash offers a number of client libraries (SDKs) designed to help you integrate Unleash into your applications. The SDKs provide an interface for fetching and evaluating feature flags.
@@ -147,20 +147,24 @@ Versions in parentheses are the minimum SDK versions that support [strategy vari
 
 ## OpenFeature providers
 
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging.
+The [Unleash OpenFeature providers](/sdks/openfeature) wrap the Unleash SDKs, so Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
 
-Unleash also supports [OpenFeature](https://openfeature.dev/), an open standard that provides a vendor-neutral API for feature flagging. In OpenFeature, a provider is the component that connects the OpenFeature SDK to a flag management system. The Unleash providers translate OpenFeature API calls into Unleash SDK operations: Unleash still manages and evaluates your flags, while your application code depends only on the OpenFeature API.
-
-OpenFeature can be useful when you want a common feature flag interface across services, frameworks, or vendors. The trade-off is that the OpenFeature API models only the capabilities that feature flag systems have in common. It does not cover Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics), including the [safeguards](/concepts/impact-metrics#configure-safeguards) that depend on them. To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
+The OpenFeature API models only the capabilities that feature flag systems have in common.
+It does not cover Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics), including the [safeguards](/concepts/impact-metrics#configure-safeguards) that depend on them.
+To get the most out of Unleash, we recommend that you use the Unleash SDKs directly.
 
 Unleash maintains the following OpenFeature providers:
 
 -   [Node.js provider](/sdks/openfeature/node)
 -   [PHP provider](/sdks/openfeature/php)
--   [Python provider](https://github.com/Unleash/unleash-openfeature-python-provider)
+-   [Python provider](/sdks/openfeature/python)
 -   [Ruby provider](/sdks/openfeature/ruby)
--   [Rust provider](https://github.com/Unleash/unleash-openfeature-rust-provider)
--   [Swift provider](https://github.com/Unleash/unleash-openfeature-swift-provider)
+-   [Rust provider](/sdks/openfeature/rust)
+-   [Swift provider](/sdks/openfeature/swift)
+-   [Android provider](/sdks/openfeature/android)
+
+For use cases, setup examples for all languages including community-maintained providers, and a detailed comparison with the Unleash SDKs, see [OpenFeature](/sdks/openfeature).
 
 ## Community SDKs
 
