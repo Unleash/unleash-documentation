@@ -364,7 +364,7 @@ OpenFeature defines typed evaluation methods. The Unleash providers resolve them
 | Number, integer, float, or double | The payload of the flag's variant | `number` |
 | Object | The payload of the flag's variant | `json` |
 
-If the flag is disabled or the variant payload is missing or has a different type, the evaluation returns the default value you pass to the evaluation method. The detail methods, such as `getStringDetails`, report the assigned variant name. Unleash SDKs don't report why a flag evaluated the way it did, so most providers return the `UNKNOWN` evaluation reason.
+Boolean evaluations return the flag's enabled state, so a disabled flag returns `false`. For non-Boolean evaluations, a disabled flag or a missing or mismatched variant payload returns the default value you pass to the evaluation method. When a variant is assigned, detail methods such as `getStringDetails` report its name. Unleash SDKs don't report why a flag evaluated the way it did, so most providers return the `UNKNOWN` evaluation reason.
 
 ### Context mapping
 
