@@ -159,6 +159,11 @@ export const featureService = new FeatureService(unleash);
   - **Centralized control**: It gives you a single place to manage logging, performance monitoring, and robust error handling for all flag checks.
   - **Improved readability**: Methods with business-friendly names (`canUserSeeNewProfilePage()`) make the code's intent clearer than a generic `isEnabled("newUserProfilePage")`.
 
+<Tip>
+If you want a standardized abstraction instead of a custom wrapper, you can use [OpenFeature](/sdks/openfeature), a vendor-neutral API with Unleash providers for several languages.
+The trade-off is that OpenFeature doesn't expose Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics).
+</Tip>
+
 ### Handling variant payloads inside your wrapper
 
 This wrapper is also a good place to validate any feature flag payload you receive from Unleash.
