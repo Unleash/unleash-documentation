@@ -1,0 +1,124 @@
+---
+title: Android OpenFeature provider
+slug: /sdks/openfeature/android
+og:site_name: Unleash
+og:title: Android OpenFeature provider
+description: Set up the Unleash OpenFeature provider for Android to evaluate feature flags through the OpenFeature API.
+keywords: [unleash, android, kotlin, openfeature, provider, sdk, feature flags]
+max-toc-depth: 3
+last-updated: October 14, 2026
+---
+
+The [Unleash OpenFeature Android provider](https://github.com/Unleash/unleash-openfeature-android-provider) lets Android applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
+
+The provider wraps the [Unleash Android SDK](/sdks/android) and uses the same frontend SDK behavior for fetching evaluated flags, polling, and metrics. Because the Android SDK is a frontend SDK, this is a static-context provider: you set the evaluation context on the OpenFeature API instead of passing it per evaluation, and context changes trigger a refetch of the flag configuration from Unleash.
+
+## Requirements
+
+-   Android API level 21 or later
+
+## Installation
+
+Add the provider to your module's Gradle dependencies. The provider exposes the OpenFeature Kotlin SDK and the Unleash Android SDK as API dependencies, so you don't need to add them separately.
+
+```kotlin
+implementation("io.getunleash:unleash-openfeature-android-provider:<version>")
+```
+
+Find the latest version in the [provider releases](https://github.com/Unleash/unleash-openfeature-android-provider/releases).
+
+## Configuration
+
+Create an `UnleashOpenFeatureProvider` with your Android application context and an `UnleashConfig`, then register it with OpenFeature. The provider builds and owns the Unleash client. Connect to the Frontend API or Unleash Edge with a frontend token.
+
+```kotlin
+import dev.openfeature.sdk.ImmutableContext
+import dev.openfeature.sdk.OpenFeatureAPI
+import io.getunleash.android.UnleashConfig
+import io.getunleash.openfeature.android.UnleashOpenFeatureProvider
+
+val config = UnleashConfig
+    .newBuilder("my-android-app")
+    .proxyUrl("<YOUR_UNLEASH_URL>/api/frontend")
+    .clientKey("<YOUR_FRONTEND_API_TOKEN>")
+    .delayedInitialization(false)
+    .build()
+
+val provider = UnleashOpenFeatureProvider(
+    androidContext = applicationContext,
+    unleashConfig = config,
+)
+
+// Call from a coroutine
+OpenFeatureAPI.setProviderAndWait(
+    provider,
+    initialContext = ImmutableContext(targetingKey = "user-123"),
+)
+```
+
+You can configure the `UnleashConfig` with the same [options](/sdks/android#initialization) you would use with the Unleash Android SDK client.
+
+<Note>
+Set `delayedInitialization(false)` in the configuration. The Unleash Android SDK only starts fetching flags when the client starts, and with the default `delayedInitialization` setting the client waits for an explicit `start()` call that the provider doesn't make. Without this setting, the provider doesn't fetch any flags and every evaluation returns `false` or the default value.
+</Note>
+
+`setProviderAndWait` registers the provider and applies the initial context, which triggers a flag fetch for that context. It doesn't wait for the fetch to complete, so evaluations made immediately after registration can return `false` or the default value until the flag configuration arrives. After that, the SDK continues polling for flag updates in the background.
+
+## Evaluate a flag
+
+Build an OpenFeature client and evaluate flags through the OpenFeature API:
+
+```kotlin
+val client = OpenFeatureAPI.getClient()
+
+val enabled = client.getBooleanValue("my-feature", false)
+```
+
+The provider supports all OpenFeature evaluation methods. Boolean evaluation uses the flag's enabled state and returns `false` if the flag doesn't exist, regardless of the default value you supply. All other types resolve from the payload of the flag's [variant](/concepts/feature-flag-variants):
+
+-   String values accept `string` and `csv` payloads.
+-   Integer and double values accept `number` payloads.
+-   Object values accept `json` payloads.
+
+A missing flag, a disabled variant, or a variant without a payload returns the default value. A payload of the wrong type returns the default value with a type mismatch error, and a payload that can't be parsed returns the default value with a parse error. The detail methods, such as `getStringDetails`, also report the assigned variant name. The evaluation reason is `UNKNOWN` for successful evaluations.
+
+## Update the evaluation context
+
+The provider ignores the per-evaluation context parameter. To change the context, update it on the OpenFeature API; the Unleash client then refetches the flag configuration for the new context:
+
+```kotlin
+import dev.openfeature.sdk.Value
+
+// Call from a coroutine
+OpenFeatureAPI.setEvaluationContextAndWait(
+    ImmutableContext(
+        targetingKey = "user-456",
+        attributes = mapOf("plan" to Value.String("pro")),
+    )
+)
+```
+
+## Context mapping
+
+The provider maps the OpenFeature evaluation context to an [Unleash context](/concepts/unleash-context).
+
+If you set a targeting key, the provider maps it to `userId`. The targeting key takes precedence over a `userId` attribute set on the evaluation context. The `userId`, `sessionId`, and `remoteAddress` attributes map to the corresponding top-level Unleash context fields.
+
+The provider adds all other scalar attributes, such as strings, numbers, booleans, and dates, to the Unleash context [properties](/concepts/unleash-context#the-properties-field) as strings. It discards list, structure, and null attributes.
+
+## Shutdown
+
+Shut down OpenFeature when you no longer need the provider. This also closes the underlying Unleash client.
+
+```kotlin
+// Call from a coroutine
+OpenFeatureAPI.shutdown()
+```
+
+## Provider events
+
+The provider doesn't define events of its own. The OpenFeature Kotlin SDK reports provider status, such as ready, reconciling, and error, through `OpenFeatureAPI.statusFlow` around initialization and context changes.
+
+## Example
+
+To try the provider, clone the [provider repository](https://github.com/Unleash/unleash-openfeature-android-provider) and run the [example application](https://github.com/Unleash/unleash-openfeature-android-provider/blob/main/app/src/main/java/io/getunleash/openfeature/android/example/MainActivity.kt) from Android Studio. Replace the Frontend API URL and client key in `MainActivity.kt` with your own, and add `.delayedInitialization(false)` to the configuration.
