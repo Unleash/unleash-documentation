@@ -97,16 +97,12 @@ Tokens created in Unleash v8.2 or earlier use the [legacy format](#legacy-token-
 
 <Accordion title="Upgrade to secure token storage" id="upgrade-to-secure-token-storage">
 
-Secure token storage is the default for all new tokens from Unleash v8.3. Unleash does not migrate existing tokens; tokens created before the upgrade keep working in the [legacy format](#legacy-token-format) until you delete them.
+From Unleash v8.3, all new tokens use secure storage. Tokens created before the upgrade keep working in the [legacy format](#legacy-token-format) until you delete them.
 
 To move all your tokens to secure storage:
 
 1. [Rotate](#rotate-a-token) each backend, frontend, personal access, and service account token created in v8.2 or earlier.
 2. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with tokens created in v8.3, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
-
-{/* TODO: verify against the v8.3 release before merging. Simon Hornby expects the UNLEASH_EXPERIMENTAL_SECURE_TOKEN and UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN variables to stay as an opt-out for a grace period; Gastón to confirm. Also confirm the process for hosted customers who want to opt out. */}
-
-If you need to keep creating tokens in the legacy format for a transition period, set `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=false` for backend, frontend, and admin tokens, or `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=false` for personal access and service account tokens, and restart Unleash. Existing secure tokens continue to work. For hosted instances, contact Unleash support.
 
 </Accordion>
 
