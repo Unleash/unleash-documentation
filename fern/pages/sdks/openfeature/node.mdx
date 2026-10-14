@@ -46,8 +46,6 @@ await OpenFeature.setProviderAndWait(provider);
 
 `setProviderAndWait` starts the Unleash SDK and waits for startup to complete before the provider is registered for use. After startup, the SDK continues refreshing feature flag data in the background.
 
-If you need direct access to the underlying Unleash client, use `provider.unleashClient`.
-
 ## Evaluate a flag
 
 Build an OpenFeature client and evaluate flags through the OpenFeature API:
