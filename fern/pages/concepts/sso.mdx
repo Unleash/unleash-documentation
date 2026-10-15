@@ -22,3 +22,9 @@ For step-by-step configuration instructions, refer to the following guides:
 - [SAML 2.0 with Okta](/single-sign-on/how-to-add-sso-saml)
 - [SAML 2.0 with Keycloak](/single-sign-on/how-to-add-sso-saml-keycloak)
 - [SAML 2.0 with Microsoft Entra ID](/single-sign-on/how-to-add-sso-azure-saml)
+
+## Session length and re-authentication
+
+How long a signed-in session lasts, and what happens when it ends, is configured separately from SSO. See [Session timeouts](/deploy/session-timeouts).
+
+When session timeouts are enabled, Unleash also asks your identity provider for a fresh authentication on every SSO sign-in — `ForceAuthn` for SAML 2.0, `prompt=login` and `max_age` for OpenID Connect. Whether the provider acts on that request is controlled on the provider side and varies between providers; [Session timeouts](/deploy/session-timeouts#single-sign-on-and-re-authentication) covers what each one does and how to verify it.
