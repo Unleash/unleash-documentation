@@ -84,7 +84,7 @@ A missing flag, a disabled variant, or a variant without a payload returns the d
 
 ## Update the evaluation context
 
-The provider ignores the per-evaluation context parameter. To change the context, update it on the OpenFeature API; the Unleash client then refetches the flag configuration for the new context:
+The provider ignores the per-evaluation context parameter. To change the context, update it on the OpenFeature API. The Unleash client refetches the flag configuration for the new context, and `setEvaluationContextAndWait` returns when the refetch completes:
 
 ```kotlin
 import dev.openfeature.sdk.Value
