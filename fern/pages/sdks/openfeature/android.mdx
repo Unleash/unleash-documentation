@@ -80,7 +80,7 @@ The provider supports all OpenFeature evaluation methods. Boolean evaluation use
 -   Integer and double values accept `number` payloads.
 -   Object values accept `json` payloads.
 
-A missing flag, a disabled variant, or a variant without a payload returns the default value. A payload of the wrong type returns the default value with a type mismatch error, and a payload that can't be parsed returns the default value with a parse error. The detail methods, such as `getStringDetails`, also report the assigned variant name. The evaluation reason is `UNKNOWN` for successful evaluations.
+A missing flag, a disabled variant, or a variant without a payload returns the default value. A payload of the wrong type returns the default value with a type mismatch error, and a payload that can't be parsed returns the default value with a parse error. The detail methods, such as `getStringDetails`, also report the assigned variant name, even when they return the default value.
 
 ## Update the evaluation context
 
