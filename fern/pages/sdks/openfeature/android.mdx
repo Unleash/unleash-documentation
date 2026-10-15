@@ -56,7 +56,7 @@ OpenFeatureAPI.setProviderAndWait(
 )
 ```
 
-You can configure the `UnleashConfig` with the same [options](/sdks/android#initialization) you would use with the Unleash Android SDK client.
+You can configure the `UnleashConfig` with the same [options](/sdks/android#initialization) you use with the Unleash Android SDK client.
 
 <Note>
 Set `delayedInitialization(false)` in the configuration. The Unleash Android SDK only starts fetching flags when the client starts, and with the default `delayedInitialization` setting the client waits for an explicit `start()` call that the provider doesn't make. Without this setting, the provider doesn't fetch any flags and every evaluation returns `false` or the default value.
