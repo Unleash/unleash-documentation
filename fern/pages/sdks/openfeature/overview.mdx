@@ -281,7 +281,6 @@ val config = UnleashConfig
     .newBuilder("my-android-app")
     .proxyUrl("<YOUR_UNLEASH_URL>/api/frontend")
     .clientKey("<YOUR_FRONTEND_API_TOKEN>")
-    .delayedInitialization(false)
     .build()
 
 val provider = UnleashOpenFeatureProvider(
@@ -300,7 +299,7 @@ val client = OpenFeatureAPI.getClient()
 val enabled = client.getBooleanValue("my-feature", false)
 ```
 
-See the [Android provider](/sdks/openfeature/android) documentation to learn why the configuration sets `delayedInitialization(false)`, and for context updates and shutdown.
+See the [Android provider](/sdks/openfeature/android) documentation for context updates and shutdown.
 
 </Tab>
 </Tabs>
