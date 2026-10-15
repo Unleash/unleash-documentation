@@ -15,10 +15,10 @@ Unleash providers connect the OpenFeature SDK to Unleash. Each provider wraps an
 
 ## How it works
 
-1.  Your application evaluates a flag through an OpenFeature client, for example `getBooleanValue("my-feature", false, context)`.
-2.  The Unleash provider translates the OpenFeature [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context) into an [Unleash context](/concepts/unleash-context).
-3.  The underlying Unleash SDK evaluates the flag, using the same caching, polling, and metrics behavior as when you use the SDK directly.
-4.  The provider returns the result to OpenFeature as a typed value, together with evaluation details such as the variant name.
+- Your application evaluates a flag through an OpenFeature client, for example `getBooleanValue("my-feature", false, context)`.
+- The Unleash provider translates the OpenFeature [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context) into an [Unleash context](/concepts/unleash-context).
+- The underlying Unleash SDK evaluates the flag, using the same caching, polling, and metrics behavior as when you use the SDK directly.
+- The provider returns the result to OpenFeature as a typed value, together with evaluation details such as the variant name.
 
 Backend providers, such as [Node.js](/sdks/openfeature/node) and [Python](/sdks/openfeature/python), wrap backend SDKs that evaluate flags locally and accept a context with every evaluation.
 Frontend providers, such as [Swift](/sdks/openfeature/swift) and [Android](/sdks/openfeature/android), wrap frontend SDKs that fetch flags evaluated for one context at a time.
@@ -28,9 +28,9 @@ With a frontend provider, you set the context on the OpenFeature API, and changi
 
 OpenFeature is a good fit when:
 
--   **Your organization standardizes on one feature flag API.** Platform teams can give every service the same evaluation interface across languages and frameworks, and keep the choice of flag management system behind the provider.
--   **You're migrating from another feature flag system.** If your code already uses OpenFeature, you can switch to Unleash by swapping the provider, without changing evaluation call sites. See [Migrate from LaunchDarkly](/guides/feature-flag-migration-best-practices#migrate-from-launchdarkly) for a step-by-step migration that includes this approach.
--   **You want to use OpenFeature hooks and ecosystem tooling.** [Hooks](https://openfeature.dev/docs/reference/concepts/hooks) run custom logic before and after every flag evaluation, for use cases like logging, telemetry, and validation. You register hooks on the OpenFeature API or client, so they work with the Unleash providers. Browse the [OpenFeature ecosystem](https://openfeature.dev/ecosystem) for available hooks.
+-   Your organization standardizes on one feature flag API. Platform teams can give every service the same evaluation interface across languages and frameworks, and keep the choice of flag management system behind the provider.
+-   You're migrating from another feature flag system. If your code already uses OpenFeature, you can switch to Unleash by swapping the provider, without changing evaluation call sites. See [Migrate from LaunchDarkly](/guides/feature-flag-migration-best-practices#migrate-from-launchdarkly) for a step-by-step migration that includes this approach.
+-   You want to use OpenFeature hooks and ecosystem tooling. [Hooks](https://openfeature.dev/docs/reference/concepts/hooks) run custom logic before and after every flag evaluation, for use cases like logging, telemetry, and validation. You register hooks on the OpenFeature API or client, so they work with the Unleash providers. Browse the [OpenFeature ecosystem](https://openfeature.dev/ecosystem) for available hooks.
 
 If you don't need a vendor-neutral API, use the [Unleash SDK](/sdks) for your language. The Unleash SDKs support capabilities that the OpenFeature API doesn't model, as described in [OpenFeature providers compared with Unleash SDKs](#openfeature-providers-compared-with-unleash-sdks).
 
