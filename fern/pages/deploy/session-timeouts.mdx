@@ -1,0 +1,132 @@
+---
+title: Session timeouts
+description: "Configure how long Unleash admin sessions last: a maximum session length, an idle timeout, what counts as activity, and how single sign-on affects re-authentication."
+keywords: session timeout, idle timeout, session length, re-authentication, sign out, SESSION_IDLE_TIMEOUT_MINUTES, SESSION_TTL_HOURS
+og:site_name: Unleash Documentation
+og:title: Session timeouts in Unleash
+max-toc-depth: 3
+last-updated: October 15, 2026
+---
+
+## Overview
+
+Unleash applies two independent limits to an admin user's session:
+
+- **Maximum session length** – the session expires a fixed time after sign-in. Activity never extends it.
+- **Idle timeout** – the session ends after a period without activity. Activity restarts the window.
+
+The maximum session length always applies. The idle timeout, and Unleash actively ending sessions rather than letting them expire, require `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS=true`.
+
+Both deadlines are carried by the session record on the server as well as by the cookie, so a copied or replayed cookie cannot outlive them.
+
+### What the flag changes
+
+`SESSION_TTL_HOURS` is absolute either way: the deadline is sign-in plus that many hours, and no amount of activity moves it. What the flag decides is how a session ends, and whether there is an idle timeout at all:
+
+| | Flag off (default) | Flag on |
+| :--- | :--- | :--- |
+| **Maximum session length** | The session expires. Its cookie and its stored record both carry the sign-in deadline, so past that point the session no longer resolves and the user has to sign in again. | Unleash ends it. On the first request past the deadline the session is deleted server-side and the request is answered with `401`. |
+| **Idle timeout** | No effect, whatever `SESSION_IDLE_TIMEOUT_MINUTES` is set to. | Enforced, as described below. |
+| **`Clear-Site-Data` on an idle sign-out** | Does not apply. | Sent, unless `SESSION_CLEAR_SITE_DATA_ON_LOGOUT=false`. |
+
+With the flag off there is no `401` and no `SessionEndedError`: the session simply stops resolving, and the Admin UI sends the user to sign in as it would for any unauthenticated request.
+
+## Configuration
+
+| Environment variable | Default | Description |
+| :--- | :--- | :--- |
+| `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` | `false` | Enables the idle timeout and lets Unleash end sessions itself. With this off, `SESSION_IDLE_TIMEOUT_MINUTES` has no effect and sessions past their maximum length expire rather than being ended. |
+| `SESSION_TTL_HOURS` | `48` | Maximum session length in hours, measured from sign-in and never extended by activity. Applies whether or not the flag is on. |
+| `SESSION_IDLE_TIMEOUT_MINUTES` | `0` | End a session after this many minutes without activity. `0` turns the idle timeout off. |
+| `SESSION_CLEAR_SITE_DATA_ON_LOGOUT` | `true` | Send the `Clear-Site-Data` header when a user signs out and when a session ends on the idle timeout. |
+
+On self-hosted instances these are read from the environment at startup, so changing any of them requires a restart.
+
+For example, to end sessions after 15 minutes of inactivity and after 12 hours in any case:
+
+```bash
+UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS=true
+SESSION_IDLE_TIMEOUT_MINUTES=15
+SESSION_TTL_HOURS=12
+```
+
+<Warning>
+The idle timeout must be shorter than the maximum session length to have any effect. If it is not, Unleash logs a warning at startup and sessions end only at the maximum session length.
+</Warning>
+
+## What counts as activity
+
+The idle window restarts on:
+
+- Any request that changes something — `POST`, `PUT`, `PATCH` or `DELETE`.
+- A keep-alive request the Admin UI sends while somebody is using it. The UI posts to `/api/admin/session/keep-alive` on pointer, keyboard, wheel and touch input, and when the user switches back to the tab, only while that tab is visible, and at most once per interval — a third of the idle window, capped at 60 seconds. A 15-minute idle window therefore produces at most one keep-alive request per minute per open tab.
+
+The following do **not** restart it:
+
+- Page views and other read requests (`GET`, `HEAD`, `OPTIONS`).
+- Background polling from an open tab. Several Admin UI pages refresh themselves every few seconds; if that counted, a forgotten tab left on screen would keep its session alive indefinitely.
+
+The practical effect is that a user who is reading, clicking or scrolling stays signed in, and a tab nobody is sitting at does not.
+
+## What happens when a session ends
+
+With the flag on, when either limit is reached:
+
+
+
+1. The session is deleted from the session store.
+2. The session cookie is cleared.
+3. The next request is answered with `401` and a `SessionEndedError` body naming the reason: `idle`, `max_age`, or `unknown_start` for a session whose sign-in time cannot be read.
+4. The Admin UI returns the user to the sign-in page.
+
+When the reason is `idle` and `SESSION_CLEAR_SITE_DATA_ON_LOGOUT` is on, Unleash also sends `Clear-Site-Data: "cookies", "storage"`, so an unattended browser is left with nothing cached from the session.
+
+With the flag off, a session past its maximum length expires instead: the cookie and the stored record are both past their deadline, so the next request arrives unauthenticated and the Admin UI sends the user to sign in. There is no `401`, no `SessionEndedError` and no `Clear-Site-Data`.
+
+Either way the user signs in again as normal, and nothing from the previous session is reattached.
+
+## Single sign-on and re-authentication
+
+<Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
+
+Ending the session is Unleash's own behaviour and works the same with every identity provider. Whether the user is asked for credentials again when they sign back in is decided by the identity provider.
+
+With session timeouts enabled, Unleash asks for a fresh authentication on every SSO sign-in:
+
+- **SAML 2.0** – the authentication request carries `ForceAuthn="true"`.
+- **OpenID Connect** – the authorization request carries `prompt=login` and `max_age=300`.
+
+Both are requests. A service provider cannot compel an identity provider to honour them, and support varies:
+
+| Identity provider | Notes |
+| :--- | :--- |
+| Microsoft Entra ID | Documents that `ForceAuthn` forces re-authentication even with a valid provider session. A Conditional Access sign-in frequency policy on the Unleash application is the provider-side equivalent. |
+| Okta | Honoured only when **Honor Force Authentication** is enabled on the application, under SAML Settings. |
+| Google Workspace | Does not honour `ForceAuthn`, and its OpenID Connect implementation supports neither `prompt=login` nor the `auth_time` claim. Users are returned to Unleash on their existing Google session without a credential prompt. |
+
+Unleash checks the authentication time the provider reports — `AuthnInstant` for SAML, `auth_time` for OpenID Connect — and expects it to be within the last 5 minutes, allowing 2 minutes of clock skew. If it is missing or older than that, **the sign-in still succeeds** and Unleash logs a warning naming the provider:
+
+```
+SAML AuthnInstant is missing or not within the last 5 minutes. Check that the IdP honors
+ForceAuthn (in Okta: Honor Force Authentication) and that its clock matches ours.
+```
+
+The warning includes the provider's entity ID, the timestamp it reported, and how old that timestamp is, so you can tell a provider that ignores the request from one whose clock is wrong.
+
+<Tip>
+If you need a credential prompt on every return after a timeout, verify it against your own provider rather than assuming: sign in, wait out the idle window, sign in again, and check whether a prompt appeared and whether the warning above was logged.
+</Tip>
+
+## Scope
+
+Session timeouts apply to the Admin UI and the admin API requests made from it. API tokens and personal access tokens authenticate without a session, so no idle timeout applies to them. Manage their lifetime separately.
+
+## Troubleshooting
+
+| Symptom | Cause to check |
+| :--- | :--- |
+| Sessions never end on the idle timeout | The flag is not set, or the idle timeout is not shorter than `SESSION_TTL_HOURS` — look for the startup warning. |
+| Sessions end without a `401` or a clear reason in the logs | Expected with the flag off: the session expires rather than being ended, so there is nothing to log. Turn the flag on if you need the reason recorded. |
+| Users are signed out while reading a long page | Expected if they are not clicking, typing or scrolling; the keep-alive only reports real input. Consider a longer idle window. |
+| Users sign back in without being asked for credentials | The identity provider is not honouring the forced re-authentication request. Look for the `AuthnInstant` or `auth_time` warning in the server log, and check the provider-side setting. |
+| Sessions end much sooner than configured | More than one Unleash instance with different settings behind the same load balancer, or a clock difference between instances. |

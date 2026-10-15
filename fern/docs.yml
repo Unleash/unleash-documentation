@@ -222,6 +222,8 @@ navigation:
                 path: pages/deploy/getting-started.mdx
               - page: Configuring Unleash
                 path: pages/deploy/configuring-unleash.mdx
+              - page: Session timeouts
+                path: pages/deploy/session-timeouts.mdx
               - page: Upgrading Unleash
                 path: pages/deploy/upgrading-unleash.mdx
               - page: License keys
