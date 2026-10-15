@@ -30,7 +30,7 @@ OpenFeature is a good fit when:
 
 -   Your organization standardizes on one feature flag API. Platform teams can give every service the same evaluation interface across languages and frameworks, and keep the choice of flag management system behind the provider.
 -   You're migrating from another feature flag system. If your code already uses OpenFeature, you can switch to Unleash by swapping the provider, without changing evaluation call sites. See [Migrate from LaunchDarkly](/guides/feature-flag-migration-best-practices#migrate-from-launchdarkly) for a step-by-step migration that includes this approach.
--   You want to use OpenFeature hooks and ecosystem tooling. [Hooks](https://openfeature.dev/docs/reference/concepts/hooks) run custom logic before and after every flag evaluation, for use cases like logging, telemetry, and validation. You register hooks on the OpenFeature API or client, so they work with the Unleash providers. Browse the [OpenFeature ecosystem](https://openfeature.dev/ecosystem) for available hooks.
+-   You want to use OpenFeature hooks and ecosystem tooling. [Hooks](https://openfeature.dev/docs/reference/concepts/hooks) run custom logic before and after every flag evaluation, for use cases such as logging, telemetry, and validation. You register hooks on the OpenFeature API or client, so they work with the Unleash providers. Browse the [OpenFeature ecosystem](https://openfeature.dev/ecosystem) for available hooks.
 
 If you don't need a vendor-neutral API, use the [Unleash SDK](/sdks) for your language. The Unleash SDKs support capabilities that the OpenFeature API doesn't model, as described in [OpenFeature providers compared with Unleash SDKs](#openfeature-providers-compared-with-unleash-sdks).
 
@@ -62,6 +62,8 @@ Unleash doesn't maintain the community providers. Their release status, supporte
 ## Get started
 
 Install the provider for your language, register it with OpenFeature, and evaluate a flag. Backend providers need a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens), and frontend providers need a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens).
+
+### Unleash-maintained providers
 
 <Tabs>
 <Tab title="Node.js">
@@ -298,9 +300,14 @@ val client = OpenFeatureAPI.getClient()
 val enabled = client.getBooleanValue("my-feature", false)
 ```
 
-See the [Android provider](/sdks/openfeature/android) documentation for why the configuration sets `delayedInitialization(false)`, and for context updates and shutdown.
+See the [Android provider](/sdks/openfeature/android) documentation to learn why the configuration sets `delayedInitialization(false)`, and for context updates and shutdown.
 
 </Tab>
+</Tabs>
+
+### Community-maintained providers
+
+<Tabs>
 <Tab title="Go (community)">
 
 The OpenFeature community maintains this provider. It wraps the [Unleash Go SDK](/sdks/go).
