@@ -57,7 +57,21 @@ OpenFeatureAPI.setProviderAndWait(
 
 You can configure the `UnleashConfig` with the same [options](/sdks/android#initialization) you use with the Unleash Android SDK client.
 
-`setProviderAndWait` registers the provider, applies the initial context, and waits for the first flag configuration to arrive, so evaluations made immediately after registration use your context. The context is applied before the client starts, so the first fetch already carries it. The wait is bounded - three seconds by default, configurable with `initializationTimeout` - because the SDK reports readiness only once a non-empty flag set reaches its cache, which a failed fetch, a project with no flags, or `pollingStrategy.enabled(false)` never produce. If the wait times out, the provider logs a warning and registers anyway, and evaluations return `false` or the default value until a later poll succeeds. After that, the SDK continues polling for flag updates in the background.
+`setProviderAndWait` registers the provider, applies the initial context, and waits for the first flag configuration to arrive, so evaluations made immediately after registration use your context. The context is applied before the client starts, so the first fetch already carries it.
+
+The wait is bounded because the SDK reports readiness only once a non-empty flag set reaches its cache. A failed fetch, a project with no flags, or polling disabled with `pollingStrategy.enabled(false)` never produce one. The default timeout is three seconds. To change it, pass `initializationTimeout` to the provider constructor:
+
+
+---start code block
+import kotlin.time.Duration.Companion.seconds
+
+val provider = UnleashOpenFeatureProvider(
+    androidContext = applicationContext,
+    unleashConfig = config,
+    initializationTimeout = 5.seconds,
+)
+
+If the wait times out, the provider logs a warning and registers anyway. Evaluations return false or the default value until a later poll succeeds. After that, the SDK continues polling for flag updates in the background.
 
 ## Evaluate a flag
 
