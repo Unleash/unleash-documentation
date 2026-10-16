@@ -57,12 +57,15 @@ OpenFeatureAPI.setProviderAndWait(
 
 You can configure the `UnleashConfig` with the same [options](/sdks/android#initialization) you use with the Unleash Android SDK client.
 
-`setProviderAndWait` registers the provider, applies the initial context, and waits for the first flag configuration to arrive, so evaluations made immediately after registration use your context. The context is applied before the client starts, so the first fetch already carries it.
+`setProviderAndWait` registers the provider, applies the initial context, and waits for the first flag configuration to arrive, so evaluations made immediately after registration use your context.
+The context is applied before the client starts, so the first fetch already carries it.
 
-The wait is bounded because the SDK reports readiness only once a non-empty flag set reaches its cache. A failed fetch, a project with no flags, or polling disabled with `pollingStrategy.enabled(false)` never produce one. The default timeout is three seconds. To change it, pass `initializationTimeout` to the provider constructor:
+The wait is bounded because the SDK reports readiness only once a non-empty flag set reaches its cache.
+A failed fetch, a project with no flags, or polling disabled with `pollingStrategy.enabled(false)` never produce one.
+The default timeout is three seconds. To change it, pass `initializationTimeout` to the provider constructor:
 
 
----start code block
+```kotlin
 import kotlin.time.Duration.Companion.seconds
 
 val provider = UnleashOpenFeatureProvider(
@@ -70,8 +73,16 @@ val provider = UnleashOpenFeatureProvider(
     unleashConfig = config,
     initializationTimeout = 5.seconds,
 )
+```
 
-If the wait times out, the provider logs a warning and registers anyway. Evaluations return false or the default value until a later poll succeeds. After that, the SDK continues polling for flag updates in the background.
+If the wait times out, the provider logs a warning and registers anyway.
+Evaluations return false or the default value until a later poll succeeds.
+After that, the SDK continues polling for flag updates in the background.
+
+<Tip>
+On a cold start with no connectivity, `setProviderAndWait` suspends for the full timeout, so don't block your first frame on it.
+</Tip>
+
 
 ## Evaluate a flag
 
