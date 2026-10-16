@@ -1,0 +1,408 @@
+---
+title: OpenFeature
+slug: /sdks/openfeature
+og:site_name: Unleash
+og:title: Use Unleash with OpenFeature
+description: Evaluate Unleash feature flags through the vendor-neutral OpenFeature API. Learn how the Unleash providers work, set one up in your language, and compare them with the Unleash SDKs.
+keywords: [unleash, openfeature, provider, sdk, feature flags, vendor-neutral, open standard]
+max-toc-depth: 3
+last-updated: October 16, 2026
+---
+
+[OpenFeature](https://openfeature.dev/) is an open standard and Cloud Native Computing Foundation (CNCF) project that provides a vendor-neutral API for feature flag evaluation. Your application code calls the OpenFeature SDK, and a [provider](https://openfeature.dev/docs/reference/concepts/provider) connects that SDK to a feature flag management system.
+
+Unleash providers connect the OpenFeature SDK to Unleash. Each provider wraps an Unleash SDK, so Unleash still manages your flags, evaluates them, and collects usage metrics. Your application code depends only on the OpenFeature API.
+
+## How it works
+
+- Your application evaluates a flag through an OpenFeature client, for example `getBooleanValue("my-feature", false, context)`.
+- The Unleash provider translates the OpenFeature [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context) into an [Unleash context](/concepts/unleash-context).
+- The underlying Unleash SDK evaluates the flag, using the same caching, polling, and metrics behavior as when you use the SDK directly.
+- The provider returns the result to OpenFeature as a typed value, together with evaluation details such as the variant name.
+
+Backend providers, such as [Node.js](/sdks/openfeature/node) and [Python](/sdks/openfeature/python), wrap backend SDKs that evaluate flags locally and accept a context with every evaluation.
+Frontend providers, such as [Swift](/sdks/openfeature/swift) and [Android](/sdks/openfeature/android), wrap frontend SDKs that fetch flags evaluated for one context at a time.
+With a frontend provider, you set the context on the OpenFeature API, and changing it triggers a refetch from Unleash.
+
+## When to use OpenFeature
+
+OpenFeature is a good fit when:
+
+-   Your organization standardizes on one feature flag API. Platform teams can give every service the same evaluation interface across languages and frameworks, and keep the choice of flag management system behind the provider.
+-   You're migrating from another feature flag system. If your code already uses OpenFeature, you can switch to Unleash by swapping the provider, without changing evaluation call sites. See [Migrate from LaunchDarkly](/guides/feature-flag-migration-best-practices#migrate-from-launchdarkly) for a step-by-step migration that includes this approach.
+-   You want to use OpenFeature hooks and ecosystem tooling. [Hooks](https://openfeature.dev/docs/reference/concepts/hooks) run custom logic before and after every flag evaluation, for use cases such as logging, telemetry, and validation. You register hooks on the OpenFeature API or client, so they work with the Unleash providers. Browse the [OpenFeature ecosystem](https://openfeature.dev/ecosystem) for available hooks.
+
+If you don't need a vendor-neutral API, use the [Unleash SDK](/sdks) for your language. The Unleash SDKs support capabilities that the OpenFeature API doesn't model, as described in [OpenFeature providers compared with Unleash SDKs](#openfeature-providers-compared-with-unleash-sdks).
+
+## Available providers
+
+Unleash maintains providers for the following languages:
+
+| Language | Package | Type | Wraps |
+| --- | --- | --- | --- |
+| [Node.js](/sdks/openfeature/node) | `@unleash/openfeature-node-provider` | Backend | [Node.js SDK](/sdks/node) |
+| [PHP](/sdks/openfeature/php) | `unleash/openfeature-provider` | Backend | [PHP SDK](/sdks/php) |
+| [Python](/sdks/openfeature/python) | `unleash-openfeature-python-provider` | Backend | [Python SDK](/sdks/python) |
+| [Ruby](/sdks/openfeature/ruby) | `unleash-openfeature-provider` | Backend | [Ruby SDK](/sdks/ruby) |
+| [Rust](/sdks/openfeature/rust) | `unleash-openfeature-rust-provider` | Backend | [Rust SDK](/sdks/rust) |
+| [Swift](/sdks/openfeature/swift) | `UnleashOpenFeatureSwiftProvider` | Frontend | [iOS SDK](/sdks/ios) |
+| [Android](/sdks/openfeature/android) | `io.getunleash:unleash-openfeature-android-provider` | Frontend | [Android SDK](/sdks/android) |
+
+The OpenFeature community maintains additional Unleash providers in the OpenFeature contribution repositories:
+
+| Language | Package | Type |
+| --- | --- | --- |
+| [Go](https://github.com/open-feature/go-sdk-contrib/tree/main/providers/unleash) | `github.com/open-feature/go-sdk-contrib/providers/unleash` | Backend |
+| [Java](https://github.com/open-feature/java-sdk-contrib/tree/main/providers/unleash) | `dev.openfeature.contrib.providers:unleash` | Backend |
+| [.NET](https://github.com/open-feature/dotnet-sdk-contrib/tree/main/src/OpenFeature.Providers.Unleash) | `OpenFeature.Providers.Unleash` | Backend |
+| [JavaScript (browser)](https://github.com/open-feature/js-sdk-contrib/tree/main/libs/providers/unleash-web) | `@openfeature/unleash-web-provider` | Frontend |
+
+Unleash doesn't maintain the community providers. Their release status, supported features, and [context mapping](#context-mapping) can differ from the Unleash-maintained providers, so check each provider's documentation before you adopt it. The JavaScript browser provider also works with the OpenFeature [React](https://github.com/open-feature/js-sdk-contrib/tree/main/libs/providers/unleash-web#react-framework) and [Angular](https://github.com/open-feature/js-sdk-contrib/tree/main/libs/providers/unleash-web#angular-framework) SDKs.
+
+## Get started
+
+Install the provider for your language, register it with OpenFeature, and evaluate a flag. Backend providers need a [backend token](/concepts/api-tokens-and-client-keys#backend-tokens), and frontend providers need a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens).
+
+### Unleash-maintained providers
+
+<Tabs>
+<Tab title="Node.js">
+
+```bash
+npm install @unleash/openfeature-node-provider @openfeature/server-sdk unleash-client
+```
+
+```ts
+import { OpenFeature } from '@openfeature/server-sdk';
+import { UnleashProvider } from '@unleash/openfeature-node-provider';
+
+const provider = new UnleashProvider({
+  appName: 'my-node-app',
+  url: '<YOUR_UNLEASH_URL>/api',
+  customHeaders: {
+    Authorization: '<YOUR_API_TOKEN>'
+  }
+});
+
+await OpenFeature.setProviderAndWait(provider);
+
+const client = OpenFeature.getClient();
+
+const enabled = await client.getBooleanValue('my-feature', false, {
+  targetingKey: 'user-123'
+});
+```
+
+See the [Node.js provider](/sdks/openfeature/node) documentation for configuration, events, and shutdown.
+
+</Tab>
+<Tab title="PHP">
+
+```bash
+composer require unleash/openfeature-provider
+```
+
+```php
+<?php
+
+use OpenFeature\OpenFeatureAPI;
+use OpenFeature\implementation\flags\EvaluationContext;
+use Unleash\Client\UnleashBuilder;
+use Unleash\OpenFeature\Provider\UnleashFlagProvider;
+
+$builder = UnleashBuilder::create()
+    ->withAppName('my-php-app')
+    ->withAppUrl('<YOUR_UNLEASH_URL>/api')
+    ->withInstanceId('my-php-app-1')
+    ->withHeader('Authorization', '<YOUR_API_TOKEN>');
+
+OpenFeatureAPI::getInstance()->setProvider(new UnleashFlagProvider($builder));
+
+$client = OpenFeatureAPI::getInstance()->getClient();
+
+$enabled = $client->getBooleanValue('my-feature', false, new EvaluationContext('user-123'));
+```
+
+See the [PHP provider](/sdks/openfeature/php) documentation for configuration and context mapping.
+
+</Tab>
+<Tab title="Python">
+
+```bash
+pip install unleash-openfeature-python-provider
+```
+
+```python
+from openfeature import api
+from openfeature.evaluation_context import EvaluationContext
+
+from unleash_openfeature_python_provider import UnleashFlagProvider
+
+provider = UnleashFlagProvider(
+    url="<YOUR_UNLEASH_URL>/api",
+    app_name="my-python-app",
+    custom_headers={"Authorization": "<YOUR_API_TOKEN>"},
+)
+
+api.set_provider_and_wait(provider)
+
+client = api.get_client()
+
+enabled = client.get_boolean_value(
+    "my-feature", False, EvaluationContext(targeting_key="user-123")
+)
+```
+
+See the [Python provider](/sdks/openfeature/python) documentation for configuration and shutdown.
+
+</Tab>
+<Tab title="Ruby">
+
+```ruby
+# Gemfile
+gem 'unleash-openfeature-provider'
+```
+
+```ruby
+require 'open_feature/sdk'
+require 'unleash-openfeature-provider'
+
+provider = Unleash::OpenFeature::Provider::UnleashFlagProvider.new(
+  app_name: 'my-ruby-app',
+  url: '<YOUR_UNLEASH_URL>/api',
+  custom_http_headers: {
+    Authorization: '<YOUR_API_TOKEN>'
+  }
+)
+
+OpenFeature::SDK.configure do |config|
+  config.set_provider(provider)
+end
+
+client = OpenFeature::SDK.build_client
+
+enabled = client.fetch_boolean_value(
+  flag_key: 'my-feature',
+  default_value: false,
+  evaluation_context: OpenFeature::SDK::EvaluationContext.new(targeting_key: 'user-123')
+)
+```
+
+See the [Ruby provider](/sdks/openfeature/ruby) documentation for configuration and context mapping.
+
+</Tab>
+<Tab title="Rust">
+
+```bash
+cargo add unleash-openfeature-rust-provider open-feature unleash-api-client
+cargo add tokio --features macros,rt-multi-thread
+```
+
+```rust
+use open_feature::{EvaluationContext, OpenFeature};
+use unleash_api_client::ClientBuilder;
+use unleash_openfeature_rust_provider::UnleashFlagProvider;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let provider = UnleashFlagProvider::new(
+        ClientBuilder::default(),
+        "<YOUR_UNLEASH_URL>/api",
+        "my-rust-app",
+        "my-rust-app-instance",
+        Some("<YOUR_API_TOKEN>".to_string()),
+    )?;
+    provider.initialize_client().await?;
+
+    let mut api = OpenFeature::singleton_mut().await;
+    api.set_provider(provider).await;
+
+    let client = api.create_client();
+    let context = EvaluationContext::default().with_targeting_key("user-123");
+
+    let enabled = client
+        .get_bool_value("my-feature", Some(&context), None)
+        .await
+        .unwrap_or(false);
+
+    Ok(())
+}
+```
+
+See the [Rust provider](/sdks/openfeature/rust) documentation for startup behavior and shutdown.
+
+</Tab>
+<Tab title="Swift">
+
+```swift
+// Package.swift
+dependencies: [
+    .package(url: "https://github.com/Unleash/unleash-openfeature-swift-provider", from: "1.0.0"),
+]
+```
+
+```swift
+import OpenFeature
+import UnleashOpenFeatureSwiftProvider
+
+let provider = try UnleashProvider(config: UnleashProviderConfig(
+    unleashUrl: "<YOUR_UNLEASH_URL>/api/frontend",
+    clientKey: "<YOUR_FRONTEND_API_TOKEN>",
+    appName: "my-ios-app"
+))
+
+await OpenFeatureAPI.shared.setProviderAndWait(
+    provider: provider,
+    initialContext: ImmutableContext(targetingKey: "user-123")
+)
+
+let client = OpenFeatureAPI.shared.getClient()
+
+let enabled = client.getBooleanValue(key: "my-feature", defaultValue: false)
+```
+
+See the [Swift provider](/sdks/openfeature/swift) documentation for context updates and shutdown.
+
+</Tab>
+<Tab title="Android">
+
+```kotlin
+// build.gradle.kts
+implementation("io.getunleash:unleash-openfeature-android-provider:<version>")
+```
+
+```kotlin
+import dev.openfeature.sdk.ImmutableContext
+import dev.openfeature.sdk.OpenFeatureAPI
+import io.getunleash.android.UnleashConfig
+import io.getunleash.openfeature.android.UnleashOpenFeatureProvider
+
+val config = UnleashConfig
+    .newBuilder("my-android-app")
+    .proxyUrl("<YOUR_UNLEASH_URL>/api/frontend")
+    .clientKey("<YOUR_FRONTEND_API_TOKEN>")
+    .build()
+
+val provider = UnleashOpenFeatureProvider(
+    androidContext = applicationContext,
+    unleashConfig = config,
+)
+
+// Call from a coroutine
+OpenFeatureAPI.setProviderAndWait(
+    provider,
+    initialContext = ImmutableContext(targetingKey = "user-123"),
+)
+
+val client = OpenFeatureAPI.getClient()
+
+val enabled = client.getBooleanValue("my-feature", false)
+```
+
+See the [Android provider](/sdks/openfeature/android) documentation for context updates and shutdown.
+
+</Tab>
+</Tabs>
+
+### Community-maintained providers
+
+<Tabs>
+<Tab title="Go (community)">
+
+The OpenFeature community maintains this provider. It wraps the [Unleash Go SDK](/sdks/go).
+
+```bash
+go get github.com/open-feature/go-sdk-contrib/providers/unleash
+```
+
+See the [provider README](https://github.com/open-feature/go-sdk-contrib/tree/main/providers/unleash) for configuration and usage.
+
+</Tab>
+<Tab title="Java (community)">
+
+The OpenFeature community maintains this provider. It wraps the [Unleash Java SDK](/sdks/java).
+
+```xml
+<dependency>
+    <groupId>dev.openfeature.contrib.providers</groupId>
+    <artifactId>unleash</artifactId>
+    <version>LATEST_VERSION</version>
+</dependency>
+```
+
+See the [provider README](https://github.com/open-feature/java-sdk-contrib/tree/main/providers/unleash) for configuration and usage.
+
+</Tab>
+<Tab title=".NET (community)">
+
+The OpenFeature community maintains this provider. It wraps the [Unleash .NET SDK](/sdks/dotnet).
+
+```bash
+dotnet add package OpenFeature.Providers.Unleash
+```
+
+See the [provider README](https://github.com/open-feature/dotnet-sdk-contrib/tree/main/src/OpenFeature.Providers.Unleash) for configuration and usage.
+
+</Tab>
+<Tab title="JavaScript (community)">
+
+The OpenFeature community maintains this provider for browser applications. It wraps the [Unleash JavaScript SDK](/sdks/javascript-browser) and connects to the Frontend API or Unleash Edge.
+
+```bash
+npm install @openfeature/unleash-web-provider @openfeature/web-sdk
+```
+
+See the [provider README](https://github.com/open-feature/js-sdk-contrib/tree/main/libs/providers/unleash-web) for configuration and usage, including how to use the provider with the OpenFeature React and Angular SDKs.
+
+</Tab>
+</Tabs>
+
+## How Unleash concepts map to OpenFeature
+
+### Flag evaluation
+
+OpenFeature defines typed evaluation methods. The Unleash providers resolve them as follows:
+
+| OpenFeature method | Resolves from | Accepted payload types |
+| --- | --- | --- |
+| Boolean | The flag's enabled state | Not applicable |
+| String | The payload of the flag's [variant](/concepts/feature-flag-variants) | `string`, `csv` |
+| Number, integer, float, or double | The payload of the flag's variant | `number` |
+| Object | The payload of the flag's variant | `json` |
+
+Boolean evaluations return the flag's enabled state, so a disabled flag returns `false`. For non-Boolean evaluations, a disabled flag or a missing or mismatched variant payload returns the default value you pass to the evaluation method. When a variant is assigned, detail methods such as `getStringDetails` report its name. Unleash SDKs don't report why a flag evaluated the way it did, so most providers return the `UNKNOWN` evaluation reason.
+
+### Context mapping
+
+The Unleash providers follow the same rules to map the OpenFeature evaluation context to the [Unleash context](/concepts/unleash-context):
+
+-   The targeting key maps to `userId` and takes precedence over a `userId` attribute.
+-   Attributes named after top-level Unleash context fields, such as `sessionId` and `remoteAddress`, map to those fields.
+-   All other scalar attributes become Unleash context [properties](/concepts/unleash-context#the-properties-field), which you can use in [strategy constraints](/concepts/activation-strategies#constraints). The providers discard nested values, such as lists and objects.
+
+Each provider page lists the exact fields it maps.
+
+<Warning>
+Community providers can map the context differently. For example, some community providers don't map the targeting key to `userId`, or expect differently cased attribute names. Check the context mapping in the provider's documentation, or set `userId` explicitly, to make sure strategies that depend on `userId` behave as expected.
+</Warning>
+
+## OpenFeature providers compared with Unleash SDKs
+
+OpenFeature models the capabilities that feature flag systems have in common. Unleash-specific capabilities that fall outside that common API aren't available through the providers. The following table compares the Unleash providers with the Unleash SDKs they wrap.
+
+| Capability | Unleash SDKs | OpenFeature providers |
+| --- | --- | --- |
+| Flag evaluation with [activation strategies](/concepts/activation-strategies) and constraints | ✅ | ✅ |
+| [Variants](/concepts/feature-flag-variants) and payloads | ✅ Variant name and payload | ✅ Payload as a typed value, variant name in evaluation details |
+| [Unleash context](/concepts/unleash-context) and custom properties | ✅ | ✅ Mapped from the evaluation context |
+| Usage metrics | ✅ | ✅ Reported by the wrapped SDK |
+| [Impression data](/concepts/impression-data) | ✅ | ❌ |
+| [Impact metrics](/concepts/impact-metrics) and [safeguards](/concepts/impact-metrics#configure-safeguards) | ✅ | ❌ |
+| Fallback function for unknown flags | ✅ Backend SDKs | ❌ |
+| Direct access to the Unleash client | ✅ | ❌ |
+| [Bootstrap](/sdks#bootstrap) | ✅ | Varies by provider |
+| Client events, such as ready and configuration changed | ✅ Unleash SDK events | Varies by provider |
+
+In exchange, OpenFeature adds capabilities that sit above any single provider, such as [hooks](https://openfeature.dev/docs/reference/concepts/hooks), named clients, and a consistent evaluation API across vendors. The Unleash providers don't implement the OpenFeature [tracking](https://openfeature.dev/docs/reference/concepts/tracking) API.
+
+To use all Unleash capabilities, including impression data, impact metrics, and safeguards, use the [Unleash SDK](/sdks) for your language directly.
