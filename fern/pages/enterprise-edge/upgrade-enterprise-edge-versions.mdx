@@ -5,6 +5,7 @@ keywords: enterprise edge, upgrade, migration, v17, v18, v19, v20, tokens, troub
 og:site_name: Unleash
 og:title: Upgrade Enterprise Edge versions
 max-toc-depth: 3
+last-updated: October 15, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">Edge v17+</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -42,7 +43,7 @@ Complete this checklist before you upgrade your version:
   <Step title="Inventory your tokens">
     For each token, record the following:
 
-    - Startup tokens configured in `TOKENS`.
+    - Startup tokens configured in `TOKENS`. Unleash shows a token's value only when you create it, so take the values from your secrets manager or Edge configuration, not from the Unleash Admin UI.
     - The [environments](/concepts/environments) and [projects](/concepts/projects) each token covers.
     - The SDKs and client applications that depend on each token.
   </Step>

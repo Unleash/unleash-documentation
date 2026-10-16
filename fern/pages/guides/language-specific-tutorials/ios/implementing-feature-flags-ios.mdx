@@ -6,7 +6,7 @@ keywords: implement, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "How to Implement Feature Flags in iOS"
 max-toc-depth: 3
-last-updated: July 28, 2026
+last-updated: October 15, 2026
 ---
 
 iOS is a mobile operating system developed by Apple for their mostly used mobile device: the iPhone. [Swift](https://www.swift.org/) is a programming language designed for Apple iOS devices. Unleash offers an [iOS SDK](/sdks/ios) for connecting SwiftUI with your iOS application to use feature flags. We will be using the open-source iOS Swift project called [Open Meteo](https://github.com/ighiba/open-meteo)!
@@ -191,7 +191,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-Next, replace the `<client_key>` string in the config object with the API token you generated. You can do this by copying the API token into your clipboard from the API Access view table in your Unleash instance and pasting it into the code.
+Next, replace the `<client_key>` string in the config object with the API token you copied when you created it. If you no longer have it, create a new token in the API Access view and copy it right away; Unleash shows a token only once.
 
 As the application is launching, it will make an authenticated call to the Unleash server so we can begin using the `tempUnit` feature flag we created.
 
