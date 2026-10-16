@@ -4,7 +4,7 @@ description: "Learn how to configure self-hosted Unleash using Docker environmen
 max-toc-depth: 3
 og:title: Configure Unleash
 og:site_name: Unleash
-last-updated: August 25, 2026
+last-updated: October 15, 2026
 ---
 
 This guide explains how to configure your self-hosted Unleash instance when running it via [Docker Compose or the Docker CLI](/deploy/getting-started).
@@ -237,8 +237,10 @@ If emails fail to send or contain errors:
 | :------------------------------------ | :------------------ | :--------------------------------------------------------------------------------------------------------------- |
 | `SECURE_HEADERS`                      | `false`             | Set to `true` to enable security headers like HSTS, CSP (recommended if serving over HTTPS).                       |
 | `CSP_ALLOWED_*`                       | N/A                 | Comma-separated lists for specific [CSP directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy#directives) when `SECURE_HEADERS` is true. For example: `CSP_ALLOWED_SCRIPT` for `script-src`.     |
-| `SESSION_TTL_HOURS`                   | `48`                | User session duration in hours.                                                                                    |
-| `SESSION_CLEAR_SITE_DATA_ON_LOGOUT` | `true`              | Whether to send `Clear-Site-Data` header on logout.                                                              |                                                                            |
+| `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` | `false`           | Enables `SESSION_IDLE_TIMEOUT_MINUTES` and lets Unleash end sessions itself, answering the first request past a deadline with `401`. While this is off, sessions past their maximum length expire rather than being ended, and no idle timeout applies. |
+| `SESSION_TTL_HOURS`                   | `48`                | User session duration in hours, measured from sign-in and never extended by activity. Applies whether or not session timeouts are enabled. |
+| `SESSION_IDLE_TIMEOUT_MINUTES`        | `0`                 | Minutes of inactivity after which a session ends; `0` disables it. Requires session timeouts to be enforced and a value lower than `SESSION_TTL_HOURS` — otherwise Unleash logs a warning at startup and the limit never applies. Activity means a state-changing request, or the Admin UI reporting user input; page views and background polling do not count. |
+| `SESSION_CLEAR_SITE_DATA_ON_LOGOUT`   | `true`              | Whether to send `Clear-Site-Data` header on logout. |
 | `MAX_PARALLEL_SESSIONS`             | N/A                 | Maximum number of parallel user sessions allowed with password-based login.                                                                |
 | `UNLEASH_FRONTEND_API_ORIGINS` |	`*` |	Comma-separated list of allowed origins (CORS) for the Frontend API. Use * with caution. Example: https://app.mycompany.com,https://*.yourdomain.net.|
 
