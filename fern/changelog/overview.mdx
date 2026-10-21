@@ -16,9 +16,15 @@ A single release note can carry more than one tag when a release touches several
 </Accordion>
 
 <Accordion title="Versioning">
-Unleash follows semantic versioning, with major versions (for example, `v7.0.0`) including significant new features and might include breaking changes, and minor versions (for example, `v7.4.0`) adding new functionality while maintaining backward compatibility.
+Unleash versions use the format `MAJOR.MINOR.BUILD`:
 
-For a comprehensive list of all Unleash releases, including patch versions and history prior to 2025, visit the [Unleash Releases](https://github.com/Unleash/unleash/releases) page on GitHub.
+- **Major versions** (for example, `v8.0.0`) mark releases with significant changes and can include breaking changes. Review the [upgrade guide](/deploy/upgrading-unleash) before you upgrade.
+- **Minor versions** (for example, `v8.3.0`) are feature releases, summarized on this page.
+- **Builds** (for example, `v8.3.4`) are published weekly from the latest Unleash code. They include dependency updates and security fixes, and can also include new features and other changes.
+
+Unleash doesn't strictly follow semantic versioning. Builds come from the same code that runs Unleash Cloud, including ongoing work toward the next major version. We aim to keep every build backward compatible, and in practice almost all are. In rare cases, a build can include a change that's not backward compatible; when that happens, the release notes on GitHub call it out. If you self-host Unleash, we recommend testing new builds in a non-production environment before you upgrade.
+
+For a comprehensive list of all Unleash releases, including builds and history prior to 2025, visit the [Unleash Releases](https://github.com/Unleash/unleash/releases) page on GitHub.
 
 The [Unleash MCP server](/integrate/mcp), [Unleash Enterprise Edge](/unleash-edge), and each [SDK](/sdks) are versioned independently and publish their own changelog in their respective GitHub repositories.
 </Accordion>
