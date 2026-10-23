@@ -73,35 +73,50 @@ Admin tokens grant full read and write access to all resources in the Unleash se
 
 <Button small outlined className="version-button" href="/support/availability">v8.3</Button>
 
-Unleash does not store complete token values in its database. For each token, Unleash stores two values:
+From Unleash v8.3, new tokens generated through the Admin UI and token-creation APIs use secure storage. Unleash stores two values instead of the complete credential:
 
 - A **selector**, which identifies the token's database record. The selector is part of the token, so Unleash can find the correct record during authentication. The selector is not a secret.
 - A **verifier**, which Unleash derives from the complete token and uses to verify it. Unleash stores the verifier in the database and never includes it in the token or in API responses.
 
-When Unleash receives a token, it extracts the selector, retrieves the corresponding verifier, and verifies the presented token. Unleash cannot reconstruct the complete token from the stored selector and verifier. If your database is exposed, the stored values cannot be used to authenticate against Unleash.
+When Unleash receives a secure token, it extracts the selector, retrieves the corresponding verifier, and verifies the presented token. Unleash cannot reconstruct the complete token from the stored selector and verifier. The stored selector and verifier cannot themselves be used as credentials, reducing the risk if someone obtains read access to the database or a backup.
 
-This has the following consequences for how you work with tokens:
+This has the following consequences for how you work with secure tokens:
 
 - Unleash shows the complete token only once, when you create it. Copy it immediately and store it in a secure location, such as a secrets manager.
 - Token lists in the Admin UI show a token's name, type, and scope. They don't include a copy action for the token value.
-- The [get API tokens](/api/get-all-api-tokens) endpoint returns the selector in the `secret` field instead of the complete token. Responses also include `secure: true`.
+- For secure tokens, the [get API tokens](/api/get-all-api-tokens) endpoint returns the selector in the `secret` field instead of the complete token. Responses also include `secure: true`. Lists can contain both secure and legacy tokens; legacy tokens have `secure: false`.
 - The [update API token](/api/update-api-token) and [delete API token](/api/delete-api-token) endpoints accept either the selector or the complete token as the token identifier.
-- [Events](/concepts/events) for token operations include the selector, never the complete token.
+- [Events](/concepts/events) for secure token operations include the selector, never the complete token.
 - If you lose a token, [rotate it](#rotate-a-token): create a new one and delete the old one.
 
 <Note>
 Secure storage does not make [frontend tokens](#frontend-tokens) confidential. Frontend tokens remain safe to expose client-side because they only grant access to evaluated flags for a given context.
 </Note>
 
-Tokens created in Unleash v8.2 or earlier use the [legacy format](#legacy-token-format), and Unleash stores their complete value. These tokens continue to work. To move to secure storage, [rotate](#rotate-a-token) them.
+Existing [legacy tokens](#legacy-token-format) continue to work, and Unleash stores their complete values until you delete them. Tokens supplied through the [initialization environment variables](/deploy/configuring-unleash#initial-setup) also use this legacy storage path. To move these tokens to secure storage, [rotate](#rotate-a-token) them.
+
+Secure storage was available as an opt-in feature in Unleash v8.2, so a token's creation version alone does not identify its storage format. Secure backend and frontend tokens contain `.v2_`; secure personal access and service account tokens start with `user:v2_`.
+
+<Accordion title="Enable secure storage in Unleash v8.2">
+
+For self-hosted v8.2 instances, set the environment variables for the token types you use and restart Unleash:
+
+| Environment variable | Token types |
+| --- | --- |
+| `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=true` | Backend, frontend, and deprecated admin tokens, including tokens created for Unleash Edge |
+| `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=true` | Personal access tokens and service account tokens |
+
+These settings affect newly generated tokens only. From v8.3, secure storage is the default for generated tokens and these environment variables are not required.
+
+</Accordion>
 
 <Accordion title="Upgrade to secure token storage" id="upgrade-to-secure-token-storage">
 
-From Unleash v8.3, all new tokens use secure storage. Tokens created before the upgrade keep working in the [legacy format](#legacy-token-format) until you delete them.
+From Unleash v8.3, new tokens generated through the Admin UI and token-creation APIs use secure storage. Upgrading does not convert existing legacy tokens or remove their complete values from the database. Tokens supplied through initialization environment variables remain a legacy exception.
 
 To move all your tokens to secure storage:
 
-1. [Rotate](#rotate-a-token) each backend, frontend, personal access, and service account token created in v8.2 or earlier.
+1. Identify and [rotate](#rotate-a-token) each legacy backend, frontend, personal access, and service account token, including tokens supplied through initialization environment variables. Identify legacy tokens by their [format](#legacy-token-format), rather than their creation date.
 2. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with tokens created in v8.3, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
 
 </Accordion>
@@ -126,12 +141,12 @@ The environment value is the name of an environment on your Unleash instance, su
 
 Personal access tokens and service account tokens start with `user:`, followed by the secret. They do not contain project or environment information.
 
-The format of the secret depends on when the token was created:
+The secret uses one of two formats:
 
 <Tabs>
-<Tab title="v8.3 and later" id="v2-token-format">
+<Tab title="Secure tokens (V2)" id="v2-token-format">
 
-Tokens created in Unleash v8.3 or later use [secure storage](#how-unleash-stores-tokens). The secret starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
+Tokens generated with [secure storage](#how-unleash-stores-tokens) use the V2 format. The secret starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
 
 ```
 {{projects}}:{{environment}}.v2_{{selector}}_{{random}}
@@ -163,9 +178,9 @@ Some example API tokens are:
     ```
 
 </Tab>
-<Tab title="v8.2 and earlier" id="legacy-token-format">
+<Tab title="Legacy tokens (V1)" id="legacy-token-format">
 
-Tokens created in Unleash v8.2 or earlier don't include the `v2_` marker. The secret is a 56-character hexadecimal string, and Unleash stores the complete token in its database.
+Legacy tokens don't include the `v2_` marker. Generated legacy tokens use a 56-character hexadecimal secret, and Unleash stores the complete token in its database. Tokens supplied through initialization environment variables also use legacy storage, but their supplied secret can have a different length and format.
 
 ```
 {{projects}}:{{environment}}.{{secret}}
@@ -239,7 +254,7 @@ To rotate a token:
 2. Update your SDKs and integrations to use the new token.
 3. Delete the old token once nothing is using it.
 
-Rotating also moves a token to [secure storage](#how-unleash-stores-tokens): the new token starts with `v2_`, and deleting the old token removes its complete value from the database.
+Rotating a legacy token by generating its replacement with [secure storage](#how-unleash-stores-tokens) moves it to the V2 format: the new token's secret portion starts with `v2_`, and deleting the old token removes its complete value from the live database. This does not erase copies in existing backups; continue to protect backups according to your retention policy.
 
 ### Expiration notifications
 
