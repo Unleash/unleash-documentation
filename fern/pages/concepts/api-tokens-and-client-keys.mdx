@@ -80,6 +80,10 @@ From Unleash v8.3, new tokens generated through the Admin UI and token-creation 
 
 When Unleash receives a secure token, it extracts the selector, retrieves the corresponding verifier, and verifies the presented token. Unleash cannot reconstruct the complete token from the stored selector and verifier. The stored selector and verifier cannot themselves be used as credentials, reducing the risk if someone obtains read access to the database or a backup.
 
+<Note>
+Secure token storage applies to the Unleash server database. Unleash Edge uses in-memory caching by default; persistent storage is opt-in. If you configure Redis, S3, or a local backup folder, Edge persists complete token credentials, including V2 tokens, in its snapshots. Protect access to that storage and its backups as you would other secrets. See [Edge persistence configuration](/unleash-edge/configure#persistence) and [production deployment guidance](/unleash-edge/deploy#production-deployment).
+</Note>
+
 This has the following consequences for how you work with secure tokens:
 
 - Unleash shows the complete token only once, when you create it. Copy it immediately and store it in a secure location, such as a secrets manager.
