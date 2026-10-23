@@ -146,7 +146,7 @@ The secret uses one of two formats:
 <Tabs>
 <Tab title="Secure tokens (V2)" id="v2-token-format">
 
-Tokens generated with [secure storage](#how-unleash-stores-tokens) use the V2 format. The secret starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
+Tokens generated with [secure storage](#how-unleash-stores-tokens) use the V2 format. The secret contains `.v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as the credential.
 
 ```
 {{projects}}:{{environment}}.v2_{{selector}}_{{random}}
