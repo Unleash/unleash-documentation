@@ -46,6 +46,8 @@ resource "unleash_api_token" "backend_token" {
 
 To manage an API token with Terraform, create it with the `unleash_api_token` resource. Tokens you create in the Admin UI or through the API stay outside Terraform state and can't be imported.
 
+Terraform retains the complete token credential in its state after creation, even when Unleash uses [secure token storage](/concepts/api-tokens-and-client-keys#how-unleash-stores-tokens). Protect access to your Terraform state and its backups as you would any other secrets store.
+
 ### Environments
 
 - `unleash_environment`: Create and manage environments.
