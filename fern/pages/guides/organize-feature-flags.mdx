@@ -5,7 +5,7 @@ keywords: organizing, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Organizing feature flags using environments and projects"
 max-toc-depth: 2
-last-updated: July 30, 2026
+last-updated: October 26, 2026
 ---
 
 As your use of Unleash grows from a handful of developers to hundreds or even thousands, you need to ensure you can maintain control, security, and velocity across your organization.
@@ -193,7 +193,7 @@ Security is enforced through [API tokens](/concepts/api-tokens-and-client-keys) 
 For example, your checkout service would use a token valid only for the `production` environment and the `project-checkout`. This token could not fetch configurations from the `development` environment, nor could it access flags from another project like `project-search`.
 This creates a strong security boundary, serving as a critical safeguard against both environment mix-ups and unauthorized cross-project data access.
 
-As with any API token, proper secret management is essential to prevent misuse.
+As with any API token, proper secret management is essential to prevent misuse. Store tokens in a secrets manager and [rotate](/concepts/api-tokens-and-client-keys#rotate-a-token) them on a schedule. To learn how Unleash protects tokens, see [How Unleash stores tokens](/concepts/api-tokens-and-client-keys#how-unleash-stores-tokens).
 
 ## Manage flag configurations across projects and environments
 
