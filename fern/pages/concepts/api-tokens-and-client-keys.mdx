@@ -16,12 +16,7 @@ Unleash supports the following types of API tokens:
 - [Personal access tokens](#personal-access-tokens) for testing and debugging or providing temporary access to an automation tool.
 - [Service account tokens](/concepts/service-accounts) for providing API access to integrations or automation tools.
 
-Each token is either a secure token or a legacy token:
-
-- **Secure tokens** contain `v2_`. Unleash stores a selector and a verifier instead of the complete token. From Unleash v8.3, every token you create in the Admin UI or through the API is a secure token.
-- **Legacy tokens** don't contain `v2_`. Unleash stores the complete token in its database. Tokens created in earlier versions and tokens created from the `INIT_*_API_TOKENS` [environment variables](/deploy/configuring-unleash#initial-setup) are typically legacy tokens.
-
-Unleash shows a secure token only once, when you create it. Copy the token immediately and store it in a secrets manager. To learn more, see [How Unleash stores tokens](#how-unleash-stores-tokens).
+Each token is either a secure token or a legacy token. See [Token versions](#token-versions) for the differences.
 
 To connect a frontend SDK to Unleash using Unleash Edge, you need both a [backend](#backend-tokens) and [frontend token](#frontend-tokens). See [Connect a frontend SDK to Unleash using Edge](#connect-a-frontend-sdk-to-unleash-using-edge) for an example.
 
@@ -45,7 +40,7 @@ Use frontend tokens for connecting [frontend SDKs](/sdks#frontend-sdks) to Unlea
 -   Registering applications with the Unleash server
 -   Sending usage metrics
 
-Frontend tokens are scoped to one or more projects and a single environment. When creating a frontend token, you can give it access to a specific list of projects or to all current or future projects. Frontend tokens are not considered secret and are safe to expose client-side.
+Frontend tokens are scoped to one or more projects and a single environment. When creating a frontend token, you can give it access to a specific list of projects or to all current or future projects. Frontend tokens are not considered secret and are safe to expose client-side, including [secure tokens](#token-versions).
 
 Frontend tokens cannot be used in backend SDKs; use [backend tokens](#backend-tokens) instead.
 
@@ -74,39 +69,55 @@ Admin tokens are deprecated. Use other token types:
 
 Admin tokens grant full read and write access to all resources in the Unleash server API. This includes all projects, all environments, and all [root resources](/concepts/rbac).
 
+## Token versions
+
+Each API token is either a secure token or a legacy token. The version determines what the token looks like, how Unleash stores it, and when you can view the complete token, meaning the full value you use to authenticate.
+
+| | Secure token | Legacy token |
+| --- | --- | --- |
+| Unleash version | Created in v8.3 or later | Created in v8.2 or earlier |
+| Token secret | Contains `v2_` | Doesn't contain `v2_` |
+| Stored in the Unleash database | A selector and a verifier. Unleash never stores the complete token. | The complete token |
+| Complete token shown | Only once, when you create it | When you create it, and from the [get API tokens](/api/get-all-api-tokens) endpoint |
+| `secure` field in API responses | `true` | `false` |
+
+[Unleash Cloud](/support/availability#plans) always runs the latest version, so every token you create there is a secure token. If you self-host, your Unleash version determines which version of token you create.
+
+Unleash shows a secure token only once, when you create it. Copy the token immediately and store it in a secrets manager.
+
+Legacy tokens keep working after you upgrade. To replace them, see [How Unleash stores tokens](#how-unleash-stores-tokens) > **Legacy tokens** > **Upgrade to secure tokens**.
+
 ## How Unleash stores tokens
 
-<Button small outlined className="version-button" href="/support/availability">v8.3</Button>
+How Unleash stores a token depends on its [version](#token-versions):
 
-For a secure token, Unleash stores two values instead of the complete token:
+<Tabs>
+<Tab title="Secure tokens" id="secure-token-storage">
 
-- A **selector**, which identifies the token's database record. The selector is part of the token, so Unleash can find the correct record during authentication. The selector is not a secret.
+For a [secure token](#token-versions), Unleash stores two values instead of the complete token:
+
+- A **selector**, which identifies the token's database record. The selector is part of the token, so Unleash can find the correct record during authentication. The selector isn't a secret.
 - A **verifier**, which Unleash derives from the complete token and uses to verify it. Unleash stores the verifier in the database and never includes it in the token or in API responses.
 
-When Unleash receives a secure token, it extracts the selector, retrieves the matching verifier, and verifies the token. Unleash can't reconstruct the complete token from these values, and the values can't be used to authenticate. This limits the impact if someone gains read access to your database or its backups.
+When Unleash receives a secure token, it extracts the selector, retrieves the matching verifier, and verifies the token. Unleash can't reconstruct the complete token from these values, and the values alone can't authenticate a request. This limits the impact if someone gains read access to your database or its backups.
 
-This has the following consequences for how you work with secure tokens:
+Because Unleash never stores the complete token:
 
-- Unleash shows the complete token only once, when you create it. Copy it immediately and store it in a secrets manager.
-- Token lists in the Admin UI show a token's name, type, and scope. They don't include a copy action for the token value.
-- The [get API tokens](/api/get-all-api-tokens) endpoint returns the selector in the `secret` field and sets `secure: true`. For legacy tokens, it returns the complete token and sets `secure: false`.
+- You can't retrieve a secure token after creation. If you lose one, [rotate it](#rotate-a-token).
+- The [get API tokens](/api/get-all-api-tokens) endpoint returns the selector in the `secret` field and sets `secure: true`.
 - The [update API token](/api/update-api-token) and [delete API token](/api/delete-api-token) endpoints accept either the selector or the complete token as the token identifier.
-- [Events](/concepts/events) for secure token operations include the selector, never the complete token.
-- If you lose a token, [rotate it](#rotate-a-token): create a new one and delete the old one.
+- [Events](/concepts/events) for secure token operations include the selector and `tokenVersion: 2`, never the complete token.
 
-<Note>
-Secure tokens don't make [frontend tokens](#frontend-tokens) confidential. Frontend tokens remain safe to expose client-side because they only grant access to evaluated flags for a given context.
-</Note>
+Secure storage applies to the Unleash database only. Other systems that hold your tokens store the complete token, including [Terraform state](/integrate/terraform) and Unleash Edge when you configure [persistent storage](/unleash-edge/configure#persistence) with Redis, S3, or a backup folder. Protect that storage and its backups as you would any other secret. For Edge, see [production deployment](/unleash-edge/deploy#production-deployment).
 
-<Note>
-Unleash stores secure tokens this way in its own database. Other systems that hold your tokens store the complete token, including [Terraform state](/integrate/terraform) and Unleash Edge when you configure [persistent storage](/unleash-edge/configure#persistence) with Redis, S3, or a backup folder. Protect that storage and its backups as you would any other secret. For Edge, see [production deployment](/unleash-edge/deploy#production-deployment).
-</Note>
+</Tab>
+<Tab title="Legacy tokens" id="legacy-token-storage">
 
-Legacy tokens keep working after you upgrade, and Unleash keeps their complete value in the database until you delete them. To replace legacy tokens with secure tokens, [rotate](#rotate-a-token) them.
+For a [legacy token](#token-versions), Unleash stores the complete token in its database. The [get API tokens](/api/get-all-api-tokens) endpoint returns the complete token in the `secret` field and sets `secure: false`.
+
+Legacy tokens keep working after you upgrade to Unleash v8.3 or later. Unleash keeps the complete token in the database until you delete the token.
 
 <Accordion title="Upgrade to secure tokens" id="upgrade-to-secure-token-storage">
-
-After you upgrade to Unleash v8.3, every token you create in the Admin UI or through the API is a secure token. Your existing legacy tokens keep working.
 
 To replace your legacy tokens with secure tokens:
 
@@ -115,6 +126,9 @@ To replace your legacy tokens with secure tokens:
 3. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with secure tokens, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
 
 </Accordion>
+
+</Tab>
+</Tabs>
 
 ## API token format
 
@@ -136,12 +150,12 @@ The environment value is the name of an environment on your Unleash instance, su
 
 Personal access tokens and service account tokens start with `user:`, followed by the secret. They do not contain project or environment information.
 
-The format of the secret depends on whether the token is a secure token or a legacy token:
+The format of the secret depends on whether the token is a [secure token](#token-versions) or a [legacy token](#token-versions):
 
 <Tabs>
 <Tab title="Secure tokens" id="v2-token-format">
 
-The secret of a [secure token](#how-unleash-stores-tokens) starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as a secret.
+The secret of a secure token starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as a secret.
 
 ```
 {{projects}}:{{environment}}.v2_{{selector}}_{{random}}
@@ -221,9 +235,9 @@ Depending on your [permissions](#api-token-permissions), you can create API toke
 - **Settings > API access** inside a project: for project-specific backend or frontend tokens; permitted for project Members or users with a [corresponding root role](#api-token-permissions).
 - **Profile > View profile settings > Personal API tokens**: for [personal access tokens](#personal-access-tokens).
 
-Unleash shows the complete token once, right after you create it. Copy it before you close the confirmation.
+Unleash shows the complete token once, right after you create it. Copy it before you close the confirmation. Token lists show a token's name, type, and scope only.
 
-To create tokens programmatically, use the [create API token](/api/create-api-token), [create project API token](/api/create-project-api-token), [create personal access token](/api/create-pat), or [create service account token](/api/create-service-account-token) endpoint. For secure tokens, the create response is the only response that includes the complete token in the `secret` field.
+To create tokens programmatically, use the [create API token](/api/create-api-token), [create project API token](/api/create-project-api-token), [create personal access token](/api/create-pat), or [create service account token](/api/create-service-account-token) endpoint. For [secure tokens](#token-versions), the create response is the only response that includes the complete token in the `secret` field.
 
 ## Token expiry and rotation
 
@@ -249,7 +263,7 @@ To rotate a token:
 2. Update your SDKs and integrations to use the new token.
 3. Delete the old token once nothing is using it.
 
-When you rotate a legacy token, the new token is a [secure token](#how-unleash-stores-tokens). Deleting the old token removes its complete value from the database. Copies in existing database backups remain until your retention policy removes them, so keep protecting those backups.
+If you rotate a token in [Unleash Cloud](/support/availability#plans) or in a self-hosted instance running v8.3 or later, the new token is a [secure token](#token-versions). When you delete a [legacy token](#token-versions), Unleash removes the complete token from the database. Copies in existing database backups remain until your retention policy removes them, so keep protecting those backups.
 
 ### Expiration notifications
 
