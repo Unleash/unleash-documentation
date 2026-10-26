@@ -5,6 +5,7 @@ keywords: [data privacy, security, telemetry, PII, usage statistics, Unleash]
 og:site_name: Unleash
 og:title: Data and privacy
 max-toc-depth: 2
+last-updated: October 7, 2026
 ---
 
 At Unleash, we prioritize the privacy and security of our customers' data. Our [architecture](/concepts) ensures privacy by evaluating feature flags locally within the [client SDKs](/sdks) or [Unleash Edge](/unleash-edge), meaning no user data is shared with the Unleash instance.
@@ -37,6 +38,24 @@ To improve Unleash, we collect anonymous usage statistics:
 
 All collected data is anonymous and limited to usage counts. This data helps us understand how features are used in Unleash, enabling us to prioritize important features and make informed decisions about deprecating features that are no longer relevant to our users.
 
+### MCP server feedback
+
+<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The [Unleash MCP server](/integrate/mcp) can share anonymous diagnostic [feedback reports](/integrate/mcp#send-feedback) with Unleash to help improve the MCP server. The assistant sends a report when a tool call fails, when a result isn't what it expected, or when you ask for something the MCP server can't do yet.
+
+- **Local MCP server**: Feedback reports are opt-in. The MCP server sends reports only after you accept a one-time consent prompt, and saves whether you opted in or out on your machine.
+- **Remote MCP server**: In Unleash v8.3 and later, an admin turns feedback reports on or off for the whole instance. See [Feedback from the remote server](/integrate/mcp#feedback-from-the-remote-server).
+
+Each report contains only the following fields:
+
+- Issue type: `tool_error`, `unsupported_action`, or `unexpected_result`
+- MCP tool name and a normalized error code, such as `HTTP_500`
+- MCP server version, and the name and version of the MCP client
+- A short summary that the assistant writes
+
+The assistant is instructed to leave flag names, project IDs, code, URLs, and tokens out of the summary. Reports never include raw error messages or your personal access token. By default, reports go to Unleash, not to your Unleash instance. You can also [send reports to your own endpoint](/integrate/mcp#send-reports-to-your-own-endpoint). For details, see [Send feedback](/integrate/mcp#send-feedback).
+
 ## Manage data collection settings
 
 We recognize that privacy requirements differ across organizations. While the data collected by Unleash is limited and anonymous, we provide options to manage data collection settings:
@@ -48,3 +67,9 @@ Set the `CHECK_VERSION` environment variable to anything other than `true`, `t`,
 ### Disable feature telemetry
 
 Set the `SEND_TELEMETRY` environment variable to anything other than `true`, `t`, or `1` before starting Unleash. This disables feature telemetry while still allowing version tracking.
+
+### Disable MCP server feedback
+
+For the local MCP server, set `UNLEASH_MCP_SEND_FEEDBACK=false` in the MCP server's environment. You don't see a consent prompt, and the assistant doesn't see the `send_feedback` tool. If you distribute MCP configuration centrally, set the variable there to apply it to every developer.
+
+For the remote MCP server, go to **Admin settings > Remote MCP server** and disable **Send feedback from the Remote MCP Server to Unleash**.

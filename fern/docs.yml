@@ -337,6 +337,12 @@ navigation:
               - page: ISO27001
                 path: pages/privacy-and-compliance/iso27001.mdx
                 slug: iso27001
+              - page: DORA
+                path: pages/privacy-and-compliance/dora.mdx
+                slug: dora
+              - page: EU AI Act
+                path: pages/privacy-and-compliance/eu-ai-act.mdx
+                slug: eu-ai-act
 
       - section: Support and community
         skip-slug: true
@@ -750,10 +756,10 @@ navigation:
             path: pages/sdks/frontend/vue.mdx
 
       - section: OpenFeature providers
+        path: pages/sdks/openfeature/overview.mdx
         skip-slug: true
         contents:
           - page: Node.js
-            availability: beta
             path: pages/sdks/openfeature/node.mdx
           - page: PHP
             availability: beta
@@ -768,8 +774,18 @@ navigation:
             availability: beta
             path: pages/sdks/openfeature/rust.mdx
           - page: Swift
-            availability: beta
             path: pages/sdks/openfeature/swift.mdx
+          - page: Android
+            availability: beta
+            path: pages/sdks/openfeature/android.mdx
+          - link: Go (community)
+            href: https://github.com/open-feature/go-sdk-contrib/tree/main/providers/unleash
+          - link: Java (community)
+            href: https://github.com/open-feature/java-sdk-contrib/tree/main/providers/unleash
+          - link: .NET (community)
+            href: https://github.com/open-feature/dotnet-sdk-contrib/tree/main/src/OpenFeature.Providers.Unleash
+          - link: JavaScript (community)
+            href: https://github.com/open-feature/js-sdk-contrib/tree/main/libs/providers/unleash-web
 
       - section: Community SDKs
         collapsed: true

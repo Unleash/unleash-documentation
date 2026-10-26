@@ -5,7 +5,7 @@ keywords: [SOC2, SOC 2 Type II, compliance, security, access control, audit logs
 og:site_name: Unleash
 og:title: SOC2 compliance for feature flags
 max-toc-depth: 2
-last-updated: May 11, 2026
+last-updated: October 8, 2026
 ---
 
 ## Overview
@@ -17,6 +17,7 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 
 ## How Unleash features map to SOC2 Type II controls
 
+<StickyTable>
 | SOC2 Type II Control                                | Control Description                                                                                             | Unleash Feature                                                                                                                                           |
 |---------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | CC 2.1, CC 7.2 Log management utilized      | The company utilizes a log management tool to identify events that may have a potential impact on the company's ability to achieve its security objectives. | [Event log](/concepts/events) and [login history](/concepts/login-history) provide access to all configuration change and access logs.                                                                         |
@@ -33,3 +34,4 @@ This guide provides an overview of how [Unleash Enterprise](https://www.getunlea
 | CC 6.1, CC 6.6 Remote access encrypted and enforced | The company's production systems can only be remotely accessed by authorized employees via an approved encrypted connection. | Unleash is secured by enforcing TLS 1.2.                                                                                                               |
 | CC 6.7 Data transmission encrypted          | The company uses secure data transmission protocols to encrypt confidential and sensitive data when transmitted over public networks. | Unleash is secured by enforcing TLS 1.2.                                                                                                               |
 | SD SOC 2 System Description                 | The company has completed a description of its systems for Section III of the audit report.                                           | This documentation is available in the SOC 2 report in the Trust Center. The report is performed by an external auditor and renewed annually. |
+</StickyTable>
