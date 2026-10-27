@@ -245,11 +245,21 @@ To assign tags to a feature flag, do the following:
 
 For example, you can create a `slack` tag type and assign Slack channel names as tag values. This lets you configure a Slack integration to send updates about specific feature flags to the correct channels.
 
+### Delete a tag
+
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button>
+
+You can delete a tag value that you no longer need, for example a tag for an old release. Deleting a tag removes it from every feature flag that uses it. The tag type and its other values are not affected.
+
+To delete a tag, go to **Configure > Tag types**, select the tag type, and click **Delete** next to the tag value. The **Used in** column shows how many flags use each value.
+
+To delete a tag programmatically, use the [delete tag](/api/delete-tag) endpoint.
+
 ## External links
 
 <Button small outlined className="version-button" href="/support/availability">v7.0</Button>
 
-You can add external links to your feature flags, allowing you to connect them to related resources like key metrics, analytics, or issue trackers. You can add a link on the **Overview** page of any feature flag.
+You can add external links to your feature flags, allowing you to connect them to related resources like key metrics, analytics, or issue trackers. To add a link, open the feature flag's **Overview** page and click **Add link** in the **Resources** section of the **Flag details** panel.
 
 In addition, you can define link templates at the project level in **Settings > Project settings > Enterprise settings > Project link templates**. These templates automatically populate links for all new feature flags within that project. For example, you can create templates to find all usages of
 a feature flag in your repository or automatically link to a Jira issue when a flag is created from Jira.

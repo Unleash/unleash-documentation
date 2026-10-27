@@ -61,7 +61,7 @@ Feature flags are always evaluated per environment. Enabling a flag in `dev` doe
     Open the feature flag `demoApp.step2`.
   </Step>
   <Step>
-    In the `dev` environment, click **Add strategy > Default strategy > Configure**. In the **Targeting** tab, go to the **Constraints** section and click **Add constraint**.
+    In the `dev` environment, click **Add strategy > Set up manually > Configure**. In the **Targeting** tab, go to the **Constraints** section and click **Add constraint**.
   </Step>
   <Step>
     Set the context field to `userId`, the operator to **is one of**, then click **+ Add values**. Find your user ID on the demo page (displayed as **userId: xxxxxx**), enter it in the input field, and click **Add**.
@@ -91,7 +91,7 @@ Use a gradual rollout to safely expose a feature to a portion of your user base.
     Open the feature flag `demoApp.step3`.
   </Step>
   <Step>
-    In the `dev` environment, click **Add strategy > Default strategy > Configure**. Set the rollout percentage to **25%** using the slider.
+    In the `dev` environment, click **Add strategy > Set up manually > Configure**. Set the rollout percentage to **25%** using the slider.
   </Step>
   <Step>
     Leave stickiness as **default** to ensure each user consistently sees the same experience.
@@ -121,7 +121,7 @@ Gradual rollout relies on [stickiness](/concepts/stickiness#calculation): a conc
     Open `demoApp.step4`.
   </Step>
   <Step>
-    In the `dev` environment, click **Add strategy > Default strategy > Configure**.
+    In the `dev` environment, click **Add strategy > Set up manually > Configure**.
   </Step>
   <Step>
     Go to the **Variants** tab and click **Add variant**. Give the variant a name, set the payload type to `String`, and enter a hex color value as the payload, for example `#6366f1`.

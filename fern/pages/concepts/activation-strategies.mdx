@@ -147,7 +147,7 @@ The value must start with and contain at least major, minor, and patch versions.
 
 #### Regex operator
 
-<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.1.9</Button>
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.1.9</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
 The regex operator matches the context field against a regular expression. Use it when the other string operators aren't expressive enough, for example to match an ID format, a set of email domains, or a naming pattern for hosts or applications.
 
@@ -172,7 +172,7 @@ When you add a regex constraint in the Admin UI, use **Test regex** to enter sam
 
 #### IP address operator
 
-<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.2</Button>
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.2</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
 The IP address operator checks whether the context field is an IP address that falls within any of the provided IP addresses or ranges. Use it to target traffic from an office network, a VPN, a partner's address space, or a set of known servers.
 
@@ -203,7 +203,7 @@ To add an activation strategy with a constraint to a feature flag, do the follow
 
 1. Open the Admin UI and go to the feature flag you'd like to add a strategy to.
 2. Select the environment you want to configure and click **Add strategy**.
-3. Select your desired [strategy type](#strategy-types) and click **Apply** or **Configure**.
+3. Under **Set up manually**, click **Configure**.
 4. In the **Targeting** tab, go to the **Constraints** section, and click **Add constraint**.
 5. Select a context field to constrain on, for example, `email`.
 6. Set your desired operator, for example, `STR_ENDS_WITH`.
@@ -211,7 +211,7 @@ To add an activation strategy with a constraint to a feature flag, do the follow
 8. Click **Save strategy**.
 
 <Frame background="subtle">
-![A feature flag with two strategies](/assets/add-strategy-modal.png)
+![The Add strategy dialog with the options Use project default, Set up manually, and Start from a template](/assets/add-strategy-dialog.png)
 </Frame>
 
 ## Client-side implementation
@@ -229,7 +229,12 @@ Unleash SDKs expect all context values to be strings. If you use an operator tha
 
 ## Strategy types
 
-When you add an activation strategy to a flag, you can choose from several options, depending on how you want to target and roll out your feature.
+When you add an activation strategy to a flag, the **Add strategy** dialog offers the following options:
+
+- **Use project default**: Apply the [default strategy](#default-strategy) that your team has defined for the environment in this project.
+- **Set up manually**: Configure a [gradual rollout](#gradual-rollout) with your own rollout percentage, targeting, and variants.
+- **Start from a template**: Roll out with a predefined sequence of milestones from a [release template](#release-templates).
+- **More strategies**: Add an [advanced strategy](#advanced-strategies) or a [custom strategy](#custom-strategies).
 
 ### Default strategy
 
@@ -245,25 +250,24 @@ The default activation strategy is a type of gradual rollout strategy that you c
 
 #### Add the default strategy to a flag
 
-To add your project's default strategy, click **Add strategy** and select **Project default**.
+To add your project's default strategy, click **Add strategy**, then under **Use project default**, click **Apply default**. The option shows the rollout percentage of the default strategy for the environment, for example **100% of all users**.
 In environments without an active strategy, you'll also see a suggested option to apply your default strategy directly.
 
-### Standard strategies
+### Gradual rollout
 
-#### Gradual rollout
+Roll out a feature to a percentage of your users while ensuring each user has a consistent experience. You can combine gradual rollout with [targeting](#targeting) rules to support most rollout scenarios. To turn a feature on for your entire user base, set the rollout percentage to 100%.
 
-Roll out a feature to a percentage of your users while ensuring each user has a consistent experience. You can combine gradual rollout with [targeting](#targeting) rules to support most rollout scenarios.
-
-#### Standard on/off
-
-Turn the feature on or off for your entire user base. For more control, we recommend using a [gradual rollout](#gradual-rollout) strategy set to 100% instead.
-
+To add a gradual rollout, click **Add strategy**, then under **Set up manually**, click **Configure**.
 
 ### Release templates
 
 [Release templates](/concepts/release-templates) are a collection of activation strategies that let you reuse predefined rollout configurations across multiple flags. They make it easier to standardize rollout processes and reduce manual setup.
 
+To add a strategy from a release template, click **Add strategy**, then under **Start from a template**, click **Select template**.
+
 ### Advanced strategies
+
+Advanced strategies target a feature at specific IP addresses or hostnames. To add one, click **Add strategy**, open **More strategies**, and select the strategy under **Advanced strategies**.
 
 #### IPs
 
@@ -285,7 +289,7 @@ Parameters:
 Whenever possible, we recommend using a standard [gradual rollout](#gradual-rollout) strategy with [strategy constraints](#constraints) instead of defining a custom strategy. They offer similar flexibility without requiring custom code distribution within your SDKs.
 </Note>
 
-Custom activation strategies let you define your own activation strategies to use with Unleash.
+Custom activation strategies let you define your own activation strategies to use with Unleash. To add a custom strategy to a flag, click **Add strategy**, open **More strategies**, and select the strategy under **Custom strategies**.
 
 <Frame background="subtle">
 ![A strategy creation form. It has fields labeled "strategy name" — "TimeStamp" — and "description" — "activate toggle after a given timestamp". It also has fields for a parameter named "enableAfter". The parameter is of type "string" and the parameter description is "Expected format: YYYY-MM-DD HH:MM". The parameter is required.](/assets/timestamp_create_strategy.png)
