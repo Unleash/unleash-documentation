@@ -2,21 +2,21 @@
 title: API tokens and client keys
 og:site_name: Unleash Documentation
 og:title: API tokens and client keys - Authenticate SDKs and integrations with Unleash
-description: Unleash uses API keys to facilitate communication between consuming clients such as SDKs, Unleash Edge, or other tools and automation.
-keywords: api tokens, client keys, authentication, backend tokens, frontend tokens, personal access tokens
+description: Unleash uses API tokens to authenticate SDKs, Unleash Edge, integrations, and automation. Learn about token types, how Unleash stores tokens, and how to create and rotate them.
+keywords: api tokens, client keys, authentication, backend tokens, frontend tokens, personal access tokens, secure tokens, token storage, token rotation
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: October 26, 2026
 ---
 
-## Overview
-
-Unleash uses API keys to facilitate communication between consuming clients such as [SDKs](/sdks), [Unleash Edge](/unleash-edge), or other tools and automation.
+Unleash uses API tokens to authenticate consuming clients such as [SDKs](/sdks), [Unleash Edge](/unleash-edge), and other tools and automation.
 
 Unleash supports the following types of API tokens:
 - [Backend tokens](#backend-tokens) for connecting [backend SDKs](/sdks#backend-sdks) or [Unleash Edge](/unleash-edge) to Unleash.
 - [Frontend tokens](#frontend-tokens) for connecting [frontend SDKs](/sdks#frontend-sdks) to Unleash using the [Frontend API](/concepts/front-end-api) or [Unleash Edge](/unleash-edge).
 - [Personal access tokens](#personal-access-tokens) for testing and debugging or providing temporary access to an automation tool.
 - [Service account tokens](/concepts/service-accounts) for providing API access to integrations or automation tools.
+
+Each token is either a secure token or a legacy token. See [Token versions](#token-versions) for the differences.
 
 To connect a frontend SDK to Unleash using Unleash Edge, you need both a [backend](#backend-tokens) and [frontend token](#frontend-tokens). See [Connect a frontend SDK to Unleash using Edge](#connect-a-frontend-sdk-to-unleash-using-edge) for an example.
 
@@ -40,7 +40,7 @@ Use frontend tokens for connecting [frontend SDKs](/sdks#frontend-sdks) to Unlea
 -   Registering applications with the Unleash server
 -   Sending usage metrics
 
-Frontend tokens are scoped to one or more projects and a single environment. When creating a frontend token, you can give it access to a specific list of projects or to all current or future projects. Frontend tokens are not considered secret and are safe to expose client-side.
+Frontend tokens are scoped to one or more projects and a single environment. When creating a frontend token, you can give it access to a specific list of projects or to all current or future projects. Frontend tokens are not considered secret and are safe to expose client-side, including [secure tokens](#token-versions).
 
 Frontend tokens cannot be used in backend SDKs; use [backend tokens](#backend-tokens) instead.
 
@@ -69,6 +69,148 @@ Admin tokens are deprecated. Use other token types:
 
 Admin tokens grant full read and write access to all resources in the Unleash server API. This includes all projects, all environments, and all [root resources](/concepts/rbac).
 
+## Token versions
+
+Each API token is either a secure token or a legacy token. The version determines what the token looks like, how Unleash stores it, and when you can view the complete token, meaning the full value you use to authenticate.
+
+| | Secure token | Legacy token |
+| --- | --- | --- |
+| Unleash version | Created in v8.3 or later | Created in v8.2 or earlier |
+| Token secret | Contains `v2_` | Doesn't contain `v2_` |
+| Stored in the Unleash database | A selector and a verifier. Unleash never stores the complete token. | The complete token |
+| Complete token shown | Only once, when you create it | When you create it, and from the [get API tokens](/api/get-all-api-tokens) endpoint |
+| `secure` field in API responses | `true` | `false` |
+
+[Unleash Cloud](/support/availability#plans) always runs the latest version, so every token you create there is a secure token. If you self-host, your Unleash version determines which version of token you create.
+
+Unleash shows a secure token only once, when you create it. Copy the token immediately and store it in a secrets manager.
+
+Legacy tokens keep working after you upgrade. To replace them, see [How Unleash stores tokens](#how-unleash-stores-tokens) > **Legacy tokens** > **Upgrade to secure tokens**.
+
+## How Unleash stores tokens
+
+How Unleash stores a token depends on its [version](#token-versions):
+
+<Tabs>
+<Tab title="Secure tokens" id="secure-token-storage">
+
+For a [secure token](#token-versions), Unleash stores two values instead of the complete token:
+
+- A **selector**, which identifies the token's database record. The selector is part of the token, so Unleash can find the correct record during authentication. The selector isn't a secret.
+- A **verifier**, which Unleash derives from the complete token and uses to verify it. Unleash stores the verifier in the database and never includes it in the token or in API responses.
+
+When Unleash receives a secure token, it extracts the selector, retrieves the matching verifier, and verifies the token. Unleash can't reconstruct the complete token from these values, and the values alone can't authenticate a request. This limits the impact if someone gains read access to your database or its backups.
+
+Because Unleash never stores the complete token:
+
+- You can't retrieve a secure token after creation. If you lose one, [rotate it](#rotate-a-token).
+- The [get API tokens](/api/get-all-api-tokens) endpoint returns the selector in the `secret` field and sets `secure: true`.
+- The [update API token](/api/update-api-token) and [delete API token](/api/delete-api-token) endpoints accept either the selector or the complete token as the token identifier.
+- [Events](/concepts/events) for secure token operations include the selector and `tokenVersion: 2`, never the complete token.
+
+Secure storage applies to the Unleash database only. Other systems that hold your tokens store the complete token, including [Terraform state](/integrate/terraform) and Unleash Edge when you configure [persistent storage](/unleash-edge/configure#persistence) with Redis, S3, or a backup folder. Protect that storage and its backups as you would any other secret. For Edge, see [production deployment](/unleash-edge/deploy#production-deployment).
+
+</Tab>
+<Tab title="Legacy tokens" id="legacy-token-storage">
+
+For a [legacy token](#token-versions), Unleash stores the complete token in its database. The [get API tokens](/api/get-all-api-tokens) endpoint returns the complete token in the `secret` field and sets `secure: false`.
+
+Legacy tokens keep working after you upgrade to Unleash v8.3 or later. Unleash keeps the complete token in the database until you delete the token.
+
+<Accordion title="Upgrade to secure tokens" id="upgrade-to-secure-token-storage">
+
+To replace your legacy tokens with secure tokens:
+
+1. Find your legacy tokens. Their secret doesn't contain `v2_`, and the [get API tokens](/api/get-all-api-tokens) endpoint returns them with `secure: false`.
+2. [Rotate](#rotate-a-token) each legacy backend, frontend, personal access, and service account token, including tokens created from the `INIT_*_API_TOKENS` environment variables.
+3. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later. Earlier versions work with secure tokens, but v20.5.0 improves the telemetry that Edge reports to Unleash about tokens in use.
+
+</Accordion>
+
+</Tab>
+</Tabs>
+
+## API token format
+
+Backend, frontend, and deprecated admin tokens consist of three parts:
+
+1. Project information
+2. Environment
+3. Secret
+
+The parts are separated by two delimiters: a colon (`:`) between the projects and the environment, and a period (`.`) between the environment and the secret.
+
+The project value can be one of:
+
+- A single project ID, for example, `default`: the token can only access that project.
+- `[]`: the token is valid for a specific set of projects. The project IDs are not shown in the token.
+- `*`: the token is valid for all current and future projects.
+
+The environment value is the name of an environment on your Unleash instance, such as `development`. Admin tokens use `*:*` as the project and environment value.
+
+Personal access tokens and service account tokens start with `user:`, followed by the secret. They do not contain project or environment information.
+
+The format of the secret depends on whether the token is a [secure token](#token-versions) or a [legacy token](#token-versions):
+
+<Tabs>
+<Tab title="Secure tokens" id="v2-token-format">
+
+The secret of a secure token starts with `v2_`, followed by the selector and a random string, both Base64 URL-encoded. Treat the complete token, including its selector, as a secret.
+
+```
+{{projects}}:{{environment}}.v2_{{selector}}_{{random}}
+```
+
+Personal access tokens and service account tokens use the same secret:
+
+```
+user:v2_{{selector}}_{{random}}
+```
+
+Some example API tokens are:
+
+-   A token with access to the `development` environment of a single project, `new-checkout-flow`:
+    ```
+    new-checkout-flow:development.v2_Y8mfumDNYCBPIzU_X48tyA_P3XdoA9Fel9KoioeVKw5FWmA-PGd2jxq9SYj2hqCwlk
+    ```
+-   A token with access to the `production` environment in multiple projects:
+    ```
+    []:production.v2_jgjspSh-Z8ArlCHA91NDZQ_7o96eJAm7t1uJQFmT_Jzav5_MQv8yKjEpFmlsSYuP_M
+    ```
+-   A token with access to the `development` environment in all current and future projects:
+    ```
+    *:development.v2_6mV-cGeq4amfxekzzk6nOA_H6QEoJKSQaqa66MxSyAz2lBvg1OlFxnTdHYAWOwIhHI
+    ```
+-   A personal access token or service account token:
+    ```
+    user:v2_nn1XkimQkV8SSoUPEeuE3Q_48zN1UZIx-IPXr3vMB-8DS1zC-6LoZHtn0ara9dLTP4
+    ```
+
+</Tab>
+<Tab title="Legacy tokens" id="legacy-token-format">
+
+The secret of a legacy token doesn't contain `v2_`. When Unleash creates a legacy token, the secret is a 56-character hexadecimal string. Tokens created from the `INIT_*_API_TOKENS` environment variables use the secret you provide, so their format can differ.
+
+```
+{{projects}}:{{environment}}.{{secret}}
+```
+
+For example:
+
+```
+new-checkout-flow:development.be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
+```
+
+Legacy personal access tokens and service account tokens use the same hexadecimal secret:
+
+```
+user:be7536c3a160ff15e3a92da45de531dd54bc1ae15d8455c0476f086b
+```
+
+In Unleash v4.3 or earlier, API tokens are a 56-character hexadecimal string with no additional information.
+
+</Tab>
+</Tabs>
 
 ## API token permissions
 
@@ -85,55 +227,6 @@ The following table provides a summary of what actions different roles can perfo
 | Viewer root role                              | Cannot view, create, update, or delete tokens.                          |
 | Any role                                      | Can create personal access tokens.                          |
 
-## API token format
-
-API tokens consist of three parts:
-
-1. Project information
-2. Environment
-3. Hash
-
-The parts are separated by two delimiters: a colon (`:`) between the projects and the environment, and a period (`.`) between the environment and the hash.
-
-```
-{{projects}}:{{environment}}.{{hash}}
-```
-
-The project value of the token can be one of:
--   A single project ID, for example, `default`: when the token can only access a single project.
--   `[]`: when the token is valid for a specific set of projects. The list of projects is not shown in the token.
--   `*`: when the token is valid for all current and future projects.
-
-The environment value of the token is the name of an environment on your Unleash instance, such as `development`. The hash is a 64-character-long hexadecimal string.
-
-Personal access tokens start with the string `user`, and do not contain additional project or environment information.
-
-Some example API tokens are:
-
--   A token with access to the `development` environment of a single project, `new-checkout-flow`:
-    ```
-    new-checkout-flow:development.be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
-    ```
--   A token with access to the `production` environment in multiple projects:
-    ```
-    []:production.be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
-    ```
--   A token with access to the `development` environment in all current and future projects:
-    ```
-    *:development.be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
-    ```
--   A personal access token:
-    ```
-    user:be7536c3a160ff15e3a92da45de531dd54bc1ae15d8455c0476f086b
-    ```
-
-
-Note, in Unleash v4.3 or less, API tokens are a 64-character-long hexadecimal string with no additional information. For example:
-
-```
-be44368985f7fb3237c584ef86f3d6bdada42ddbd63a019d26955178
-```
-
 ## Create an API token
 
 Depending on your [permissions](#api-token-permissions), you can create API tokens in the Unleash Admin UI in four ways:
@@ -141,6 +234,10 @@ Depending on your [permissions](#api-token-permissions), you can create API toke
 - **Admin settings > Service accounts > New service account**: for creating a service account and assigning a token.
 - **Settings > API access** inside a project: for project-specific backend or frontend tokens; permitted for project Members or users with a [corresponding root role](#api-token-permissions).
 - **Profile > View profile settings > Personal API tokens**: for [personal access tokens](#personal-access-tokens).
+
+Unleash shows the complete token once, right after you create it. Copy it before you close the confirmation. Token lists show a token's name, type, and scope only.
+
+To create tokens programmatically, use the [create API token](/api/create-api-token), [create project API token](/api/create-project-api-token), [create personal access token](/api/create-pat), or [create service account token](/api/create-service-account-token) endpoint. For [secure tokens](#token-versions), the create response is the only response that includes the complete token in the `secret` field.
 
 ## Token expiry and rotation
 
@@ -162,9 +259,11 @@ A token's access configuration, that is its type, projects, and environment, can
 
 To rotate a token:
 
-1. Create a new token with the same type, project, and environment scope.
+1. Create a new token with the same type, project, and environment scope, and copy it.
 2. Update your SDKs and integrations to use the new token.
 3. Delete the old token once nothing is using it.
+
+If you rotate a token in [Unleash Cloud](/support/availability#plans) or in a self-hosted instance running v8.3 or later, the new token is a [secure token](#token-versions). When you delete a [legacy token](#token-versions), Unleash removes the complete token from the database. Copies in existing database backups remain until your retention policy removes them, so keep protecting those backups.
 
 ### Expiration notifications
 
