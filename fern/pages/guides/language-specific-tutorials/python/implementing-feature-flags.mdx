@@ -151,7 +151,7 @@ DBPASS=app_password
 Next, install the Python SDK. Open your repository in a code editor and navigate to `requirements.txt` inside the `src` folder. Reference the Python SDK for installation.
 
 ```text
-UnleashClient==5.11.1
+UnleashClient==7.0.0
 ```
 
 In `src/backend/__init__.py`, import `UnleashClient`:
@@ -166,7 +166,7 @@ In the same file, call the Unleash client for initialization when the app runs w
 client = UnleashClient(
    url="http://host.docker.internal:4242/api",
    app_name="flask-surveys-container-app",
-   custom_headers={'Authorization': '<API token>'}
+   api_key='<API token>',
 )
 
 client.initialize_client()
