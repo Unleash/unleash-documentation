@@ -58,7 +58,7 @@ from UnleashClient import UnleashClient
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 )
 
 client.initialize_client()
@@ -70,7 +70,7 @@ You can also use the client as a context manager, which initializes the client o
 with UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 ) as client:
     client.is_enabled("my-flag")
 ```
@@ -86,7 +86,7 @@ from UnleashClient import AsyncUnleashClient
 client = AsyncUnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 )
 
 await client.initialize_client()
@@ -98,7 +98,7 @@ You can also use the client as an async context manager, which initializes the c
 async with AsyncUnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 ) as client:
     client.is_enabled("my-flag")
 ```
@@ -136,7 +136,7 @@ def on_event(event: BaseEvent) -> None:
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     event_callback=on_event,
 )
 
@@ -172,7 +172,7 @@ async def main() -> None:
     client = AsyncUnleashClient(
         url="https://<your-unleash-instance>/api",
         app_name="my-python-app",
-        custom_headers={"Authorization": "<your-backend-token>"},
+        api_key="<your-backend-token>",
         event_callback=on_event,
     )
 
@@ -193,6 +193,23 @@ if __name__ == "__main__":
 
 ## Configuration options
 
+`url` and `app_name` are the first two arguments. All other arguments are keyword-only, and related settings are grouped into option objects:
+
+```python
+from UnleashClient import HttpOptions, MetricsOptions, PollingOptions, UnleashClient
+
+client = UnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    api_key="<your-backend-token>",
+    http=HttpOptions(timeout=10),
+    mode=PollingOptions(interval=30),
+    metrics=MetricsOptions(disabled=True),
+)
+```
+
+Settings can't be changed after the client is created. To change a setting, create a new client.
+
 Both client constructors support the following parameters. Parameters marked "Sync client only" apply only to `UnleashClient`.
 
 <ParamField path="url" type="str" required={true}>
@@ -203,72 +220,40 @@ Both client constructors support the following parameters. Parameters marked "Sy
   Name of the application using the client. Included in registration, metrics, and request headers.
 </ParamField>
 
-<ParamField path="environment" type="str" default="default" deprecated={true}>
-  Logical environment name. Deprecated; the environment is determined by your API token.
+<ParamField path="api_key" type="str" default="None">
+  Your backend API token, sent as the `Authorization` header. Only a client that never contacts Unleash, such as one that only reads a [bootstrapped](#bootstrap) cache, can leave it unset.
 </ParamField>
 
-<ParamField path="instance_id" type="str" default="unleash-python-sdk">
-  Unique identifier for this client instance.
+<ParamField path="identity" type="IdentityOptions" default="IdentityOptions()">
+  How the client identifies itself to Unleash. See [`IdentityOptions`](#identityoptions).
 </ParamField>
 
-<ParamField path="refresh_interval" type="int" default="15">
-  How often, in seconds, the SDK polls for updated flag configuration.
+<ParamField path="http" type="HttpOptions" default="HttpOptions()">
+  How the client communicates with Unleash. See [`HttpOptions`](#httpoptions).
 </ParamField>
 
-<ParamField path="refresh_jitter" type="int" default="None">
-  Maximum jitter, in seconds, added to the refresh interval.
+<ParamField path="mode" type="PollingOptions | StreamingOptions" default="PollingOptions()">
+  How the client receives flag updates: [`PollingOptions`](#pollingoptions) or [`StreamingOptions`](#streamingoptions). `AsyncUnleashClient` supports polling only.
 </ParamField>
 
-<ParamField path="metrics_interval" type="int" default="60">
-  How often, in seconds, the SDK sends usage metrics to Unleash.
-</ParamField>
-
-<ParamField path="metrics_jitter" type="int" default="None">
-  Maximum jitter, in seconds, added to the metrics interval.
-</ParamField>
-
-<ParamField path="disable_metrics" type="bool" default="False">
-  Disables sending usage metrics to Unleash.
-</ParamField>
-
-<ParamField path="disable_registration" type="bool" default="False">
-  Disables client registration with Unleash.
-</ParamField>
-
-<ParamField path="custom_headers" type="dict" default="None">
-  Additional headers for all API requests. Use this to add `Authorization`.
-</ParamField>
-
-<ParamField path="custom_options" type="dict" default="None">
-  Extra options passed to the underlying [HTTP requests](https://requests.readthedocs.io/en/latest/api/#main-interface), for example to skip SSL verification. Sync client only.
-</ParamField>
-
-<ParamField path="request_timeout" type="int" default="30">
-  Timeout, in seconds, for requests to the Unleash server.
-</ParamField>
-
-<ParamField path="request_retries" type="int" default="3">
-  Number of retries for requests to the Unleash server.
+<ParamField path="metrics" type="MetricsOptions" default="MetricsOptions()">
+  How the client reports usage metrics to Unleash. See [`MetricsOptions`](#metricsoptions).
 </ParamField>
 
 <ParamField path="custom_strategies" type="dict" default="None">
   Dictionary of strategy names to strategy objects. See [custom strategies](#custom-strategies).
 </ParamField>
 
-<ParamField path="cache_directory" type="str" default="None">
-  Location of the on-disk cache. When unset, the cache library determines the location.
+<ParamField path="cache" type="BaseCache" default="None">
+  Custom cache implementation that extends `UnleashClient.cache.BaseCache`. See [custom cache](#custom-cache). When unset, the SDK uses an on-disk cache.
 </ParamField>
 
-<ParamField path="project_name" type="str" default="None" deprecated={true}>
-  Restricts flag fetches to a single project. Deprecated; use a [project-scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
+<ParamField path="cache_directory" type="str" default="None">
+  Location of the on-disk cache. When unset, a platform-specific user cache directory is used. Ignored when you pass `cache`.
 </ParamField>
 
 <ParamField path="verbose_log_level" type="int" default="30">
   Numerical [log level](https://docs.python.org/3/library/logging.html#logging-levels) used when checking a feature flag fails.
-</ParamField>
-
-<ParamField path="cache" type="BaseCache" default="None">
-  Custom cache implementation that extends `UnleashClient.cache.BaseCache`. See [custom cache](#custom-cache). When unset, the SDK uses an on-disk cache.
 </ParamField>
 
 <ParamField path="scheduler" type="BaseScheduler" default="None">
@@ -276,7 +261,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 </ParamField>
 
 <ParamField path="scheduler_executor" type="str" default="None">
-  Name of the APScheduler executor to use with a custom scheduler. Sync client only.
+  Name of the APScheduler executor to use with a custom scheduler. Required with `scheduler`. Sync client only.
 </ParamField>
 
 <ParamField path="multiple_instance_mode" type="InstanceAllowType" default="WARN">
@@ -287,12 +272,74 @@ Both client constructors support the following parameters. Parameters marked "Sy
   Function that receives SDK [events](#events), including impression events. Called on a dedicated background thread. If you run under a WSGI server or in multiple processes, see [framework integration](#framework-integration).
 </ParamField>
 
+### IdentityOptions
+
+<ParamField path="instance_id" type="str" default="unleash-python-sdk">
+  Unique identifier for this client instance.
+</ParamField>
+
 <ParamField path="sdk_flavor" type="str" default="None">
   Identifier of an integration built on top of this SDK, such as an OpenFeature provider. Leave unset for plain SDK usage.
 </ParamField>
 
 <ParamField path="sdk_flavor_version" type="str" default="None">
   Version of the integration named by `sdk_flavor`.
+</ParamField>
+
+### HttpOptions
+
+<ParamField path="headers" type="dict" default="None">
+  Additional headers for all API requests. Pass your API token as `api_key`, not here: an `Authorization` header raises a `ValueError`.
+</ParamField>
+
+<ParamField path="options" type="dict" default="None">
+  Extra options passed to the underlying [HTTP requests](https://requests.readthedocs.io/en/latest/api/#main-interface), for example to skip SSL verification. Sync client only.
+</ParamField>
+
+<ParamField path="timeout" type="int" default="30">
+  Timeout, in seconds, for requests to the Unleash server.
+</ParamField>
+
+<ParamField path="retries" type="int" default="3">
+  How many times a failed feature fetch is retried.
+</ParamField>
+
+### PollingOptions
+
+The default mode. The SDK fetches flag configuration from Unleash on an interval.
+
+<ParamField path="interval" type="int" default="15">
+  How often, in seconds, the SDK polls for updated flag configuration.
+</ParamField>
+
+<ParamField path="jitter" type="int" default="None">
+  Maximum random delay, in seconds, added to each refresh.
+</ParamField>
+
+<ParamField path="project_name" type="str" default="None" deprecated={true}>
+  Restricts flag fetches to a single project. Deprecated; use a [project-scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
+</ParamField>
+
+### StreamingOptions
+
+Experimental. The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. Pass `mode=StreamingOptions()`; it has no settings. Sync client only.
+
+### MetricsOptions
+
+<ParamField path="interval" type="int" default="60">
+  How often, in seconds, the SDK sends usage metrics to Unleash.
+</ParamField>
+
+<ParamField path="jitter" type="int" default="None">
+  Maximum random delay, in seconds, added to each metrics send.
+</ParamField>
+
+<ParamField path="disabled" type="bool" default="False">
+  Disables sending usage metrics to Unleash.
+</ParamField>
+
+<ParamField path="disable_registration" type="bool" default="False">
+  Disables client registration with Unleash.
 </ParamField>
 
 ## Check flags
@@ -391,7 +438,7 @@ client.get_variant("my-flag", app_context)
 
 The SDK enriches the context automatically before evaluation:
 
-- `appName` and `environment` are set from the client configuration.
+- `appName` is set from `app_name`, and `environment` from your API token, or `"default"` when the token doesn't name an environment. Values you pass in the context take precedence.
 - `currentTime` is set to the current UTC time when you don't provide it, so date-based constraints work without extra setup.
 - Any top-level key that isn't a standard context field is moved into `properties`. Passing `{"custom-property": "some-value"}` at the top level is equivalent to nesting it under `properties`.
 
@@ -458,7 +505,7 @@ my_custom_strategies = {
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     custom_strategies=my_custom_strategies,
 )
 ```
@@ -477,7 +524,7 @@ my_custom_strategies = {
 client = AsyncUnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     custom_strategies=my_custom_strategies,
 )
 ```
@@ -493,6 +540,7 @@ To subscribe to SDK events, provide an `event_callback` function when you initia
 |------------|-------------|
 | `READY` | The SDK loaded feature flags from the Unleash server or the local cache. Emitted at least once. |
 | `FETCHED` | A new version of the feature flags was fetched from the server. The event includes a `features` property with all flags returned by that fetch. |
+| `FETCH_COMPLETED` | A feature fetch ended, successfully or not. The event's `status` says how: `CHANGED`, `NOT_CHANGED`, `UNAUTHORIZED`, `RATE_LIMITED`, `UNAVAILABLE`, or `INVALID_RESPONSE`. Emitted after every poll, but not in streaming mode. |
 | `FEATURE_FLAG` | A flag with [impression data](/concepts/impression-data) enabled was evaluated with `is_enabled`. |
 | `VARIANT` | A flag with impression data enabled was evaluated with `get_variant`. |
 
@@ -532,7 +580,7 @@ def example_callback(event: UnleashEvent):
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     event_callback=example_callback,
 )
 client.initialize_client()
@@ -564,7 +612,7 @@ def example_callback(event: UnleashEvent):
 client = AsyncUnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     event_callback=example_callback,
 )
 await client.initialize_client()
@@ -594,7 +642,7 @@ def example_callback(event: UnleashEvent):
 
 <Markdown src="/snippets/sdks/impact-metrics.mdx" />
 
-The SDK automatically attaches `appName` and `environment` labels to all impact metrics.
+The SDK automatically attaches `appName` and `environment` labels to all impact metrics. The environment is taken from your API token, or is `"default"` when the token doesn't name one.
 
 Define and record metrics through the client's `impact_metrics` property:
 
@@ -607,7 +655,7 @@ from UnleashClient import UnleashClient
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 )
 client.initialize_client()
 
@@ -636,7 +684,7 @@ from UnleashClient import AsyncUnleashClient
 client = AsyncUnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 )
 await client.initialize_client()
 
@@ -696,7 +744,7 @@ client.impact_metrics.observe_histogram("request_time_ms", 125)
 </Tab>
 </Tabs>
 
-Impact metrics are batched and sent on the same interval as standard SDK metrics, controlled by `metrics_interval`.
+Impact metrics are batched and sent on the same interval as standard SDK metrics, controlled by `MetricsOptions(interval=...)`.
 
 ## Bootstrap
 
@@ -734,7 +782,7 @@ cache.bootstrap_from_dict({
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     cache=cache,
 )
 ```
@@ -751,7 +799,7 @@ cache.bootstrap_from_file(Path("/path/to/your_bootstrap.json"))
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     cache=cache,
 )
 ```
@@ -770,7 +818,7 @@ cache.bootstrap_from_url(
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     cache=cache,
 )
 ```
@@ -783,7 +831,7 @@ The `headers` argument is optional; use it when the bootstrap URL requires authe
 
 The SDK persists the latest flag configuration to an on-disk cache between restarts, using [fcache](https://pypi.org/project/fcache/). Set `cache_directory` to control where the cache is stored.
 
-On startup, the SDK loads cached state first, then fetches fresh configuration from Unleash. If Unleash is temporarily unreachable, the SDK continues serving cached or bootstrapped values and keeps polling on `refresh_interval`.
+On startup, the SDK loads cached state first, then fetches fresh configuration from Unleash. If Unleash is temporarily unreachable, the SDK continues serving cached or bootstrapped values and keeps polling on `PollingOptions(interval=...)`.
 
 ### Custom cache
 
@@ -825,7 +873,7 @@ Pass your cache instance to either client with the `cache` argument:
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
     cache=CustomCache("my-cache"),
 )
 ```
@@ -854,7 +902,7 @@ from celery.signals import worker_process_init
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<your-backend-token>"},
+    api_key="<your-backend-token>",
 )
 
 @worker_process_init.connect
@@ -875,7 +923,7 @@ This mode is available with `UnleashClient`. `AsyncUnleashClient` accepts the `f
 To test code that depends on feature flags without a running Unleash instance, bootstrap a cache with the flag state you want and turn off all network activity:
 
 ```python
-from UnleashClient import UnleashClient
+from UnleashClient import MetricsOptions, UnleashClient
 from UnleashClient.cache import FileCache
 
 def make_test_client(cache_dir: str) -> UnleashClient:
@@ -894,8 +942,7 @@ def make_test_client(cache_dir: str) -> UnleashClient:
     client = UnleashClient(
         url="http://localhost:4242/api",
         app_name="test-app",
-        disable_metrics=True,
-        disable_registration=True,
+        metrics=MetricsOptions(disabled=True, disable_registration=True),
         cache=cache,
     )
     client.initialize_client(fetch_toggles=False)
@@ -908,6 +955,17 @@ def test_my_feature(tmp_path):
 ```
 
 With `fetch_toggles=False`, the client loads flags from the cache only, so tests are deterministic and make no network requests. This approach uses `UnleashClient`, because `fetch_toggles=False` is specific to the sync client.
+
+## Migrating to v7
+
+Version 7 changes how you configure the client:
+
+- The API token is passed as `api_key` instead of an `Authorization` header in `custom_headers`.
+- All arguments after `url` and `app_name` are keyword-only, and most settings moved into the option objects described in [configuration options](#configuration-options).
+- `environment` has been removed. The environment comes from your API token.
+- Settings can't be changed after the client is created.
+
+For the complete mapping from v6 arguments to v7, read the [v7 migration guide](https://github.com/Unleash/unleash-python-sdk/blob/main/v7_MIGRATION_GUIDE.md).
 
 ## Migrating to v6
 
@@ -922,7 +980,7 @@ If `is_enabled` always returns `False`:
 
 - Confirm the flag exists and is enabled in the target environment.
 - Verify `url` points to your Unleash API base URL, for example `https://<your-unleash-instance>/api`.
-- Verify `custom_headers` includes a valid backend API token in `Authorization`.
+- Verify `api_key` is a valid backend API token.
 - Verify the SDK completed its initial sync by checking that the `READY` event fired. `is_initialized` being `True` only means that `initialize_client()` has completed.
 - Verify your [Unleash context](/concepts/unleash-context) fields match your rollout strategy and constraints.
 
