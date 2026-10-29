@@ -1,0 +1,261 @@
+---
+title: Migrating from Unleash Open Source to Unleash Enterprise
+description: Move from a self-hosted Unleash Open Source instance to Unleash Enterprise, either by upgrading your self-hosted instance in place or by moving your flags, users, and SDK connections to Unleash Cloud.
+keywords: migration, migrate, open source, oss, enterprise, unleash cloud, pay-as-you-go, import, export, license key
+og:site_name: "Unleash Documentation"
+og:title: "Migrating from Unleash Open Source to Unleash Enterprise"
+max-toc-depth: 3
+last-updated: October 29, 2026
+---
+
+Learn how to move from a self-hosted [Unleash Open Source](/support/availability#plans) instance to Unleash Enterprise. The right approach depends on where your Enterprise instance will run:
+
+- To keep hosting Unleash yourself, [upgrade your existing instance in place](#migrate-to-self-hosted-unleash-enterprise). You switch the Docker image, add a license key, and keep your database, users, API tokens, and SDK connections.
+- To move to [Unleash Cloud](/support/availability#plans), including the pay-as-you-go plan, [set up a new instance and move your configuration into it](#migrate-to-unleash-cloud). You import your flags, add your users, create new API tokens, and point your applications at the new instance.
+
+![Two migration paths from Unleash Open Source: switch to self-hosted Unleash Enterprise by changing the Docker image and adding a license key, or move to Unleash Cloud by setting up a new instance, importing flags, adding users, and reconnecting SDKs](/assets/migration-oss-paths.svg)
+
+If you are coming from LaunchDarkly, another provider, or a homegrown system, see [Migrating to Unleash](/guides/feature-flag-migration-best-practices) instead. For a feature-by-feature comparison of the two editions, see [Unleash Open Source and Unleash Enterprise comparison](/support/oss-comparison).
+
+## Choose a migration path
+
+Both paths give you the full Enterprise feature set. They differ in how much of your existing setup carries over automatically.
+
+<CardGroup cols={2}>
+  <Card title="Self-hosted Unleash Enterprise" icon="fa-solid fa-server" href="#migrate-to-self-hosted-unleash-enterprise">
+    An in-place upgrade of the instance you already run. Your database, flags, users, API tokens, and SDK connections stay as they are. This is the shortest path if you want to keep hosting Unleash yourself.
+  </Card>
+  <Card title="Unleash Cloud" icon="fa-solid fa-cloud" href="#migrate-to-unleash-cloud">
+    A new, fully managed instance with its own URL. You move flag configuration with export and import, add users through single sign-on or invitations, and reconnect your SDKs with new tokens. Choose this path to stop operating Unleash infrastructure.
+  </Card>
+</CardGroup>
+
+For help deciding between self-hosted, hybrid, and cloud-hosted setups, see [hosting options](/deploy/hosting-options).
+
+<Note>
+Both migration paths keep your percentage rollouts stable. Unleash assigns users to rollout buckets with the same hashing algorithm in every edition, so a user who is inside a 25% rollout today stays inside it after the migration, as long as the flag name and [stickiness](/concepts/stickiness) stay the same.
+</Note>
+
+## Migrate to self-hosted Unleash Enterprise
+
+The Enterprise Docker image runs against the same PostgreSQL database as the open-source image. Switching images upgrades your instance in place: every flag, strategy, user, API token, and connected application continues to work, and your Unleash URL stays the same.
+
+### Prerequisites
+
+- A [license key](/deploy/license-keys#get-a-new-license). You receive one as part of your Enterprise trial or from your account representative.
+- Admin access to the instance and to the environment that runs it, such as your Docker host, Docker Compose file, or Helm values.
+- A recent [backup of your Unleash database](/deploy/configuring-unleash#back-up-and-restore-the-database).
+
+### Switch to the Enterprise image
+
+<Steps>
+  <Step>
+    Back up your database with `pg_dump` before you change anything, as you would before any [upgrade](/deploy/upgrading-unleash).
+  </Step>
+  <Step>
+    Replace the image reference `unleashorg/unleash-server` with `unleashorg/unleash-enterprise` in your Docker Compose file, `docker run` command, or Helm values. Use the tag for the minor version you run today, for example `8.3`. The two images publish patch releases independently, so patch numbers may differ. If you also want to move to a newer major version, do that as a separate step and follow the [upgrade guide](/deploy/upgrading-unleash).
+
+    <CodeBlocks>
+    <CodeBlock title="Docker Compose">
+    ```yaml
+    services:
+      unleash:
+        image: unleashorg/unleash-enterprise:<version>
+        environment:
+          - DATABASE_URL=postgres://user:password@db-host:5432/unleash
+          - UNLEASH_LICENSE=<your-license-key>
+          # ... other service config
+    ```
+    </CodeBlock>
+    <CodeBlock title="Docker CLI">
+    ```shell
+    docker run -p 4242:4242 \
+      -e DATABASE_URL=postgres://user:password@db-host:5432/unleash \
+      -e UNLEASH_LICENSE=<your-license-key> \
+      unleashorg/unleash-enterprise:<version>
+    ```
+    </CodeBlock>
+    </CodeBlocks>
+
+    If you deploy with the [Helm chart](https://github.com/Unleash/helm-charts), update the image references in your values file. The chart's defaults point to the open-source image.
+  </Step>
+  <Step>
+    Provide the license key. Set it as the `UNLEASH_LICENSE` environment variable, stored as a secret in your deployment tooling, or paste it into **Admin settings > Instance config > License** after the instance starts. Until a valid license is installed, the instance runs in read-only mode and the only available action is to add the license. See [license keys](/deploy/license-keys) for seat counts, expiration, and renewals.
+  </Step>
+  <Step>
+    Restart the instance and verify the upgrade. Log in with your existing credentials, go to **Admin settings > Instance config > License**, and check that your plan, seat count, and expiration date are shown. In **Configure > Applications**, confirm that your SDKs still report in.
+  </Step>
+</Steps>
+
+### Set up Enterprise capabilities
+
+Your applications need no changes. Once the instance runs the Enterprise image, you can start using the capabilities that open-source Unleash does not include:
+
+- [Single sign-on](/concepts/sso) and [SCIM provisioning](/concepts/scim), so your team signs in through your identity provider.
+- Additional [projects](/concepts/projects) and [environments](/concepts/environments). Open-source instances are limited to one project and two environments, so this is usually the first thing teams change. See [organize feature flags](/guides/organize-feature-flags) for guidance.
+- Project roles, custom roles, and user groups through [role-based access control](/concepts/rbac), and [change requests](/concepts/change-requests) for approval workflows.
+- [Unleash Enterprise Edge](/unleash-edge) for scaling SDK traffic and serving frontend applications.
+- [Service accounts](/concepts/service-accounts) for automation and the [Terraform provider](/integrate/terraform) for instance configuration as code.
+
+The [user management and access controls](/guides/user-management-access-controls) guide walks through authentication, roles, and auditing for an Enterprise instance.
+
+## Migrate to Unleash Cloud
+
+Unleash Cloud is a new instance with a new URL, so the migration moves configuration from your open-source instance into it rather than upgrading in place. The work falls into four areas: setting up the instance, bringing your users, moving flag configuration, and reconnecting your applications and integrations. Your applications keep working against the open-source instance until you move them, so there is no downtime.
+
+The table shows what carries over and how:
+
+| Item | How it gets to Unleash Cloud |
+|---|---|
+| Feature flags, their state per environment, [activation strategies](/concepts/activation-strategies), constraints, [strategy variants](/concepts/strategy-variants), and tags | [Export and import](/concepts/import-export) per environment |
+| [Custom context fields](/concepts/unleash-context#custom-context-fields) and tag types | Included in the export and import |
+| [Segments](/concepts/segments) and [custom activation strategies](/concepts/custom-activation-strategies) | Create them in Unleash Cloud before you import. The export contains only references to them. |
+| [Projects](/concepts/projects) and [environments](/concepts/environments) | Create them in Unleash Cloud before you import |
+| Users, roles, and groups | Add through [single sign-on](/concepts/sso), [SCIM](/concepts/scim), invitations, or manually |
+| [API tokens](/concepts/api-tokens-and-client-keys) | Create new tokens in Unleash Cloud |
+| SDK and [Unleash Edge](/unleash-edge) connections | Point them at the new URL with the new tokens |
+| [Integrations](/integrate) and webhooks | Configure them again in Unleash Cloud |
+| Event log, flag metrics, and impression history | Stay with your open-source instance. Keep a [database backup](/deploy/configuring-unleash#back-up-and-restore-the-database) if you need them for auditing. |
+
+<Tip>
+An AI coding assistant such as [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), or [Cursor](/integrate/cursor) can take over much of the mechanical work. Ask it to find every place in your codebases, Helm values, and CI configuration where the Unleash URL and API tokens are set, to script the export and import against the [Admin API](/api) when you have more flags than fit in one file, and to compare [Playground](/concepts/playground) results between the two instances. With the [Unleash MCP server](/integrate/mcp) connected, the assistant can also list the projects and flags on your Unleash Cloud instance to verify that the import is complete. Review the resulting changes before you deploy them.
+</Tip>
+
+### Prerequisites
+
+- An Unleash Cloud instance. [Start a pay-as-you-go plan or free trial](https://www.getunleash.io/plans/enterprise-payg), or ask your account representative for an instance on an annual contract. The person who signs up becomes the first Admin.
+- Admin access to your open-source instance, to export flags and to read the configuration you need to recreate.
+- A list of the applications, Edge instances, CI jobs, and integrations that connect to your open-source instance. **Configure > Applications** on the open-source instance shows the SDKs that currently report in.
+
+### Set up the new instance
+
+Create the structure that your flags depend on before you import anything. Imports validate against the target instance and stop when a referenced segment, custom strategy, or context field is missing.
+
+<Steps>
+  <Step>
+    Create the environments you need. New Unleash Cloud instances come with **development** and **production**. If your open-source instance was created before Unleash 4.3, it may also use an environment called **default**. Either create a matching environment in Unleash Cloud or decide which environment its configuration moves into.
+  </Step>
+  <Step>
+    Decide on projects. Your open-source instance has a single project, and your Unleash Cloud instance also starts with a project called **default**. You can import everything into that project and [move flags between projects](/concepts/projects#move-a-feature-flag-between-projects) later, or create your target projects first and import a filtered selection of flags into each one. Flag names are unique across an instance, so splitting flags across projects needs no renaming. See [organize feature flags](/guides/organize-feature-flags) for how to choose a project structure.
+  </Step>
+  <Step>
+    Recreate [custom context fields](/concepts/unleash-context#custom-context-fields) that define legal values. Context fields are included in the export, but when legal values are involved the matching field must already exist in the target with at least the same legal values.
+  </Step>
+  <Step>
+    Recreate [segments](/concepts/segments) and [custom activation strategies](/concepts/custom-activation-strategies) with the same names as on your open-source instance. The export references them by name only. For custom strategies, keep the parameter names identical, because the import checks only the strategy name.
+  </Step>
+  <Step>
+    Leave [change requests](/concepts/change-requests) disabled until the import is complete. If change requests are enabled for the target environment, the import lands in a draft change request that needs approval instead of applying directly.
+  </Step>
+</Steps>
+
+<Tip>
+If you plan to use the [Terraform provider](/integrate/terraform), this is a good moment to start. Define projects, environments, context fields, roles, and single sign-on as code, apply it to the new instance, and keep the configuration in version control.
+</Tip>
+
+### Bring your users
+
+User accounts are specific to an instance, so your team needs accounts on Unleash Cloud. Pick whichever of these fits how your organization manages identities:
+
+- [Single sign-on](/concepts/sso) with SAML 2.0 or OpenID Connect. Select **Auto-create users** in the single sign-on configuration so team members get an account with a default root role the first time they sign in. This is how most teams moving to Unleash Cloud onboard their users, and it removes the need to recreate accounts by hand.
+- [SCIM provisioning](/concepts/scim) from Okta or Microsoft Entra ID, if you want user groups and group membership to sync from your identity provider as well.
+- [Public invite links](/concepts/public-signup), which let anyone with the link sign up with the Viewer role.
+- Manual creation in **Admin settings > User config > Users**, for small teams.
+
+After users exist, assign roles. The open-source Admin, Editor, and Viewer roles exist in Unleash Enterprise as [predefined root roles](/concepts/rbac#predefined-roles), so you can map your current assignments one to one. Enterprise adds project roles, custom roles, and user groups, which you can introduce once the migration is done.
+
+### Move your flag configuration
+
+Export and import work per environment: one export file contains the flags you selected with their configuration in one environment. Repeat the cycle for each environment you use.
+
+<Steps>
+  <Step>
+    On your open-source instance, go to **Flags overview** and click **Export flags**. Select the environment to export from and click **Export selection**. To import different groups of flags into different projects, filter or select the flags first and export each group separately.
+  </Step>
+  <Step>
+    On your Unleash Cloud instance, open the target project and click **Import**. Select the target environment, upload the exported JSON file, and click **Validate**.
+  </Step>
+  <Step>
+    Resolve any validation errors. Errors about segments, custom strategies, context fields, or legal values mean something is missing on the target. Create it and restart the import. See the full list of [validation rules](/concepts/import-export#validation-rules).
+  </Step>
+  <Step>
+    Click **Import configuration**, then repeat for the next environment with a fresh export from your open-source instance.
+  </Step>
+  <Step>
+    Verify a sample of flags with the [Playground](/concepts/playground) on both instances, using the same context, and compare the results.
+  </Step>
+</Steps>
+
+Keep these constraints in mind:
+
+- Import files are limited to 500 kB. If an export is larger, [export in batches](/concepts/import-export#export-a-selection-of-flags-from-a-project).
+- A flag that already exists in a different project on the target is rejected. Import each flag into only one project.
+- Archived flags on the target block imports of flags with the same name. Delete or revive them first.
+- Importing a flag that already exists in the target project overwrites its configuration, so you can re-run an import if flags changed on the open-source instance after your first export.
+
+To script the transfer, use the [export](/api/export-features) and [import](/api/import-toggles) endpoints of the Admin API with a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) on each instance. The [instance synchronization script](/deploy/how-to-synchronize-unleash-instances) shows a complete example that exports from one instance and imports into another by tag and environment.
+
+<Warning>
+Make Unleash Cloud the only place where flags change from the moment you start importing. If a change still has to happen on the open-source instance during the transition, export and import that environment again so the two instances stay identical until every application has moved.
+</Warning>
+
+### Reconnect your applications
+
+API tokens belong to the instance that issued them, so every SDK, Edge instance, and script needs a new token and the new URL. [Unleash Cloud](/support/availability#plans) issues [secure tokens](/concepts/api-tokens-and-client-keys#token-versions), which are shown once at creation, so copy each token into your secrets manager immediately.
+
+<Steps>
+  <Step>
+    Create new [API tokens](/concepts/api-tokens-and-client-keys#create-an-api-token) in **Admin settings > Access control > API access**: backend tokens for backend SDKs and frontend tokens for frontend SDKs, scoped to the projects and environments each application uses. If you want the tokens to be independent of any individual user, create them under a [service account](/concepts/service-accounts).
+  </Step>
+  <Step>
+    Decide whether your SDKs connect to the Unleash API directly or through [Unleash Enterprise Edge](/unleash-edge). Edge is the recommended way to serve frontend SDKs and high SDK volumes. If you run Edge yourself, point its `UPSTREAM_URL` at the new instance and give it the new backend tokens, as described in [hosting options](/deploy/hosting-options#hybrid).
+  </Step>
+  <Step>
+    Update each application's SDK configuration with the new URL and token. Backend SDKs use the `/api` path of your Unleash Cloud instance, for example `https://<your-instance>.app.unleash-hosted.com/api`, or your Edge URL. Frontend SDKs use the `/api/frontend` path. The flag names, context fields, and evaluation code stay the same.
+  </Step>
+  <Step>
+    Deploy the applications one at a time and check **Configure > Applications** on the Unleash Cloud instance to confirm that each one reports in. Because both instances hold the same flag configuration, an application that has not moved yet keeps working against the open-source instance.
+  </Step>
+  <Step>
+    Reconnect [integrations](/integrate) such as Slack, Datadog, Jira, and webhooks, and update any CI jobs or scripts that call the Admin API. If you manage configuration with Terraform, point the provider at the new instance and import the resources you created into state.
+  </Step>
+</Steps>
+
+### Decommission the open-source instance
+
+When **Configure > Applications** on the open-source instance shows no active SDKs, take a final [database backup](/deploy/configuring-unleash#back-up-and-restore-the-database) to retain the event log and metrics history, then shut the instance down. Revoke its API tokens first if you want to be certain that no forgotten client can keep reading flags from it.
+
+## Key takeaways
+
+- If you keep self-hosting, switch to the `unleashorg/unleash-enterprise` image and add a license key. Your data, users, tokens, and SDK connections carry over unchanged.
+- If you move to Unleash Cloud, create segments, custom strategies, context fields, projects, and environments first, then import flags per environment.
+- Bring users through single sign-on with auto-created accounts or SCIM provisioning rather than recreating them by hand.
+- Every SDK, Edge instance, and script needs a new token and the new URL. Move applications one at a time while both instances hold the same configuration.
+- Freeze flag changes on the open-source instance once you start importing, or re-import after each change.
+- Keep a final database backup of the open-source instance for its event log and metrics history.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Do I lose any data when I switch a self-hosted instance to the Enterprise image?">
+    No. The Enterprise image uses the same database schema as the open-source image, so flags, strategies, users, API tokens, event history, and metrics all stay in place. Take a backup before you switch, as you would for any upgrade.
+  </Accordion>
+  <Accordion title="Can I move my users from Unleash Open Source to Unleash Cloud?">
+    Users are created on the new instance rather than transferred. The fastest way is [single sign-on](/concepts/sso) with **Auto-create users** enabled, so each team member gets an account on first sign-in, optionally combined with [SCIM](/concepts/scim) for group sync. For small teams, [invite links](/concepts/public-signup) or manual creation work as well.
+  </Accordion>
+  <Accordion title="Do I need to change my application code when moving to Unleash Cloud?">
+    Only the SDK configuration changes: the Unleash URL and the API token. Flag names, context fields, and evaluation calls stay the same. If you run [Unleash Edge](/unleash-edge), update its upstream URL and tokens as well.
+  </Accordion>
+  <Accordion title="Will the same users be in my percentage rollouts after the migration?">
+    Yes. Unleash uses the same hashing for rollout buckets in every edition and hosting model, so a user's position in a gradual rollout is unchanged as long as the flag name and [stickiness](/concepts/stickiness) stay the same.
+  </Accordion>
+  <Accordion title="Why does the import stop with an error about segments or strategies?">
+    The export contains references to [segments](/concepts/segments) and [custom activation strategies](/concepts/custom-activation-strategies) by name, not their definitions. Create them on the Unleash Cloud instance with the same names and run the import again. See the [validation rules](/concepts/import-export#validation-rules).
+  </Accordion>
+  <Accordion title="Can I use export and import to move between two self-hosted instances?">
+    Yes, the same steps apply. For a full-fidelity move of a self-hosted instance to new infrastructure, a database [dump and restore](/deploy/configuring-unleash#migrate-an-instance) is simpler, because it also carries users, tokens, and history.
+  </Accordion>
+  <Accordion title="I already run self-hosted Unleash Enterprise. How do I move to Unleash Cloud?">
+    Follow the [Unleash Cloud path](#migrate-to-unleash-cloud) in this guide. The steps are the same, with more to recreate up front if you use multiple projects, additional environments, or [release templates](/concepts/release-templates), which are not part of the export.
+  </Accordion>
+</AccordionGroup>

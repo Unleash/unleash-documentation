@@ -860,12 +860,19 @@ navigation:
           - page: Feature flags for migrations and modernization
             path: pages/guides/feature-flags-for-migrations.mdx
             slug: feature-flags-for-migrations
-          - page: Migrating to Unleash
-            path: pages/guides/feature-flag-migration-best-practices.mdx
-            slug: feature-flag-migration-best-practices
           - page: Managing large constraints
             path: pages/guides/managing-constraints.mdx
             slug: managing-constraints
+
+      - section: Migration guides
+        skip-slug: true
+        contents:
+          - page: Migrating to Unleash
+            path: pages/guides/feature-flag-migration-best-practices.mdx
+            slug: feature-flag-migration-best-practices
+          - page: Migrating from Open Source to Enterprise
+            path: pages/guides/migrate-from-open-source.mdx
+            slug: migrate-from-open-source
 
       - section: Development and release workflows
         skip-slug: true
