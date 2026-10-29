@@ -115,7 +115,7 @@ The table shows what carries over and how:
 | [API tokens](/concepts/api-tokens-and-client-keys) | Create new tokens in Unleash Cloud |
 | SDK and [Unleash Edge](/unleash-edge) connections | Point them at the new URL with the new tokens |
 | [Integrations](/integrate) and webhooks | Configure them again in Unleash Cloud |
-| Event log, flag metrics, and impression history | Stay with your open-source instance. Keep a [database backup](/deploy/configuring-unleash#back-up-and-restore-the-database) if you need them for auditing. |
+| Event log and flag metrics | Stay with your open-source instance. Keep a [database backup](/deploy/configuring-unleash#back-up-and-restore-the-database) if you need them for auditing. [Impression data](/concepts/impression-data) lives in your own analytics tooling and is unaffected. |
 
 <Tip>
 An AI coding assistant such as [Claude Code](/integrate/claude-code), [GitHub Copilot](/integrate/github-copilot), or [Cursor](/integrate/cursor) can take over much of the mechanical work. Ask it to find every place in your codebases, Helm values, and CI configuration where the Unleash URL and API tokens are set, to script the export and import against the [Admin API](/api) when you have more flags than fit in one file, and to compare [Playground](/concepts/playground) results between the two instances. With the [Unleash MCP server](/integrate/mcp) connected, the assistant can also list the projects and flags on your Unleash Cloud instance to verify that the import is complete. Review the resulting changes before you deploy them.
@@ -196,7 +196,7 @@ Keep these constraints in mind:
 To script the transfer, use the [export](/api/export-features) and [import](/api/import-toggles) endpoints of the Admin API with a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) on each instance. The [instance synchronization script](/deploy/how-to-synchronize-unleash-instances) shows a complete example that exports from one instance and imports into another by tag and environment.
 
 <Warning>
-Make Unleash Cloud the only place where flags change from the moment you start importing. If a change still has to happen on the open-source instance during the transition, export and import that environment again so the two instances stay identical until every application has moved.
+Freeze flag changes while applications move, if you can. Until the last application has moved, some of them still read from the open-source instance, so a change made only in Unleash Cloud never reaches them. If a change cannot wait, such as disabling a flag in an incident, make it on the open-source instance and then export and import the affected environment again, so both instances serve the same configuration. Avoid editing flags in Unleash Cloud during this window, because the next import overwrites them.
 </Warning>
 
 ### Reconnect your applications
@@ -205,10 +205,10 @@ API tokens belong to the instance that issued them, so every SDK, Edge instance,
 
 <Steps>
   <Step>
-    Create new [API tokens](/concepts/api-tokens-and-client-keys#create-an-api-token) in **Admin settings > Access control > API access**: backend tokens for backend SDKs and frontend tokens for frontend SDKs, scoped to the projects and environments each application uses. If you want the tokens to be independent of any individual user, create them under a [service account](/concepts/service-accounts).
+    Create new [API tokens](/concepts/api-tokens-and-client-keys#create-an-api-token) in **Admin settings > Access control > API access**: backend tokens for backend SDKs and frontend tokens for frontend SDKs, scoped to the projects and environments each application uses.
   </Step>
   <Step>
-    Decide whether your SDKs connect to the Unleash API directly or through [Unleash Enterprise Edge](/unleash-edge). Edge is the recommended way to serve frontend SDKs and high SDK volumes. If you run Edge yourself, point its `UPSTREAM_URL` at the new instance and give it the new backend tokens, as described in [hosting options](/deploy/hosting-options#hybrid).
+    Decide whether your SDKs connect to the Unleash API directly or through [Unleash Enterprise Edge](/unleash-edge). Edge is the recommended way to serve frontend SDKs and high SDK volumes. If you already run Edge against the open-source instance, leave it in place and start a second Edge instance with its `UPSTREAM_URL` set to Unleash Cloud and the new backend tokens, as described in [hosting options](/deploy/hosting-options#hybrid). Edge validates tokens against its upstream, so an Edge pointed at Unleash Cloud rejects the tokens that applications still on the open-source instance use. Retire the old Edge once no application connects to it.
   </Step>
   <Step>
     Update each application's SDK configuration with the new URL and token. Backend SDKs use the `/api` path of your Unleash Cloud instance, for example `https://<your-instance>.app.unleash-hosted.com/api`, or your Edge URL. Frontend SDKs use the `/api/frontend` path. The flag names, context fields, and evaluation code stay the same.
@@ -217,7 +217,7 @@ API tokens belong to the instance that issued them, so every SDK, Edge instance,
     Deploy the applications one at a time and check **Configure > Applications** on the Unleash Cloud instance to confirm that each one reports in. Because both instances hold the same flag configuration, an application that has not moved yet keeps working against the open-source instance.
   </Step>
   <Step>
-    Reconnect [integrations](/integrate) such as Slack, Datadog, Jira, and webhooks, and update any CI jobs or scripts that call the Admin API. If you manage configuration with Terraform, point the provider at the new instance and import the resources you created into state.
+    Reconnect [integrations](/integrate) such as Slack, Datadog, Jira, and webhooks, and update any CI jobs or scripts that call the Admin API. Give those scripts a token from a [service account](/concepts/service-accounts), so the automation is independent of any individual user. If you manage configuration with Terraform, point the provider at the new instance and import the resources you created into state.
   </Step>
 </Steps>
 
@@ -231,7 +231,7 @@ When **Configure > Applications** on the open-source instance shows no active SD
 - If you move to Unleash Cloud, create segments, custom strategies, context fields, projects, and environments first, then import flags per environment.
 - Bring users through single sign-on with auto-created accounts or SCIM provisioning rather than recreating them by hand.
 - Every SDK, Edge instance, and script needs a new token and the new URL. Move applications one at a time while both instances hold the same configuration.
-- Freeze flag changes on the open-source instance once you start importing, or re-import after each change.
+- Freeze flag changes while applications move. If a change cannot wait, make it on the open-source instance and import the environment again, so applications on both instances see the same configuration.
 - Keep a final database backup of the open-source instance for its event log and metrics history.
 
 ## Frequently asked questions
@@ -244,7 +244,7 @@ When **Configure > Applications** on the open-source instance shows no active SD
     Users are created on the new instance rather than transferred. The fastest way is [single sign-on](/concepts/sso) with **Auto-create users** enabled, so each team member gets an account on first sign-in, optionally combined with [SCIM](/concepts/scim) for group sync. For small teams, [invite links](/concepts/public-signup) or manual creation work as well.
   </Accordion>
   <Accordion title="Do I need to change my application code when moving to Unleash Cloud?">
-    Only the SDK configuration changes: the Unleash URL and the API token. Flag names, context fields, and evaluation calls stay the same. If you run [Unleash Edge](/unleash-edge), update its upstream URL and tokens as well.
+    Only the SDK configuration changes: the Unleash URL and the API token. Flag names, context fields, and evaluation calls stay the same. If you run [Unleash Edge](/unleash-edge), start a second Edge instance connected to Unleash Cloud and move applications to it together with their new tokens.
   </Accordion>
   <Accordion title="Will the same users be in my percentage rollouts after the migration?">
     Yes. Unleash uses the same hashing for rollout buckets in every edition and hosting model, so a user's position in a gradual rollout is unchanged as long as the flag name and [stickiness](/concepts/stickiness) stay the same.
