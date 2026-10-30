@@ -2,14 +2,14 @@
 title: License keys
 og:title: License keys
 og:site_name: Unleash
-description: "Set up Unleash Enterprise license keys for self-hosted deployments, activation, renewal, refresh, removal, and offline use."
-last-updated: May 11, 2026
+description: "Get and manage Unleash Enterprise license keys for self-hosted trials and instances in License Hub, install them in Unleash, and understand seat count and expiration enforcement."
+last-updated: October 30, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v5.8</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
 
-Self-hosted Unleash Enterprise uses license keys to ensure you comply with the terms of your contract.
+Self-hosted Unleash Enterprise uses license keys to ensure you comply with the terms of your contract. You get and manage license keys for your self-hosted trials and instances in [License Hub](https://license.getunleash.io).
 
 ## License policy
 
@@ -43,13 +43,38 @@ If you reach the maximum number of seats included in your license, you cannot ad
 
 The Unleash Admin UI displays a banner if you do not comply with your license. In addition, you receive a warning in advance if less than 10% of your available seats remain, your license is 30 days or less from expiration, or if you are running on a trial license.
 
+## License Hub
+
+[License Hub](https://license.getunleash.io) is where you manage the license keys for your self-hosted Unleash Enterprise instances. Sign in with Google, GitHub, or your email address. Your License Hub account belongs to your company, and everyone who is a license manager for the company sees the same licenses.
+
+License Hub has two tabs:
+
+- **Licenses**: lists your instances. Each instance has a license with its plan, status, seat count, creation date, expiry date, and license key. The page also walks you through starting Unleash, logging in, and installing the license.
+- **License Managers**: lists the people who can manage your company's licenses and invoices. License managers do not get access to the Unleash instances themselves.
+
+### Start a trial
+
+To try self-hosted Unleash Enterprise, [sign up for License Hub](https://license.getunleash.io/sign-up). License Hub creates a company account and a trial license for your first instance. The license card shows how many days are left on the trial and the number of seats it includes.
+
+To upgrade a trial to a paid plan, click **Upgrade to paid plan** on the license card.
+
+### Add an instance
+
+Each Unleash instance needs its own license key. To license another instance, such as a production instance alongside your development instance, go to the **Licenses** tab and click **Add new instance**. Click **Edit** on an instance to change its name.
+
+### Get your license key
+
+In the **Licenses** tab, find the instance and click **Copy** next to **License key**. Then [install the key](#update-your-license) in your Unleash instance.
+
+### Add a license manager
+
+To let a colleague manage your company's licenses and invoices, go to the **License Managers** tab, enter their email address, and click **Add license manager**. The table shows when each license manager joined and when they last logged in.
+
 ## Get a new license
 
-If you are a new customer, your account representative will provide the required license key as part of your self-hosted instance onboarding.
+If you are starting out or adding an instance, get your license key from [License Hub](#license-hub).
 
-If you are an existing customer and are making changes to your agreement (changing seat count or the contract expiration), contact your account representative to obtain the required license key.
-
-Alternatively, you can reach out to license@getunleash.io.
+If you have an existing contract and are changing your agreement, such as the seat count or the contract expiration, contact your account representative to obtain the required license key. You can also reach out to license@getunleash.io.
 
 ## Check your current license
 
