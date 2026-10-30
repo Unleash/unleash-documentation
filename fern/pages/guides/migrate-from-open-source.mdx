@@ -43,7 +43,7 @@ The Enterprise Docker image runs against the same PostgreSQL database as the ope
 ### Prerequisites
 
 - A [license key](/deploy/license-keys#get-a-new-license). You receive one as part of your Enterprise trial or from your account representative.
-- Admin access to the instance and to the environment that runs it, such as your Docker host, Docker Compose file, or Helm values.
+- Access to the environment that runs the instance, such as your Docker host, Docker Compose file, or Helm values, to change the image and set the `UNLEASH_LICENSE` environment variable. If you prefer to install the license through the Admin UI instead, you also need Admin access to the instance.
 - A recent [backup of your Unleash database](/deploy/configuring-unleash#back-up-and-restore-the-database).
 
 ### Switch to the Enterprise image
@@ -95,7 +95,7 @@ Your applications need no changes. Once the instance runs the Enterprise image, 
 - Additional [projects](/concepts/projects) and [environments](/concepts/environments). Open-source instances are limited to one project and two environments, so this is usually the first thing teams change. See [organize feature flags](/guides/organize-feature-flags) for guidance.
 - Project roles, custom roles, and user groups through [role-based access control](/concepts/rbac), and [change requests](/concepts/change-requests) for approval workflows.
 - [Unleash Enterprise Edge](/unleash-edge) for scaling SDK traffic and serving frontend applications.
-- [Service accounts](/concepts/service-accounts) for automation and the [Terraform provider](/integrate/terraform) for instance configuration as code.
+- [Service accounts](/concepts/service-accounts), so scripts and the [Terraform provider](/integrate/terraform) run with their own identity instead of a personal access token.
 
 The [user management and access controls](/guides/user-management-access-controls) guide walks through authentication, roles, and auditing for an Enterprise instance.
 
@@ -170,7 +170,7 @@ Export and import work per environment: one export file contains the flags you s
 
 <Steps>
   <Step>
-    On your open-source instance, go to **Flags overview** and click **Export flags**. Select the environment to export from and click **Export selection**. To import different groups of flags into different projects, filter or select the flags first and export each group separately.
+    On your open-source instance, open your project and click **Export all project flags**. Select the environment to export from and click **Export selection**. This exports every flag in the project. To import different groups of flags into different projects, or to stay under the import file size limit, [export a selection of flags](/concepts/import-export#export-a-selection-of-flags-from-a-project) instead and repeat per group. Each selection is limited to 100 flags, the maximum page size.
   </Step>
   <Step>
     On your Unleash Cloud instance, open the target project and click **Import**. Select the target environment, upload the exported JSON file, and click **Validate**.
@@ -196,7 +196,7 @@ Keep these constraints in mind:
 To script the transfer, use the [export](/api/export-features) and [import](/api/import-toggles) endpoints of the Admin API with a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) on each instance. The [instance synchronization script](/deploy/how-to-synchronize-unleash-instances) shows a complete example that exports from one instance and imports into another by tag and environment.
 
 <Warning>
-Freeze flag changes while applications move, if you can. Until the last application has moved, some of them still read from the open-source instance, so a change made only in Unleash Cloud never reaches them. If a change cannot wait, such as disabling a flag in an incident, make it on the open-source instance and then export and import the affected environment again, so both instances serve the same configuration. Avoid editing flags in Unleash Cloud during this window, because the next import overwrites them.
+Freeze flag changes while applications move, if you can. Until the last application has moved, some of them still read from the open-source instance, so a change made only in Unleash Cloud never reaches them. [Maintenance mode](/concepts/maintenance-mode) enforces the freeze by putting an instance into read-only mode without affecting SDKs. If a change cannot wait, such as disabling a flag in an incident, make it on the open-source instance and then export and import the affected environment again, so both instances serve the same configuration. Avoid editing flags in Unleash Cloud during this window, because the next import overwrites them.
 </Warning>
 
 ### Reconnect your applications
