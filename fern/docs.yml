@@ -1020,6 +1020,14 @@ navigation:
               - page: Advanced Ruby on Rails examples
                 path: pages/guides/language-specific-tutorials/rails/rails-examples.mdx
 
+      - section: Workshops
+        skip-slug: true
+        hidden: true
+        contents:
+          - page: Runtime control with AI, Java edition
+            path: pages/guides/embeddr-workshop-java.mdx
+            hidden: true
+
   - tab: learning-lab
     layout:
       - page: Unleash Learning Lab
