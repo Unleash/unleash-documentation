@@ -181,7 +181,7 @@ Before you start, make sure you have the following:
 - An Unleash instance: Hosted or self-hosted.
 - A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens): The server acts with the permissions of the user who owns the token. In Unleash, create one under **Profile** > **View profile settings** > **Personal API tokens**.
 
-### Add the server to your client
+### Add the MCP server to your client
 
 For Claude Code, run the following command from the project where you want to use the server:
 
@@ -201,7 +201,7 @@ codex mcp add unleash \
     -- npx -y @unleash/mcp@latest
 ```
 
-For clients configured with JSON, add the server to the client's MCP servers:
+For clients configured with JSON, add the MCP server to the client's MCP servers:
 
 ```json
 {
@@ -352,7 +352,7 @@ AI agents can make mistakes. When you turn on [change requests](/concepts/change
 
 - Tools that change an environment, such as `releases`, `kill switches`, and `experiments`, put the change into a change request instead of applying it.
 - The agent receives the change request ID, its state, and a link to it in the Unleash UI. It passes the link to you.
-- You review and approve the change request in Unleash. The server can't approve it. Approval is the one step intentionally left to a human.
+- You review, approve, and apply or schedule the change request in Unleash. The server can't approve or apply it. These steps remain with a human, intentionally.
 - When the agent inspects a flag, it sees pending change requests, so it doesn't mistake a waiting change for an applied one or request it again.
 
 You don't have to ask the agent to create a change request.
