@@ -206,6 +206,8 @@ When running in [Offline mode](#modes-of-operation), there is no upstream instan
 
 If migrating from the legacy Unleash Proxy, you can use `PRETRUSTED_TOKENS` to support legacy secrets (for example, `secret-123@development`) without updating your frontend clients.
 
+Clients send only the secret (`Authorization: secret-123`); the `@development` suffix maps it to an environment in Edge's configuration. Use this as a temporary migration step, then replace the secret with an Unleash-issued frontend token and remove the pretrusted entry. See [Keep existing Proxy secrets during migration](/unleash-edge/migrate-from-proxy#keep-existing-proxy-secrets-during-migration) for the tradeoffs and migration steps.
+
 Note: You must still provide a standard backend token via `TOKENS` that covers the same environment. This ensures Edge can fetch the feature data required by the legacy token.
 
 ## Health and readiness
