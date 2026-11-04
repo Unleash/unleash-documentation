@@ -801,3 +801,12 @@ body::after {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+/* Lists inside table cells, such as the citation lists on compliance pages.
+   Fern renders lists with outside markers and no left padding, so inside a
+   table cell the markers hang into the cell gutter. Indent them so wrapped
+   items align, and drop the bottom margin Fern adds after lists. */
+.fern-layout-guide td ol,
+.fern-layout-guide td ul {
+    padding-left: 1.4em;
+    margin: 0.25em 0 0;
+}
