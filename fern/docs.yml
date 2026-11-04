@@ -343,6 +343,9 @@ navigation:
               - page: EU AI Act
                 path: pages/privacy-and-compliance/eu-ai-act.mdx
                 slug: eu-ai-act
+              - page: OCC
+                path: pages/privacy-and-compliance/occ.mdx
+                slug: occ
 
       - section: Support and community
         skip-slug: true
