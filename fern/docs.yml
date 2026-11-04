@@ -343,6 +343,12 @@ navigation:
               - page: EU AI Act
                 path: pages/privacy-and-compliance/eu-ai-act.mdx
                 slug: eu-ai-act
+              - page: OCC
+                path: pages/privacy-and-compliance/occ.mdx
+                slug: occ
+              - page: NIST
+                path: pages/privacy-and-compliance/nist.mdx
+                slug: nist
 
       - section: Support and community
         skip-slug: true

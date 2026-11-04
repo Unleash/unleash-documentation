@@ -1,0 +1,159 @@
+---
+title: NIST CSF 2.0 and AI RMF compliance for feature flags
+description: Map NIST CSF 2.0 and AI RMF outcomes to Unleash Enterprise controls for change control, access, monitoring, incident response, supplier risk, and AI governance.
+keywords: [NIST, NIST CSF 2.0, Cybersecurity Framework, CSWP 29, AI RMF, AI Risk Management Framework, NIST AI 100-1, NIST AI 600-1, Generative AI Profile, supply chain risk management, AI governance, change management, feature flags, Unleash Enterprise]
+og:site_name: Unleash
+og:title: NIST CSF 2.0 and AI RMF compliance for feature flags
+max-toc-depth: 2
+last-updated: November 4, 2026
+---
+
+## Overview
+
+The [NIST Cybersecurity Framework](https://csrc.nist.gov/pubs/cswp/29/the-nist-cybersecurity-framework-csf-20/final) (CSF) 2.0 is a voluntary framework that many security teams use to organize their controls and assess vendors. The [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) (AI RMF 1.0) plays the same role for AI systems. Neither is a certification: an organization aligns its own program to the framework and asks suppliers to show which outcomes their products support.
+
+A feature management platform touches a specific set of CSF outcomes: change control for production applications, the identities and permissions that decide who can change production behavior, log records, and the fastest way to contain a faulty feature. For AI features, it is the mechanism the AI RMF asks for to supersede, disengage, or deactivate a system that is not behaving as intended.
+
+This guide outlines how [Unleash Enterprise](https://www.getunleash.io/pricing) features align with those outcomes. For a summary of all frameworks, see the [compliance overview](/privacy-and-compliance/compliance-overview). For the NIST SP 800-53 control families, see [FedRAMP compliance](/privacy-and-compliance/fedramp).
+
+## Which documents this page covers
+
+The following table lists the NIST documents that the mappings on this page cite.
+
+<StickyTable>
+| Document | What it is |
+|----------|------------|
+| NIST Cybersecurity Framework (CSF) 2.0 (NIST CSWP 29) | Six functions (Govern, Identify, Protect, Detect, Respond, Recover) broken into categories and subcategories. The subcategory IDs cited on this page, such as PR.PS-01, are the outcomes an organization maps its controls to. Published February 26, 2024, replacing CSF 1.1. |
+| NIST AI Risk Management Framework (AI RMF 1.0) (NIST AI 100-1) | Four functions (Govern, Map, Measure, Manage) with numbered subcategories, such as MANAGE 2.4, for managing risk across the AI lifecycle. Published January 26, 2023. NIST is revising the AI RMF as part of the July 2025 AI Action Plan; this page maps to AI RMF 1.0. |
+| Generative Artificial Intelligence Profile (NIST AI 600-1) | A companion to the AI RMF that lists generative AI risks and suggested actions, keyed to AI RMF subcategories. Published July 26, 2024. |
+</StickyTable>
+
+## How Unleash features map to CSF 2.0 outcomes
+
+The following tables are organized by CSF function. Each row names the outcome, the subcategories it comes from, and the Unleash feature that supports it.
+
+Unleash provides controls and evidence for the parts of each outcome that concern the feature management platform itself. You meet the rest through your own cybersecurity program.
+
+### Govern: supply chain risk management
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| Supplier criticality and due diligence: GV.SC-04, GV.SC-06, ID.RA-10 | Suppliers are known and prioritized by criticality, and planning and due diligence are performed before a supplier relationship begins. | The [SOC 2 Type II](/privacy-and-compliance/soc2) report, penetration test summaries, 14 security policies, and the Unleash compliance mappings support due diligence. These include this page and the [ISO 27001](/privacy-and-compliance/iso27001), [FedRAMP](/privacy-and-compliance/fedramp), and [DORA](/privacy-and-compliance/dora) mappings. The open-source codebase allows direct code inspection, and self-hosting removes the hosted service from the supplier dependency entirely. |
+| Supplier requirements and lifecycle monitoring: GV.SC-05, GV.SC-07, DE.CM-06 | Cybersecurity requirements are built into supplier contracts, and supplier risk is assessed and monitored over the life of the relationship. | Enterprise agreements cover hosting region, SLAs, security commitments, incident notification, and termination assistance. Unleash renews its SOC 2 Type II report annually, and a third party performs penetration tests annually, with results available through the Trust Center. |
+| Suppliers in incident planning and exit: GV.SC-08, GV.SC-10 | Relevant suppliers are included in incident planning, response, and recovery, and supply chain plans cover activities after the relationship ends. | Unleash provides incident response commitments to hosted customers through the Trust Center. Unleash is built on an open-source core under the AGPLv3 license. Configuration is exportable through the [API](/api) and [import and export](/concepts/import-export), and the hosted and self-hosted editions run the same software, so a migration from hosted to self-hosted does not require a rewrite of application code. Moving away from Unleash entirely requires replacing the SDK integration, unless your applications use the OpenFeature API through an [Unleash OpenFeature provider](/sdks/openfeature), in which case you replace the provider. |
+</StickyTable>
+
+### Identify: asset management
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| Inventory and lifecycle of software and services: ID.AM-02, ID.AM-08 | Inventories of software, services, and systems are maintained, and they are managed throughout their life cycles. | Every [feature flag](/concepts/feature-flags) is an inventoried item with an owning [project](/concepts/projects), a type, and a [lifecycle stage](/concepts/feature-flags#lifecycle-stages). [Technical debt](/concepts/technical-debt) reporting shows stale and potentially stale flags, so you remove temporary changes rather than let them accumulate in production. [Applications](/concepts/applications) show which services connect to Unleash and which projects' flags they use, and the [Network](/concepts/network-view) dashboards show incoming traffic from SDKs and Unleash Edge. |
+| Integrity of software before use: ID.RA-09 | The authenticity and integrity of software are assessed prior to acquisition and use. | Unleash develops its open-source core and [SDKs](/sdks) in public on GitHub, with a visible commit history, release notes, and security advisories. Self-hosted customers can include Unleash in their own vulnerability scanning and software composition analysis before deployment. |
+</StickyTable>
+
+### Protect: identity, platform security, data, and resilience
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| Identities and authentication: PR.AA-01, PR.AA-03 | Identities and credentials for authorized users, services, and hardware are managed by the organization, and users, services, and hardware are authenticated. | [Single sign-on](/concepts/sso) (SSO) with SAML and OIDC lets you enforce multi-factor authentication (MFA) through your identity provider, such as [Okta](/single-sign-on/how-to-add-sso-open-id-connect#configure-the-okta-application), [Microsoft Entra ID](/single-sign-on/how-to-add-sso-azure-saml), [Keycloak](/single-sign-on/how-to-setup-sso-keycloak-group-sync), or any [SAML](/single-sign-on/how-to-add-sso-saml) or [OIDC](/single-sign-on/how-to-add-sso-open-id-connect) provider. [SCIM](/concepts/scim) provisioning and group sync automate joiner, mover, and leaver handling. [Service accounts](/concepts/service-accounts) and scoped [API tokens](/concepts/api-tokens-and-client-keys) give services, CI pipelines, and AI agents their own managed identities. Unleash restricts logins after 10 failed attempts. |
+| Least privilege and separation of duties: PR.AA-05 | Access permissions, entitlements, and authorizations are managed and enforced, incorporating least privilege and separation of duties. | [Role-based access control](/concepts/rbac) (RBAC) provides custom root and project roles and environment-level permissions. A [change request](/concepts/change-requests) needs approval from someone other than its author, and custom roles restrict who can approve and who can apply changes in each environment. Users with the Admin root role can approve and apply their own changes, so limit that role to maintain separation of duties. The same roles determine who can use the kill switch, so disabling a feature in production is itself an access-controlled, logged action. |
+| Configuration management and change control: PR.PS-01 | Configuration management practices are established and applied, including change control for production configuration. | [Change requests](/concepts/change-requests) make approval a mandatory step before any flag, strategy, or segment change takes effect in a protected environment, with up to 10 required approvers per project and environment. Each request records who proposed, reviewed, approved, and applied the change, and the [event log](/concepts/events#event-log) retains the full history. The [Terraform provider](/integrate/terraform) manages instance configuration, such as projects, environments, roles, and access, as code. The provider does not manage feature flags; flag changes go through change requests instead. The [ServiceNow integration](/integrate/servicenow) mirrors each change request into ServiceNow as a standard change. |
+| Secure software development and controlled release: PR.PS-06 | Secure software development practices are integrated and their performance is monitored throughout the development life cycle, including how changes reach production. | Separate [environments](/concepts/environments) with environment-specific permissions support testing before production. [Release templates](/concepts/release-templates) standardize how you roll out a change across environments and audiences. [Segments](/concepts/segments) and strategy constraints limit any change to a defined population, such as an allow-list of internal users, before wider exposure. |
+| Log records: PR.PS-04 | Log records are generated and made available for continuous monitoring. | The [event log](/concepts/events#event-log) records every change with the user (`createdBy`, `createdByUserId`, and IP address), timestamp, and, where the event type supplies them, the previous state (`preData`) and new state (`data`). You can search the event log in the Admin UI and through the [Events API](/api/search-events), and export it as CSV or JSON to your security information and event management (SIEM) system on your retention schedule. [Login history](/concepts/login-history) records authentication events and is available in the Admin UI. Unleash keeps login events for 14 days, so download them periodically to retain them longer. |
+| Data at rest and in transit: PR.DS-01, PR.DS-02 | The confidentiality, integrity, and availability of data at rest and data in transit are protected. | Hosted Unleash encrypts data in transit (TLS) and at rest. For self-hosted deployments, TLS termination, database encryption, and key management stay in your own infrastructure. With backend SDKs and Unleash Edge, flags are evaluated locally and end-user data does not need to be sent to the central Unleash service. For more details, see [Data collection and privacy](/privacy-and-compliance/data-privacy). |
+| Resilience and capacity: PR.IR-03, PR.IR-04 | Mechanisms achieve resilience requirements in normal and adverse situations, and adequate resource capacity is maintained to ensure availability. | [Unleash Enterprise Edge](/unleash-edge) serves flag evaluations from a local cache close to your applications, scales horizontally, and continues serving if the Unleash API is unavailable. Backend [SDKs](/sdks) evaluate flags locally and keep evaluating from their cached configuration during an outage, so the feature management layer does not become a single point of failure. Unleash also supports fully air-gapped deployments. |
+| Backups: PR.DS-11 | Backups of data are created, protected, maintained, and tested. | Hosted Unleash runs automated periodic backups across multiple availability zones. [Self-hosted deployments](/deploy/hosting-options#self-hosted) store all configuration in PostgreSQL, which you back up under your own policy, and [export](/concepts/import-export) provides point-in-time configuration snapshots. |
+</StickyTable>
+
+### Detect: continuous monitoring and analysis
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| Monitoring of runtime environments and user activity: DE.CM-03, DE.CM-09 | Personnel activity, technology usage, software, runtime environments, and their data are monitored to find potentially adverse events. | [Impact metrics](/concepts/impact-metrics) attach error rates, latency, and custom measurements to the flags that control each feature, and release plan safeguards pause a rollout automatically when a threshold is crossed. [Login history](/concepts/login-history) and the [event log](/concepts/events#event-log) record who did what in the platform. |
+| Analysis and correlation of events: DE.AE-02, DE.AE-03 | Potentially adverse events are analyzed and information is correlated from multiple sources. | [Signals](/concepts/signals) accept alerts from your monitoring stack, and [actions](/concepts/actions) respond to them inside Unleash, so a monitoring system can disable a flag automatically when it reports a regression. Event log exports let your SIEM correlate configuration changes with application and infrastructure events. |
+</StickyTable>
+
+### Respond and Recover
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| Containment: RS.MI-01, RS.MA-05 | Incidents are contained, and the criteria for initiating recovery are applied. | Disabling a flag or an environment withdraws the affected feature from all users at once, or from a specific [segment](/concepts/segments), without a deployment. Because flags decouple deployment from release, you can switch off a defect in new code in seconds rather than roll it back through a release cycle. |
+| Incident analysis and records: RS.AN-03, RS.AN-06 | Analysis determines what took place and the root cause, and actions performed during an investigation are recorded with their integrity and provenance preserved. | The [event log](/concepts/events#event-log) provides an exportable, timestamped timeline of every configuration change before and during an incident, including the approvals that authorized each change and, where the event type supplies them, the previous and new state. |
+| Notification: RS.CO-02 | Internal and external stakeholders are notified of incidents. | Unleash provides incident response and notification commitments to hosted customers through the Trust Center and the Enterprise agreement. Change request and event log exports supply the change history that an incident report requires. |
+| Recovery and restoration: RC.RP-02, RC.RP-05 | Recovery actions are selected and performed, restored assets are verified, and normal operating status is confirmed. | You restore a feature by re-enabling the flag or reverting a [release plan](/concepts/release-templates) to an earlier milestone, and the event log records the restoration. You can restore configuration from an [export](/concepts/import-export) snapshot or, for self-hosted deployments, a PostgreSQL backup. |
+</StickyTable>
+
+## How Unleash features map to the AI RMF
+
+The AI RMF asks organizations to govern, map, measure, and manage AI risk across the lifecycle. Feature flags sit at the deployment and operation end of that lifecycle: they control when an AI system starts serving users, to whom, and how you switch it off.
+
+Unleash provides controls and evidence for the runtime configuration of an AI system. You meet the rest of each outcome through your own processes and the other tools in your AI stack.
+
+<StickyTable>
+| Outcome | Description | Unleash feature |
+|---------|-------------|-----------------|
+| AI system inventory and decommissioning: GOVERN 1.6, GOVERN 1.7 | Mechanisms are in place to inventory AI systems, and processes exist for decommissioning and phasing out AI systems safely. | When you put each AI feature behind a [flag](/concepts/feature-flags), it gets an inventory entry with an owning project, a type, and a lifecycle stage, and disabling and archiving the flag is a recorded decommissioning step. [Technical debt](/concepts/technical-debt) reporting shows flags that have passed their expected lifetime, so AI features that are due for retirement surface for review. |
+| Roles, accountability, and human oversight: GOVERN 2.1, MAP 3.5 | Roles and responsibilities for AI risk are documented, and processes for human oversight are defined, assessed, and documented. | [Change requests](/concepts/change-requests) make a named person the approver of any change to how an AI feature is exposed, and [custom roles](/concepts/rbac) restrict who can approve or apply. AI agents that change configuration act through [service accounts](/concepts/service-accounts) with scoped permissions and go through the same approvals, so the [event log](/concepts/events#event-log) shows whether a person or an agent made each change. |
+| Monitoring in production: MEASURE 2.4, MEASURE 2.6, MEASURE 3.1 | AI system functionality and behavior are monitored in production, safety metrics reflect real-time monitoring and response times for failures, and emergent risks are tracked in deployment. | [Impact metrics](/concepts/impact-metrics) tie error rates, latency, and business outcomes to the flag that controls the AI feature, and release plan safeguards pause a rollout automatically when a threshold is crossed. [Signals](/concepts/signals) accept alerts from your model monitoring stack. |
+| Supersede, disengage, or deactivate: MANAGE 2.4 | Mechanisms are in place and applied to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use. | Disabling the flag deactivates the AI feature for all users in seconds, or for a specific [segment](/concepts/segments), without a deployment. [Strategy variants](/concepts/strategy-variants) supersede one model version with another, or fall back to a non-AI path, by routing a defined share of traffic. [Actions](/concepts/actions) can disable the flag automatically from a monitoring signal. |
+| Post-deployment monitoring, change management, and incident response: MANAGE 4.1, MANAGE 4.3 | Post-deployment monitoring plans cover appeal and override, decommissioning, incident response, recovery, and change management, and incidents and errors are communicated to relevant parties. | Change requests, release templates, and the event log give AI features the same change management and incident record as any other production change. Staged exposure through release templates, starting with an internal allow-list, lets a team observe an AI feature before customers see it. |
+| Generative AI deployment and incident actions: AI 600-1, suggested actions under MANAGE 1.3, MANAGE 2.4, and MANAGE 4.1 | The profile's suggested actions for generative AI include considering a staged release approach, procedures for disengaging or deactivating a system and escalating incidents, and post-deployment monitoring. | You can deploy every generative AI feature behind a flag with a kill switch, expose it first to an internal allow-list, expand it by percentage or segment, and withdraw it in seconds, with impact metrics recording the result at each stage. |
+</StickyTable>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is Unleash NIST certified?">
+No. NIST does not certify any product against the CSF or the AI RMF; they are voluntary frameworks that an organization applies to its own program. A security review can check which CSF outcomes a vendor's controls support, which is what this page lists.
+
+Unleash holds a SOC 2 Type II attestation and provides control mappings for [ISO 27001](/privacy-and-compliance/iso27001) and [FedRAMP](/privacy-and-compliance/fedramp). It does not hold an ISO 27001 certificate or a FedRAMP authorization.
+</Accordion>
+
+<Accordion title="Does this page cover NIST SP 800-53?">
+Not directly. SP 800-53 Rev. 5 is the control catalog behind FedRAMP, and [FedRAMP compliance](/privacy-and-compliance/fedramp) maps Unleash features to its control families: access control, audit and accountability, security assessment and authorization, configuration management, identification and authentication, system and communications protection, and system and information integrity.
+
+NIST publishes Informative References online that map CSF 2.0 subcategories to SP 800-53 controls, so you can read the two pages together.
+</Accordion>
+
+<Accordion title="How do the AI RMF and the EU AI Act relate?">
+The AI RMF is a voluntary US framework; the EU AI Act is binding law for AI systems placed on the EU market. They overlap on human oversight, logging, post-market monitoring, and the ability to intervene in or stop a system. [EU AI Act compliance](/privacy-and-compliance/eu-ai-act) maps the same Unleash features to the Act's articles.
+</Accordion>
+
+<Accordion title="Does the AI RMF apply to AI agents that change configuration?">
+Yes. The AI RMF applies to any AI system, and the Generative AI Profile names autonomous agents among the security threats to assess. In Unleash, you give an agent its own [service account](/concepts/service-accounts) with scoped permissions, its changes go through [change requests](/concepts/change-requests) like a human user's, and the [event log](/concepts/events#event-log) attributes each change to the agent's identity. This is the oversight and audit record that the Govern and Manage functions ask for.
+</Accordion>
+
+<Accordion title="Does Unleash support the four-eyes principle for production changes?">
+Yes. [Change requests](/concepts/change-requests) enforce review and approval before a change is applied to a protected environment. You can require between 1 and 10 approvers, restrict who can approve through custom roles, and require approval for flag changes, strategy changes, and segment changes. Users with the Admin root role can approve and apply their own changes, so limit that role to keep the four-eyes principle in place. Unleash retains the full history of each change request in the [event log](/concepts/events).
+</Accordion>
+
+<Accordion title="Which Unleash plan do I need?">
+The controls that map most directly to CSF 2.0 and AI RMF outcomes are [Enterprise features](/support/oss-comparison): change requests and approval workflows, custom roles and environment-level permissions, SSO and SCIM, more than two environments, release templates, impact metrics with safeguards, signals and actions, login history, and Enterprise Edge. The event log, segments, strategy constraints, and the open-source SDKs are available in all editions.
+</Accordion>
+
+<Accordion title="Where can I get the documents my assessment requires?">
+The Trust Center provides the SOC 2 Type II report, penetration test summaries, business continuity and disaster recovery policies, and security policies on request. For subcontractor lists, hosting locations, and contractual terms, [contact us](https://www.getunleash.io/plans/enterprise).
+</Accordion>
+</AccordionGroup>
+
+## Related resources
+
+- [Compliance overview](/privacy-and-compliance/compliance-overview)
+- [FedRAMP compliance](/privacy-and-compliance/fedramp)
+- [EU AI Act compliance](/privacy-and-compliance/eu-ai-act)
+- [SOC 2 compliance](/privacy-and-compliance/soc2)
+- [ISO/IEC 27001 compliance](/privacy-and-compliance/iso27001)
+- [Change requests](/concepts/change-requests)
+- [Event log](/concepts/events#event-log)
+- [Role-based access control](/concepts/rbac)
+- [Impact metrics](/concepts/impact-metrics)
+- [Signals](/concepts/signals) and [actions](/concepts/actions)
+- [Unleash Enterprise Edge](/unleash-edge)
+- Cybersecurity Framework 2.0: [NIST CSWP 29](https://csrc.nist.gov/pubs/cswp/29/the-nist-cybersecurity-framework-csf-20/final)
+- AI Risk Management Framework 1.0: [NIST AI 100-1](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10)
+- Generative AI Profile: [NIST AI 600-1](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence)
