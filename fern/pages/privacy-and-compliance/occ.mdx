@@ -1,0 +1,168 @@
+---
+title: OCC and US banking supervisory guidance for feature flags
+description: Map OCC and interagency US banking guidance to Unleash Enterprise controls for change management, access control, resilience, third-party risk, and model risk.
+keywords: [OCC, Office of the Comptroller of the Currency, FFIEC, 12 CFR 30, interagency guidance, US banking, third-party risk management, operational resilience, model risk management, SR 26-2, change management, feature flags, Unleash Enterprise]
+og:site_name: Unleash
+og:title: OCC and US banking supervisory guidance for feature flags
+max-toc-depth: 2
+last-updated: November 4, 2026
+---
+
+## Overview
+
+The [Office of the Comptroller of the Currency](https://www.occ.gov) (OCC) supervises national banks, federal savings associations, and federal branches and agencies of foreign banks. There is no single OCC regulation for information and communication technology risk. Examiners assess technology, change, and vendor controls against regulations, interagency guidance, and the Federal Financial Institutions Examination Council (FFIEC) IT Examination Handbook. The OCC issues most of these documents jointly with the Federal Reserve and the Federal Deposit Insurance Corporation (FDIC), so the same expectations apply to state banks and bank holding companies.
+
+Across these documents, examiners look for the same things: changes are approved, tested, attributed, and reversible; access follows least privilege and segregation of duties; third-party software is assessed and monitored; and incidents are detected, contained, and reported. A feature management platform is in scope because it controls application behavior in production.
+
+This guide outlines how [Unleash Enterprise](https://www.getunleash.io/pricing) features align with those expectations. For a summary of all frameworks, see the [compliance overview](/privacy-and-compliance/compliance-overview).
+
+## Which guidance this page covers
+
+The following table lists the documents that the mappings on this page cite and the institutions each one applies to. Supervisory guidance is not enforceable in itself, but examiners use it to assess safety and soundness, and findings under it are cited through 12 CFR Part 30.
+
+<StickyTable>
+| Document | Applies to |
+|----------|------------|
+| Interagency Guidelines Establishing Information Security Standards (12 CFR 30, Appendix B) | All OCC-supervised institutions, including federal branches and agencies of foreign banks. |
+| Computer-Security Incident Notification Rule (12 CFR Part 53) | All OCC-supervised banking organizations and their bank service providers. |
+| Interagency Guidance on Third-Party Relationships: Risk Management (OCC Bulletin 2023-17) | All OCC-supervised institutions. |
+| FFIEC IT Examination Handbook: Architecture, Infrastructure, and Operations (2021), Development, Acquisition, and Maintenance (2024, OCC Bulletin 2024-26), Information Security, and Business Continuity Management booklets | Examiner procedures for all OCC-supervised institutions, including federal branches and agencies. |
+| Interagency Paper on Sound Practices to Strengthen Operational Resilience (OCC Bulletin 2020-94, SR 20-24) | Firms with \$250 billion or more in assets, or \$100 billion or more with specified risk indicators. |
+| OCC Heightened Standards (12 CFR 30, Appendix D) | Covered banks with \$50 billion or more in average total consolidated assets. |
+| Model Risk Management: Revised Guidance (OCC Bulletin 2026-13, SR 26-2, FDIC FIL-15-2026) | All OCC-supervised banks; most relevant to banks with more than \$30 billion in total assets. |
+</StickyTable>
+
+## How Unleash features map to OCC expectations
+
+Each of the following tables cites the document and the specific expectation, then describes the Unleash feature that supports it.
+
+Unleash provides controls and evidence for the parts of each expectation that concern the feature management platform itself. You meet the rest through your own risk management program.
+
+### Change management
+
+<StickyTable>
+| Expectation | Description | Unleash feature |
+|-------------|-------------|-----------------|
+| **Change control**<ol><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(d)</li><li>_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet</li><li>_FFIEC IT Examination Handbook_, Development, Acquisition, and Maintenance booklet</li></ol> | Institutions must have procedures to ensure that modifications to customer information systems are consistent with the information security program. Examiners expect a documented change management process that covers all changes to production systems, including configuration changes, with approval by an appropriate authority, testing before implementation, segregation between who requests, approves, and implements a change, a back-out plan, and a record of every change. | [Change requests](/concepts/change-requests) make approval a mandatory step before any flag, strategy, or segment change takes effect in a protected environment, with up to 10 required approvers per project and environment. Each request records who proposed, reviewed, approved, and applied the change, and the [event log](/concepts/events#event-log) retains the full history. You can schedule approved changes for a maintenance window. The [ServiceNow integration](/integrate/servicenow) mirrors each change request into ServiceNow as a standard change, so flag changes appear in the same IT service management (ITSM) record as the rest of your change management. |
+| **Testing, DevOps, and environments**<br />_FFIEC IT Examination Handbook_, Development, Acquisition, and Maintenance booklet | Changes should be tested in an environment separate from production, with deployment controls that limit the effect of a defect reaching production. | Separate [environments](/concepts/environments), such as development, staging, and production, with environment-specific permissions support testing before production. [Release templates](/concepts/release-templates) standardize how you roll out a change across environments and audiences, so teams reuse the approved procedure rather than reinvent it. The [Terraform provider](/integrate/terraform) manages instance configuration, such as projects, environments, roles, and access, as code, so platform configuration goes through the same review and version control as application code. The provider does not manage feature flags; flag changes go through change requests instead. |
+| **Back-out and minimal disruption**<ol><li>_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet</li><li>_Interagency Paper on Sound Practices to Strengthen Operational Resilience_ (OCC Bulletin 2020-94), Appendix A</li></ol> | Every change should have a tested back-out procedure, and configuration changes to systems supporting critical operations should cause minimal disruption. | Flags provide the back-out: you can reverse a change by disabling the flag or reverting a release plan to an earlier milestone without a redeployment. Because you can hold configuration values in [strategy variants](/concepts/strategy-variants) rather than in code, you can apply a corrected parameter at runtime the same way. [Segments](/concepts/segments) and strategy constraints limit the blast radius of any change to a defined population, such as one region, one branch, or an allow-list of internal users, before wider exposure. |
+| **Emergency changes**<br />_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet | Emergency changes should follow an expedited but still controlled and documented path, with retrospective review. | The [skip change requests](/concepts/rbac#environment-level-permissions) permission gives a controlled path for emergency changes that remains fully logged in the event log, so the retrospective review has the same evidence as a standard change. |
+| **New and modified products and services**<br />_OCC Heightened Standards_ (12 CFR 30, Appendix D), II.K.4 | Covered banks must integrate risk management into the processes for approving new and modified products and services. | Release templates and change requests make the approval of a feature rollout a recorded step with named approvers. [Impact metrics](/concepts/impact-metrics) attach error rates, latency, and business measurements to each rollout, so the front line unit can show how the change performed against its risk limits. |
+</StickyTable>
+
+### Access control and identity
+
+<StickyTable>
+| Expectation | Description | Unleash feature |
+|-------------|-------------|-----------------|
+| **Access controls**<br />_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(a) | Institutions must implement access controls on information systems, including controls to authenticate and permit access only to authorized individuals. | [Role-based access control](/concepts/rbac) (RBAC) provides custom root and project roles and environment-level permissions. [Single sign-on](/concepts/sso) (SSO) with SAML and OIDC supports multi-factor authentication (MFA) enforced by your identity provider. [SCIM](/concepts/scim) provisioning and group sync automate joiner, mover, and leaver handling. The same roles determine who can use the kill switch, so the ability to disable a feature in production is itself an access-controlled, logged action. |
+| **Dual control and segregation of duties**<ol><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(e)</li><li>_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet</li></ol> | Institutions must consider dual control procedures and segregation of duties for staff with access to customer information systems. Access to production systems should be limited to what a role requires, and no single person should be able to request, approve, and implement a change. | A change request needs approval from someone other than its author, and custom roles restrict who can approve and who can apply changes in each environment. Users with the Admin root role can approve and apply their own changes, so limit that role to maintain segregation of duties. [Service accounts](/concepts/service-accounts) and scoped [API tokens](/concepts/api-tokens-and-client-keys) separate machine access from human access, so CI pipelines and AI agents act under their own identity and permissions. |
+| **Authentication and encryption**<ol><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(a) and (c)</li><li>_FFIEC IT Examination Handbook_, Information Security booklet</li></ol> | Access controls must authenticate users and permit access only to authorized individuals, with authentication strength commensurate with the risk of the system. Electronic customer information must be encrypted in transit and at rest where unauthorized access is possible. | SSO lets you enforce MFA for every Unleash user through [Okta](/single-sign-on/how-to-add-sso-open-id-connect#configure-the-okta-application), [Microsoft Entra ID](/single-sign-on/how-to-add-sso-azure-saml), [Keycloak](/single-sign-on/how-to-setup-sso-keycloak-group-sync), or any [SAML](/single-sign-on/how-to-add-sso-saml) or [OIDC](/single-sign-on/how-to-add-sso-open-id-connect) provider. Unleash restricts logins after 10 failed attempts. Hosted Unleash encrypts data in transit (TLS) and at rest. For self-hosted deployments, TLS termination, database encryption, and key management stay in your own infrastructure. |
+| **Logging and monitoring**<ol><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(f)</li><li>_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet</li></ol> | Institutions must maintain monitoring systems and procedures to detect actual and attempted attacks on or intrusions into information systems. Examiners expect audit trails of privileged activity and configuration changes. | The [event log](/concepts/events#event-log) records every change with the user (`createdBy`, `createdByUserId`, and IP address), timestamp, and, where the event type supplies them, the previous state (`preData`) and new state (`data`). You can search the event log in the Admin UI and through the [Events API](/api/search-events), and export it as CSV or JSON to your security information and event management (SIEM) system on your retention schedule. [Login history](/concepts/login-history) records authentication events and is available in the Admin UI. Unleash keeps login events for 14 days, so download them periodically to retain them longer. |
+</StickyTable>
+
+### Operational resilience and incident response
+
+<StickyTable>
+| Expectation | Description | Unleash feature |
+|-------------|-------------|-----------------|
+| **Secure and resilient information system management**<br />_Interagency Paper on Sound Practices to Strengthen Operational Resilience_ (OCC Bulletin 2020-94) | Systems supporting critical operations should be subject to robust risk identification, protection, detection, and response and recovery programs, within a board-approved tolerance for disruption. | Flags decouple deployment from release, so you can switch off a defect in new code in seconds rather than roll it back through a release cycle. [Impact metrics](/concepts/impact-metrics) and release plan safeguards pause a rollout automatically when an error rate or latency threshold is crossed. You can stage rollouts by region or legal entity, so a change reaches one branch or market before another. |
+| **Surveillance and risk reporting**<ol><li>_Interagency Paper on Sound Practices to Strengthen Operational Resilience_ (OCC Bulletin 2020-94), surveillance and reporting</li><li>_OCC Heightened Standards_ (12 CFR 30, Appendix D), II.J</li></ol> | Firms should monitor the state of critical operations and report to management. Covered banks must have IT capable of timely, accurate risk reporting under normal and stressed conditions. | Impact metrics attach error rates, latency, and custom measurements to the flags that control each feature. [Signals and actions](/concepts/signals) accept alerts from your monitoring stack and trigger actions in Unleash in response, so a monitoring system can disable a flag automatically when it reports a regression. |
+| **Response programs and incident notification**<ol><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.C.1(g)</li><li>_Computer-Security Incident Notification Rule_ (12 CFR Part 53)</li></ol> | Institutions must have response programs that specify the actions to take when unauthorized access is suspected or detected. Separately, a banking organization must notify its primary federal regulator as soon as possible and no later than 36 hours after determining that a notification incident has occurred. Bank service providers must notify affected bank customers of incidents that disrupt services for 4 hours or more. | Disabling a flag or an environment withdraws the affected feature from all users at once, or from a specific segment, without a deployment. This shortens the time to contain an incident and supports the determination of whether it rises to the notification threshold. The [event log](/concepts/events#event-log) provides an exportable, timestamped timeline of every configuration change before and during an incident, including the approvals that authorized each change, for the incident record. Unleash provides its own incident response commitments to hosted customers through the Trust Center. |
+| **Availability and capacity**<ol><li>_Interagency Paper on Sound Practices to Strengthen Operational Resilience_ (OCC Bulletin 2020-94)</li><li>_FFIEC IT Examination Handbook_, Architecture, Infrastructure, and Operations booklet</li></ol> | Systems supporting critical operations must remain available and have sufficient capacity, with dependencies on third parties understood and mitigated. | [Unleash Enterprise Edge](/unleash-edge) serves flag evaluations from a local cache close to your applications, scales horizontally, and continues serving if the Unleash API is unavailable. Backend [SDKs](/sdks) evaluate flags locally and keep evaluating from their cached configuration during an outage, so the feature management layer does not become a single point of failure for your applications. |
+| **Business continuity and backup**<ol><li>_Interagency Paper on Sound Practices to Strengthen Operational Resilience_ (OCC Bulletin 2020-94), business continuity management</li><li>_FFIEC IT Examination Handbook_, Business Continuity Management booklet</li></ol> | Firms must maintain and test backup and recovery capabilities for critical systems. | Hosted Unleash runs automated periodic backups across multiple availability zones. [Self-hosted deployments](/deploy/hosting-options#self-hosted) store all configuration in PostgreSQL, which you back up under your own policy, and the [export](/concepts/import-export) API provides point-in-time configuration snapshots. |
+</StickyTable>
+
+### Third-party risk management
+
+<StickyTable>
+| Expectation | Description | Unleash feature |
+|-------------|-------------|-----------------|
+| **Due diligence and selection**<br />_Interagency Guidance on Third-Party Relationships: Risk Management_ (OCC Bulletin 2023-17) | Before entering a relationship, a bank should assess the third party's ability to perform, including its information security program, incident response, and resilience, in proportion to the risk of the relationship. The 2026 proposal to replace this guidance keeps this stage and scales its depth to assessed risk. | The [SOC 2 Type II](/privacy-and-compliance/soc2) report, penetration test summaries, 14 security policies, and the Unleash compliance mappings support due diligence. These include this page and the [ISO 27001](/privacy-and-compliance/iso27001), [FedRAMP](/privacy-and-compliance/fedramp), and [DORA](/privacy-and-compliance/dora) mappings. Self-hosting removes the hosted service from the dependency entirely: the software runs in your infrastructure, under your controls, and the open-source codebase allows direct code inspection. |
+| **Contract negotiation and service provider oversight**<ol><li>_Interagency Guidance on Third-Party Relationships: Risk Management_ (OCC Bulletin 2023-17)</li><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B), III.D</li></ol> | Contracts should address performance, information security, incident notification, audit and access rights, subcontractors, and termination. Appendix B separately requires banks to oversee service providers that handle customer information. | Enterprise agreements cover hosting region, SLAs, support, security commitments, incident notification, and termination assistance. With backend SDKs and Unleash Edge, end-user data does not need to be sent to the central Unleash service. With a self-hosted instance, no end-user data leaves your infrastructure, which narrows the scope of Appendix B oversight. For more details, see [Data collection and privacy](/privacy-and-compliance/data-privacy). |
+| **Ongoing monitoring**<br />_Interagency Guidance on Third-Party Relationships: Risk Management_ (OCC Bulletin 2023-17) | Banks should monitor third parties over the life of the relationship, including reviewing audit reports, performance data, and control testing. | Unleash renews its SOC 2 Type II report annually, and a third party performs penetration tests annually, with results available through the Trust Center. Traffic and connection statistics in the Admin UI, and the [event log](/concepts/events#event-log), give your second line the operational evidence to review. |
+| **Termination and exit**<br />_Interagency Guidance on Third-Party Relationships: Risk Management_ (OCC Bulletin 2023-17) | Banks should be able to end a relationship in an orderly way, with data access and transition timelines planned in advance for higher-risk relationships. | Unleash is built on an open-source core under the AGPLv3 license. Configuration is exportable through the [API](/api), [SDKs](/sdks) are open source, and the hosted and self-hosted editions run the same software, so a migration from hosted to self-hosted does not require a rewrite of application code. Moving away from Unleash entirely requires replacing the SDK integration, unless your applications use the OpenFeature API through an [Unleash OpenFeature provider](/sdks/openfeature), in which case you replace the provider. |
+| **Supply chain risk management**<br />_FFIEC IT Examination Handbook_, Development, Acquisition, and Maintenance booklet | Institutions should understand the provenance and maintenance of software components they acquire, including open-source components. | Unleash develops its open-source core and SDKs in public on GitHub, with a visible commit history, release notes, and security advisories. Self-hosted customers can include Unleash in their own vulnerability scanning and software composition analysis. |
+</StickyTable>
+
+### Model risk and AI features
+
+<StickyTable>
+| Expectation | Description | Unleash feature |
+|-------------|-------------|-----------------|
+| **Governance and controls over model use**<br />_Model Risk Management: Revised Guidance_ (OCC Bulletin 2026-13) | Banks should control how models are implemented and used in production, with changes to models and their use recorded and, where material, triggering validation. | When you put each model-backed feature behind a flag, the moment a model, or a new model version, starts serving customers becomes an approved, attributed, and reversible change. [Strategy variants](/concepts/strategy-variants) can route a defined share of traffic to a new version while the incumbent continues to serve the rest, and the [event log](/concepts/events#event-log) records when each change in use took effect. |
+| **Validation and ongoing monitoring**<br />_Model Risk Management: Revised Guidance_ (OCC Bulletin 2026-13) | Banks should monitor model performance in production, including drift and whether the conditions the model was built under still hold. | [Impact metrics](/concepts/impact-metrics) tie error rates, latency, and business outcomes to the flag that controls the model, and release plan safeguards pause a rollout automatically when a threshold is crossed, so you can withdraw a degraded model before it reaches the full population. |
+| **Third-party models**<br />_Model Risk Management: Revised Guidance_ (OCC Bulletin 2026-13) | Banks should apply oversight to vendor-supplied models even where the methodology is not fully transparent. | A flag around a third-party model or API gives you your own kill switch and rollout control, independent of the vendor, and the same evidence trail as for internally built models. |
+| **Generative and agentic AI (no AI-specific guidance yet; existing expectations apply)**<ol><li>_Model Risk Management: Revised Guidance_ (OCC Bulletin 2026-13) (explicitly out of scope)</li><li>_Interagency Guidelines Establishing Information Security Standards_ (12 CFR 30, Appendix B)</li><li>_Interagency Guidance on Third-Party Relationships: Risk Management_ (OCC Bulletin 2023-17)</li></ol> | The agencies have said generative and agentic AI are novel and rapidly evolving and will be addressed in separate guidance. In the meantime, examiners assess AI features under the bank's existing risk governance, change management, and third-party frameworks. | You can deploy every AI feature behind a flag with a kill switch, expose it first to an internal allow-list, and withdraw it in seconds. AI agents that change configuration act through [service accounts](/concepts/service-accounts) with scoped permissions and go through the same [change requests](/concepts/change-requests) as a human, so the event log shows whether a person or an agent made each change. |
+</StickyTable>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is Unleash certified or approved by the OCC?">
+No. The OCC supervises banks, not software products, and it does not certify vendors. The OCC expects your bank to assess Unleash under its third-party risk management process and to show examiners the controls and evidence described on this page.
+
+Unleash holds a SOC 2 Type II attestation and provides control mappings for [ISO 27001](/privacy-and-compliance/iso27001) and [FedRAMP](/privacy-and-compliance/fedramp). It does not hold an ISO 27001 certificate or a FedRAMP authorization.
+</Accordion>
+
+<Accordion title="Is Unleash examined by the OCC as a bank service provider?">
+No. Under the Bank Service Company Act, the agencies may examine companies that provide services to banks, and they do so for a small number of significant providers such as core processors. Unleash has not been designated or examined.
+
+Whether hosted Unleash is a bank service provider for the purposes of the incident notification rule in 12 CFR Part 53 depends on how your bank uses it. Enterprise agreements set out Unleash's incident notification commitments either way. Self-hosted Unleash is software running in your own environment, and examiners review it as part of your own systems.
+</Accordion>
+
+<Accordion title="Does this apply to the US branch of a foreign bank?">
+Yes. The OCC licenses and examines federal branches and agencies of foreign banks under the same safety and soundness framework, and OCC bulletins, including the third-party guidance and the FFIEC handbook releases, are addressed to them. Examiners generally allow a branch to rely on head office systems and policies, but they expect the branch to show that those controls operate for the branch's own activities and that it can produce the evidence locally.
+
+Because you can scope flags by environment, project, and segment, a branch can run on a group-wide Unleash instance while keeping its own approvals, roles, and audit trail for the features it exposes to US customers.
+</Accordion>
+
+<Accordion title="Does OCC guidance apply differently to hosted and self-hosted Unleash?">
+Yes. [Hosted Unleash](https://www.getunleash.io/pricing) is a third-party relationship, so it falls under the third-party guidance: due diligence, contract provisions, ongoing monitoring, and termination planning, plus service provider oversight under 12 CFR 30, Appendix B.
+
+Self-hosted Unleash runs inside your own infrastructure. It's still software you license and should assess under supply chain risk management, but the operational controls, such as hosting, encryption, backups, network security, and log retention, are yours. This is why many banks choose to self-host.
+</Accordion>
+
+<Accordion title="What will change if the 2026 third-party risk management proposal is finalized?">
+The proposed guidance would replace OCC Bulletin 2023-17 with a shorter, principles-based document organized around four components: identify and assess risk, oversee risk proportionately, make residual risk decisions, and establish governance. It keeps the same lifecycle stages (due diligence, contracting, ongoing monitoring, and termination) but scales the depth of each to the assessed risk of the relationship rather than the type of activity.
+
+The mappings on this page are written against those stages, so they remain valid under either version. Unleash will update this page when the agencies issue the final guidance.
+</Accordion>
+
+<Accordion title="Does Unleash support the four-eyes principle for production changes?">
+Yes. [Change requests](/concepts/change-requests) enforce review and approval before a change is applied to a protected environment. You can require between 1 and 10 approvers, restrict who can approve through custom roles, and require approval for flag changes, strategy changes, and segment changes. Users with the Admin root role can approve and apply their own changes, so limit that role to keep the four-eyes principle in place. Unleash retains the full history of each change request in the [event log](/concepts/events).
+</Accordion>
+
+<Accordion title="Can Unleash stay available during an outage of the Unleash API or the network?">
+Yes. Once initialized, [SDKs](/sdks) keep their flag configuration in a local cache and continue evaluating flags during an outage; they only stop receiving updates. At startup, an SDK needs to reach Unleash or Edge unless it supports and is configured for [bootstrapping](/sdks#bootstrap); without flag data, flags evaluate as disabled or to the default value defined in code. [Unleash Enterprise Edge](/unleash-edge) adds a resilient caching layer that continues to serve evaluations and collect metrics while the API is unreachable. Unleash also supports fully air-gapped deployments.
+</Accordion>
+
+<Accordion title="Does Unleash process customer information covered by 12 CFR 30, Appendix B?">
+With backend SDKs and Unleash Edge, flags are evaluated locally and end-user data does not need to be sent to the central Unleash service. Frontend SDKs that call the Frontend API directly send evaluation context to the endpoint they connect to, which can be [Unleash Enterprise Edge](/unleash-edge) inside your own infrastructure. With a self-hosted Unleash instance, no end-user data leaves your infrastructure at all. For more details, see [Data collection and privacy](/privacy-and-compliance/data-privacy).
+</Accordion>
+
+<Accordion title="Which Unleash plan do I need?">
+The controls that map most directly to OCC expectations are [Enterprise features](/support/oss-comparison): change requests and approval workflows, custom roles and environment-level permissions, SSO and SCIM, more than two environments, release templates, impact metrics with safeguards, signals and actions, login history, and Enterprise Edge. The event log, segments, strategy constraints, and the open-source SDKs are available in all editions.
+</Accordion>
+
+<Accordion title="Where can I get the documents my vendor assessment requires?">
+The Trust Center provides the SOC 2 Type II report, penetration test summaries, business continuity and disaster recovery policies, and security policies on request. For subcontractor lists, hosting locations, and contractual terms, [contact us](https://www.getunleash.io/plans/enterprise).
+</Accordion>
+</AccordionGroup>
+
+## Related resources
+
+- [Compliance overview](/privacy-and-compliance/compliance-overview)
+- [DORA compliance](/privacy-and-compliance/dora)
+- [SOC 2 compliance](/privacy-and-compliance/soc2)
+- [ISO/IEC 27001 compliance](/privacy-and-compliance/iso27001)
+- [FedRAMP compliance](/privacy-and-compliance/fedramp)
+- [Change requests](/concepts/change-requests)
+- [Event log](/concepts/events#event-log)
+- [Role-based access control](/concepts/rbac)
+- [Impact metrics](/concepts/impact-metrics)
+- [Unleash Enterprise Edge](/unleash-edge)
+- Third-party risk guidance: [OCC Bulletin 2023-17](https://www.occ.gov/news-issuances/bulletins/2023/bulletin-2023-17.html)
+- Operational resilience sound practices: [OCC Bulletin 2020-94](https://www.occ.gov/news-issuances/bulletins/2020/bulletin-2020-94.html)
+- FFIEC Development, Acquisition, and Maintenance booklet: [OCC Bulletin 2024-26](https://www.occ.gov/news-issuances/bulletins/2024/bulletin-2024-26.html)
+- Model risk management revised guidance: [OCC Bulletin 2026-13](https://www.occ.gov/news-issuances/bulletins/2026/bulletin-2026-13.html)
