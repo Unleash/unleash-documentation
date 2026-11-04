@@ -9,7 +9,7 @@ slug: integrate/claude-code
 last-updated: November 4, 2026
 ---
 
-The [Unleash MCP server](/integrate/mcp) connects [Claude Code](https://claude.com/product/claude-code) to your Unleash instance, enabling AI-assisted feature flag management. This page covers how to install and configure the server in Claude Code. To learn what the server can do, see [Unleash MCP server](/integrate/mcp).
+The [Unleash MCP server](/integrate/mcp) connects [Claude Code](https://claude.com/product/claude-code) to your Unleash instance, enabling AI-assisted feature flag management. This page covers how to install and configure the server in Claude Code, and how to install the Unleash plugin. To learn what the server can do, see [Unleash MCP server](/integrate/mcp).
 
 Claude Code supports MCP across multiple interfaces:
 
@@ -363,6 +363,57 @@ claude --print --output-format json \
 
 </Tab>
 </Tabs>
+
+## Install the Unleash plugin
+
+The [Unleash plugin for Claude Code](https://github.com/Unleash/unleash-claude-skills) bundles the Unleash MCP server with skills that apply [FeatureOps](https://featureops.io) practices. The MCP server handles the Unleash side, and the skills capture how your team works, such as which changes need a flag, how you name flags, and how you roll them out. Skills work out of the box, and you can customize them for your team.
+
+The plugin includes the following skills:
+
+| Skill | Invoke | What it does |
+|-------|--------|--------------|
+| `featureops` | `/unleash:featureops` | Decides whether a change needs a flag, finds an existing flag before creating one, wraps code behind a flag, plans a progressive rollout, and removes stale flags. |
+| `migrate-gitlab-flags` | `/unleash:migrate-gitlab-flags <app-dir>` | Migrates a codebase from GitLab Feature Flags to Unleash. You invoke it manually. |
+
+The `featureops` skill also activates on its own when your request involves feature flags, rollouts, or kill switches.
+
+<Steps>
+
+<Step title="Install the plugin">
+
+In Claude Code, add the marketplace and install the plugin:
+
+```text
+/plugin marketplace add Unleash/unleash-claude-skills
+/plugin install unleash@unleash-marketplace
+```
+
+The plugin registers the Unleash MCP server for you, so you don't need to follow [Install the MCP server](#install-the-mcp-server) as well. Registering the server twice gives you two copies of the same tools.
+
+</Step>
+
+<Step title="Set your credentials">
+
+The plugin reads your Unleash URL and token from your shell environment:
+
+```bash
+export UNLEASH_BASE_URL=https://your-instance.getunleash.io
+export UNLEASH_PAT=your-personal-access-token
+```
+
+Restart Claude Code or run `/reload-plugins`, then ask: "List my Unleash projects".
+
+</Step>
+
+</Steps>
+
+The plugin runs the MCP server locally with `npx` and pins the server version its skills were tested with.
+To use the [remote MCP server](/integrate/mcp#remote-mcp-server) instead, see the plugin's [README](https://github.com/Unleash/unleash-claude-skills#readme).
+
+While a skill is active, Claude Code approves the read-only Unleash tools automatically and still asks for confirmation before any change. 
+The plugin's server uses a different tool prefix than a server you add yourself, `mcp__plugin_unleash_mcp__*` instead of `mcp__unleash__*`, which matters if you write allow rules.
+
+To change the defaults, such as flag naming, flag lifetimes, or which areas of your code count as high risk, add a policy override at `.unleash/featureops.md` in your repository, or at `~/.unleash/featureops.md` for personal defaults. To learn how, see the [plugin repository](https://github.com/Unleash/unleash-claude-skills).
 
 ## Tools and workflows
 
