@@ -34,11 +34,15 @@ In order to configure SSO with SAML with your Unleash enterprise you should navi
 
 ### Step 3: Keycloak with SAML 2.0
 
-Open to the Keycloak dashboard and navigate to "Clients" and click "Add Client" button. Give it a unique clientId (e.g. unleash), use the "saml" protocol and specify the following SAML Endpoint:
+Open to the Keycloak dashboard and navigate to "Clients" and click "Add Client" button. Set **Client ID** to the public Unleash instance URL (the SP Entity ID), for example, `https://eu.app.unleash-hosted.com/instance-id`. It must exactly match the public URL configured in Unleash, with no trailing slash unless the configured URL includes one. Use the "saml" protocol and specify the following SAML Endpoint (ACS):
 
 ```
-https://<unleash.hostname.com>/auth/saml/callback
+https://eu.app.unleash-hosted.com/instance-id/auth/saml/callback
 ```
+
+Replace the example instance URL with your own public Unleash URL.
+
+The client ID is separate from the **IDP Initiated SSO URL Name**, which may still be `unleash`. If an existing client uses `unleash` as its client ID, update it to the public instance URL and test sign-in before upgrading to an Unleash version that enables stricter Audience validation. See the [Audience compatibility note in the Okta guide](/single-sign-on/how-to-add-sso-saml#step-3-create-an-application-in-okta).
 
 <Frame background="subtle">
 ![Keycloak: Add client](/assets/keykloak_step1-768x347.png)
