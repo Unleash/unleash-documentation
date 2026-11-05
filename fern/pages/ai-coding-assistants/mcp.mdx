@@ -2,7 +2,7 @@
 title: Unleash MCP server
 og:site_name: Unleash Documentation
 og:title: Unleash MCP server - Manage feature flags with AI agents
-description: Connect AI agents to Unleash with the Model Context Protocol (MCP). Release features, run experiments, check who gets a flag, and review changes from your agent.
+description: Connect AI agents to Unleash with the Model Context Protocol (MCP). Release features, run experiments, check who gets a flag, and review feature's history from your agent.
 keywords: mcp, model context protocol, ai, llm, agents, coding assistants, claude, feature flags, automation, change requests
 max-toc-depth: 3
 slug: integrate/mcp
@@ -179,7 +179,7 @@ Before you start, make sure you have the following:
 
 - Node.js 24 or later: The server is distributed as an npm package.
 - An Unleash instance: Hosted or self-hosted.
-- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens): The server acts with the permissions of the user who owns the token. In Unleash, create one under **Profile** > **View profile settings** > **Personal API tokens**.
+- A [service account with token](https://docs.getunleash.io/concepts/service-accounts) or [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens), as the server acts with the permissions of the user who owns the token.
 
 ### Add the MCP server to your client
 
@@ -240,6 +240,8 @@ The following workflows show what you can ask an agent to do. The agent chooses 
 
 Before it changes anything, an agent usually looks up the values it needs, such as project IDs, segment IDs, and context fields. The `search` and `inspect` tools provide the same options that the Unleash UI shows in its dropdowns. You can say "the checkout project" and the agent finds the matching ID.
 
+If the flag doesn't exist, the server creates it in a switched-off state. To turn a flag on in an environment, ask the agent to enable it explicitly or roll it out gradually.
+
 ### Release a feature gradually
 
 Ask the agent to release a flag to a share of users in one environment:
@@ -249,8 +251,6 @@ Ask the agent to release a flag to a share of users in one environment:
 - "Release new-checkout in production using the standard rollout template."
 
 The agent describes the end state of the release for that environment, and the server replaces the environment's existing targets with it. Each audience in a release has a name that says why it exists, for example "Beta testers".
-
-If the flag doesn't exist, the server creates it. To turn a flag off in an environment, ask the agent to release it as disabled.
 
 ### Add a kill switch
 
