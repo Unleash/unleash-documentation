@@ -77,12 +77,6 @@ _(These will be used to enrich the user data in Unleash)._
 Replace the example URLs with your own public Unleash URL, including the correct region and instance path for hosted instances.
 </Note>
 
-<Warning>
-If your existing Okta configuration uses `unleash-enterprise` as the Audience URI, update it to your public Unleash instance URL and test sign-in before a future Unleash upgrade enables stricter SAML Audience validation. A mismatched Audience can cause `ERR_AUDIENCE_MISMATCH` and prevent sign-in.
-
-The samlify upgrade from 2.13.1 to 2.15.1 was reverted after stricter default Audience validation exposed these mismatches. Correcting the Audience URI is expected to remain compatible with Unleash deployments using samlify 2.13.1, but verify your IdP configuration and sign-in flow after changing it.
-</Warning>
-
 **d) Get the Okta Setup Instructions**
 
 Click the "View Setup Instructions" to get the necessary configuration required for Unleash.
