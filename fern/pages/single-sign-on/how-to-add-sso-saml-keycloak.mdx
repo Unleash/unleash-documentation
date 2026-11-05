@@ -34,10 +34,10 @@ In order to configure SSO with SAML with your Unleash enterprise you should navi
 
 ### Step 3: Keycloak with SAML 2.0
 
-Open to the Keycloak dashboard and navigate to "Clients" and click "Add Client" button. Set **Client ID** to the public Unleash instance URL (the SP Entity ID), for example, `https://eu.app.unleash-hosted.com/instance-id`. It must exactly match the public URL configured in Unleash, with no trailing slash unless the configured URL includes one. Use the "saml" protocol and specify the following SAML Endpoint (ACS):
+Open to the Keycloak dashboard and navigate to "Clients" and click "Add Client" button. Set **Client ID** to the public Unleash instance URL (the SP Entity ID). For hosted instances, use `https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>`. It must exactly match the public URL configured in Unleash, with no trailing slash unless the configured URL includes one. Use the "saml" protocol and specify the following SAML Endpoint (ACS):
 
 ```
-https://eu.app.unleash-hosted.com/instance-id/auth/saml/callback
+https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>/auth/saml/callback
 ```
 
 Replace the example instance URL with your own public Unleash URL.

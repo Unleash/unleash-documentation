@@ -57,8 +57,8 @@ will hold the settings we need for Unleash.
 
 Configure these settings separately:
 
-- **Single sign-on URL (ACS):** `https://<your-unleash-url>/auth/saml/callback`. For example, `https://eu.app.unleash-hosted.com/instance-id/auth/saml/callback`. If you enter **Recipient URL** and **Destination URL** separately, use this same callback URL.
-- **Audience URI (SP Entity ID):** The public Unleash instance URL, for example, `https://eu.app.unleash-hosted.com/instance-id`. This must exactly match the public URL configured in Unleash, including the scheme, hostname, instance path, and any trailing slash. Do not add a trailing slash unless the configured URL includes one, and do not append `/auth/saml/callback`.
+- **Single sign-on URL (ACS):** `https://<your-unleash-url>/auth/saml/callback`. For hosted instances, use `https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>/auth/saml/callback`. If you enter **Recipient URL** and **Destination URL** separately, use this same callback URL.
+- **Audience URI (SP Entity ID):** The public Unleash instance URL. For hosted instances, use `https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>`. This must exactly match the public URL configured in Unleash, including the scheme, hostname, instance path, and any trailing slash. Do not add a trailing slash unless the configured URL includes one, and do not append `/auth/saml/callback`.
 - **IdP-initiated SSO URL name:** A separate Okta setting, which may use `unleash-enterprise`. This name is not the Audience URI. Copy the resulting IdP sign-on URL from Okta's setup instructions for use in Unleash.
 - **Name ID format:** `EmailAddress`. Unleash expects the SSO provider to send an email address.
 
