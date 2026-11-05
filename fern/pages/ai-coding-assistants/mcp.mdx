@@ -1,276 +1,64 @@
 ---
-title: Unleash MCP Server
+title: Unleash MCP server
 og:site_name: Unleash Documentation
-og:title: Unleash MCP Server - AI-powered feature flag management
-description: A Model Context Protocol (MCP) server that enables LLM-powered coding assistants to create and manage Unleash feature flags following best practices.
-keywords: mcp, model context protocol, ai, llm, coding assistants, claude, feature flags, automation
+og:title: Unleash MCP server - Manage feature flags with AI agents
+description: Connect AI agents to Unleash with the Model Context Protocol (MCP). Release features, run experiments, check who gets a flag, and review feature's history from your agent.
+keywords: mcp, model context protocol, ai, llm, agents, coding assistants, claude, feature flags, automation, change requests
 max-toc-depth: 3
 slug: integrate/mcp
-last-updated: October 27, 2026
+last-updated: November 5, 2026
 ---
 
-A purpose-driven [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for managing [Unleash](https://www.getunleash.io/) feature flags. This server enables LLM-powered coding assistants to create and manage feature flags following Unleash best practices.
+The Unleash [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server lets AI agents work with Unleash the way you work in the Unleash UI: find flags, release them, check who gets them, and see what changed.
+
+The Unleash MCP server works with any MCP client, including coding assistants such as [Claude Code](/integrate/claude-code), [Codex](/integrate/codex), [Cursor](/integrate/cursor), [Copilot](/integrate/github-copilot), [Kiro](/integrate/kiro), [OpenCode](/integrate/opencode), and with agents that run outside an editor.
 
 ## Overview
 
-This MCP server provides tools that integrate with the [Unleash Admin API](/get-started/unleash-overview#admin-api). It evaluates code changes to decide when a feature flag is needed, creates flags with proper validation and typing, and detects existing flags to prevent duplicates or encourage reuse. The server streams progress for visibility during operations, handles errors gracefully with helpful hints, and follows [best practices](/guides/feature-flag-best-practices) from the Unleash documentation.
+Instead of mirroring every API operation as a tool, the server exposes a small set of tools organized around outcomes.
+Each tool does a complete job, such as "*releasing a flag to 10% of users*", so the agent doesn't have to work out the order of several API calls.
+This keeps the agent's context small and reduces guesswork.
 
-Every tool falls into one of these use cases:
+The server provides tools for the following:
 
-| Use case | Tools | What it does |
-|----------|-------|--------------|
-| **Evaluate and wrap code in feature flags** | `evaluate_change`, `detect_flag`, `create_flag`, `wrap_change` | Assess whether a code change needs a flag, create one if it does, and generate the wrapping code. |
-| **Discover and audit** | `list_projects`, `list_flags` | List projects available to your token and the flags within a project (active or archived). Useful before creating flags and for periodic flag audits. |
-| **Manage rollouts** | `get_flag_state`, `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy` | Check flag state, configure rollout strategies, and enable or disable flags across environments. |
-| **Clean up after rollout** | `cleanup_flag` | Generate instructions for safely removing a flag from your codebase after rollout. |
-| **Send feedback** | `send_feedback` | Share anonymous diagnostic reports with Unleash to help improve the MCP server. The assistant sends these reports automatically. |
+- **Release features safely**: Roll out a flag to audiences, split by value, or through a [release template](/concepts/release-templates).
+- **Protect long-lived features**: Turn a permanent kill switch on or off.
+- **Run experiments**: Split audiences across values, such as control and treatment, for A/B tests.
+- **Explore your feature management setup**: Look up projects, flags, segments, context fields, and tags before acting on them.
+- **Debug targeting**: Check why a user gets or doesn't get a flag.
+- **Manage your inventory**: Create segments, context fields, tags, release templates, and projects, and manage flag properties and lifecycle.
+- **Review changes**: Read the audit log of who changed what and when.
+- **Answer questions about Unleash**: Point the agent to the Unleash documentation for guidance on practices and concepts.
 
-See the [Tool reference](#tool-reference) section for detailed parameters and output for each tool.
+For the list of tools, with a description and an example prompt for each, see the [README on GitHub](https://github.com/Unleash/unleash-mcp).
 
-### Workflows
-
-The sections below walk through each use case. For agent-specific prompt examples and setup, see the dedicated integration guides for
-[Claude Code](/integrate/claude-code),
-[Cursor](/integrate/cursor),
-[GitHub Copilot](/integrate/github-copilot),
-[Kiro](/integrate/kiro),
-and [OpenCode](/integrate/opencode).
-
-<Tabs>
-<Tab title="Evaluate and wrap code in feature flags">
-
-Use this workflow when implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
-
-<Steps>
-<Step title="Evaluate the change">
-The assistant calls `evaluate_change` to assess the code change, score its risk, and recommend whether a feature flag is needed.
-</Step>
-
-<Step title="Check for duplicates">
-`detect_flag` runs automatically as part of evaluation to search for existing flags. If a suitable flag exists, the assistant suggests reusing it instead of creating a duplicate.
-</Step>
-
-<Step title="Create the flag">
-If no suitable flag exists, `create_flag` creates one in Unleash with the appropriate name, type, and description. The flag is created disabled by default.
-</Step>
-
-<Step title="Wrap the code">
-`wrap_change` generates framework-specific guard code for the new flag. The assistant applies the wrapping pattern to your code.
-</Step>
-</Steps>
-
-</Tab>
-
-<Tab title="Discover and audit">
-
-Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
-
-<Steps>
-<Step title="List available projects (optional)">
-If you don't already know the target project, the assistant calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
-</Step>
-
-<Step title="List active flags">
-The assistant calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
-</Step>
-
-<Step title="List archived flags">
-For a full audit, the assistant calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
-</Step>
-
-<Step title="Cross-reference with the codebase">
-The assistant compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the `cleanup_flag` tool to remove them safely.
-</Step>
-</Steps>
-
-</Tab>
-
-<Tab title="Manage rollouts">
-
-Use this workflow to control how a flag behaves across environments, such as enabling in staging for testing while keeping it disabled in production.
-
-<Steps>
-<Step title="Check flag state">
-The assistant calls `get_flag_state` to return the flag's metadata, enabled environments, and active strategies.
-</Step>
-
-<Step title="Configure rollout or toggle">
-Depending on your goal, the assistant calls `set_flag_rollout` to configure a gradual rollout strategy or `toggle_flag_environment` to enable or disable the flag in a specific environment.
-</Step>
-</Steps>
-
-<Warning>
-AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See [Protect production environments](#protect-production-environments) for details.
-</Warning>
-
-</Tab>
-
-<Tab title="Clean up after rollout">
-
-Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
-
-<Steps>
-<Step title="Generate cleanup instructions">
-The assistant calls `cleanup_flag` and returns all files and line numbers where the flag is used, which code path to preserve (the "enabled" branch), and suggestions for tests to run after removal.
-</Step>
-
-<Step title="Remove the flag">
-Review the results, remove the conditional branches from your code, and archive or delete the flag from Unleash.
-</Step>
-</Steps>
-
-<Tip>
-Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
-</Tip>
-
-</Tab>
-</Tabs>
+The Unleash MCP server respects your existing access controls. It acts with the permissions of the user or service account behind the access token.
+Where an environment requires [change requests](/concepts/change-requests), the server submits one instead of applying the change directly. See [Change requests and approvals](#change-requests-and-approvals).
 
 ## Get started
 
-You have two ways to run the Unleash MCP server:
+You can connect to the Unleash MCP server in two ways:
 
-- **Local MCP server**: Runs inside your LLM client on your machine. Use this setup if your organization allows installing MCP servers on developer laptops. See [Run the MCP server locally](#run-the-mcp-server-locally).
-- **[Remote MCP server](#remote-mcp-server)**: Hosted by your Unleash instance. Use this setup if developers cannot install local MCP servers, or if you want a single, managed entry point for all clients.
+- **[Remote MCP server](#remote-mcp-server)**: Hosted by your Unleash instance. You don't install or run anything on your machine. Use this setup if you want a single, managed entry point for all clients, or if developers can't install MCP servers on their laptops.
+- **[Local MCP server](#run-the-mcp-server-locally)**: Runs on your machine as a process that your MCP client starts. Use this setup if you don't have access to the remote server, such as on Unleash Open Source or on a plan without it.
 
-## Run the MCP server locally
+After you connect the server, follow the setup guide for your client for client-specific details such as approval settings and enterprise configuration:
 
-This section covers the different ways to install and run the Unleash MCP server locally. You can either follow a setup for [agents](#agent-setup) (such as Claude Code and Codex), run the MCP as a [standalone process](#quickstart-with-npx) using npx, or use a [local development](#local-development-setup) setup.
-
-### Prerequisites
-
-Before you can run the server locally, you need the following:
-- Node.js 18 or higher
-- Yarn package manager or npm
-- An Unleash instance (hosted or self-hosted)
-- A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) with permissions to create feature flags
-
-### Agent setup
-
-You can add the MCP server directly to Claude Code or Codex. Agent configurations are path-specific. You must run the following command from the root directory of the project where you want to use the MCP.
-
-For Claude Code:
-
-```bash
-claude mcp add unleash \
-    --env UNLEASH_BASE_URL={{your-instance-url}} \
-    --env UNLEASH_PAT={{your-personal-access-token}} \
-    -- npx -y @unleash/mcp@latest --log-level error
-```
-
-Check out the dedicated [Claude Code integration guide](/integrate/claude-code) for additional guidance and best practices.
-
-For Codex:
-```bash
-codex mcp add unleash \
-    --env UNLEASH_BASE_URL={{your-instance-url}} \
-    --env UNLEASH_PAT={{your-personal-access-token}} \
-    -- npx -y @unleash/mcp@latest --log-level error
-```
-
-To opt in to or out of [feedback reports](#send-feedback) without a consent prompt, add `--env UNLEASH_MCP_SEND_FEEDBACK=true` or `--env UNLEASH_MCP_SEND_FEEDBACK=false` to either command.
-
-For other agents, see the dedicated integration guides:
-
+- [Claude Code](/integrate/claude-code)
+- [GitHub Copilot](/integrate/github-copilot)
 - [Cursor](/integrate/cursor)
-- [GitHub Copilot](/integrate/github-copilot) (VS Code and Copilot CLI)
+- [OpenAI Codex](/integrate/codex)
+- [Gemini CLI and Antigravity](/integrate/gemini-antigravity)
 - [Kiro](/integrate/kiro)
+- [OpenCode](/integrate/opencode)
 
-### Quickstart with npx
-
-You can run the MCP server as a standalone process without cloning the repository using `npx`. Provide configuration through environment variables or a local `.env` file in the directory where you run the command:
-
-```bash
-UNLEASH_BASE_URL={{your-instance-url}} \
-UNLEASH_PAT={{your-personal-access-token}} \
-UNLEASH_DEFAULT_PROJECT={{default_project_id}} \
-npx @unleash/mcp@latest --log-level debug
-```
-
-The CLI supports the same flags as the local build (for example, `--dry-run`, `--log-level`).
-
-### Local development setup
-
-Follow these steps to set up the project for local development.
-
-1. **Install dependencies**
-
-Clone the repository and install dependencies using Yarn.
-
-```bash
-git clone https://github.com/Unleash/unleash-mcp.git
-cd unleash-mcp
-yarn install
-```
-
-2. **Configure environment variables**
-
-Copy `.env.example` to `.env` and fill in your Unleash credentials:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```env
-UNLEASH_BASE_URL={{your-instance-url}}
-UNLEASH_PAT={{your-personal-access-token}}
-UNLEASH_DEFAULT_PROJECT={{default_project_id}}  # Optional: the project the MCP should use by default
-```
-
-3. **Build the project**
-
-```bash
-yarn build
-```
-
-Output will be in the `dist/` directory.
-
-4. **(Optional) Run checks**
-
-Run type checking, linting, and tests:
-
-```bash
-# Type checking and linting
-yarn lint
-
-# Run tests (the Vitest framework is configured, but no test suites yet)
-yarn test
-```
-
-#### Running the server
-
-**Development mode with hot reload**
-
-```bash
-yarn dev
-```
-
-**Production mode**
-
-```bash
-node dist/index.js
-```
-
-**With CLI flags**
-
-```bash
-# Dry run mode (simulates API calls without actually creating flags)
-node dist/index.js --dry-run
-
-# Custom log level
-node dist/index.js --log-level debug
-
-# Combine flags
-node dist/index.js --dry-run --log-level debug
-```
+To check that the server works, ask your agent: "List my Unleash projects".
 
 ## Remote MCP server
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
-The remote MCP server lets LLM clients connect to a Streamable HTTP MCP server hosted by your Unleash instance, without installing anything locally. This is useful when developers cannot run MCP servers on their laptops, or when you want to manage MCP access centrally.
+The remote MCP server lets MCP clients connect to a Streamable HTTP MCP server hosted by your Unleash instance, without installing anything locally. This is useful when developers can't run MCP servers on their laptops, or when you want to manage MCP access centrally.
 
 When enabled, your Unleash instance exposes an MCP endpoint at:
 
@@ -278,7 +66,7 @@ When enabled, your Unleash instance exposes an MCP endpoint at:
 https://<your-instance-url>/api/admin/mcp
 ```
 
-The remote MCP server exposes the same [tools](#tool-reference) as the local server. For [feedback reports](#send-feedback), an admin decides for the whole instance instead of each user opting in. See [Feedback from the remote server](#feedback-from-the-remote-server).
+The remote MCP server exposes the same tools as the local server. For [feedback reports](#send-feedback), an admin decides for the whole instance instead of each user opting in. See [Feedback from the remote server](#feedback-from-the-remote-server).
 
 ### Enable the remote MCP server
 
@@ -329,6 +117,13 @@ claude mcp add --transport http unleash https://<your-instance-url>/api/admin/mc
 
 Then run `/mcp` in Claude Code and select **unleash** to log in.
 
+For Codex, add the server and then log in:
+
+```bash
+codex mcp add unleash --url https://<your-instance-url>/api/admin/mcp
+codex mcp login unleash
+```
+
 </Tab>
 <Tab title="Personal access token">
 
@@ -372,376 +167,230 @@ For the remote MCP server, an admin turns [feedback reports](#send-feedback) on 
 
 To change the setting, go to **Admin settings > Remote MCP server** and toggle **Send feedback from the Remote MCP Server to Unleash**. The setting is enabled by default, including on existing instances after you upgrade, and only takes effect while the remote MCP server is enabled.
 
-When the setting is enabled, the remote server shares the same anonymous diagnostic reports as the local server. See [What is recorded](#what-is-recorded). When the setting is disabled, remote clients don't see the `send_feedback` tool.
+When the setting is enabled, the remote server shares the same anonymous diagnostic reports as the local server. See [What is recorded](#what-is-recorded). When the setting is disabled, MCP clients don't see the `send_feedback` tool.
 
-## Tool reference
+## Run the MCP server locally
 
-This section describes each of the core tools in detail, including its purpose, parameters, and output.
+The local server runs as a process on your machine that your MCP client starts and talks to over standard input and output (stdio). It calls your Unleash instance with a personal access token.
 
-### Create flag
+### Prerequisites
 
-The `create_flag` tool creates a new feature flag in Unleash with comprehensive validation and progress tracking.
+Before you start, make sure you have the following:
 
-#### When to use
+- Node.js 24 or later: The server is distributed as an npm package.
+- An Unleash instance: Hosted or self-hosted.
+- A [service account with token](https://docs.getunleash.io/concepts/service-accounts) or [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens), as the server acts with the permissions of the user who owns the token.
 
-Use this tool when you have already determined that a feature flag is required (for example, after running `evaluate_change`) and you are ready to create it with the correct type and metadata.
+### Add the MCP server to your client
 
-#### Parameters
+For Claude Code, run the following command from the project where you want to use the server:
 
-The tool accepts the following parameters:
-- `name` (required): Unique feature flag name within the project.
-- `type` (required): Feature flag type indicating lifecycle and intent.
-  - `release`: Gradual feature rollouts to users.
-  - `experiment`: A/B tests and experiments.
-  - `operational`: System behavior and operational toggles.
-  - `kill-switch`: Emergency shutdowns or circuit breakers.
-  - `permission`: Control feature access based on user roles or entitlements.
-- `description` (required): Clear explanation of what the flag controls and why it exists.
-- `projectId` (optional): Target project (defaults to `UNLEASH_DEFAULT_PROJECT`).
-- `impressionData` (optional): Enable analytics tracking (defaults to false).
-
-#### Usage example
-
-**Agent prompt**
-
-```
-Use create_flag with:
-- name: "new-checkout-flow"
-- type: "release"
-- description: "Gradual rollout of the redesigned checkout experience"
-- projectId: "ecommerce"
+```bash
+claude mcp add unleash \
+    --env UNLEASH_BASE_URL={{your-instance-url}} \
+    --env UNLEASH_PAT={{your-personal-access-token}} \
+    -- npx -y @unleash/mcp@latest
 ```
 
-**Tool payload**
-```json
-{
-  "name": "new-checkout-flow",
-  "type": "release",
-  "description": "Gradual rollout of the redesigned checkout experience with improved conversion tracking",
-  "projectId": "ecommerce",
-  "impressionData": true
-}
+For Codex:
+
+```bash
+codex mcp add unleash \
+    --env UNLEASH_BASE_URL={{your-instance-url}} \
+    --env UNLEASH_PAT={{your-personal-access-token}} \
+    -- npx -y @unleash/mcp@latest
 ```
 
-**Tool output**
-
-On success, the tool returns a JSON object containing the new feature flag's URL in the Unleash Admin UI, an MCP resource link for programmatic access, creation timestamp, and configuration details.
-
-### Evaluate change
-
-The `evaluate_change` tool evaluates whether a code change should be behind a feature flag. It examines the structure, context, and potential risk of the change and returns a recommendation with an explanation and next steps.
-
-#### When to use
-
-Use `evaluate_change` at the beginning of a feature or modification when you want to understand whether the work requires a feature flag. This tool is also helpful when you are unsure which flag type to use or want guidance on rollout planning.
-
-#### How it works
-The tool returns detailed, markdown-formatted guidance for the LLM assistant based on [Unleash best practices](/guides/feature-flag-best-practices).
-
-The guidance includes:
-- **Parent flag detection**: Checks if code is already protected by existing flags.
-- **Risk assessment**: Analyzes code patterns to identify risky operations.
-- **Code type evaluation**: Classifies the change (for example, test, config, feature, or bug fix).
-- **Recommendation**: Suggests whether to create a flag, use an existing flag, or skip the flag.
-- **Next actions**: Provides specific instructions on what to do next.
-
-When `evaluate_change` determines a flag is needed, it provides explicit instructions to:
-
-1. Call `create_flag` tool to create the feature flag.
-2. Call `wrap_change` tool to get language-specific code wrapping guidance.
-3. Implement the wrapped code following the detected patterns.
-
-**The evaluation process**
-
-The tool follows a clear evaluation process:
-
-```
-Step 1: Gather code changes (git diff, read files)
-        ↓
-Step 2: Check for parent flags (avoiding nesting)
-        ↓
-Step 3: Assess code type (test? config? feature?)
-        ↓
-Step 4: Evaluate risk (auth? payments? API changes?)
-        ↓
-Step 5: Calculate risk score
-        ↓
-Step 6: Make recommendation
-        ↓
-Step 7: Take action (create flag or proceed without)
-```
-
-**Risk assessment**
-
-The tool uses language-agnostic patterns to score risk:
-- **Critical risk** (Score +5): For example, auth, payments, security, and database operations.
-- **High risk** (Score +3): For example, API changes, external services, or new classes.
-- **Medium risk** (Score +2): For example, async operations or state management.
-- **Low risk** (Score +1): For example, bug fixes, refactors, or small changes.
-
-**Parent flag detection**
-
-The tool looks for common patterns across languages, such as:
-- **Conditionals**: `if (isEnabled('flag'))`, `if client.is_enabled('flag'):`
-- **Assignments**: `const enabled = useFlag('flag')`
-- **Hooks**: `const enabled = useFlag('flag')` → `{enabled && <Component />}`
-- **Guards**: `if (!isEnabled('flag')) return;`
-- **Wrappers**: `withFeatureFlag('flag', () => {...})`
-
-#### Parameters
-
-All parameters are optional, but more context leads to better recommendations:
-- `repository` (string): Repository name or path.
-- `branch` (string): Current branch name.
-- `files` (array): List of files being changed.
-- `description` (string): Description of the change.
-- `riskLevel` (enum): `low`, `medium`, `high`, or `critical`, as assessed by the user.
-- `codeContext` (string): Surrounding code for parent flag detection.
-
-#### Usage example
-
-**Agent prompt**
-
-Simple usage where you let the agent gather context:
-```
-Use evaluate_change to help me determine if I need a feature flag
-```
-
-Explicit instructions:
-```
-Use evaluate_change with:
-- description: "Add Stripe payment processing"
-- riskLevel: "high"
-```
-
-**Tool payload**
+For clients configured with JSON, add the MCP server to the client's MCP servers:
 
 ```json
 {
-  "repository": "my-app",
-  "branch": "feature/stripe-integration",
-  "files": ["src/payments/stripe.ts"],
-  "description": "Add Stripe payment processing",
-  "riskLevel": "high",
-  "codeContext": "surrounding code for parent flag detection"
-}
-```
-
-**Tool output**
-
-Returns a JSON object with the evaluation result, including a `needsFlag` boolean, a `recommendation` (e.g., "create_new"), a suggested flag name, risk level, and a detailed `explanation`.
-
-```json
-{
-  "needsFlag": true,
-  "reason": "new_feature",
-  "recommendation": "create_new",
-  "suggestedFlag": "stripe-payment-integration",
-  "riskLevel": "critical",
-  "riskScore": 5,
-  "explanation": "This change integrates Stripe payments, which is critical risk...",
-  "confidence": 0.9
-}
-```
-
-### Detect flag
-
-The `detect_flag` tool finds existing feature flags in the codebase so you can reuse them instead of creating duplicates. This tool is automatically integrated into the `evaluate_change` workflow but can also be used manually.
-
-#### When to use
-
-Use this tool before creating a new feature flag or during code evaluation to check for existing flags that might already cover your use case. This helps prevent flag duplication.
-
-#### How it works
-
-The tool returns comprehensive search instructions and uses multiple detection strategies:
-- **File-based detection**: Search in files you're modifying for existing flags.
-- **Git history analysis**: Look for recently added flags in commit history.
-- **Semantic name matching**: Match descriptions to existing flag names.
-- **Code context analysis**: Inspect code around the change.
-
-The tool then follows a scoring process:
-
-```
-Step 1: Execute file-based search (grep for flag patterns in target files)
-        ↓
-Step 2: Search git history for recent flag additions
-        ↓
-Step 3: Perform semantic matching (description → flag names)
-        ↓
-Step 4: Analyze code context (if provided)
-        ↓
-Step 5: Combine scores from all methods
-        ↓
-Step 6: Return best candidate with confidence score
-```
-
-**Confidence levels**
-
-The tool returns candidates with confidence scores:
-
-- High `≥0.7`: Strong match; reuse is recommended.
-- Medium `0.4-0.7`: Possible match; review manually.
-- Low `<0.4`: Weak match; likely create a new flag.
-
-#### Parameters
-
-- `description` (required): Description of the change or feature. For example, `"payment processing with Stripe"`, `"new checkout flow"`.
-- `files` (optional): Files being modified. For example, `["src/payments/stripe.ts", "src/checkout/flow.ts"]`.
-- `codeContext` (optional): Nearby code to scan for flags.
-
-#### Usage example
-
-**Agent prompt**
-
-Check for existing flags before creating a flag:
-```
-Use detect_flag with description "payment processing with Stripe"
-```
-
-Integrated automatically in evaluation:
-```
-Use evaluate_change - automatically searches for existing flags
-```
-
-**Tool payload**
-
-```json
-{
-  "description": "payment processing with Stripe",
-  "files": ["src/payments/stripe.ts"]
-}
-```
-
-**Tool output**
-
-Returns a JSON object indicating if a flag was found. If `flagFound` is true, it includes a `candidate` object with the flag's name, location, confidence score, and the reason for the match.
-
-Match found:
-```json
-{
-  "flagFound": true,
-  "candidate": {
-    "name": "stripe-payment-integration",
-    "location": "src/payments/stripe.ts:42",
-    "context": "if (client.isEnabled('stripe-payment-integration')) {",
-    "confidence": 0.85,
-    "reasoning": "Found in same file you're modifying, added 2 days ago",
-    "detectionMethod": "file-based"
+  "mcpServers": {
+    "unleash": {
+      "command": "npx",
+      "args": ["-y", "@unleash/mcp@latest"],
+      "env": {
+        "UNLEASH_BASE_URL": "{{your-instance-url}}",
+        "UNLEASH_PAT": "{{your-personal-access-token}}"
+      }
+    }
   }
 }
 ```
 
-No match found:
+The exact file and format depend on your client. See the setup guide for your client in [Get started](#get-started).
 
-```json
-{
-  "flagFound": false,
-  "candidate": null
-}
-```
+To opt in to or out of [feedback reports](#send-feedback) without a consent prompt, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false` in the same `env` configuration.
 
-### Wrap change
+### Configuration
 
-The tool `wrap_change` generates language-specific code snippets and guidance for wrapping code with feature flags. It helps LLMs and developers follow existing patterns in the codebase and use flags correctly.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `UNLEASH_BASE_URL` | Yes | The URL of your Unleash instance, such as `https://your-instance.getunleash.io`. Don't include `/api`. |
+| `UNLEASH_PAT` | Yes | The personal access token the server calls Unleash with. |
+| `UNLEASH_MCP_SEND_FEEDBACK` | No | Set to `true` to send [feedback reports](#send-feedback) without asking, or `false` to turn them off. Unset, you're asked on the first report. |
+| `UNLEASH_FEEDBACK_URL` | No | The Unleash instance that receives feedback reports. By default, reports go to Unleash. See [Send reports to your own endpoint](#send-reports-to-your-own-endpoint). |
+| `UNLEASH_MCP_CONFIG_DIR` | No | The directory that stores your feedback answer in `feedback_consent.json`. Defaults to your platform's configuration directory. |
 
-#### When to use
-Use this tool after you have created a feature flag (with `create_flag`) and need to implement it in your code. It's especially useful when you want to ensure you are following existing codebase patterns or need framework-specific examples (e.g., React, Django).
+To keep secrets out of your client configuration, store the variables in an environment file and start the server with `node --env-file=.env`. This requires running the server from a local copy of the [repository](https://github.com/Unleash/unleash-mcp) instead of through `npx`. See the README for the steps.
 
-#### How it works
+## Workflows
 
-This tool is the final step in the `evaluate_change` → `create_flag` → `wrap_change` workflow.
+The following workflows show what you can ask an agent to do. The agent chooses and combines the tools. You don't name them in your prompts.
 
-The tool provides the following guidance in its response:
-1. **Search instructions**: Step-by-step guide for finding existing flag patterns in your codebase using grep.
-2. **Pattern detection**: Identifies common patterns (for example, imports, client variable names, method names, or wrapping styles).
-3. **Default templates**: Fallback code snippets if no patterns are found.
-4. **Framework-specific examples**: Specialized patterns for React, Express, Django, and others.
-5. **Multiple patterns**: If-blocks, guard clauses, hooks, decorators, middleware, and more.
+Before it changes anything, an agent usually looks up the values it needs, such as project IDs, segment IDs, and context fields. The `search` and `inspect` tools provide the same options that the Unleash UI shows in its dropdowns. You can say "the checkout project" and the agent finds the matching ID.
 
-**Supported languages and frameworks:**
+If the flag doesn't exist, the server creates it in a switched-off state. To turn a flag on in an environment, ask the agent to enable it explicitly or release it gradually.
 
-- **TypeScript/JavaScript**: Node.js, React Hooks, Express middleware.
-- **Python**: FastAPI, Django, Flask decorators.
-- **Go**: Standard if-blocks, HTTP middleware.
-- **Ruby**: Rails controllers.
-- **PHP**: Laravel controllers.
-- **C#**: .NET/ASP.NET controllers.
-- **Java**: Spring Boot.
-- **Rust**: Actix/Rocket handlers.
+### Release a feature gradually
 
-#### Parameters
+Ask the agent to release a flag to a share of users in one environment:
 
-- `flagName` (required): Feature flag name to wrap the code with. For example: `"new-checkout-flow"`, or `"stripe-integration"`.
-- `language` (optional): Programming language (auto-detected from `fileName` if not provided). Supported: `typescript`, `javascript`, `python`, `go`, `ruby`, `php`, `csharp`, `java`, `rust`
-- `fileName` (optional): File name being modified (helps detect language), For example: `"checkout.ts"`, `"payment.py"`, or `"handler.go"`.
-- `codeContext` (optional): Surrounding code to help detect existing patterns.
-- `frameworkHint` (optional): Framework for specialized templates. For example, `"React"`, `"Express"`, `"Django"`, `"Rails"`, or `"Spring Boot"`.
+- "Roll out new-checkout to 10% of users in production."
+- "Release new-checkout to the beta-testers segment in staging, then to 25% of everyone else."
+- "Release new-checkout in production using the standard rollout template."
+
+The agent describes the end state of the release for that environment, and the server replaces the environment's existing targets with it. Each audience in a release has a name that says why it exists, for example "Beta testers".
+
+### Add a kill switch
+
+Ask the agent to turn a permanent kill switch on or off, for everyone or for selected audiences:
+
+- "Turn off payments in production."
+
+If the kill switch doesn't exist, the server creates it as a permanent flag of the kill switch type. A name that describes the disabled state, such as `disable-payments`, makes the switch easier to read.
+
+### Run an A/B test
+
+Ask the agent to split an audience across values, or to give each audience its own value:
+
+- "Split checkout 50/50 between control and the new flow."
+
+If the flag doesn't exist, the server creates it as an experiment flag that reports impression data. The MCP server sets up the split. It doesn't analyze the results, and it doesn't end the experiment for you.
+
+### Check who gets a feature
+
+Ask the agent to evaluate a flag in an environment, with a context such as a user ID or country:
+
+- "Does user 42 get new-checkout in production?"
+- "Why isn't user 42 seeing new-checkout in staging?"
+
+This is the agent equivalent of the [Unleash playground](/concepts/playground). The result tells you whether the flag is enabled, disabled, or unknown for the context, and explains each target in the order Unleash checks them: which segments and constraints matched or missed, and what rollout percentage applied. If a parent flag or the environment turns the flag off, the result says so.
+
+A result of unknown means a target uses a [custom strategy](/concepts/activation-strategies) that only an SDK can evaluate.
+
+### Look up and manage your inventory
+
+Ask the agent to find things, or to prepare them before a release:
+
+- "Which flags in the checkout project are tagged team:payments?"
+- "Show me everything about the new-checkout flag."
+- "Create a beta-testers segment for userId 1, 2, and 3."
+- "Make new-checkout depend on the payments-v2 flag."
+- "Archive the old-banner flag."
+
+### Review what changed
+
+Ask the agent what changed, who changed it, and when:
+
+- "What changed in production yesterday?"
+- "Show me the history of new-checkout this week."
+
+A search covers at most 31 days and defaults to yesterday and today.
+
+### Ask about Unleash
+
+Ask the agent a question about Unleash practices or concepts, such as how to add the SDK to a framework or which flag type to use. The `docs` tool gives the agent the index of the Unleash documentation, and the agent reads the pages that answer your question.
 
 
-#### Usage example
+### Clean up stale flags
 
-**Agent prompt**
+The server helps you find stale flags and record their outcome in Unleash. Your agent removes the flag from the code using its own knowledge of your codebase, with the Unleash documentation for guidance.
 
-```
-Use wrap_change with:
-- flagName: "new-checkout-flow"
-- fileName: "src/components/checkout.ts"
-- frameworkHint: "React"
-```
+<Steps>
 
-**Tool payload**
+<Step title="Find stale flags">
 
-```json
-{
-  "flagName": "new-checkout-flow",
-  "fileName": "checkout.ts",
-  "frameworkHint": "React"
-}
-```
+Ask the agent to list flags that are stale or potentially stale in a project. Unleash marks a flag as potentially stale when it passes its expected lifetime.
 
-**Tool output**
+- "List the stale and potentially stale flags in the checkout project."
 
-Returns a comprehensive, markdown-formatted string that guides the user on how to wrap their code. This includes a quickstart, search instructions, wrapping instructions with placeholders, all available templates for the language, and links to SDK documentation.
+</Step>
 
-```markdown
-# Feature Flag Wrapping Guide: "new-checkout-flow"
+<Step title="Check each flag">
 
-**Language:** TypeScript
-**Framework:** React
+Ask the agent to inspect a flag before you act on it. The agent can see the environments where the flag is enabled, when SDKs last reported it, its parent and child flags, and any pending change requests.
 
-## Quick Start
-[Recommended pattern with import and usage]
+- "Is it safe to remove the old-banner flag? Check where it's enabled and when it was last used."
 
-## How to Search for Existing Flag Patterns
-[Step-by-step Grep instructions]
+</Step>
 
-## How to Wrap Code with Feature Flag
-[Wrapping instructions with examples]
+<Step title="Record how the rollout ended">
 
-## All Available Templates
-[If-block, guard clause, hooks, ternary, etc.]
-```
+Ask the agent to record whether you kept or discarded the feature. If you kept it and tried several values, the agent records the value you kept. You can also confirm or override the stale marking. These are notes for your team and don't change what SDKs receive.
 
-### Send feedback
+</Step>
 
-<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button>
+<Step title="Remove the flag from the code">
 
-The `send_feedback` tool shares anonymous diagnostic feedback reports with Unleash to help improve the MCP server. Unleash uses these reports to prioritize fixes and new tools.
+Ask the agent to remove the flag and the code path you no longer need. Review and deploy the change as usual.
+
+</Step>
+
+<Step title="Archive the flag">
+
+After the code change is live, ask the agent to archive the flag. Archived flags are no longer served to SDKs, which treat them as off, so archive a flag only after no code evaluates it. In an environment with change requests, archiving creates one.
+
+</Step>
+
+</Steps>
+
+
+## Change requests and approvals
+
+AI agents can make mistakes. When you turn on [change requests](/concepts/change-requests) for an environment, the server follows them automatically:
+
+- Tools that change an environment, such as `releases`, `kill switches`, and `experiments`, put the change into a change request instead of applying it.
+- The agent receives the change request ID, its state, and a link to it in the Unleash UI. It passes the link to you.
+- You review, approve, and apply or schedule the change request in Unleash. The server can't approve or apply it. These steps remain with a human, intentionally.
+- When the agent inspects a flag, it sees pending change requests, so it doesn't mistake a waiting change for an applied one or request it again.
+
+You don't have to ask the agent to create a change request.
+
+<Warning>
+When you have an open draft change request, Unleash adds the agent's change to your draft. The MCP server then submits the whole draft for review, including any changes you made yourself.
+</Warning>
+
+Enable change requests on any environment where unreviewed changes pose a risk, especially production. For configuration steps, see [change requests](/concepts/change-requests).
+
+## Limits
+
+The server is designed to cover the common cases in a token-efficient way. Some operations stay in the Unleash UI or in the API:
+
+- **Approvals and access control**: You approve change requests, and manage users, roles, and tokens, in the UI.
+- **Flag deletion**: The server archives and revives flags but doesn't delete them, because you can't undo a deletion.
+- **Other activation strategies**: Releases write gradual rollouts. If an environment has other kinds of targets, such as user ID lists or IP addresses, the server refuses to change that environment's targets and asks you to change them in the UI.
+- **Experiment results**: The server sets up an experiment but doesn't analyze its results.
+- **Audit history**: A search covers at most 31 days, in pages of 25 changes.
+
+## Send feedback
+
+The `send_feedback` tool shares anonymous diagnostic reports with Unleash to help improve the MCP server. Unleash uses these reports to prioritize fixes and new tools.
 
 You don't call this tool yourself. The assistant calls it automatically.
 
-#### When to use
+### When feedback is sent
 
 The assistant sends a report before it replies to you in the following cases:
 
 - `tool_error`: A tool call returns an error.
 - `unsupported_action`: You ask for something the MCP server can't do yet.
 - `unexpected_result`: A tool call succeeds, but the result isn't what the assistant expected.
+- `unanswered_question`: You ask about Unleash and the documentation pages the assistant read don't answer it.
 
 The assistant doesn't send a report for authentication errors (HTTP 401 or 403), or when `send_feedback` itself fails.
 
-#### Consent
+### Consent
 
 The local MCP server sends feedback reports only after you opt in. The first time the assistant calls `send_feedback`, your client shows a consent prompt. What happens next depends on your response:
 
@@ -783,7 +432,7 @@ To skip the prompt, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false`. The va
 
 The remote MCP server doesn't show a consent prompt. Instead, an admin turns feedback reports on or off for the whole instance. See [Feedback from the remote server](#feedback-from-the-remote-server).
 
-#### Clients without a consent prompt
+### Clients without a consent prompt
 
 In the following clients, you don't see the consent prompt. To opt in or out, set `UNLEASH_MCP_SEND_FEEDBACK` to `true` or `false`.
 
@@ -810,19 +459,19 @@ Feedback reports stay off until you set `UNLEASH_MCP_SEND_FEEDBACK=true`.
 </Tab>
 </Tabs>
 
-#### What is recorded
+### What is recorded
 
 Each report contains only the following fields:
 
-- Issue type, tool name, and normalized error code
+- Issue type, the name of the tool involved, and the status and error name of a failed result
 - MCP server version, client name, and client version
 - A short summary that the assistant writes
 
-The tool name and error code follow a fixed format, so they can't contain free text. The assistant is instructed to leave flag names, project IDs, code, URLs, and tokens out of the summary. Reports never include raw error messages or your personal access token.
+The tool name is chosen from a fixed list, and the error name follows a fixed format, so neither can contain free text. The assistant is instructed to leave flag names, project IDs, code, URLs, and tokens out of the summary. Reports never include raw error messages or your personal access token.
 
 By default, reports go to Unleash, not to your Unleash instance. To send them to your own endpoint instead, see [Send reports to your own endpoint](#send-reports-to-your-own-endpoint). See also [Data and privacy](/privacy-and-compliance/data-privacy#mcp-server-feedback).
 
-#### Send reports to your own endpoint
+### Send reports to your own endpoint
 
 To collect feedback reports yourself instead of sending them to Unleash, set `UNLEASH_FEEDBACK_URL` to the base URL of your endpoint, for example `https://feedback.example.com`. The URL must start with `http://` or `https://`.
 
@@ -831,132 +480,56 @@ The MCP server then sends each report as a `POST` request to `{UNLEASH_FEEDBACK_
 ```json
 {
   "category": "mcp",
-  "userType": null,
-  "difficultyScore": null,
-  "positive": null,
-  "areasForImprovement": "{\"issueType\":\"tool_error\",\"summary\":\"Setting the rollout failed with a server error.\",\"tool\":\"set_flag_rollout\",\"errorCode\":\"HTTP_500\",\"mcpVersion\":\"0.5.0\",\"client\":\"claude-code\",\"clientVersion\":\"2.1.80\"}"
+  "areasForImprovement": "{\"issueType\":\"tool_error\",\"summary\":\"Releasing the flag failed with a server error.\",\"tool\":\"release\",\"error\":{\"status\":500,\"name\":\"ServerError\"},\"mcpVersion\":\"2.0.0\",\"client\":\"claude-code\",\"clientVersion\":\"2.1.80\"}"
 }
 ```
 
 Reports sent to your own endpoint don't reach Unleash. Consent works the same way: the MCP server sends reports only after you opt in.
 
-#### Parameters
+## Migrate from version 0.5
 
-- `issueType` (required): `tool_error`, `unsupported_action`, or `unexpected_result`.
-- `summary` (required): One or two sentences describing what went wrong or what was requested (maximum 500 characters).
-- `tool` (optional): Name of the MCP tool involved, for example `create_flag`. Omit for unsupported requests.
-- `errorCode` (optional): Normalized error code from the failed tool result, for example `HTTP_500` or `VALIDATION_ERROR`.
+Version 2 of the Unleash MCP server replaces the tools of version 0.5 with a smaller set built around outcomes. It also changes the requirements:
 
-#### Output
+- **Node.js 24 or later**: Version 0.5 required Node.js 20 or later.
+- **No `UNLEASH_DEFAULT_PROJECT`**: The agent looks up the project instead.
+- **No command-line flags**: The `--log-level` and `--dry-run` flags are removed.
+- **No code-aware guidance in the server**: The server no longer generates code wrapping templates or cleanup instructions. The agent uses its own knowledge of your language and framework, and the Unleash documentation, instead.
 
-Returns a confirmation that the report was sent, or would be sent in `--dry-run` mode. If you haven't opted in, returns a message that feedback is disabled. The structured content includes `success`, `sent`, `dryRun`, and `message`. If the MCP server can't save whether you opted in or out to `feedback_consent.json`, the result also includes a `warning`. In that case, your choice applies to the current session only, and you see the prompt again in your next session.
+Use the following table to find the closest equivalent of each tool in version 0.5:
 
-## Architecture
+| Version 0.5 tool | Closest equivalent now |
+|------------------|------------------------|
+| `evaluate_change` | The agent decides whether a change needs a flag, guided by the [documentation](/guides/feature-flag-best-practices) and your team's skills. |
+| `detect_flag` | `search` for existing flags by name or tag. |
+| `create_flag` | `release`, `kill_switch`, and `experiment` create a missing flag. `manage_flag` defines a flag without releasing it. |
+| `wrap_change` | The agent writes the code, using the Unleash SDK documentation. |
+| `list_projects`, `list_flags` | `search` |
+| `get_flag_state` | `inspect` |
+| `set_flag_rollout`, `toggle_flag_environment`, `remove_flag_strategy` | `release` describes the end state of an environment, including turning a flag off. |
+| `cleanup_flag` | `manage_flag` records the outcome and archives the flag. The agent removes the code. See [Clean up stale flags](#clean-up-stale-flags). |
+| `send_feedback` | `send_feedback`. See [Send feedback](#send-feedback). |
 
-The server follows a focused, purpose-driven design:
-
-- **Thin surface area**: Only the endpoints needed for the core capabilities.
-- **Purpose-driven**: Each module serves a specific, well-defined purpose.
-- **Explicit validation**: Zod schemas validate all inputs before API calls.
-- **Error normalization**: All errors converted to `{code, message, hint}` format.
-- **Progress streaming**: Long-running operations provide visibility.
-- **Best practices integration**: Guidance from Unleash docs embedded in tool descriptions.
-- **Opt-in feedback**: The local server sends [feedback reports](#send-feedback) only after you opt in, and each report contains a fixed set of fields.
-
-## Configuration
-
-This section provides a quick reference for all configuration options.
-
-**Environment variables:**
-- `UNLEASH_BASE_URL`: Your Unleash instance URL (required).
-- `UNLEASH_PAT`: Personal access token (required).
-- `UNLEASH_DEFAULT_PROJECT`: The default project ID the MCP should use (optional).
-- `UNLEASH_MCP_SEND_FEEDBACK`: Set to `true` or `false` to opt in to or out of [feedback reports](#send-feedback) without a consent prompt (optional). Takes precedence over `feedback_consent.json`. With `false`, the assistant doesn't see the `send_feedback` tool.
-- `UNLEASH_FEEDBACK_URL`: Base URL of your own endpoint for feedback reports (optional). By default, reports go to Unleash. See [Send reports to your own endpoint](#send-reports-to-your-own-endpoint).
-- `UNLEASH_MCP_CONFIG_DIR`: Directory for `feedback_consent.json` (optional). Defaults to your platform's configuration directory. See [Consent](#consent).
-
-**CLI flags:**
-- `--dry-run`: Simulate operations without making actual API calls.
-- `--log-level`: Set logging verbosity (debug, info, warn, error).
-
-## Protect production environments
-
-AI assistants can make mistakes and toggle the wrong flag. When [change requests](/concepts/change-requests) are enabled for an environment, the MCP server submits a change request instead of applying the change directly. A human must approve the request before it takes effect, preventing accidental changes whether made manually or by an AI assistant.
-
-Enable change requests on any environment where unreviewed changes pose a risk, especially production. For configuration steps, see [change requests](/concepts/change-requests).
-
-## Best practices
-
-This server encourages Unleash best practices from the [official documentation](/guides/feature-flag-best-practices):
-
-### Flag lifecycle
-
-1. **Create with intent**: Choose the right flag type to signal purpose.
-2. **Document clearly**: Write descriptions that explain the "why".
-3. **Plan for cleanup**: Feature flags are temporary; plan their removal.
-4. **Monitor usage**: Enable impression data for important flags.
-
-### Flag types
-
-- **Release flags**: For gradual feature rollouts (remove after full rollout).
-- **Experiment flags**: For A/B tests (remove after analysis).
-- **Operational flags**: For system behavior (longer-lived, review periodically).
-- **Kill switches**: For emergency controls (maintain until feature is stable).
-- **Permission flags**: For access control (longer-lived, review permissions).
-- **Sunset flags**: For planned feature removal.
-
-### Naming conventions
-
-- Use kebab-case: `new-checkout-flow`
-- Be descriptive: `enable-ai-recommendations` not `flag1`.
-- Include scope when needed: `mobile-push-notifications`.
-
-## API reference
-
-This server uses the Unleash Admin API. For complete API documentation, see:
-
-- [Unleash Admin API OpenAPI Spec](https://app.unleash-hosted.com/hosted/docs/openapi.json)
-- [Unleash API Documentation](/api)
-
-### Endpoints used
-
-- `POST /api/admin/projects/{projectId}/features` - Create feature flag
-
-`send_feedback` doesn't call your Unleash instance. It sends reports to Unleash, or to `POST {UNLEASH_FEEDBACK_URL}/feedback` if you set [your own endpoint](#send-reports-to-your-own-endpoint).
+To keep using version 0.5, pin it in your client configuration: `npx -y @unleash/mcp@0.5.0`.
 
 ## Troubleshooting
 
-### Configuration issues
+The server returns failures to the agent as text, so the agent usually tells you what went wrong.
 
-**Error: "UNLEASH_BASE_URL must be a valid URL"**: Ensure your base URL is complete, including protocol. For example, `https://app.unleash-hosted.com/instance`. Remove any trailing slashes.
+**The agent can't connect to the server**: Check that `UNLEASH_BASE_URL` is a complete URL that includes the protocol, such as `https://your-instance.getunleash.io`, without `/api` at the end. Check that `UNLEASH_PAT` is set. For the local server, run `node --version` and confirm it's 24 or later.
 
-**Error: "UNLEASH_PAT is required"**: Check that your `.env` file exists and contains `UNLEASH_PAT={{your-personal-access-token}}`. Verify that the token is valid in Unleash.
+**Unauthorized (HTTP 401)**: Your token is invalid or has expired. Create a new token under **Profile** > **View profile settings** > **Personal API tokens**. For the remote server with browser login, log in again to get a new 24-hour token.
 
-### API issues
+**Forbidden (HTTP 403)**: Your token doesn't have permission for this action. Review the role and permissions of the user or service account in Unleash.
 
-**Error: "HTTP_401"**: Your personal access token may be invalid or expired. Generate a new token under **Profile > View Profile settings > Personal API tokens > New token**.
+**Not found (HTTP 404)**: The project, flag, or environment doesn't exist, or you can't see it. Ask the agent to search for the correct name first.
 
-**Error: "HTTP_403"**: Your token doesn't have permission to create flags in this project. Review your role and permissions in Unleash.
+**A change didn't take effect**: Check whether the environment requires change requests. The change might be waiting for approval in Unleash. Ask the agent to inspect the flag to see pending change requests.
 
-**Error: "HTTP_404"**: The project ID doesn't exist. Confirm the project ID in Unleash Admin UI.
+**"Feedback is disabled"**: You declined the consent prompt, your client couldn't show it, or `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK=true`. To see the prompt again, delete `feedback_consent.json`. See [Consent](#consent). Feedback settings don't affect flag operations.
 
-**Error: "HTTP_409"**: A flag with this name already exists in the project. Use a different name or reuse the existing flag.
+## Related resources
 
-### Feedback issues
-
-**"Feedback is disabled"**: You declined the consent prompt, your client couldn't show it, or `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, set `UNLEASH_MCP_SEND_FEEDBACK=true`. To see the prompt again, delete `feedback_consent.json`. See [Consent](#consent).
-
-**Error: "Failed to connect to the Unleash feedback endpoint"**: The MCP server can't reach the address that receives feedback reports. Check your network connection. If you set `UNLEASH_FEEDBACK_URL`, check that the URL is correct. Flag operations aren't affected.
-
-## License
-
-MIT
-
-## Contributing
-
-This is a purpose-driven project with a focused scope. Contributions should:
-
-- Align with the three core use cases (evaluate and wrap code in feature flags, manage rollouts, clean up after rollout).
-- Maintain the thin, purpose-driven architecture.
-- Follow Unleash best practices.
-- Include clear documentation.
+- [Unleash MCP server on GitHub](https://github.com/Unleash/unleash-mcp)
+- [Change requests](/concepts/change-requests)
+- [Feature flag best practices](/guides/feature-flag-best-practices)
+- [API tokens and client keys](/concepts/api-tokens-and-client-keys)
