@@ -4,7 +4,7 @@ description: "Learn how to configure self-hosted Unleash using Docker environmen
 max-toc-depth: 3
 og:title: Configure Unleash
 og:site_name: Unleash
-last-updated: October 15, 2026
+last-updated: November 10, 2026
 ---
 
 This guide explains how to configure your self-hosted Unleash instance when running it via [Docker Compose or the Docker CLI](/deploy/getting-started).
@@ -237,12 +237,36 @@ If emails fail to send or contain errors:
 | :------------------------------------ | :------------------ | :--------------------------------------------------------------------------------------------------------------- |
 | `SECURE_HEADERS`                      | `false`             | Set to `true` to enable security headers like HSTS, CSP (recommended if serving over HTTPS).                       |
 | `CSP_ALLOWED_*`                       | N/A                 | Comma-separated lists for specific [CSP directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy#directives) when `SECURE_HEADERS` is true. For example: `CSP_ALLOWED_SCRIPT` for `script-src`.     |
-| `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` | `false`           | Enables `SESSION_IDLE_TIMEOUT_MINUTES` and lets Unleash end sessions itself, answering the first request past a deadline with `401`. While this is off, sessions past their maximum length expire rather than being ended, and no idle timeout applies. |
-| `SESSION_TTL_HOURS`                   | `48`                | User session duration in hours, measured from sign-in and never extended by activity. Applies whether or not session timeouts are enabled. |
-| `SESSION_IDLE_TIMEOUT_MINUTES`        | `0`                 | Minutes of inactivity after which a session ends; `0` disables it. Requires session timeouts to be enforced and a value lower than `SESSION_TTL_HOURS` — otherwise Unleash logs a warning at startup and the limit never applies. Activity means a state-changing request, or the Admin UI reporting user input; page views and background polling do not count. |
-| `SESSION_CLEAR_SITE_DATA_ON_LOGOUT`   | `true`              | Whether to send `Clear-Site-Data` header on logout. |
+| `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` | `false`           | Set to `true` to enable the idle timeout and SSO re-authentication requests. See [Session timeouts](#session-timeouts). |
+| `SESSION_TTL_HOURS`                   | `48`                | Maximum session length in hours, measured from sign-in. Activity does not extend it. |
+| `SESSION_IDLE_TIMEOUT_MINUTES`        | `15`                | Minutes of inactivity after which a session ends. Set to `0` to disable the idle timeout. Applies only when `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` is `true`. |
+| `SESSION_CLEAR_SITE_DATA_ON_LOGOUT`   | `true`              | Whether to send the `Clear-Site-Data` header on logout and when a session reaches the idle timeout. |
 | `MAX_PARALLEL_SESSIONS`             | N/A                 | Maximum number of parallel user sessions allowed with password-based login.                                                                |
 | `UNLEASH_FRONTEND_API_ORIGINS` |	`*` |	Comma-separated list of allowed origins (CORS) for the Frontend API. Use * with caution. Example: https://app.mycompany.com,https://*.yourdomain.net.|
+
+#### Session timeouts
+
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button>
+
+Unleash limits how long a session lasts in two ways:
+
+- **Maximum session length**: A session ends `SESSION_TTL_HOURS` after sign-in, regardless of activity. This limit always applies.
+- **Idle timeout**: A session ends after `SESSION_IDLE_TIMEOUT_MINUTES` without activity. This limit applies only when `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` is `true`.
+
+When a session reaches either limit, Unleash ends the session and responds to the next request with a `401` status code. The user must sign in again.
+
+To use the idle timeout, set `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` to `true`. If you don't set `SESSION_IDLE_TIMEOUT_MINUTES`, sessions end after 15 minutes without activity.
+
+The following count as activity and restart the idle timeout:
+
+- A request that changes data, such as creating or updating a feature flag.
+- User input in the Unleash Admin UI, such as clicking, typing, or scrolling, while the browser tab is visible.
+
+Page views and background polling do not count as activity.
+
+Set `SESSION_IDLE_TIMEOUT_MINUTES` to a value shorter than `SESSION_TTL_HOURS`. If the idle timeout is equal to or longer than the maximum session length, Unleash logs a warning at startup and the idle timeout never takes effect.
+
+When `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` is `true`, Unleash also asks your identity provider to re-authenticate users each time they start an SSO sign-in from Unleash. For details, see [Session length and re-authentication](/concepts/sso#session-length-and-re-authentication).
 
 
 ### Logging and monitoring

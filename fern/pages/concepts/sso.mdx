@@ -5,7 +5,7 @@ keywords: sso, single sign-on, saml, openid connect, authentication, okta, keycl
 og:site_name: Unleash Documentation
 og:title: Single Sign-On Configuration in Unleash
 max-toc-depth: 3
-last-updated: October 15, 2026
+last-updated: November 10, 2026
 ---
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -25,6 +25,13 @@ For step-by-step configuration instructions, refer to the following guides:
 
 ## Session length and re-authentication
 
-How long a signed-in session lasts, and what happens when it ends, is configured separately from SSO.
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button>
 
-When session timeouts are enabled, Unleash also asks your identity provider for a fresh authentication on every SSO sign-in — `ForceAuthn` for SAML 2.0, `prompt=login` and `max_age` for OpenID Connect. Whether the provider acts on that request is controlled on the provider side and varies between providers.
+SSO settings do not control how long a session lasts. For self-hosted instances, you set the maximum session length and the idle timeout with environment variables. See [Session timeouts](/deploy/configuring-unleash#session-timeouts).
+
+When `UNLEASH_EXPERIMENTAL_SESSION_TIMEOUTS` is `true`, Unleash asks your identity provider to re-authenticate the user each time they start an SSO sign-in from Unleash, instead of reusing an existing identity provider session:
+
+- **SAML 2.0**: Unleash sets `ForceAuthn` in the authentication request.
+- **OpenID Connect**: Unleash sends the `prompt=login` and `max_age` parameters.
+
+Your identity provider decides whether to honor the request, and behavior varies between providers. For example, Okta honors `ForceAuthn` only when **Honor Force Authentication** is enabled for the application. If the identity provider does not re-authenticate the user, Unleash still completes the sign-in and logs a warning.
