@@ -6,7 +6,7 @@ og:title: Set up SSO with SAML 2.0 and Okta
 keywords: SSO, SAML, Okta, single sign-on, authentication
 max-toc-depth: 3
 slug: single-sign-on/how-to-add-sso-saml
-last-updated: May 11, 2026
+last-updated: November 5, 2026
 ---
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -55,9 +55,12 @@ will hold the settings we need for Unleash.
 
 **c) Configure SAML 2.0**
 
-Unleash expects an email to be sent from the SSO provider so make sure Name ID format is set to email. Also you must
-give the IdP Initiated SSO URL Name, we have chosen to call it "unleash-enterprise". This gives us the Sign-on URL we
-will need in our Unleash configuration later.
+Configure these settings separately:
+
+- **Single sign-on URL (ACS):** `https://<your-unleash-url>/auth/saml/callback`. For hosted instances, use `https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>/auth/saml/callback`. If you enter **Recipient URL** and **Destination URL** separately, use this same callback URL.
+- **Audience URI (SP Entity ID):** The public Unleash instance URL. For hosted instances, use `https://<region>.app.unleash-hosted.com/<your_unleash_instance_name>`. This must exactly match the public URL configured in Unleash, including the scheme, hostname, instance path, and any trailing slash. Do not add a trailing slash unless the configured URL includes one, and do not append `/auth/saml/callback`.
+- **IdP-initiated SSO URL name:** A separate Okta setting, which may use `unleash-enterprise`. This name is not the Audience URI. Copy the resulting IdP sign-on URL from Okta's setup instructions for use in Unleash.
+- **Name ID format:** `EmailAddress`. Unleash expects the SSO provider to send an email address.
 
 Additionally, you may provide the following attributes:
 
@@ -67,14 +70,11 @@ Additionally, you may provide the following attributes:
 _(These will be used to enrich the user data in Unleash)._
 
 <Frame background="subtle">
-![Okta: Configure SAML](/assets/okta_configure_saml2.0-768x832.png)
+![Okta: Configure SAML with the callback URL as ACS and the public instance URL as Audience URI](/assets/okta_configure_saml2.0-768x832.png)
 </Frame>
 
 <Note>
-Please make sure to replace URLs with the public URL for your Unleash instance. This will require correct region
-prefix and the instance name. The example above uses region="us" and instance-name="ushosted".
-
-The correct format is: https://**[region]**.app.unleash-hosted.com/**[instanceName]**/auth/saml/callback
+Replace the example URLs with your own public Unleash URL, including the correct region and instance path for hosted instances.
 </Note>
 
 **d) Get the Okta Setup Instructions**
@@ -89,6 +89,8 @@ Click the "View Setup Instructions" to get the necessary configuration required 
 
 Go back to Unleash Admin Dashboard and navigate to `Admin Menu -> Single-Sign-On -> SAML`. Fill in the values captured
 in the _"Get the Okta Setup Instructions"_ step.
+
+The **Entity ID** field in Unleash identifies the IdP (Okta). It is separate from Unleash's SP Entity ID configured as the Audience URI in Okta.
 
 You may also choose to "Auto-create users". This will make Unleash automatically create new users on the fly the first
 time they sign-in to Unleash with the given SSO provider (JIT). If you decide to automatically create users in Unleash
@@ -203,7 +205,7 @@ You'll need the following variables at the very least
 | Variable name         | Purpose                                                                                                   | Required                                 | Possible values         |
 |-----------------------|-----------------------------------------------------------------------------------------------------------|------------------------------------------|-------------------------|
 | SAML_ENABLED          | Tells unleash that you want to use environment variable configuration and turns on support for SAML login | Yes                                      | true / false            |
-| SAML_ENTITY_ID        | The SAML 2.0 entity ID                                                                                    | Yes                                      | Strings                 |
+| SAML_ENTITY_ID        | The IdP's SAML 2.0 entity ID, not Unleash's SP Entity ID                                                    | Yes                                      | Strings                 |
 | SAML_SIGNON_URL       | Which URL to use for redirecting Single Sign on requests                                                  | Yes                                      | Valid url               |
 | SAML_CERTIFICATE_FILE | An absolute path to read the X509 certificate from                                                        | Only if SAML_CERTIFICATE is not set      | Absolute file paths     |
 | SAML_CERTIFICATE      | The X509 certificate as a string                                                                          | Only if SAML_CERTIFICATE_FILE is not set | X509 certificate string |
