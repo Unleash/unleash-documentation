@@ -5,7 +5,7 @@ keywords: a/b testing, feature flags, experimentation, variants, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Implement A/B testing using feature flags"
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: October 27, 2026
 ---
 
 Feature flags are a great way to run A/B or multivariate tests with minimal code modifications, and Unleash offers built-in features that make it easy to get started. In this tutorial, we will walk through how to do an A/B test using Unleash with your application.
@@ -67,7 +67,7 @@ In this tutorial, we'll use a gradual rollout strategy with the rollout percenta
   Activation strategies are defined and configured on the Unleash server. Backend SDKs evaluate feature flags locally using the configuration retrieved from the server. For frontend SDKs, evaluation happens on the server side, and the results are delivered to the client by the Unleash server or Unleash Edge.
 </Note>
 
-Let's set up the strategy! Open your feature flag, and select an environment. Click **Add strategy**, select **Gradual rollout**, and click **Configure**.
+Let's set up the strategy! Open your feature flag, and select an environment. Click **Add strategy**, then under **Set up manually**, click **Configure**.
 
 <Frame background="subtle">
   ![Add your first strategy from the flag view in Unleash.](/assets/add-strategy.png)

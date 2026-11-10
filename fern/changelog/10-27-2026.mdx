@@ -1,0 +1,57 @@
+---
+description: Review Unleash v8.3.0 release notes, covering secure token storage, the simplified Add strategy dialog, deleting tags, new regex, IP address, and SemVer constraint operators, and feedback reports from the MCP server.
+tags: ["Unleash", "SDKs", "MCP server"]
+---
+
+# Unleash v8.3.0
+
+## Secure token storage
+
+Unleash now stores API tokens securely by default. Every backend, frontend, personal access, and service account token you create in v8.3 or later is a [secure token](/concepts/api-tokens-and-client-keys#token-versions): Unleash stores a selector and a verifier in its database instead of the complete token, so the token can't be recovered from the database or its backups. You can recognize a secure token by the `v2_` prefix in its secret.
+
+Because Unleash never stores the complete token, it shows the token only once, when you create it. Copy it immediately and store it in a secrets manager. If you lose a secure token, [rotate it](/concepts/api-tokens-and-client-keys#rotate-a-token).
+
+Tokens created in v8.2 or earlier are [legacy tokens](/concepts/api-tokens-and-client-keys#token-versions) and keep working after you upgrade. To replace them with secure tokens, [rotate each legacy token](/concepts/api-tokens-and-client-keys#upgrade-to-secure-token-storage), including tokens created from the `INIT_*_API_TOKENS` environment variables. If you use [Unleash Edge](/unleash-edge), upgrade to Edge v20.5.0 or later for improved token telemetry.
+
+For self-hosted v8.2 instances, you can opt in before upgrading. Set the environment variables for the token types you use and restart Unleash:
+
+| Environment variable | Token types |
+| --- | --- |
+| `UNLEASH_EXPERIMENTAL_SECURE_TOKEN=true` | Backend, frontend, and deprecated admin tokens, including tokens created for Unleash Edge |
+| `UNLEASH_EXPERIMENTAL_SECURE_ACCOUNT_TOKEN=true` | Personal access tokens and service account tokens |
+
+These settings affect newly generated tokens only. From v8.3, secure storage is the default and these environment variables are not required.
+
+## Simplified Add strategy dialog
+
+The **Add strategy** dialog now presents three options instead of a list of every strategy type, so you can pick the right one without comparing similar choices:
+
+- **Use project default** applies the [default strategy](/concepts/activation-strategies#default-strategy) your team has defined for the environment in this project.
+- **Set up manually** opens the [gradual rollout](/concepts/activation-strategies#gradual-rollout) form, where you choose the rollout percentage, targeting, and variants. This option replaces the separate Standard and Gradual rollout strategies, and carries a **Gradual rollout** label during the transition.
+- **Start from a template** applies a [release template](/concepts/release-templates) with a predefined sequence of milestones.
+
+The IPs and Hosts [advanced strategies](/concepts/activation-strategies#advanced-strategies) and your [custom strategies](/concepts/activation-strategies#custom-strategies) are available under **More strategies**. See [Strategy types](/concepts/activation-strategies#strategy-types).
+
+## Delete tags
+
+You can now [delete a tag](/concepts/feature-flags#delete-a-tag) that you no longer need. Go to **Configure > Tag types**, select the tag type, and click **Delete** next to the tag value. The list shows how many flags use each value. Deleting a tag removes it from every feature flag that uses it, while the tag type and its other values stay in place. You can also delete tags with the [delete tag](/api/delete-tag) endpoint.
+
+## Flag links moved into Flag details
+
+[External links](/concepts/feature-flags#external-links) now live in a **Resources** section at the bottom of the **Flag details** panel on the flag's **Overview** page, instead of in a separate box. Click **Add link** in that section to add a link. Everything else about links works as before.
+
+## Feedback reports from the MCP server
+
+The [Unleash MCP server](/integrate/mcp) can now send anonymous diagnostic reports to Unleash when a tool call fails, returns an unexpected result, or you ask for something the server can't do yet. Unleash uses these reports to prioritize fixes and new tools. Reports never include flag names, project IDs, code, raw error messages, or tokens. The local MCP server asks for your consent first, and an admin controls the setting for the remote MCP server. See [Send feedback](/integrate/mcp#send-feedback).
+
+## Regex, IP address, and SemVer constraint operators
+
+New [constraint operators](/concepts/activation-strategies#constraint-operators) give you more precise targeting in activation strategies and segments. The regex and IP address operators are available in beta.
+
+The [regex operator](/concepts/activation-strategies#regex-operator) matches a context field against a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax), so you can target patterns such as ID formats, email domains, or application names that the other string operators can't express. You can test sample values against your expression in the Admin UI before you save.
+
+The [IP address operator](/concepts/activation-strategies#ip-address-operator) checks whether a context field, typically `remoteAddress`, falls within a list of IP addresses or CIDR ranges. Both IPv4 and IPv6 are supported.
+
+The [SemVer operators](/concepts/activation-strategies#versioning-semver-operators) now include `SEMVER_GTE` and `SEMVER_LTE`, so you can target versions greater than or equal to, or less than or equal to, a given version with a single constraint.
+
+All three operators require an SDK version that supports them. See [SDK compatibility](/sdks#strategy-constraints) for the minimum version per SDK.
