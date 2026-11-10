@@ -193,7 +193,9 @@ if __name__ == "__main__":
 
 ## Configuration options
 
-`url` and `app_name` are the first two arguments. All other arguments are keyword-only, and related settings are grouped into option objects:
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v7.0.0+</Button>
+
+`url` and `app_name` are positional arguments. All other arguments are keyword-only, and related settings are grouped into option objects:
 
 ```python
 from UnleashClient import HttpOptions, MetricsOptions, PollingOptions, UnleashClient
@@ -208,7 +210,9 @@ client = UnleashClient(
 )
 ```
 
-Settings can't be changed after the client is created. To change a setting, create a new client.
+Client settings are fixed at creation. To change a setting, create a new client.
+
+If you are upgrading from an earlier version, see [Migrating to v7](#migrating-to-v7).
 
 Both client constructors support the following parameters. Parameters marked "Sync client only" apply only to `UnleashClient`.
 
@@ -221,7 +225,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 </ParamField>
 
 <ParamField path="api_key" type="str" default="None">
-  Your backend API token, sent as the `Authorization` header. Only a client that never contacts Unleash, such as one that only reads a [bootstrapped](#bootstrap) cache, can leave it unset.
+  Your backend API token, sent as the `Authorization` header. Required for any client that connects to Unleash.
 </ParamField>
 
 <ParamField path="identity" type="IdentityOptions" default="IdentityOptions()">
@@ -289,7 +293,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 ### HttpOptions
 
 <ParamField path="headers" type="dict" default="None">
-  Additional headers for all API requests. Pass your API token as `api_key`, not here: an `Authorization` header raises a `ValueError`.
+  Additional headers for all API requests. Pass your API token as `api_key` instead of as a header. An `Authorization` header raises a `ValueError`.
 </ParamField>
 
 <ParamField path="options" type="dict" default="None">
@@ -301,7 +305,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 </ParamField>
 
 <ParamField path="retries" type="int" default="3">
-  How many times a failed feature fetch is retried.
+  Number of times the SDK retries a failed request for flag configuration. The sync client retries on `500`, `502`, and `504` responses.
 </ParamField>
 
 ### PollingOptions
@@ -322,7 +326,9 @@ The default mode. The SDK fetches flag configuration from Unleash on an interval
 
 ### StreamingOptions
 
-Experimental. The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. Pass `mode=StreamingOptions()`; it has no settings. Sync client only.
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. To use streaming, pass `mode=StreamingOptions()`. `StreamingOptions` takes no settings. Sync client only.
 
 ### MetricsOptions
 
@@ -540,7 +546,7 @@ To subscribe to SDK events, provide an `event_callback` function when you initia
 |------------|-------------|
 | `READY` | The SDK loaded feature flags from the Unleash server or the local cache. Emitted at least once. |
 | `FETCHED` | A new version of the feature flags was fetched from the server. The event includes a `features` property with all flags returned by that fetch. |
-| `FETCH_COMPLETED` | A feature fetch ended, successfully or not. The event's `status` says how: `CHANGED`, `NOT_CHANGED`, `UNAUTHORIZED`, `RATE_LIMITED`, `UNAVAILABLE`, or `INVALID_RESPONSE`. Emitted after every poll, but not in streaming mode. |
+| `FETCH_COMPLETED` | A fetch of the feature flags completed, successfully or not. The event includes a `status` property with the result: `CHANGED`, `NOT_CHANGED`, `UNAUTHORIZED`, `RATE_LIMITED`, `UNAVAILABLE`, or `INVALID_RESPONSE`. Emitted after every poll in polling mode. |
 | `FEATURE_FLAG` | A flag with [impression data](/concepts/impression-data) enabled was evaluated with `is_enabled`. |
 | `VARIANT` | A flag with impression data enabled was evaluated with `get_variant`. |
 
@@ -642,7 +648,7 @@ def example_callback(event: UnleashEvent):
 
 <Markdown src="/snippets/sdks/impact-metrics.mdx" />
 
-The SDK automatically attaches `appName` and `environment` labels to all impact metrics. The environment is taken from your API token, or is `"default"` when the token doesn't name one.
+The SDK automatically attaches `appName` and `environment` labels to all impact metrics. The `environment` label comes from your API token. If the token has no environment, the label is `default`.
 
 Define and record metrics through the client's `impact_metrics` property:
 
@@ -962,8 +968,15 @@ Version 7 changes how you configure the client:
 
 - The API token is passed as `api_key` instead of an `Authorization` header in `custom_headers`.
 - All arguments after `url` and `app_name` are keyword-only, and most settings moved into the option objects described in [configuration options](#configuration-options).
-- `environment` has been removed. The environment comes from your API token.
-- Settings can't be changed after the client is created.
+- The `environment` argument has been removed. The environment comes from your API token.
+- The constructor raises a `ValueError` if `url` is not an absolute `http://` or `https://` URL with a host.
+- Client settings are fixed at creation. The `unleash_*` settings properties, `strategy_mapping`, and `connector_mode` have been removed.
+
+The `environment` field of the [Unleash context](#unleash-context) and the `environment` label on impact metrics now come from your API token. In v6, the context field was `default` unless you set the `environment` argument. If a strategy or constraint uses the `environment` context field, for example `environment IN [default]`, update it to match your token's environment, or pass the value in the context:
+
+```python
+client.is_enabled("my-flag", {"environment": "default"})
+```
 
 For the complete mapping from v6 arguments to v7, read the [v7 migration guide](https://github.com/Unleash/unleash-python-sdk/blob/main/v7_MIGRATION_GUIDE.md).
 
