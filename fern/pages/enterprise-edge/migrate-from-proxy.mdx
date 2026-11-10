@@ -58,30 +58,30 @@ To serve any traffic (even for frontend clients), Edge must have the feature dat
 
 #### Keep existing Proxy secrets during migration
 
-Use Edge v20.6.4 or later for this migration path. `PRETRUSTED_TOKENS` simplifies migration from Proxy by letting you move your frontend clients to Edge before replacing their existing credentials.
+Use Edge v20.6.4 or later for this migration path.
 
-For example, if your Proxy clients use the secret `test`, configure Edge with:
+`PRETRUSTED_TOKENS` lets you move your frontend clients to Edge before replacing their existing credentials. For example, if your Proxy clients use the secret `test`, configure Edge with:
 
 ```sh
 PRETRUSTED_TOKENS=test@development
 ```
 
-Clients continue sending `Authorization: test`. The `@development` suffix is Edge configuration metadata that maps the secret to an environment; do not include it in the SDK's token or the request header. Edge must also have a backend token in `TOKENS` covering that environment.
+Clients continue sending `Authorization: test`. The `@development` suffix tells Edge which environment the secret belongs to. Do not include it in the SDK token or the request header. Edge must also have a backend token in `TOKENS` that covers that environment.
 
-Edge trusts these credentials locally instead of validating them with Unleash. Treat this as a migration step, then replace the Proxy secret with an Unleash-issued frontend token.
+Edge trusts these credentials locally instead of validating them with Unleash. Once your clients run against Edge, replace the Proxy secret with an Unleash-issued frontend token.
 
 #### Replace the legacy secret with a frontend token
 
-Keeping a legacy secret in `PRETRUSTED_TOKENS` means you miss out on:
+Replacing the legacy secret with an Unleash-issued frontend token gives you:
 
-- **Project-scoped access:** The `secret@environment` format grants access to all projects available in that environment on the Edge instance. An Unleash frontend token can restrict access to selected projects.
-- **Central token lifecycle management:** Deleting a token or setting its expiry in Unleash does not revoke a locally trusted credential. You must remove the secret from every Edge instance's configuration. Unleash-issued frontend tokens use normal Edge validation to enforce revocation and expiry.
-- **Token last-seen reporting:** Edge does not report locally trusted credentials to Unleash as seen API tokens. This only affects token usage visibility; toggle yes/no counts, variant counts, and impact metrics still flow upstream for the configured environment.
+- **Project-scoped access:** A legacy secret grants access to every project Edge serves in that environment. A frontend token restricts access to selected projects.
+- **Central token lifecycle management:** Edge validates frontend tokens against Unleash, so deleting a token or setting its expiry takes effect everywhere. A legacy secret stays valid until you remove it from every Edge instance's configuration.
+- **Token last-seen reporting:** Edge reports frontend tokens to Unleash as seen API tokens. A legacy secret never appears there. Flag evaluation counts, variant counts, and [impact metrics](/concepts/impact-metrics) flow upstream for both.
 
 To complete the migration:
 
 1. [Create a frontend token](/concepts/api-tokens-and-client-keys#create-an-api-token) in Unleash for the projects and environment your clients need. Keep its scope within the data covered by Edge's backend tokens.
-2. Update your frontend SDKs to use the new token. Do not add it to `PRETRUSTED_TOKENS`; it should use normal upstream validation.
+2. Update your frontend SDKs to use the new token. Do not add it to `PRETRUSTED_TOKENS`, so that Edge validates it against Unleash.
 3. After your clients have switched, remove the old secret from `PRETRUSTED_TOKENS` on every Edge instance and redeploy those instances.
 
 Continue [rotating frontend tokens](/concepts/api-tokens-and-client-keys#rotate-a-token) as part of your regular token management.
