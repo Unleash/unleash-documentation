@@ -5,7 +5,7 @@ og:site_name: Unleash
 og:title: React SDK
 keywords: React SDK, feature flags, React hooks, web development, frontend SDK
 max-toc-depth: 3
-last-updated: May 11, 2026
+last-updated: November 10, 2026
 ---
 
 <Markdown src="/snippets/sdks/frontend-intro.mdx" language="React" />
@@ -37,7 +37,7 @@ This library uses the core [unleash-js-sdk](https://github.com/Unleash/unleash-j
 ## Initialization
 You can use the [Frontend API](/api#frontend-api) or [unleash-edge](/unleash-edge).
 
-For the following step you will need a [frontend API Token](/api#frontend-api) or [unleash-edge pretrusted token](/unleash-edge#pretrusted-tokens).
+For the following step you need a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens) or an [Unleash Edge pretrusted token](/unleash-edge/deploy#pre-trusted-tokens).
 
 Import the provider like this in your entrypoint file (typically index.js/ts):
 
@@ -47,7 +47,7 @@ import { FlagProvider } from '@unleash/proxy-client-react';
 
 const config = {
   url: '<unleash-url>/api/frontend', // Your Frontend API URL or the Unleash Edge URL
-  clientKey: '<your-token>', // A frontend token OR one of your unleash-edge pretrusted token
+  clientKey: '<your-token>', // A frontend token or an Unleash Edge pretrusted token
   refreshInterval: 15, // How often (in seconds) the client should poll the proxy for updates
   appName: 'your-app-name', // The name of your application. It's only used for identifying your application
 };

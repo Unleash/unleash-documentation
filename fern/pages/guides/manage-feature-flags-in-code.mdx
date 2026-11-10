@@ -5,7 +5,7 @@ keywords: managing, feature, flags, feature flags, unleash
 og:site_name: "Unleash Documentation"
 og:title: "Managing feature flags in your codebase"
 max-toc-depth: 2
-last-updated: July 28, 2026
+last-updated: October 16, 2026
 ---
 
 How you manage feature flags in code directly impacts the performance, testability, and long-term maintainability of your applications.
@@ -158,6 +158,11 @@ export const featureService = new FeatureService(unleash);
   - **Vendor abstraction**: If you ever switch feature flagging providers, you only need to update your wrapper instead of hunting for SDK calls across the entire codebase.
   - **Centralized control**: It gives you a single place to manage logging, performance monitoring, and robust error handling for all flag checks.
   - **Improved readability**: Methods with business-friendly names (`canUserSeeNewProfilePage()`) make the code's intent clearer than a generic `isEnabled("newUserProfilePage")`.
+
+<Tip>
+If you want a standardized abstraction instead of a custom wrapper, you can use [OpenFeature](/sdks/openfeature), a vendor-neutral API with Unleash providers for several languages.
+The trade-off is that OpenFeature doesn't expose Unleash-specific capabilities, such as [impression data](/concepts/impression-data) and [impact metrics](/concepts/impact-metrics).
+</Tip>
 
 ### Handling variant payloads inside your wrapper
 

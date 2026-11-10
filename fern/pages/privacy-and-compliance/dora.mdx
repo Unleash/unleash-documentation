@@ -5,7 +5,7 @@ keywords: [DORA, Digital Operational Resilience Act, Regulation (EU) 2022/2554, 
 og:site_name: Unleash
 og:title: DORA compliance for feature flags
 max-toc-depth: 2
-last-updated: October 8, 2026
+last-updated: October 16, 2026
 ---
 
 ## Overview
@@ -70,7 +70,7 @@ Unleash provides controls and evidence for the parts of each requirement that co
 |------------------|-------------|-----------------|
 | Article 28(1) and 28(4) Third-party risk and due diligence | ICT third-party risk is part of ICT risk. Before contracting, financial entities must assess criticality, concentration risk, and the provider's security posture. | The SOC 2 Type II report, penetration test summaries, 14 security policies, and the Unleash compliance mappings support due diligence. These include this page and the [SOC 2](/privacy-and-compliance/soc2), [ISO 27001](/privacy-and-compliance/iso27001), and [FedRAMP](/privacy-and-compliance/fedramp) mappings. Self-hosting removes the hosted service from the dependency entirely: the software runs in your infrastructure, under your controls. |
 | Article 28(3) Register of information | Financial entities must maintain a register of all contractual arrangements for ICT services, identifying those that support critical or important functions. | Unleash provides the information needed for a register entry on request through the Enterprise agreement: legal entity (Bricks Software AS), service description, hosting locations for the hosted service, and subcontractors. |
-| Article 28(8) Exit strategies | Financial entities must be able to exit an ICT arrangement without disrupting business, and must have documented and tested exit plans. | Unleash is built on an open-source core under the AGPLv3 license. Configuration is exportable through the [API](/api), [SDKs](/sdks) are open source, and the hosted and self-hosted editions run the same software, so a migration from hosted to self-hosted does not require a rewrite of application code. Moving away from Unleash entirely requires replacing the SDK integration, unless your applications use the OpenFeature API through an [Unleash OpenFeature provider](/sdks#openfeature-providers), in which case you replace the provider. Vendor lock-in and concentration risk are structurally lower than with a proprietary hosted-only platform. |
+| Article 28(8) Exit strategies | Financial entities must be able to exit an ICT arrangement without disrupting business, and must have documented and tested exit plans. | Unleash is built on an open-source core under the AGPLv3 license. Configuration is exportable through the [API](/api), [SDKs](/sdks) are open source, and the hosted and self-hosted editions run the same software, so a migration from hosted to self-hosted does not require a rewrite of application code. Moving away from Unleash entirely requires replacing the SDK integration, unless your applications use the OpenFeature API through an [Unleash OpenFeature provider](/sdks/openfeature), in which case you replace the provider. Vendor lock-in and concentration risk are structurally lower than with a proprietary hosted-only platform. |
 | Article 30(2) and 30(3) Contractual provisions | Contracts must specify service locations, data protection, SLAs, audit and access rights, incident support, and termination and transition terms. | Enterprise agreements cover hosting region, SLAs, support, security commitments, and termination assistance. Self-hosted deployments keep all data within your own locations and under your own data protection controls. |
 </StickyTable>
 

@@ -6,10 +6,10 @@ description: Configure the Unleash MCP server to automate feature flag managemen
 keywords: github copilot, mcp, model context protocol, ai, llm, coding assistants, feature flags, automation, vs code, jetbrains, visual studio, neovim
 max-toc-depth: 3
 slug: integrate/github-copilot
-last-updated: October 7, 2026
+last-updated: November 5, 2026
 ---
 
-The [Unleash MCP server](/integrate/mcp) connects [GitHub Copilot](https://github.com/features/copilot) to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. You can evaluate code changes, create flags, automatically wrap changes in feature flags, manage rollouts, and clean up flags without leaving your editor.
+The [Unleash MCP server](/integrate/mcp) connects [GitHub Copilot](https://github.com/features/copilot) to your Unleash instance, enabling AI-assisted feature flag management directly in your IDE. This page covers how to install and configure the server for Copilot. To learn what the server can do, see [Unleash MCP server](/integrate/mcp).
 
 GitHub Copilot supports MCP in several environments:
 - [Visual Studio Code](https://code.visualstudio.com/) with full MCP support available in versions 1.102+.
@@ -23,7 +23,7 @@ GitHub Copilot supports MCP in several environments:
 
 Before you begin, make sure you have the following:
 
-- Node.js 18 or later: the MCP server is distributed as an npm package.
+- Node.js 24 or later: the MCP server is distributed as an npm package.
 - A supported IDE, see environment-specific requirements [here](#configure-your-ide).
 - An Unleash instance: cloud or self-hosted, with API access enabled.
 - A [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens) (PAT) with permissions to create and manage feature flags.
@@ -37,7 +37,6 @@ First, create a shared credentials file that works across all environments:
 ```bash title="~/.unleash/mcp.env"
 UNLEASH_BASE_URL={{UNLEASH_BASE_URL}}
 UNLEASH_PAT={{UNLEASH_PAT}}
-UNLEASH_DEFAULT_PROJECT={{UNLEASH_DEFAULT_PROJECT}}
 # Optional: set to true or false to opt in to or out of feedback reports without a consent prompt
 # UNLEASH_MCP_SEND_FEEDBACK=false
 ```
@@ -60,7 +59,7 @@ Create a file at `.vscode/mcp.json` in your project root:
       "name": "Unleash MCP",
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@unleash/mcp@latest", "--log-level", "error"],
+      "args": ["-y", "@unleash/mcp@latest"],
       "envFile": "~/.unleash/mcp.env"
     }
   }
@@ -107,11 +106,10 @@ Click **Add** and configure:
 
 - **Name:** `Unleash MCP`
 - **Command:** `npx`
-- **Arguments:** `-y @unleash/mcp@latest --log-level error`
+- **Arguments:** `-y @unleash/mcp@latest`
 - **Environment variables:**
   - `UNLEASH_BASE_URL`: Your Unleash API URL
   - `UNLEASH_PAT`: Your personal access token
-  - `UNLEASH_DEFAULT_PROJECT`: Your default project
 </Step>
 
 <Step title="Enable the server">
@@ -142,9 +140,9 @@ Go to **Tools** → **Options** → **GitHub Copilot** → **MCP Servers**.
 Click **Add** and configure:
 
 - **Name:** `Unleash MCP`
-- **Command:** `npx -y @unleash/mcp@latest --log-level error`
+- **Command:** `npx -y @unleash/mcp@latest`
 - **Working directory:** Your project root
-- **Environment variables:** Configure `UNLEASH_BASE_URL`, `UNLEASH_PAT`, and `UNLEASH_DEFAULT_PROJECT`
+- **Environment variables:** Configure `UNLEASH_BASE_URL`, `UNLEASH_PAT`,
 </Step>
 
 <Step title="Restart Visual Studio">
@@ -175,16 +173,15 @@ Add mcphub.nvim to your plugin manager. For example, with lazy.nvim:
       servers = {
         ["unleash-mcp"] = {
           command = "npx",
-          args = { "-y", "@unleash/mcp@latest", "--log-level", "error" },
+          args = { "-y", "@unleash/mcp@latest" },
           env = {
             UNLEASH_BASE_URL = os.getenv("UNLEASH_BASE_URL"),
-            UNLEASH_PAT = os.getenv("UNLEASH_PAT"),
-            UNLEASH_DEFAULT_PROJECT = os.getenv("UNLEASH_DEFAULT_PROJECT"),
-          },
-        },
-      },
+            UNLEASH_PAT = os.getenv("UNLEASH_PAT")
+          }
+        }
+      }
     })
-  end,
+  end
 }
 ```
 </Step>
@@ -195,7 +192,6 @@ Export the required variables in your shell configuration:
 ```bash title="~/.zshrc or ~/.bashrc"
 export UNLEASH_BASE_URL="https://your-instance.getunleash.io"
 export UNLEASH_PAT="your-personal-access-token"
-export UNLEASH_DEFAULT_PROJECT="default"
 ```
 </Step>
 
@@ -263,13 +259,12 @@ Fill in the following details (use Tab to move between fields):
 |-------|-------|
 | **Name** | `unleash-mcp` |
 | **Type** | `local` |
-| **Command** | `npx -y @unleash/mcp@latest --log-level error` |
+| **Command** | `npx -y @unleash/mcp@latest` |
 | **Tools** | `*` |
 
 For environment variables, add:
 - `UNLEASH_BASE_URL`: `https://your-instance.getunleash.io`
 - `UNLEASH_PAT`: Your personal access token
-- `UNLEASH_DEFAULT_PROJECT`: `default`
 
 Press `Ctrl+S` to save the configuration.
 
@@ -300,7 +295,7 @@ Configuration is stored in `~/.copilot/mcp-config.json`. You can also edit this 
 GitHub Copilot on github.com is designed for code review, issue triage, and pull request descriptions. It does not currently support custom MCP servers for feature flag management.
 
 **Recommended workflow:**
-- Use your IDE for feature flag creation and wrapping.
+- Use your IDE to manage feature flags with the MCP server.
 - Use github.com Copilot for reviewing flag-related pull requests.
 
 </Tab>
@@ -308,266 +303,22 @@ GitHub Copilot on github.com is designed for code review, issue triage, and pull
 
 ## Verify the installation
 
-After configuring your IDE, verify that the Unleash MCP tools are available (full list below).
-
-Try one of the following prompts (or the [prompt patterns](#prompt-patterns) below):
+After configuring your IDE, verify that the Unleash MCP tools are available. Try one of the following prompts:
 
 ```
 1. Show me the available tools of the Unleash MCP server.
-2. Use the Unleash MCP server to get the flag state of `your-flag-name`
-3. Use the Unleash MCP server to wrap the current change in a feature flag
+2. Use the Unleash MCP server to list my Unleash projects.
 ```
 
-## Tool reference
+## Tools and workflows
 
-The Unleash MCP server exposes the following tools.
-
-<StickyTable>
-| Tool | Description | When to use |
-|------|-------------|-------------|
-| `evaluate_change` | Analyzes a code change and determines whether it should be behind a feature flag. | Before implementing risky changes |
-| `detect_flag` | Searches for existing flags that match a description to prevent duplicates. | Before creating new flags |
-| `create_flag` | Creates a new feature flag with proper naming, typing, and metadata. | When no suitable flag exists |
-| `wrap_change` | Generates framework-specific code to guard a feature behind a flag. | After creating a flag |
-| `list_projects` | Lists Unleash projects available to the configured token, with optional pagination. | Discovering available projects |
-| `list_flags` | Lists feature flags in a project (active by default; set archived=true for archived flags). | Auditing flag inventory; discovering existing flags before creating new ones |
-| `get_flag_state` | Returns the current state, strategies, and metadata for a flag. | Debugging, status checks |
-| `set_flag_rollout` | Configures rollout percentages and activation strategies. | Gradual releases |
-| `toggle_flag_environment` | Enables or disables a flag in a specific environment. | Testing, staged rollouts |
-| `remove_flag_strategy` | Deletes a rollout strategy from a flag. | Simplifying flag configuration |
-| `cleanup_flag` | Returns file locations and instructions for removing a flag after rollout. | After full rollout |
-| `send_feedback` | Sends [feedback reports](#feedback-reports) to Unleash about failed tool calls, unsupported requests, and unexpected results. | Automatically, after a failed or unsupported request |
-</StickyTable>
+Once the server is connected, Copilot can use every tool the Unleash MCP server exposes. To learn what the server can do and see step-by-step [workflows](/integrate/mcp#workflows), read [Unleash MCP server](/integrate/mcp). For the current list of tools, see the [README on GitHub](https://github.com/Unleash/unleash-mcp#tools).
 
 ### Feedback reports
 
-<Button small outlined className="version-button" href="https://github.com/Unleash/unleash-mcp/releases/tag/v0.5.0">MCP v0.5.0</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
-
-When you opt in, the Unleash MCP server shares anonymous diagnostic [feedback reports](/integrate/mcp#send-feedback) with Unleash to help improve the MCP server. The assistant sends a report automatically when a tool call fails, when a result isn't what it expected, or when you ask for something the MCP server can't do yet.
-
-In VS Code and JetBrains IDEs, Copilot shows a consent prompt in the chat the first time the assistant tries to send a report. The MCP server saves whether you opted in or out, so you see the prompt only once.
+In VS Code and JetBrains IDEs, Copilot shows a consent prompt in the chat the first time the assistant tries to send a [feedback report](/integrate/mcp#send-feedback). The MCP server saves whether you opted in or out, so you see the prompt only once.
 
 To opt in or out in Visual Studio, Eclipse, or Xcode, or to skip the prompt, add `UNLEASH_MCP_SEND_FEEDBACK=true` or `UNLEASH_MCP_SEND_FEEDBACK=false` to `~/.unleash/mcp.env`. In IDEs that don't support `envFile`, set the variable with your other Unleash variables. To learn what a report contains, see [What is recorded](/integrate/mcp#what-is-recorded).
-
-## Workflows
-
-The Unleash MCP server supports three use cases: [evaluate and wrap code in feature flags](#evaluate-and-wrap-code-in-feature-flags), [manage rollouts across environments](#manage-rollouts-across-environments), and [clean up after rollout](#clean-up-after-rollout).
-
-### Evaluate and wrap code in feature flags
-
-Use this workflow when you're implementing a change that might affect production stability, such as a payment integration, authentication flow, or external API call.
-
-<Steps>
-<Step title="Evaluate the change">
-Ask Copilot to assess whether the change needs a feature flag:
-
-```text
-Evaluate whether the Stripe payment integration should be behind a feature flag.
-The change modifies the checkout service and handles credit card processing.
-```
-
-Copilot calls `evaluate_change` and returns a recommendation with a suggested flag name.
-</Step>
-
-<Step title="Check for duplicates">
-Copilot automatically calls `detect_flag` to search for existing flags. If a suitable flag exists, Copilot suggests reusing it instead of creating a duplicate.
-</Step>
-
-<Step title="Create the flag">
-If no suitable flag exists, ask Copilot to create one:
-
-```text
-Create a release flag for the Stripe payment integration.
-```
-
-Copilot calls `create_flag` with the appropriate name, type, and description. The flag is created in Unleash, disabled by default.
-</Step>
-
-<Step title="Wrap the code">
-Generate framework-specific guard code:
-
-```text
-Wrap the Stripe checkout handler with the stripe-payment-integration flag.
-This is a Node.js Express application.
-```
-
-Copilot calls `wrap_change` and returns code like this:
-
-```javascript title="checkout.js"
-const { isEnabled } = require('unleash-client');
-
-app.post('/checkout', async (req, res) => {
-  const context = { userId: req.user.id };
-
-  if (isEnabled('stripe-payment-integration', context)) {
-    // New Stripe payment flow
-    const result = await stripeService.processPayment(req.body);
-    return res.json(result);
-  } else {
-    // Existing payment flow
-    const result = await legacyPaymentService.process(req.body);
-    return res.json(result);
-  }
-});
-```
-</Step>
-</Steps>
-
-### Manage rollouts across environments
-
-Use this workflow to enable a flag in staging for testing while keeping it disabled in production.
-
-<Tabs>
-<Tab title="Check flag state">
-```text
-What is the current state and rollout strategies for stripe-payment-integration?
-```
-
-Copilot calls `get_flag_state` and returns the flag metadata, enabled environments, and active strategies.
-</Tab>
-
-<Tab title="Enable in staging">
-```text
-Enable stripe-payment-integration in the staging environment.
-```
-
-Copilot calls `toggle_flag_environment` to enable the flag in staging while keeping it disabled in production.
-</Tab>
-
-<Tab title="Configure rollout">
-```text
-Set up a gradual rollout for stripe-payment-integration:
-10% for 24 hours, then 50% for 48 hours, then 100%.
-```
-
-Copilot calls `set_flag_rollout` to configure the rollout strategy.
-
-</Tab>
-</Tabs>
-
-<Warning>
-AI assistants can make mistakes and toggle the wrong flag. Enable [change requests](/concepts/change-requests) on production environments to require human approval before changes take effect. See the [MCP server documentation](/integrate/mcp#protect-production-environments) for details.
-</Warning>
-
-### Clean up after rollout
-
-Use this workflow when a feature has been fully rolled out and the flag is no longer needed.
-
-```text
-Clean up the stripe-payment-integration flag. The feature is fully rolled out.
-```
-
-Copilot calls `cleanup_flag` and returns:
-
-- All files and line numbers where the flag is used.
-- Which code path to preserve (the "enabled" branch).
-- Suggestions for tests to run after removal.
-
-Review the list, remove the conditional branches, and delete the flag from Unleash.
-
-<Tip>
-Feature flags should be temporary. Regularly clean up flags after successful rollouts to prevent technical debt.
-</Tip>
-
-### Discover and audit flags
-
-Use this workflow to take inventory of existing flags before creating new ones, or to run a periodic audit for cleanup candidates.
-
-<Steps>
-<Step title="List available projects (optional)">
-If you don't already know the target project, Copilot calls `list_projects` to enumerate projects the configured token can access. Skip this step if `UNLEASH_DEFAULT_PROJECT` is set.
-</Step>
-
-<Step title="List active flags">
-Copilot calls `list_flags` with the target `projectId`. The default response returns active (non-archived) flags only.
-</Step>
-
-<Step title="List archived flags">
-For a full audit, Copilot calls `list_flags` a second time with `archived=true`. Active and archived flags are disjoint result sets in Unleash; both calls are needed for complete inventory.
-</Step>
-
-<Step title="Cross-reference with the codebase">
-Copilot compares the returned flags against references in your code. Flags present in Unleash but unused in code (especially archived ones) are cleanup candidates — chain into the [Clean up after rollout](#clean-up-after-rollout) workflow to remove them safely.
-</Step>
-</Steps>
-
-## Define custom instructions
-
-You can configure project-level instructions to make feature flag evaluation automatic. When custom instructions are present, Copilot considers them on every interaction.
-
-Create a file at `.github/copilot-instructions.md` in your repository:
-
-```markdown title=".github/copilot-instructions.md"
-## Feature flag policy
-
-When implementing new features or modifying high-risk code paths:
-
-1. Always use the `evaluate_change` tool to assess whether the change needs a feature flag
-2. Prefer reusing existing flags over creating new ones (use `detect_flag`)
-3. Follow kebab-case naming: `domain-action-variant`
-4. All payment, authentication, and external API changes MUST be flagged
-5. Use `wrap_change` to generate framework-appropriate guard code
-
-Default project: `checkout-team`
-```
-
-With these instructions in place, when a developer asks Copilot to "add Stripe payments," Copilot automatically evaluates, detects, creates, and wraps without explicit prompting.
-
-## Prompt patterns
-
-The following prompt patterns help you use the MCP tools effectively.
-
-<Accordion title="Evaluate and create a flag">
-**Intent:** Determine if a change requires a feature flag, create it if needed and wrap the code in the flag.
-
-**Prompt:**
-```text
-Evaluate whether the [description of change] should be behind a feature flag.
-The change modifies [component/service].
-```
-
-**Expected behavior:** Copilot calls `evaluate_change`, then `detect_flag`, `create_flag`, and `wrap_change` as needed.
-</Accordion>
-
-<Accordion title="Detect and reuse existing flags">
-**Intent:** Avoid duplicate flags when similar functionality exists.
-
-**Prompt:**
-```text
-Before creating a new flag for [feature], check if a similar flag already exists
-and suggest reusing it if appropriate.
-```
-
-**Expected behavior:** Copilot calls `detect_flag` and presents matches with confidence levels.
-</Accordion>
-
-<Accordion title="Toggle or check flag state">
-**Intent:** Enable, disable, or query a flag in a specific environment.
-
-**Prompts:**
-```text
-Enable [flagName] in the staging environment.
-```
-```text
-What is the current state and rollout strategies for [flagName]?
-```
-
-**Expected behavior:** Copilot calls `toggle_flag_environment` or `get_flag_state`.
-</Accordion>
-
-<Accordion title="Clean up a flag">
-**Intent:** Safely remove flagged code and delete unused flags.
-
-**Prompts:**
-```text
-Clean up the [flagName] flag now that the feature has fully shipped.
-```
-```text
-Clean up the [flagName] flag after the A/B testing experiment, only keep [variant].
-```
-
-**Expected behavior:** Copilot calls `cleanup_flag` and provides removal instructions.
-</Accordion>
 
 ## Troubleshooting
 
@@ -634,29 +385,6 @@ Some IDEs (JetBrains, Visual Studio) do not support the `envFile` property. In t
 <Accordion title="Feedback is disabled">
 `send_feedback` returns this message if you declined the consent prompt, if your IDE couldn't show it, or if `UNLEASH_MCP_SEND_FEEDBACK` is set to `false`. To opt in, add `UNLEASH_MCP_SEND_FEEDBACK=true` to `~/.unleash/mcp.env` and restart the server. In IDEs that don't support `envFile`, add the variable to the IDE's MCP `env` configuration instead. To see the consent prompt again, delete `feedback_consent.json` from the [configuration directory](/integrate/mcp#consent). Feedback settings don't affect flag operations.
 </Accordion>
-
-## Best practices
-
-Follow these guidelines for effective feature flag management with AI assistants.
-
-<CardGroup cols={2}>
-<Card title="Keep humans in the loop" icon="user-check" iconSize={8}>
-While the MCP server can automate flag creation, high-risk changes should involve human review. Approve flag creation, rollout plans, and cleanup decisions.
-</Card>
-
-<Card title="Define naming conventions" icon="tag" iconSize={8}>
-Establish organization-wide standards for flag names (e.g., `domain-action-variant`) and types (release, experiment, kill-switch). The MCP server enforces these rules.
-</Card>
-
-<Card title="Prevent duplication" icon="clone" iconSize={8} >
-Always use `detect_flag` before creating new flags. This keeps naming consistent and reduces fragmentation across microservices.
-</Card>
-
-<Card title="Keep flags temporary" icon="clock" iconSize={8}>
-Feature flags should be removed after successful rollouts. Use `cleanup_flag` regularly to prevent technical debt.
-</Card>
-</CardGroup>
-
 
 ## Related resources
 

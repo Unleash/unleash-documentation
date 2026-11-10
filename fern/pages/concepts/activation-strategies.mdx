@@ -5,7 +5,7 @@ og:title: Activation strategies - Control feature flag targeting and rollouts
 description: Activation strategies determine who should get a feature. They allow you to enable and disable features for certain users without having to redeploy your application.
 keywords: activation strategies, gradual rollout, constraints, targeting, feature flags
 max-toc-depth: 3
-last-updated: August 25, 2026
+last-updated: October 27, 2026
 ---
 
 ## Overview
@@ -59,19 +59,20 @@ A constraint has three parts:
 - An **operator**: One of the [constraint operators](#constraint-operators).
 - **Values**: A value or list of values to use in the evaluation of the constraint.
 
-These parts turn the constraint into an expression that evaluates to true or false. Here are a few example constraints:
+These parts turn the constraint into an expression that evaluates to true or false. A constraint evaluates to false if the context field is missing from the Unleash context, or if its value can't be interpreted by the operator, for example a non-numeric value with a numeric operator or an invalid IP address with the IP address operator. Here are a few example constraints:
 
 | Context field   | Operator        | Values                       | Description                                                                                                                                         |
 |-----------------|-----------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `userId`        | `STR_ENDS_WITH` | `@example.com, @mycompany.com` | Evaluates to `true` for users whose user IDs end with `@example.com` or `@mycompany.com`.                                                           |
 | `currentTime`   | `DATE_AFTER`    | `2022-06-05 21:43:22Z`         | Evaluates to `true` if the current time is after `2022-06-05 21:43:22Z`.                                                                            |
 | `plan` | `IN`       | `Premium`, `Plus`                         | Evaluates to `true` if the [custom context field](/concepts/unleash-context#custom-context-fields) `plan` is either 'Premium' or 'Plus'. |
+| `remoteAddress` | `IN_CIDR`  | `10.0.0.0/8, 192.168.1.10`     | Evaluates to `true` if the request comes from an IP address in the `10.0.0.0/8` range or from `192.168.1.10`.                                      |
 
 ### Constraint operators
 
-Constraint operators help you define the conditional statements that get evaluated as part of the constraint. [Basic operators](#basic-operators) are available in all versions and SDKs. All other operators require Unleash version 4.9+ and [SDK compatibility](/sdks#feature-compatibility-in-backend-sdks).
+Constraint operators help you define the conditional statements that get evaluated as part of the constraint. Operators are grouped into [basic operators](#basic-operators) and [advanced operators](#advanced-operators).
 
-All constraints can be negated. For example:
+All constraints can be negated, except constraints that use the [regex operator](#regex-operator). For example:
 
 | Operator      | Value |  Context field | Result |
 |-----------|--------------------------------------------------------------------|--|--------|
@@ -86,7 +87,12 @@ All constraints can be negated. For example:
 | `NOT_IN`  | The context field is not equal to any of the values provided; case sensitive. |
 
 ### Advanced operators
+
+Advanced operators require a backend SDK version that supports them. See [SDK compatibility](/sdks#strategy-constraints) for the minimum version per SDK. Frontend SDKs have no minimum version, because Unleash or Unleash Edge evaluates constraints for them.
+
 #### Numeric operators
+
+<Button small outlined className="version-button" href="/support/availability">v4.9</Button>
 
 Numeric operators compare the numeric value of context fields with the provided value. Numeric operators only accept single values.
 
@@ -98,8 +104,9 @@ Numeric operators compare the numeric value of context fields with the provided 
 | `NUM_LT`  | The context field is strictly less than the provided value.       |
 | `NUM_LTE` | The context field is less than or equal to the provided value.    |
 
-
 #### Date and time operators
+
+<Button small outlined className="version-button" href="/support/availability">v4.9</Button>
 
 All date and time operators require the `currentTime` context field, and the `currentTime` context field can only be used with date and time operators. With these operators, you can enable a feature before or after a specified time or make it available for a specific time span by combining the two operators.
 
@@ -112,6 +119,8 @@ Date and time operators only support single values.
 
 #### String operators
 
+<Button small outlined className="version-button" href="/support/availability">v4.9</Button>
+
 String operators accept multiple values and can be set to be case-sensitive or case-insensitive.
 
 | Operator              | Description |
@@ -120,8 +129,9 @@ String operators accept multiple values and can be set to be case-sensitive or c
 | `STR_ENDS_WITH`   | The context field ends with any of the provided string values.     |
 | `STR_STARTS_WITH` | The context field starts with any of the provided string values.    |
 
-
 #### Versioning (SemVer) operators
+
+<Button small outlined className="version-button" href="/support/availability">v4.9</Button>
 
 SemVer operators are used to compare version numbers such as application versions or dependency versions. SemVer operators only support single values.
 
@@ -134,6 +144,51 @@ The value must start with and contain at least major, minor, and patch versions.
 | `SEMVER_GTE` | The context field is greater than or equal to the provided value. |
 | `SEMVER_LT` | The context field is strictly less than the provided value.    |
 | `SEMVER_LTE` | The context field is less than or equal to the provided value. |
+
+#### Regex operator
+
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.1.9</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The regex operator matches the context field against a regular expression. Use it when the other string operators aren't expressive enough, for example to match an ID format, a set of email domains, or a naming pattern for hosts or applications.
+
+| Operator | Description |
+|----------|-------------|
+| `REGEX`  | The context field matches the provided regular expression. In the Admin UI, this operator is labeled **matches regex**. |
+
+The operator accepts a single value: the regular expression. Unleash uses the [RE2 regular expression dialect](https://github.com/google/re2/wiki/Syntax), and every SDK evaluates the expression with an RE2 implementation rather than the language's built-in regex engine, so a pattern behaves the same everywhere. RE2 guarantees linear-time matching, and some features of other dialects are therefore unavailable, including lookaheads, lookbehinds, and backreferences. Unleash rejects an invalid expression when you save the constraint.
+
+The expression matches if it is found anywhere in the context field value. To match the whole value, anchor the expression with `^` and `$`. Matching is case-sensitive by default. To ignore case, select the case-sensitivity toggle, labeled **Aa**, next to the operator, or use the RE2 inline flag `(?i)` in the expression itself.
+
+| Expression | Matches | Doesn't match |
+|------------|---------|---------------|
+| `^user-\d{3}$` | `user-123` | `user-12`, `beta-user-123` |
+| `@(example\|mycompany)\.com$` | `ada@example.com`, `ada@mycompany.com` | `ada@example.org` |
+| `^(checkout\|payments)-` | `checkout-api`, `payments-worker` | `search-api` |
+| `beta` | `beta`, `beta-tester`, `internal-beta` | `bta` |
+
+Regex constraints cannot be negated. To exclude values that match a pattern, add a separate strategy or use a [segment](/concepts/segments) with the constraints you want to keep.
+
+When you add a regex constraint in the Admin UI, use **Test regex** to enter sample values and check whether they match before you save. To try the constraint against a full context, use the [Playground](/concepts/playground).
+
+#### IP address operator
+
+<Button small outlined className="version-button" href="/support/availability">v8.3</Button> <Button small outlined className="version-button" href="/support/availability">Edge v20.2</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
+The IP address operator checks whether the context field is an IP address that falls within any of the provided IP addresses or ranges. Use it to target traffic from an office network, a VPN, a partner's address space, or a set of known servers.
+
+| Operator  | Description |
+|-----------|-------------|
+| `IN_CIDR` | The context field is an IP address that matches any of the provided IP addresses or ranges. In the Admin UI, this operator is labeled **is an IP in**. |
+
+The operator accepts multiple values. Each value is either a single IP address, such as `192.168.1.10`, or a range in [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation), such as `192.168.1.0/24`. Both IPv4 and IPv6 are supported, for example `2001:db8::/32`. Unleash rejects a value that isn't a valid IP address or CIDR range when you save the constraint. When you enter a CIDR range in the Admin UI, Unleash shows the first and last address in the range so you can confirm it covers what you expect.
+
+| Values | Matches | Doesn't match |
+|--------|---------|---------------|
+| `10.0.0.0/8` | `10.1.2.3` | `11.0.0.1` |
+| `192.168.1.10` | `192.168.1.10` | `192.168.1.11` |
+| `2001:db8::/32` | `2001:db8:1::1` | `2001:db9::1` |
+
+You can use the operator with any context field that holds an IP address, such as [`remoteAddress`](/concepts/unleash-context#the-remoteaddress-field). An IPv4 address never matches an IPv6 range, and vice versa. IP address constraints can be negated to exclude a range.
 
 ### Constraints best practices
 
@@ -148,7 +203,7 @@ To add an activation strategy with a constraint to a feature flag, do the follow
 
 1. Open the Admin UI and go to the feature flag you'd like to add a strategy to.
 2. Select the environment you want to configure and click **Add strategy**.
-3. Select your desired [strategy type](#strategy-types) and click **Apply** or **Configure**.
+3. Under **Set up manually**, click **Configure**.
 4. In the **Targeting** tab, go to the **Constraints** section, and click **Add constraint**.
 5. Select a context field to constrain on, for example, `email`.
 6. Set your desired operator, for example, `STR_ENDS_WITH`.
@@ -156,7 +211,7 @@ To add an activation strategy with a constraint to a feature flag, do the follow
 8. Click **Save strategy**.
 
 <Frame background="subtle">
-![A feature flag with two strategies](/assets/add-strategy-modal.png)
+![The Add strategy dialog with the options Use project default, Set up manually, and Start from a template](/assets/add-strategy-dialog.png)
 </Frame>
 
 ## Client-side implementation
@@ -174,7 +229,12 @@ Unleash SDKs expect all context values to be strings. If you use an operator tha
 
 ## Strategy types
 
-When you add an activation strategy to a flag, you can choose from several options, depending on how you want to target and roll out your feature.
+When you add an activation strategy to a flag, the **Add strategy** dialog offers the following options:
+
+- **Use project default**: Apply the [default strategy](#default-strategy) that your team has defined for the environment in this project.
+- **Set up manually**: Configure a [gradual rollout](#gradual-rollout) with your own rollout percentage, targeting, and variants.
+- **Start from a template**: Roll out with a predefined sequence of milestones from a [release template](#release-templates).
+- **More strategies**: Add an [advanced strategy](#advanced-strategies) or a [custom strategy](#custom-strategies).
 
 ### Default strategy
 
@@ -190,25 +250,24 @@ The default activation strategy is a type of gradual rollout strategy that you c
 
 #### Add the default strategy to a flag
 
-To add your project's default strategy, click **Add strategy** and select **Project default**.
+To add your project's default strategy, click **Add strategy**, then under **Use project default**, click **Apply default**. The option shows the rollout percentage of the default strategy for the environment, for example **100% of all users**.
 In environments without an active strategy, you'll also see a suggested option to apply your default strategy directly.
 
-### Standard strategies
+### Gradual rollout
 
-#### Gradual rollout
+Roll out a feature to a percentage of your users while ensuring each user has a consistent experience. You can combine gradual rollout with [targeting](#targeting) rules to support most rollout scenarios. To turn a feature on for your entire user base, set the rollout percentage to 100%.
 
-Roll out a feature to a percentage of your users while ensuring each user has a consistent experience. You can combine gradual rollout with [targeting](#targeting) rules to support most rollout scenarios.
-
-#### Standard on/off
-
-Turn the feature on or off for your entire user base. For more control, we recommend using a [gradual rollout](#gradual-rollout) strategy set to 100% instead.
-
+To add a gradual rollout, click **Add strategy**, then under **Set up manually**, click **Configure**.
 
 ### Release templates
 
 [Release templates](/concepts/release-templates) are a collection of activation strategies that let you reuse predefined rollout configurations across multiple flags. They make it easier to standardize rollout processes and reduce manual setup.
 
+To add a strategy from a release template, click **Add strategy**, then under **Start from a template**, click **Select template**.
+
 ### Advanced strategies
+
+Advanced strategies target a feature at specific IP addresses or hostnames. To add one, click **Add strategy**, open **More strategies**, and select the strategy under **Advanced strategies**.
 
 #### IPs
 
@@ -230,7 +289,7 @@ Parameters:
 Whenever possible, we recommend using a standard [gradual rollout](#gradual-rollout) strategy with [strategy constraints](#constraints) instead of defining a custom strategy. They offer similar flexibility without requiring custom code distribution within your SDKs.
 </Note>
 
-Custom activation strategies let you define your own activation strategies to use with Unleash.
+Custom activation strategies let you define your own activation strategies to use with Unleash. To add a custom strategy to a flag, click **Add strategy**, open **More strategies**, and select the strategy under **Custom strategies**.
 
 <Frame background="subtle">
 ![A strategy creation form. It has fields labeled "strategy name" — "TimeStamp" — and "description" — "activate toggle after a given timestamp". It also has fields for a parameter named "enableAfter". The parameter is of type "string" and the parameter description is "Expected format: YYYY-MM-DD HH:MM". The parameter is required.](/assets/timestamp_create_strategy.png)
