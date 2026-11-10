@@ -5,6 +5,7 @@ keywords: migrate, unleash proxy, enterprise edge, migration guide, upgrade, per
 og:site_name: Unleash
 og:title: Migrate from Unleash Proxy to Enterprise Edge
 max-toc-depth: 3
+last-updated: November 10, 2026
 ---
 
 Unleash Edge is the successor of the now-deprecated Unleash Proxy. It functions as a lightweight read replica of your Unleash instance, designed to scale your feature flag infrastructure significantly.
@@ -51,9 +52,39 @@ Deploy a single Edge container. Provide a startup token that has access to both 
 
 ### 3. Configure tokens
 
-Edge handles tokens differently than the Proxy. Unlike the Proxy, where you could define arbitrary secrets, Edge requires valid Unleash tokens to fetch data. All tokens used by clients must be valid tokens generated in the Unleash Admin UI.
+Edge requires valid Unleash tokens to fetch data. Use [frontend tokens](/concepts/api-tokens-and-client-keys#frontend-tokens) generated in Unleash for your frontend SDKs. If you need to preserve existing Proxy secrets during migration, use the temporary compatibility option below.
 
 To serve any traffic (even for frontend clients), Edge must have the feature data in its cache. You must start Edge with at least one [backend token](/concepts/api-tokens-and-client-keys#backend-tokens) that covers the [projects](/concepts/projects) and [environments](/concepts/environments) you intend to serve.
+
+#### Keep existing Proxy secrets during migration
+
+Use Edge v20.6.4 or later for this migration path.
+
+`PRETRUSTED_TOKENS` lets you move your frontend clients to Edge before replacing their existing credentials. For example, if your Proxy clients use the secret `test`, configure Edge with:
+
+```sh
+PRETRUSTED_TOKENS=test@development
+```
+
+Clients continue sending `Authorization: test`. The `@development` suffix tells Edge which environment the secret belongs to. Do not include it in the SDK token or the request header. Edge must also have a backend token in `TOKENS` that covers that environment.
+
+Edge trusts these credentials locally instead of validating them with Unleash. Once your clients run against Edge, replace the Proxy secret with an Unleash-issued frontend token.
+
+#### Replace the legacy secret with a frontend token
+
+Replacing the legacy secret with an Unleash-issued frontend token gives you:
+
+- **Project-scoped access:** A legacy secret grants access to every project Edge serves in that environment. A frontend token restricts access to selected projects.
+- **Central token lifecycle management:** Edge validates frontend tokens against Unleash, so deleting a token or setting its expiry takes effect everywhere. A legacy secret stays valid until you remove it from every Edge instance's configuration.
+- **Token last-seen reporting:** Edge reports frontend tokens to Unleash as seen API tokens. A legacy secret never appears there. Flag evaluation counts, variant counts, and [impact metrics](/concepts/impact-metrics) flow upstream for both.
+
+To complete the migration:
+
+1. [Create a frontend token](/concepts/api-tokens-and-client-keys#create-an-api-token) in Unleash for the projects and environment your clients need. Keep its scope within the data covered by Edge's backend tokens.
+2. Update your frontend SDKs to use the new token. Do not add it to `PRETRUSTED_TOKENS`, so that Edge validates it against Unleash.
+3. After your clients have switched, remove the old secret from `PRETRUSTED_TOKENS` on every Edge instance and redeploy those instances.
+
+Continue [rotating frontend tokens](/concepts/api-tokens-and-client-keys#rotate-a-token) as part of your regular token management.
 
 ### 4. Deploy and update networking
 

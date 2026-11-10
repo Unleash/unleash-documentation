@@ -5,7 +5,7 @@ keywords: enterprise edge, deploy, self-hosted, docker, kubernetes, helm, persis
 og:site_name: Unleash
 og:title: Deploy Enterprise Edge
 max-toc-depth: 2
-last-updated: June 17, 2026
+last-updated: November 10, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v7.3</Button> <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
@@ -202,9 +202,11 @@ When running in [Offline mode](#modes-of-operation), there is no upstream instan
 
 ### Pre-trusted tokens
 
-<Button small outlined className="version-button" href="/support/availability">Edge v19.10</Button>
+<Button small outlined className="version-button" href="/support/availability">Edge v20.6.4</Button>
 
-If migrating from the legacy Unleash Proxy, you can use `PRETRUSTED_TOKENS` to support legacy secrets (for example, `secret-123@development`) without updating your frontend clients.
+If migrating from the legacy Unleash Proxy, you can use `PRETRUSTED_TOKENS` to support legacy secrets (for example, `secret-123@development`) without updating your frontend clients. Use Edge v20.6.4 or later.
+
+Clients send only the secret (`Authorization: secret-123`). The `@development` suffix tells Edge which environment the secret belongs to. Use this as a temporary migration step, then replace the secret with an Unleash-issued frontend token and remove the entry from `PRETRUSTED_TOKENS`. See [Keep existing Proxy secrets during migration](/unleash-edge/migrate-from-proxy#keep-existing-proxy-secrets-during-migration) for the tradeoffs and migration steps.
 
 Note: You must still provide a standard backend token via `TOKENS` that covers the same environment. This ensures Edge can fetch the feature data required by the legacy token.
 
