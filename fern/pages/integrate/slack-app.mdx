@@ -18,11 +18,21 @@ To install the App for Slack integration, follow these steps:
 
 1. Navigate to the *integrations* page in the Unleash admin UI (available at the URL `/integrations`) and select "configure" on the App for Slack integration.
 2. On the integration configuration form, use the "install & connect" button.
-3. A new tab will open, asking you to select the Slack workspace where you'd like to install the app.
-4. After successful installation of the Unleash App for Slack in your chosen Slack workspace, you'll be automatically redirected to a page displaying a newly generated access token.
-5. Copy this access token and paste it into the `Access token` field within the integration settings.
+3. Review the URL that Slack will redirect you back to after setup. Confirm that it points to your Unleash instance, then continue to Slack.
+4. Select the Slack workspace where you'd like to install the app.
+5. After you install the app, Slack redirects you back to your Unleash instance, which completes the authentication setup for the integration.
 
 By default, the Unleash App for Slack is granted access to public channels. If you want the app to post messages to private channels, you'll need to manually invite it to each of those channels.
+
+### Legacy installation
+
+If you use an Unleash version earlier than v8.4, the installation flow requires you to copy an access token manually:
+
+1. Navigate to the *integrations* page in the Unleash admin UI (available at the URL `/integrations`) and select "configure" on the App for Slack integration.
+2. On the integration configuration form, use the "install & connect" button.
+3. A new tab opens, asking you to select the Slack workspace where you'd like to install the app.
+4. After you install the app in your chosen Slack workspace, you're redirected to a page displaying a newly generated access token.
+5. Copy this access token and paste it into the `Access token` field within the integration settings.
 
 ## Configuration
 
@@ -88,7 +98,7 @@ You can choose to trigger updates for the following events:
 
 The Unleash App for Slack integration takes the following parameters.
 
-- **Access token** - This is the only required property. After successful installation of the Unleash App for Slack in your chosen Slack workspace, you'll be automatically redirected to a page displaying a newly generated access token. You should copy this access token and paste it into this field.
+- **Access token** - This is the only required property. Unleash sets it automatically when Slack redirects you back after installation. In versions earlier than v8.4, you copy the token manually as described in [Legacy installation](#legacy-installation).
 - **Channels** - A comma-separated list of channels to post the configured events to. These channels are always notified, regardless of the event type or the presence of a Slack tag.
 
 ## Tags
