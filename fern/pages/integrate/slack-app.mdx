@@ -14,25 +14,38 @@ The App for Slack integration posts messages to a specified set of channels in y
 
 ## Installation
 
+<Button small outlined className="version-button" href="/support/availability">v8.4</Button> <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
 To install the App for Slack integration, follow these steps:
 
-1. Navigate to the *integrations* page in the Unleash admin UI (available at the URL `/integrations`) and select "configure" on the App for Slack integration.
-2. On the integration configuration form, use the "install & connect" button.
-3. Review the URL that Slack will redirect you back to after setup. Confirm that it points to your Unleash instance, then continue to Slack.
-4. Select the Slack workspace where you'd like to install the app.
-5. After you install the app, Slack redirects you back to your Unleash instance, which completes the authentication setup for the integration.
+1. In the Unleash Admin UI, go to **Configure > Integrations**.
+2. For the App for Slack integration, click **Configure**.
+3. Click **Install & connect**.
+4. On the **Connect Slack to this Unleash?** page, check that the address shown is the address of your Unleash instance, and then click **Continue to Slack**.
+5. If Slack prompts you to sign in, sign in to your Slack workspace.
+6. In the **Where do you want to use Unleash Feature Flags?** list, select the workspace where you want to install the app, and then click **Allow**. Slack redirects you back to Unleash, which saves the integration with its access token and opens it for editing.
+7. In the **Events** list, select the [events](#events) that you want to be notified about.
+8. Optional: In the **Channels** field, enter a comma-separated list of [channels](#parameters) to post the events to.
+9. Click **Update**.
 
 By default, the Unleash App for Slack is granted access to public channels. If you want the app to post messages to private channels, you'll need to manually invite it to each of those channels.
 
-### Legacy installation
+<Accordion title="Legacy installation">
 
-If you use an Unleash version earlier than v8.4, the installation flow requires you to copy an access token manually:
+If you use an Unleash version earlier than v8.4, or **Install & connect** opens a new tab that shows an access token after you install the app, your Unleash instance uses the legacy installation flow. To install the app by copying the access token to Unleash manually, follow these steps:
 
-1. Navigate to the *integrations* page in the Unleash admin UI (available at the URL `/integrations`) and select "configure" on the App for Slack integration.
-2. On the integration configuration form, use the "install & connect" button.
-3. A new tab opens, asking you to select the Slack workspace where you'd like to install the app.
-4. After you install the app in your chosen Slack workspace, you're redirected to a page displaying a newly generated access token.
-5. Copy this access token and paste it into the `Access token` field within the integration settings.
+1. In the Unleash Admin UI, go to **Configure > Integrations**.
+2. For the App for Slack integration, click **Configure**.
+3. Click **Install & connect**. Slack opens in a new tab.
+4. If Slack prompts you to sign in, sign in to your Slack workspace.
+5. Select the workspace where you want to install the app, and then click **Allow**. Slack redirects you to a page that shows your access token.
+6. Copy the access token.
+7. In Unleash, in the **Access token** field of the integration form, paste the access token.
+8. In the **Events** list, select the [events](#events) that you want to be notified about.
+9. Optional: In the **Channels** field, enter a comma-separated list of [channels](#parameters) to post the events to.
+10. Click **Create**.
+
+</Accordion>
 
 ## Configuration
 
@@ -98,7 +111,7 @@ You can choose to trigger updates for the following events:
 
 The Unleash App for Slack integration takes the following parameters.
 
-- **Access token** - This is the only required property. Unleash sets it automatically when Slack redirects you back after installation. In versions earlier than v8.4, you copy the token manually as described in [Legacy installation](#legacy-installation).
+- **Access token** - This is the only required property. Unleash sets it automatically when Slack redirects you back after installation. In the legacy installation flow, you copy the access token manually. See [Installation](#installation).
 - **Channels** - A comma-separated list of channels to post the configured events to. These channels are always notified, regardless of the event type or the presence of a Slack tag.
 
 ## Tags
