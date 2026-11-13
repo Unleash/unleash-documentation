@@ -5,97 +5,154 @@ og:title: App for Slack
 description: "Set up the Unleash App for Slack to send feature flag updates, change requests, and project events to selected channels."
 max-toc-depth: 2
 slug: integrate/slack-app
-last-updated: May 11, 2026
+last-updated: November 13, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v5.5</Button>
 
-The App for Slack integration posts messages to a specified set of channels in your Slack workspace. The channels can be public or private, and can be specified on a per-flag basis by using [Slack tags](#tags).
+The App for Slack integration posts a message to your Slack workspace when something changes in Unleash, such as when someone enables a feature flag, adds a strategy, or creates a change request. Each message describes the change, for example who enabled a feature flag and in which environment and project, and includes an **Open in Unleash** button that takes you from Slack to Unleash.
+
+You choose which [events](#events) trigger a message and which channels receive it. The channels can be public or private. You can also notify additional channels for individual feature flags by using [Slack tags](#tags).
 
 ## Installation
 
+The installation steps depend on your Unleash version.
+
+<Tabs>
+<Tab title="v8.4 and later">
+
+<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
+
 To install the App for Slack integration, follow these steps:
 
-1. Navigate to the *integrations* page in the Unleash admin UI (available at the URL `/integrations`) and select "configure" on the App for Slack integration.
-2. On the integration configuration form, use the "install & connect" button.
-3. A new tab will open, asking you to select the Slack workspace where you'd like to install the app.
-4. After successful installation of the Unleash App for Slack in your chosen Slack workspace, you'll be automatically redirected to a page displaying a newly generated access token.
-5. Copy this access token and paste it into the `Access token` field within the integration settings.
+1. In the Unleash Admin UI, go to **Configure > Integrations**.
+2. For the App for Slack integration, click **Configure**.
+3. Click **Install & connect**.
+4. On the **Connect Slack to this Unleash?** page, check that the address shown is the address of your Unleash instance, and then click **Continue to Slack**.
+5. If Slack prompts you to sign in, sign in to your Slack workspace.
+6. In the **Where do you want to use Unleash Feature Flags?** list, select the workspace where you want to install the app, and then click **Allow**. Slack redirects you back to Unleash, which saves the integration with its access token and opens it for editing.
+7. In the **Events** list, select the [events](#events) that you want to be notified about.
+8. Optional: In the **Channels** field, enter a comma-separated list of [channels](#parameters) to post the events to.
+9. Click **Update**.
 
-By default, the Unleash App for Slack is granted access to public channels. If you want the app to post messages to private channels, you'll need to manually invite it to each of those channels.
+If **Install & connect** opens a new tab that shows an access token after you install the app, follow the steps for earlier versions.
+
+</Tab>
+<Tab title="Earlier than v8.4">
+
+To install the App for Slack integration by copying the access token to Unleash manually, follow these steps:
+
+1. In the Unleash Admin UI, go to **Configure > Integrations**.
+2. For the App for Slack integration, click **Configure**.
+3. Click **Install & connect**. Slack opens in a new tab.
+4. If Slack prompts you to sign in, sign in to your Slack workspace.
+5. Select the workspace where you want to install the app, and then click **Allow**. Slack redirects you to a page that shows your access token.
+6. Copy the access token.
+7. In Unleash, in the **Access token** field of the integration form, paste the access token.
+8. In the **Events** list, select the [events](#events) that you want to be notified about.
+9. Optional: In the **Channels** field, enter a comma-separated list of [channels](#parameters) to post the events to.
+10. Click **Create**.
+
+</Tab>
+</Tabs>
+
+By default, the Unleash App for Slack has access to public channels. To post messages to a private channel, invite the app to that channel.
 
 ## Configuration
 
-The configuration settings allow you to choose the events you're interested in and whether you want to filter them by projects and environments. You can configure a comma-separated list of channels to post the configured events to. These channels are always notified, regardless of the event type or the presence of [Slack tags](#tags).
-
-#### Events
-
-You can choose to trigger updates for the following events:
-
-- addon-config-created
-- addon-config-deleted
-- addon-config-updated
-- api-token-created
-- api-token-deleted
-- change-added
-- change-discarded
-- change-edited
-- change-request-applied
-- change-request-approval-added
-- change-request-approved
-- change-request-cancelled
-- change-request-created
-- change-request-discarded
-- change-request-rejected
-- change-request-sent-to-review
-- context-field-created
-- context-field-deleted
-- context-field-updated
-- feature-archived
-- feature-created
-- feature-deleted
-- feature-environment-disabled
-- feature-environment-enabled
-- feature-environment-variants-updated
-- feature-metadata-updated
-- feature-potentially-stale-on
-- feature-project-change
-- feature-revived
-- feature-stale-off
-- feature-stale-on
-- feature-strategy-add
-- feature-strategy-remove
-- feature-strategy-update
-- feature-tagged
-- feature-untagged
-- group-created
-- group-deleted
-- group-updated
-- project-created
-- project-archived
-- project-deleted
-- segment-created
-- segment-deleted
-- segment-updated
-- service-account-created
-- service-account-deleted
-- service-account-updated
-- user-created
-- user-deleted
-- user-updated
+When you configure the integration, you choose which events to be notified about, which channels to post them to, and whether to filter events by project and environment.
 
 #### Parameters
 
-The Unleash App for Slack integration takes the following parameters.
+The App for Slack integration takes the following parameters:
 
-- **Access token** - This is the only required property. After successful installation of the Unleash App for Slack in your chosen Slack workspace, you'll be automatically redirected to a page displaying a newly generated access token. You should copy this access token and paste it into this field.
-- **Channels** - A comma-separated list of channels to post the configured events to. These channels are always notified, regardless of the event type or the presence of a Slack tag.
+<ParamField path="Access token" type="string" required={true}>
+  The token that Unleash uses to post messages to your Slack workspace. In v8.4 and later, Unleash sets the access token when Slack redirects you back after [installation](#installation). In versions earlier than v8.4, you copy the access token from the installation page and paste it into this field.
+</ParamField>
+
+<ParamField path="Channels" type="string">
+  A comma-separated list of channels to post the configured events to, for example `general, releases`. These channels are always notified, regardless of the event type or the presence of [Slack tags](#tags).
+</ParamField>
+
+#### Events
+
+The integration can subscribe to the following events:
+
+```text maxLines=10
+addon-config-created
+addon-config-deleted
+addon-config-updated
+api-token-created
+api-token-deleted
+banner-created
+banner-deleted
+banner-updated
+change-added
+change-discarded
+change-edited
+change-request-applied
+change-request-approval-added
+change-request-approved
+change-request-cancelled
+change-request-created
+change-request-discarded
+change-request-rejected
+change-request-schedule-suspended
+change-request-scheduled
+change-request-scheduled-application-failure
+change-request-scheduled-application-success
+change-request-sent-to-review
+context-field-created
+context-field-deleted
+context-field-updated
+feature-archived
+feature-created
+feature-deleted
+feature-environment-disabled
+feature-environment-enabled
+feature-environment-variants-updated
+feature-metadata-updated
+feature-potentially-stale-on
+feature-project-change
+feature-revived
+feature-stale-off
+feature-stale-on
+feature-strategy-add
+feature-strategy-remove
+feature-strategy-update
+feature-tagged
+feature-untagged
+group-created
+group-deleted
+group-updated
+project-archived
+project-created
+project-deleted
+release-plan-progressions-paused
+release-plan-progressions-resumed
+segment-created
+segment-deleted
+segment-updated
+service-account-created
+service-account-deleted
+service-account-updated
+user-access-request-approved
+user-access-request-registered
+user-access-request-rejected
+user-created
+user-deleted
+user-updated
+```
+
+#### Projects and environments
+
+You can filter which [projects](/concepts/projects) and [environments](/concepts/environments) the integration receives events from. If you don't select any projects or environments, the integration receives events from all of them. Global events that aren't specific to an environment are always received.
 
 ## Tags
 
-Besides the configured channels, you can choose to notify other channels by tagging your feature flags with Slack-specific tags. For instance, if you want the Unleash App for Slack to send notifications to the `#general` channel, add a Slack-type tag with the value "general" (or "#general"; both will work) to your flag. This will ensure that any configured events related to that feature flag will notify the tagged channel in addition to any channels configured on the integration-level.
+In addition to the configured channels, you can notify other channels by adding tags of the `slack` type to your feature flags. For example, to send notifications to the `#general` channel, add a `slack` tag with the value `general` or `#general` to the flag. Any configured event related to that feature flag then notifies the tagged channel as well as the channels configured on the integration.
 
-To exclusively use tags for determining notification channels, you can leave the "channels" field blank in the integration configuration. Since you can have multiple configurations for the integration, you're free to mix and match settings to meet your precise needs. Before posting a message, all channels for that event, both configured and tagged, are combined and duplicates are removed.
+To use only tags to determine which channels to notify, leave the **Channels** field empty in the integration configuration. Because you can create multiple configurations of the integration, you can combine settings to fit your needs. Before posting a message, Unleash combines the configured and tagged channels for the event and removes duplicates.
 
 <Frame>
 ![Example of Slack-specific tags](/assets/slack-addon-tags.png)
