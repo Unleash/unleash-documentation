@@ -198,13 +198,13 @@ if __name__ == "__main__":
 `url` and `app_name` are positional arguments. All other arguments are keyword-only, and related settings are grouped into option objects:
 
 ```python
-from UnleashClient import HttpOptions, MetricsOptions, PollingOptions, UnleashClient
+from UnleashClient import MetricsOptions, PollingOptions, RequestsTransport, UnleashClient
 
 client = UnleashClient(
     url="https://<your-unleash-instance>/api",
     app_name="my-python-app",
     api_key="<your-backend-token>",
-    http=HttpOptions(timeout=10),
+    transport=RequestsTransport(timeout=10),
     mode=PollingOptions(interval=30),
     metrics=MetricsOptions(disabled=True),
 )
@@ -217,7 +217,7 @@ If you are upgrading from an earlier version, see [Migrating to v7](#migrating-t
 Both client constructors support the following parameters. Parameters marked "Sync client only" apply only to `UnleashClient`.
 
 <ParamField path="url" type="str" required={true}>
-  URL of your Unleash or Unleash Edge API, for example `https://<your-unleash-instance>/api`.
+  URL of your Unleash or Unleash Edge API, for example `https://<your-unleash-instance>/api`. Must be an absolute `http://` or `https://` URL with a host, otherwise the constructor raises a `ValueError`.
 </ParamField>
 
 <ParamField path="app_name" type="str" required={true}>
@@ -232,8 +232,8 @@ Both client constructors support the following parameters. Parameters marked "Sy
   How the client identifies itself to Unleash. See [`IdentityOptions`](#identityoptions).
 </ParamField>
 
-<ParamField path="http" type="HttpOptions" default="HttpOptions()">
-  How the client communicates with Unleash. See [`HttpOptions`](#httpoptions).
+<ParamField path="transport" type="Transport" default="RequestsTransport() or AiohttpTransport()">
+  How the client sends its requests to Unleash, including custom headers, the timeout, and proxy settings. `UnleashClient` uses a `RequestsTransport` by default, `AsyncUnleashClient` an `AiohttpTransport`. See [transport](#transport) and [custom HTTP transport](#custom-http-transport).
 </ParamField>
 
 <ParamField path="mode" type="PollingOptions | StreamingOptions" default="PollingOptions()">
@@ -290,23 +290,23 @@ Both client constructors support the following parameters. Parameters marked "Sy
   Version of the integration named by `sdk_flavor`.
 </ParamField>
 
-### HttpOptions
+### Transport
+
+`RequestsTransport` (for `UnleashClient`) and `AiohttpTransport` (for `AsyncUnleashClient`) take the same arguments:
+
+<ParamField path="session" type="requests.Session | aiohttp.ClientSession" default="None">
+  Your own session, for example with a proxy, TLS settings, or hooks. The client never closes a session you pass in. See [custom HTTP transport](#custom-http-transport).
+</ParamField>
 
 <ParamField path="headers" type="dict" default="None">
-  Additional headers for all API requests. Pass your API token as `api_key` instead of as a header. An `Authorization` header raises a `ValueError`.
+  Additional headers for all API requests. Pass your API token as `api_key` instead of as a header. An `Authorization` header, in any letter case, raises a `ValueError`.
 </ParamField>
 
-<ParamField path="options" type="dict" default="None">
-  Extra options passed to the underlying [HTTP requests](https://requests.readthedocs.io/en/latest/api/#main-interface), for example to skip SSL verification. Sync client only.
-</ParamField>
-
-<ParamField path="timeout" type="int" default="30">
+<ParamField path="timeout" type="float" default="30">
   Timeout, in seconds, for requests to the Unleash server.
 </ParamField>
 
-<ParamField path="retries" type="int" default="3">
-  Number of times the SDK retries a failed request for flag configuration. The sync client retries on `500`, `502`, and `504` responses.
-</ParamField>
+The SDK retries a failed flag fetch up to 3 times, on a `500`, `502`, or `504` response or when no response arrives, with a short randomized backoff between attempts. Registration and metrics requests are not retried. The number of retries can't be changed.
 
 ### PollingOptions
 
@@ -328,7 +328,11 @@ The default mode. The SDK fetches flag configuration from Unleash on an interval
 
 <span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
 
-The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. To use streaming, pass `mode=StreamingOptions()`. `StreamingOptions` takes no settings. Sync client only.
+The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. To use streaming, pass `mode=StreamingOptions()`. `StreamingOptions` takes no settings.
+
+Sync client only: `AsyncUnleashClient` raises a `ValueError` for `mode=StreamingOptions()`.
+
+The streaming connection doesn't use the [transport](#transport). It connects with the SDK's own headers and a 30-second timeout, so custom headers, the timeout, and other http settings on the transport don't apply to it.
 
 ### MetricsOptions
 
@@ -422,6 +426,32 @@ The fallback function must accept the feature name and context as positional arg
 The client evaluates the fallback function if the feature flag is not found or if an exception occurs during evaluation. If the fallback function itself raises an exception, `is_enabled` returns `False` and logs a warning.
 
 The fallback function runs as part of flag evaluation, so keep it fast: its runtime adds directly to every `is_enabled` call that invokes it.
+
+### Evaluate all flags
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v7.0.0+</Button>
+
+Use `evaluate_all_toggles` to evaluate every flag the SDK knows for one context in a single call, for example to pass all flag states to a frontend. It returns a dictionary keyed by flag name:
+
+```python
+results = client.evaluate_all_toggles({"userId": "user-123"})
+
+# {
+#     "my-flag": {"enabled": True, "variant": {"name": "disabled", "enabled": False}},
+#     "my-variant-flag": {
+#         "enabled": True,
+#         "variant": {
+#             "name": "variant1",
+#             "enabled": True,
+#             "payload": {"type": "string", "value": "val1"},
+#         },
+#     },
+# }
+```
+
+`enabled` is the flag's result for this context, and `variant.enabled` is whether a variant was assigned. Unlike `is_enabled` and `get_variant`, `evaluate_all_toggles` records no usage metrics and emits no impression events, so evaluating every flag doesn't report them all as in use. Before the client has any flag configuration, it returns an empty dictionary.
+
+To list the flags without evaluating them, use `feature_definitions`, which returns each flag's `project`, `type`, and whether it is `enabled` in the environment.
 
 ## Unleash context
 
@@ -884,6 +914,74 @@ client = UnleashClient(
 )
 ```
 
+## Custom HTTP transport
+
+<Button small outlined className="version-button" href="/support/availability#sdk-versioning">SDK v7.0.0+</Button>
+
+By default, `UnleashClient` sends its requests with [requests](https://requests.readthedocs.io/), on a new session for every request, and `AsyncUnleashClient` with one [aiohttp](https://docs.aiohttp.org/) session. To configure the session, for example for a proxy or TLS settings, pass it to `RequestsTransport` or `AiohttpTransport`:
+
+<Tabs>
+<Tab title="Sync">
+
+Use a `requests.Session` for a proxy, a private certificate authority, a client certificate for mutual TLS, or hooks. A session also keeps connections open between polls.
+
+```python
+import requests
+from UnleashClient import RequestsTransport, UnleashClient
+
+session = requests.Session()
+session.proxies = {"https": "http://proxy.internal:3128"}
+session.verify = "/etc/ssl/certs/internal-ca.pem"
+session.cert = ("/etc/unleash/client.crt", "/etc/unleash/client.key")
+
+client = UnleashClient(
+    url="https://<your-unleash-instance>/api",
+    app_name="my-python-app",
+    api_key="<your-backend-token>",
+    transport=RequestsTransport(session, headers={"X-Team": "checkout"}, timeout=10),
+)
+```
+
+The client never closes a session you pass in. Close it yourself after `client.destroy()`.
+
+</Tab>
+<Tab title="Async">
+
+Create the `aiohttp.ClientSession` inside a coroutine, because aiohttp needs a running event loop, and close it after the client:
+
+```python
+import ssl
+
+import aiohttp
+from UnleashClient import AiohttpTransport, AsyncUnleashClient
+
+tls = ssl.create_default_context(cafile="/etc/ssl/certs/internal-ca.pem")
+tls.load_cert_chain("/etc/unleash/client.crt", "/etc/unleash/client.key")
+
+
+async def main() -> None:
+    async with aiohttp.ClientSession(
+        trust_env=True,
+        connector=aiohttp.TCPConnector(ssl=tls),
+    ) as session:
+        async with AsyncUnleashClient(
+            url="https://<your-unleash-instance>/api",
+            app_name="my-python-app",
+            api_key="<your-backend-token>",
+            transport=AiohttpTransport(session, headers={"X-Team": "checkout"}, timeout=10),
+        ) as client:
+            ...
+```
+
+The `timeout` of `AiohttpTransport` applies to every request, in place of the session's own. Every status reaches the client as a response, even on a session created with `raise_for_status=True`. An `AiohttpTransport()` without a session opens its own; if you create one yourself and pass it in, close it with `await transport.aclose()` after the client.
+
+</Tab>
+</Tabs>
+
+Don't mount a retrying adapter on the session: the SDK already [retries failed flag fetches](#transport), and logs a warning if it finds one.
+
+You can also use another HTTP library, such as httpx, by passing any object with an `execute(request) -> Response` method. For examples and more guidance, see [custom HTTP transport](https://github.com/Unleash/unleash-python-sdk/blob/main/README.md#custom-http-transport) in the SDK's README.
+
 ## Framework integration
 
 `UnleashClient` runs background threads to poll for feature flags and send metrics, and both clients deliver [events](#events) on a background thread. Some runtime environments, like WSGI servers and Celery workers, restrict threads or spawn new processes, and need extra setup to make sure the SDK works correctly.
@@ -920,7 +1018,7 @@ def configure_workers(sender=None, conf=None, **kwargs):
 
 When each new process creates its own client, every process runs an independent poll cycle. With many short-lived processes, this wastes system resources and counts against your Unleash usage.
 
-To avoid this, set up a leader and follower pattern: one process keeps the on-disk cache fresh, and the other processes call `initialize_client(fetch_toggles=False)`. These clients then read flag configuration from the cache instead of polling the Unleash API.
+To avoid this, set up a leader and follower pattern: one process keeps the on-disk cache fresh, and the other processes call `initialize_client(fetch_toggles=False)`. These clients then read flag configuration from the cache instead of polling the Unleash API. They reload the cache every `PollingOptions(interval=...)` seconds, 15 by default.
 
 This mode is available with `UnleashClient`. `AsyncUnleashClient` accepts the `fetch_toggles` argument for compatibility and always polls.
 
@@ -962,14 +1060,19 @@ def test_my_feature(tmp_path):
 
 With `fetch_toggles=False`, the client loads flags from the cache only, so tests are deterministic and make no network requests. This approach uses `UnleashClient`, because `fetch_toggles=False` is specific to the sync client.
 
+With either client, you can also pass a fake transport that answers the SDK's requests itself. See [tests without a server](https://github.com/Unleash/unleash-python-sdk/blob/main/README.md#tests-without-a-server) in the SDK's README.
+
 ## Migrating to v7
 
-Version 7 changes how you configure the client:
+Version 7 requires Python 3.10 or later and changes how you configure the client:
 
 - The API token is passed as `api_key` instead of an `Authorization` header in `custom_headers`.
 - All arguments after `url` and `app_name` are keyword-only, and most settings moved into the option objects described in [configuration options](#configuration-options).
+- HTTP settings moved to the [transport](#transport): `custom_headers` and `request_timeout` become `RequestsTransport(headers=..., timeout=...)`, or `AiohttpTransport(...)` for `AsyncUnleashClient`. `custom_options` has been removed; configure a `requests.Session` instead and pass `RequestsTransport(session)`. See [custom HTTP transport](#custom-http-transport).
+- `request_retries` has been removed. A failed flag fetch is retried up to 3 times, with a short backoff.
 - The `environment` argument has been removed. The environment comes from your API token.
 - The constructor raises a `ValueError` if `url` is not an absolute `http://` or `https://` URL with a host.
+- `AsyncUnleashClient` raises a `ValueError` for `mode=StreamingOptions()`. In v6, it accepted streaming settings and polled.
 - Client settings are fixed at creation. The `unleash_*` settings properties, `strategy_mapping`, and `connector_mode` have been removed.
 
 The `environment` field of the [Unleash context](#unleash-context) and the `environment` label on impact metrics now come from your API token. In v6, the context field was `default` unless you set the `environment` argument. If a strategy or constraint uses the `environment` context field, for example `environment IN [default]`, update it to match your token's environment, or pass the value in the context:
