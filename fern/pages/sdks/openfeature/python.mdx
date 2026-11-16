@@ -16,6 +16,7 @@ The provider wraps the [Unleash Python SDK](/sdks/python) and uses the same back
 ## Requirements
 
 -   Python 3.10 or later
+-   Unleash Python SDK v7 or later, installed with the provider
 
 ## Installation
 
@@ -46,7 +47,7 @@ from unleash_openfeature_python_provider import UnleashFlagProvider
 provider = UnleashFlagProvider(
     url="<YOUR_UNLEASH_URL>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<YOUR_API_TOKEN>"},
+    api_key="<YOUR_API_TOKEN>",
 )
 
 api.set_provider_and_wait(provider)

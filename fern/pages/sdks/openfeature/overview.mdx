@@ -141,7 +141,7 @@ from unleash_openfeature_python_provider import UnleashFlagProvider
 provider = UnleashFlagProvider(
     url="<YOUR_UNLEASH_URL>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<YOUR_API_TOKEN>"},
+    api_key="<YOUR_API_TOKEN>",
 )
 
 api.set_provider_and_wait(provider)
