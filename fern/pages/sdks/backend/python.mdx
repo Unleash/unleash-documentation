@@ -324,16 +324,6 @@ The default mode. The SDK fetches flag configuration from Unleash on an interval
   Restricts flag fetches to a single project. Deprecated; use a [project-scoped API token](/concepts/api-tokens-and-client-keys#api-token-format) instead.
 </ParamField>
 
-### StreamingOptions
-
-<span data-badge-type="availability" title="Beta" class="fern-docs-badge large blue subtle rounded-full">Beta</span>
-
-The SDK keeps a streaming connection open to Unleash and receives flag updates as they happen. To use streaming, pass `mode=StreamingOptions()`. `StreamingOptions` takes no settings.
-
-Sync client only: `AsyncUnleashClient` raises a `ValueError` for `mode=StreamingOptions()`.
-
-The streaming connection doesn't use the [transport](#transport). It connects with the SDK's own headers and a 30-second timeout, so custom headers, the timeout, and other http settings on the transport don't apply to it.
-
 ### MetricsOptions
 
 <ParamField path="interval" type="int" default="60">
@@ -474,7 +464,7 @@ client.get_variant("my-flag", app_context)
 
 The SDK enriches the context automatically before evaluation:
 
-- `appName` is set from `app_name`, and `environment` from your API token, or `"default"` when the token doesn't name an environment. Values you pass in the context take precedence.
+- `appName` is set from `app_name`, and `environment` from the API token. Values passed in the context take precedence.
 - `currentTime` is set to the current UTC time when you don't provide it, so date-based constraints work without extra setup.
 - Any top-level key that isn't a standard context field is moved into `properties`. Passing `{"custom-property": "some-value"}` at the top level is equivalent to nesting it under `properties`.
 
@@ -678,7 +668,7 @@ def example_callback(event: UnleashEvent):
 
 <Markdown src="/snippets/sdks/impact-metrics.mdx" />
 
-The SDK automatically attaches `appName` and `environment` labels to all impact metrics. The `environment` label comes from your API token. If the token has no environment, the label is `default`.
+The SDK automatically attaches `appName` and `environment` labels to all impact metrics. The `environment` label comes from your API token.
 
 Define and record metrics through the client's `impact_metrics` property:
 
@@ -973,7 +963,12 @@ async def main() -> None:
             ...
 ```
 
-The `timeout` of `AiohttpTransport` applies to every request, in place of the session's own. Every status reaches the client as a response, even on a session created with `raise_for_status=True`. An `AiohttpTransport()` without a session opens its own; if you create one yourself and pass it in, close it with `await transport.aclose()` after the client.
+`AiohttpTransport` sets its own `timeout` on every request and ignores any timeout on the session. To change it, pass `timeout` to the transport (default: 30 seconds).
+
+The client never closes a transport or session that is passed in:
+
+- If a session is passed, as in the example, close the session after the client.
+- If `AiohttpTransport()` is passed without a session, it opens a session of its own. Call `await transport.aclose()` after closing the client.
 
 </Tab>
 </Tabs>
