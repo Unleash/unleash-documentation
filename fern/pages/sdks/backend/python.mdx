@@ -299,7 +299,7 @@ Both client constructors support the following parameters. Parameters marked "Sy
 </ParamField>
 
 <ParamField path="headers" type="dict" default="None">
-  Additional headers for all API requests. Pass your API token as `api_key` instead of as a header. An `Authorization` header, in any letter case, raises a `ValueError`.
+  Additional headers for all API requests. Pass the API token as `api_key` instead of as a header. If you also set `api_key`, the SDK ignores an `Authorization` header and logs a warning. Without `api_key`, an `Authorization` header raises a `ValueError` when the client is created.
 </ParamField>
 
 <ParamField path="timeout" type="float" default="30">
@@ -317,7 +317,7 @@ The default mode. The SDK fetches flag configuration from Unleash on an interval
 </ParamField>
 
 <ParamField path="jitter" type="int" default="None">
-  Maximum random delay, in seconds, added to each refresh.
+  Maximum random jitter, in seconds, added to each refresh.
 </ParamField>
 
 <ParamField path="project_name" type="str" default="None" deprecated={true}>
