@@ -6,7 +6,7 @@ og:title: Python OpenFeature provider
 description: Set up the Unleash OpenFeature provider for Python to evaluate feature flags through the OpenFeature API.
 keywords: [unleash, python, openfeature, provider, sdk, feature flags]
 max-toc-depth: 3
-last-updated: August 11, 2026
+last-updated: November 18, 2026
 ---
 
 The [Unleash OpenFeature Python provider](https://github.com/Unleash/unleash-openfeature-python-provider) lets Python applications evaluate Unleash feature flags through the [OpenFeature](https://openfeature.dev/) API.
@@ -16,6 +16,7 @@ The provider wraps the [Unleash Python SDK](/sdks/python) and uses the same back
 ## Requirements
 
 -   Python 3.10 or later
+-   Unleash Python SDK v7 or later, installed with the provider
 
 ## Installation
 
@@ -46,7 +47,7 @@ from unleash_openfeature_python_provider import UnleashFlagProvider
 provider = UnleashFlagProvider(
     url="<YOUR_UNLEASH_URL>/api",
     app_name="my-python-app",
-    custom_headers={"Authorization": "<YOUR_API_TOKEN>"},
+    api_key="<YOUR_API_TOKEN>",
 )
 
 api.set_provider_and_wait(provider)
