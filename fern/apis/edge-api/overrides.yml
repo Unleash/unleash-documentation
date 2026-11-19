@@ -48,7 +48,7 @@ paths:
                 client = UnleashClient(
                     url="https://edge.unleash-instance.example.com/api/",
                     app_name="my-app",
-                    custom_headers={'Authorization': '<your-backend-token>'})
+                    api_key="<your-backend-token>")
 
                 client.initialize_client()
 
