@@ -5,7 +5,7 @@ og:title: Impact metrics - Track application-level time-series metrics in Unleas
 description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
 keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
-last-updated: September 1, 2026
+last-updated: November 20, 2026
 ---
 
 ## Overview
@@ -166,6 +166,14 @@ HTTP Basic Auth is supported by embedding credentials in the URL (for example, `
 #### Configure with an environment variable
 
 If you prefer to manage configuration outside the Admin UI on a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Unleash must be restarted for changes to take effect.
+
+### Large metric sources
+
+Unleash limits each response it reads from your metrics source to 500,000 bytes. A source with many metric names, typically more than 10,000, can exceed this limit. When it does, **Test integration** fails with `Response exceeded 500000 byte limit (HTTP 502)` and the metric selector cannot load.
+
+The limit counts every metric name your source returns, including the infrastructure metrics that Unleash [hides from the metric selector](#metric-selector-filtering).
+
+On a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_RESPONSE_BYTES_LIMIT` environment variable on your Unleash server to a higher value in bytes, for example `2000000`. Values below `500000` are ignored. Unleash must be restarted for changes to take effect.
 
 ### Metric selector filtering
 
