@@ -169,7 +169,9 @@ If you prefer to manage configuration outside the Admin UI on a self-hosted inst
 
 ### Large metric sources
 
-Unleash limits the size of each response it reads from your metrics source to 500,000 bytes. A source with more than roughly 10,000 metric names can exceed this limit, and the connection test fails with `Response exceeded 500000 byte limit`.
+Unleash limits each response it reads from your metrics source to 500,000 bytes. A source with many metric names, typically more than 10,000, can exceed this limit. When it does, **Test integration** fails with `Response exceeded 500000 byte limit (HTTP 502)` and the metric selector cannot load.
+
+The limit counts every metric name your source returns, including the infrastructure metrics that Unleash [hides from the metric selector](#metric-selector-filtering).
 
 On a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_RESPONSE_BYTES_LIMIT` environment variable on your Unleash server to a higher value in bytes, for example `2000000`. Values below `500000` are ignored. Unleash must be restarted for changes to take effect.
 
