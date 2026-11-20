@@ -167,6 +167,12 @@ HTTP Basic Auth is supported by embedding credentials in the URL (for example, `
 
 If you prefer to manage configuration outside the Admin UI on a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API` environment variable on your Unleash server to the base URL of your Prometheus or VictoriaMetrics instance. Unleash must be restarted for changes to take effect.
 
+### Large metric sources
+
+Unleash limits the size of each response it reads from your metrics source to 500,000 bytes. A source with more than roughly 10,000 metric names can exceed this limit, and the connection test fails with `Response exceeded 500000 byte limit`.
+
+On a self-hosted instance, set the `EXTERNAL_PROMETHEUS_IMPACT_METRICS_RESPONSE_BYTES_LIMIT` environment variable on your Unleash server to a higher value in bytes, for example `2000000`. Values below `500000` are ignored. Unleash must be restarted for changes to take effect.
+
 ### Metric selector filtering
 
 Prometheus and VictoriaMetrics typically expose many infrastructure metrics that are not relevant as impact metrics. Unleash filters these out of the metric selector.
