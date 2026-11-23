@@ -275,6 +275,9 @@ navigation:
                     path: pages/integrate/jira-cloud-plugin-usage.mdx
                     slug: integrate/jira-cloud-plugin-usage
 
+              - page: n8n
+                path: pages/integrate/n8n.mdx
+                slug: integrate/n8n
               - page: ServiceNow
                 availability: beta
                 path: pages/integrate/servicenow.mdx
