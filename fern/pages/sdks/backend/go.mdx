@@ -589,6 +589,8 @@ Use `unleash.DebugListener{}` during development for built-in logging of all eve
 
 [Impact metrics](/concepts/impact-metrics) are lightweight, application-level time-series metrics stored and visualized directly inside Unleash. Use them to connect application data, such as request counts, error rates, or latency, to your feature flags and release plans.
 
+<Markdown src="/snippets/sdks/impact-metrics-hosting.mdx" />
+
 The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
 
 Initialize the SDK and publish impact metrics with package-level functions.
