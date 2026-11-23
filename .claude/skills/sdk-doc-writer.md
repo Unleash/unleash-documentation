@@ -21,6 +21,7 @@ These snippets in `fern/snippets/sdks/` contain fixed wording shared across SDKs
 | `frontend-connection.mdx` | `/api/frontend` endpoint + frontend API token instructions. |
 | `impression-data-intro.mdx` | Impression data explanation for the Events section. |
 | `impact-metrics.mdx` | Impact metrics explanation + link. |
+| `impact-metrics-hosting.mdx` | Warning that recording impact metrics with the SDK is Unleash Hosted only; self-hosted uses external metrics. |
 | `unleash-context-intro.mdx` | Context intro: what it holds and what it drives (targeting, constraints, stickiness). |
 
 ## SDK page template
@@ -204,6 +205,8 @@ the SDK emits, then show a code example.]
 [If the SDK supports impact metrics, include this section. Otherwise skip it.]
 
 <Markdown src="/snippets/sdks/impact-metrics.mdx" />
+
+<Markdown src="/snippets/sdks/impact-metrics-hosting.mdx" />
 
 The SDK automatically attaches `appName`, and `environment` labels to all impact metrics.
 

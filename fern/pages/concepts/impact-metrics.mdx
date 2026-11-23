@@ -5,7 +5,7 @@ og:title: Impact metrics - Track application-level time-series metrics in Unleas
 description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
 keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
-last-updated: September 1, 2026
+last-updated: November 23, 2026
 ---
 
 ## Overview
@@ -33,9 +33,16 @@ For more use cases and how impact metrics fit into the broader release workflow,
 
 Unleash supports two metric sources: [internal](#internal-metrics) and [external](#external-metrics). Both support the same [metric types](#metric-types) and can be used in [charts](#create-charts) and [safeguards](#configure-safeguards).
 
+The sources available to you depend on your [hosting option](/deploy/hosting-options):
+
+- **Unleash Hosted**: Internal and external metrics.
+- **Self-hosted**: External metrics only.
+
 ### Internal metrics
 
 Internal metrics are defined and recorded in your application using an [Unleash SDK](/sdks#metrics-and-impression-data). The SDK sends metrics to Unleash, where they are stored and queried. See [Record internal metrics](#record-internal-metrics) for setup instructions.
+
+Internal metrics are currently available on [Unleash Hosted](/deploy/hosting-options) only. If you self-host Unleash, use [external metrics](#external-metrics).
 
 ### External metrics
 
@@ -57,11 +64,13 @@ Impact metrics support three data types:
 
 ## Record internal metrics
 
-<Note>
+<Warning>
 
-[Internal metrics](#internal-metrics) are currently supported in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
+[Internal metrics](#internal-metrics) are currently available on [Unleash Hosted](/deploy/hosting-options) only, in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
 
-</Note>
+If you self-host Unleash, do not record impact metrics with the SDK. [Connect external metrics](#connect-external-metrics) from your Prometheus or VictoriaMetrics instance instead.
+
+</Warning>
 
 To use [internal metrics](#internal-metrics), define a metric in the SDK and then record values for it. The SDK automatically attaches the following context labels: `appName`, `environment`, and `origin` (for example, `origin=sdk` or `origin=Edge`). These labels are available as filters when you [create charts](#create-charts).
 
