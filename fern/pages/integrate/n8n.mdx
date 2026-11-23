@@ -197,7 +197,7 @@ To set it up, follow these steps:
 
 Events can arrive out of order, and the same event can arrive more than once. Use the event's numeric `id` to order events and to drop duplicates.
 
-If you self-host Unleash and n8n on a private network, Unleash rejects the webhook URL by default. To allow it, set `UNLEASH_ALLOW_PRIVATE_URL_IN_INTEGRATION=true`, or add the n8n host to `UNLEASH_ALLOW_LIST_INTEGRATION` on the Unleash server.
+If you self-host Unleash and n8n on a private network, Unleash rejects the webhook URL by default. To allow it, add the n8n hostname to `UNLEASH_ALLOW_LIST_INTEGRATION` on the Unleash server. See [Private network URLs](/integrate/webhook#private-network-urls).
 
 ## Change flags with the Unleash MCP server
 

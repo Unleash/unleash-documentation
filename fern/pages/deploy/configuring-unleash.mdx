@@ -243,6 +243,8 @@ If emails fail to send or contain errors:
 | `SESSION_CLEAR_SITE_DATA_ON_LOGOUT`   | `true`              | Whether to send the `Clear-Site-Data` header on logout and when a session reaches the idle timeout. |
 | `MAX_PARALLEL_SESSIONS`             | N/A                 | Maximum number of parallel user sessions allowed with password-based login.                                                                |
 | `UNLEASH_FRONTEND_API_ORIGINS` |	`*` |	Comma-separated list of allowed origins (CORS) for the Frontend API. Use * with caution. Example: https://app.mycompany.com,https://*.yourdomain.net.|
+| `UNLEASH_ALLOW_LIST_INTEGRATION`      | N/A                 | Comma-separated list of hostnames that integrations can send requests to even when they resolve to a private network address. See [Private network URLs](/integrate/webhook#private-network-urls). |
+| `UNLEASH_ALLOW_PRIVATE_URL_IN_INTEGRATION` | `false`        | Set to `true` to let integrations send requests to any private network address. See [Private network URLs](/integrate/webhook#private-network-urls). |
 
 #### Session timeouts
 

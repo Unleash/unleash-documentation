@@ -5,7 +5,7 @@ og:title: Webhook
 description: "Set up Unleash webhooks to send feature flag, project, environment, and change events to external tools with headers and retries."
 max-toc-depth: 2
 slug: integrate/webhook
-last-updated: August 25, 2026
+last-updated: November 23, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v3.11</Button>
@@ -51,19 +51,43 @@ You can choose to trigger updates for the following events (we might add more ev
 - change-request-scheduled-application-failure
 - change-request-schedule-suspended
 - feature-potentially-stale-on
+- release-plan-progressions-paused
+- release-plan-progressions-resumed
 - feature-updated (deprecated in v4.3)
 
 #### Parameters
 
-Unleash Webhook integration takes the following parameters.
+The Webhook integration takes the following parameters:
 
-**Webhook URL** This is the only required property. If you are using a Slack Application you must also make sure your application is allowed to post the channel you want to post to.
+<ParamField path="Webhook URL" type="string" required={true}>
+  The URL that Unleash sends an HTTP POST request to for each event. The URL must use `http` or `https`. If you are using a Slack application, make sure that your application is allowed to post to the channel you want to post to. For URLs on a private network, see [Private network URLs](#private-network-urls).
+</ParamField>
 
-**Content-Type** Used to set the content-type header used when unleash performs an HTTP POST to the defined endpoint.
+<ParamField path="Content-Type" type="string" default="application/json">
+  The value of the `Content-Type` header in the request.
+</ParamField>
 
-**Body template** Used to override the body template used by Unleash when performing the HTTP POST. You may format your message using a [Mustache template](https://mustache.github.io). You will have the Unleash event format available in the rendering context:
+<ParamField path="Authorization" type="string">
+  The value of the `Authorization` header in the request. Unleash sends the value exactly as you enter it, so include the scheme yourself if your endpoint expects one, for example `Bearer <token>`. If you leave this empty, Unleash doesn't send an `Authorization` header.
+</ParamField>
 
-<EndpointResponseSnippet endpoint="GET /api/admin/events" />
+<ParamField path="Extra HTTP Headers" type="string">
+  Additional headers to send with the request, as a JSON object whose keys and values are strings, for example `{"X-Api-Key": "your-api-key"}`. A header with the same name as **Content-Type** or **Authorization** overrides that parameter. If the value isn't valid JSON, Unleash sends the request without the extra headers and records the [integration event](/integrate#integration-events) as having errors.
+</ParamField>
+
+<ParamField path="Body template" type="string">
+  A [Mustache template](https://mustache.github.io) for the request body. If you leave this empty, Unleash sends the event in the Unleash event format. See [Body template](#body-template).
+</ParamField>
+
+Unleash treats **Webhook URL**, **Authorization**, and **Extra HTTP Headers** as sensitive and masks their values after you save the integration.
+
+#### Body template
+
+You can format the request body with a [Mustache template](https://mustache.github.io). The template has access to the following variables:
+
+- `event`: The event, in the Unleash event format shown below. For example, `{{event.type}}` or `{{event.data.name}}`.
+- `eventJson`: The whole event, serialized as a JSON string. Use triple braces, `{{{eventJson}}}`, so that Mustache doesn't escape it, and don't wrap it in quotes.
+- `eventMarkdown`: A formatted Markdown description of the event. Inside a quoted JSON string, such as `"{{eventMarkdown}}"`, Unleash escapes the description so that the body stays valid JSON.
 
 Example:
 
@@ -72,13 +96,28 @@ Example:
   "event": "{{event.type}}",
   "createdBy": "{{event.createdBy}}",
   "featureToggle": "{{event.data.name}}",
-  "timestamp": "{{event.data.createdAt}}"
+  "timestamp": "{{event.data.createdAt}}",
+  "description": "{{eventMarkdown}}",
+  "json": {{{eventJson}}}
 }
 ```
 
-If you don't specify anything Unleash will use the Unleash event format:
+If you don't specify a template, Unleash sends the event in the Unleash event format:
 
 <EndpointResponseSnippet endpoint="GET /api/admin/events" />
+
+#### Private network URLs
+
+<Button small outlined className="version-button" href="/support/availability">v8.0.2</Button>
+
+Unleash rejects a webhook URL whose hostname resolves to a private or reserved network address, such as a loopback address or an address in `10.0.0.0/8` or `192.168.0.0/16`. Unleash also rejects a hostname that doesn't resolve.
+
+If you self-host Unleash and your webhook endpoint is on a private network, set one of the following environment variables on the Unleash server:
+
+- `UNLEASH_ALLOW_LIST_INTEGRATION`: A comma-separated list of hostnames to allow, for example `n8n.internal.example.com`. Unleash matches the hostname exactly, ignoring case.
+- `UNLEASH_ALLOW_PRIVATE_URL_IN_INTEGRATION`: Set to `true` to allow every private network address.
+
+Prefer the allowlist, which only opens the hosts that you name.
 
 #### Custom SSL certificates
 
