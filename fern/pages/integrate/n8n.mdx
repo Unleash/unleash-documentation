@@ -166,7 +166,7 @@ Use a gate when a flag must control what the agent can do, because the agent dec
 To stop an agent workflow with a kill switch, evaluate the flag right after the trigger, and add an **If** node that runs the rest of the workflow only when the flag is on. Turning the flag off activates the kill switch, and the workflow stops with a **Stop and Error** node before the agent can act.
 
 <Frame>
-![n8n workflow: a chat trigger, an Unleash node that evaluates a flag, and an If node that continues to the rest of the agent workflow when the flag is on, or stops with Stop and Error when it's off.](/assets/n8n-agent-kill-switch.png)
+![n8n workflow: a chat trigger, an Unleash node that evaluates a flag, and an If node named Agent allowed to act? that continues to the rest of the agent workflow when the flag is on, or stops at a Stop and Error node named Block the agent when it's off.](/assets/n8n-agent-kill-switch.png)
 </Frame>
 
 This workflow sets **Cache Duration (Seconds)** to `3`, so it picks up a flag change within a few seconds. See [Caching](#caching).
@@ -179,7 +179,7 @@ An AI Agent node offers every attached tool to the model, and n8n has no built-i
 - One agent with the same tools, plus the tool that takes a real action, such as sending an email, changing a record, or calling a paid API.
 
 <Frame>
-![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, and an If node that routes to an advanced support agent with a Gmail tool when the flag is on, or to a standard support agent without it when the flag is off.](/assets/n8n-gate-ai-agent-tools-by-flag.png)
+![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, and an If node named Advanced tools enabled? that routes to an advanced support agent with a Gmail tool when the flag is on, or to a standard support agent without it when the flag is off.](/assets/n8n-gate-ai-agent-tools-by-flag.png)
 </Frame>
 
 Turning the flag off then removes the tool, rather than relying on the model to respect a check. To keep the screenshot focused on the gated tool, only the standard agent has a chat model attached. Attach a chat model to both agents before you run the workflow.
@@ -193,7 +193,7 @@ In the following screenshots, nodes that you configure yourself, such as credent
 A **Schedule Trigger** node starts the workflow every hour. Before the automation does anything, the Unleash node evaluates a flag, and an **If** node runs the automation only when the flag is on. When the flag is off, the workflow stops with a **Stop and Error** node. Turning the flag off in Unleash pauses the automation without changing the workflow.
 
 <Frame>
-![n8n workflow: a Schedule Trigger node, an Unleash node that evaluates a flag, and an If node that routes to Run the automation when the flag is on, or to Stop and Error when it's off.](/assets/n8n-guarded-automation.png)
+![n8n workflow: a Schedule Trigger node, an Unleash node that evaluates a flag, and an If node named Automation allowed to run? that routes to Run the automation when the flag is on, or to a Stop and Error node named Automation disabled when it's off.](/assets/n8n-guarded-automation.png)
 </Frame>
 
 ### Gate a deployment from CI
@@ -201,7 +201,7 @@ A **Schedule Trigger** node starts the workflow every hour. Before the automatio
 Your CI system calls a **Webhook** node and passes the service name as a custom property in **Additional Context**. If the flag for that stage is on, the workflow calls your deployment API. If the flag is off, the workflow responds that the deployment is blocked. Your pipeline gets a release gate over HTTP, without needing write access to Unleash.
 
 <Frame>
-![n8n workflow: a Webhook node that receives a CI build event, an Unleash node that evaluates a flag, and an If node that either triggers the deployment and responds deployed, or responds blocked.](/assets/n8n-flag-gated-deploy-gate.png)
+![n8n workflow: a Webhook node that receives a CI build event, an Unleash node that evaluates a flag, and an If node named Deploy allowed? that either triggers the deployment and responds deployed, or responds blocked.](/assets/n8n-flag-gated-deploy-gate.png)
 </Frame>
 
 ### Route a tenant by variant
@@ -209,7 +209,7 @@ Your CI system calls a **Webhook** node and passes the service name as a custom 
 Evaluate a flag with the tenant ID as **User ID**, so [stickiness](/concepts/stickiness) keeps each tenant on the same variant. A **Switch** node on `{{ $json.variant.name }}` then calls one of two sub-workflows, for example two pricing engines or two system prompts for an AI agent. To move a tenant to the new version, or to change the rollout percentage, update the flag in Unleash instead of the workflow.
 
 <Frame>
-![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, a Switch node that runs a legacy or v2 pricing sub-workflow based on the variant, a Merge node, and a Slack node that logs which variant served the tenant.](/assets/n8n-route-tenant-by-variant.png)
+![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, a Switch node named Route by variant that runs a legacy or v2 pricing sub-workflow, a Merge node, and a Slack node that logs which variant served the tenant.](/assets/n8n-route-tenant-by-variant.png)
 </Frame>
 
 The [templates folder](https://github.com/Unleash/n8n-nodes-unleash/tree/main/templates) in the node's repository has these and other workflows as JSON files that you can import into n8n. Some templates use the Unleash MCP server and require Unleash Enterprise.
