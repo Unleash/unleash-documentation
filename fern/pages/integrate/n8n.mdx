@@ -13,7 +13,7 @@ The Unleash node for [n8n](https://n8n.io) evaluates feature flags in your n8n w
 
 The node reads flags through the [Frontend API](/concepts/front-end-api) with a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens), so it works on every Unleash plan and against either Unleash or [Unleash Edge](/unleash-edge). The node only reads flags. To change flags from n8n, use the [Unleash MCP server](#change-flags-with-the-unleash-mcp-server).
 
-Unleash maintains the node as the open-source [`@unleash/n8n-nodes-unleash`](https://github.com/Unleash/n8n-nodes-unleash) package, released under the MIT license. n8n has verified the node, so you can install it from the nodes panel on both n8n Cloud and self-hosted n8n.
+The node is [`open-source`](https://github.com/Unleash/n8n-nodes-unleash) (MIT license) and verified by n8n, so you can install it from the nodes panel on both n8n Cloud and self-hosted n8n.
 
 ## Prerequisites
 
@@ -157,7 +157,7 @@ Both operations cache their result for 30 seconds by default, which matches the 
 You can use the node with an n8n [AI Agent](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent) node in two ways:
 
 - **As a tool**: Attach the node to the AI Agent node as a tool, so the agent can check a flag itself before it acts.
-- **As a gate**: Evaluate a flag before the agent runs, and route the workflow on the result. For example, stop the workflow when a kill switch flag is off.
+- **As a gate**: Evaluate a flag before the agent runs, and route the workflow on the result. For example, stop the workflow when a kill switch is active.
 
 Use a gate when a flag must control what the agent can do. An AI Agent node offers every attached tool to the model, and n8n has no built-in way to hide one tool based on a condition. To give the agent a tool only when a flag is on, evaluate the flag first, and then use an **If** node to route to one of two AI Agent nodes:
 
