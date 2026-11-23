@@ -169,7 +169,7 @@ To stop an agent workflow with a kill switch, evaluate the flag right after the 
 ![n8n workflow: a chat trigger, an Unleash node that evaluates a flag, and an If node named Agent allowed to act? that continues to the rest of the agent workflow when the flag is on, or stops at a Stop and Error node named Block the agent when it's off.](/assets/n8n-agent-kill-switch.png)
 </Frame>
 
-This workflow sets **Cache Duration (Seconds)** to `3`, so it picks up a flag change within a few seconds. See [Caching](#caching).
+This workflow sets **Cache Duration (Seconds)** to `3`, so the node checks for updates on the next execution after its cached result expires. This is not an end-to-end kill-switch deadline: Edge polls upstream every 15 seconds by default unless streaming is enabled, and failed requests can return an older cached result. See [Caching](#caching).
 
 ### Give an agent a tool only when a flag is on
 
