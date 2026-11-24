@@ -866,9 +866,6 @@ navigation:
           - page: Feature flags for migrations and modernization
             path: pages/guides/feature-flags-for-migrations.mdx
             slug: feature-flags-for-migrations
-          - page: Kill switches
-            path: pages/guides/kill-switches.mdx
-            slug: kill-switches
           - page: Managing large constraints
             path: pages/guides/managing-constraints.mdx
             slug: managing-constraints
