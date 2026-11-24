@@ -1,0 +1,177 @@
+---
+title: Kill switches
+description: "Learn what a kill switch is, when to use one, and how to implement kill switches with Unleash feature flags to disable functionality at runtime without a deployment."
+keywords: kill switch, kill switches, circuit breaker, graceful degradation, incident response, feature flags, unleash
+og:site_name: "Unleash Documentation"
+og:title: "Kill switches with feature flags"
+max-toc-depth: 3
+last-updated: November 24, 2026
+---
+
+A kill switch is a [feature flag](/concepts/feature-flags) that lets you turn off a piece of functionality in production at runtime. When a feature misbehaves, a dependency fails, or load exceeds what your system can handle, you flip the flag and the affected code path stops running. You don't deploy, roll back, or restart anything.
+
+This guide covers:
+
+- [What a kill switch is](#what-is-a-kill-switch) and how it differs from a rollback.
+- [Common use cases](#use-cases), from third-party outages to AI features.
+- [How to implement a kill switch](#implement-a-kill-switch) in Unleash, including which way the flag should point.
+- [How to automate a kill switch](#automate-a-kill-switch) with production signals.
+- [Best practices](#best-practices) for keeping kill switches reliable over time.
+
+## What is a kill switch?
+
+A kill switch wraps a specific capability, such as a recommendation widget, a payment provider integration, or an expensive background job, in a flag check. In normal operation, the capability runs. When you activate the kill switch, your application skips that capability and runs a fallback instead: a cached response, a simpler implementation, a friendly message, or nothing at all.
+
+Kill switches differ from other [feature flag types](/concepts/feature-flags#feature-flag-types) in two ways:
+
+- **They are long-lived.** A release flag exists for the duration of a rollout, and then you remove it. A kill switch stays in your code for as long as the capability it protects, so Unleash gives the kill switch flag type a permanent expected lifetime and never marks it as potentially stale.
+- **They are for operations, not releases.** You don't use a kill switch to introduce something new. You use it to protect a system that is already live, and most of the time it sits untouched.
+
+### Kill switch or rollback
+
+A rollback deployment and a kill switch both get you out of a bad state, but they work at different levels.
+
+| | Rollback deployment | Kill switch |
+|---|---|---|
+| Scope | Everything in the deployment | One capability |
+| Time to take effect | Minutes, a full pipeline run | Seconds, the next SDK refresh |
+| Who can do it | Engineers with deployment access | Anyone with the right [permissions](/concepts/rbac) in Unleash |
+| Works for external failures | No, your code didn't change | Yes |
+
+The last row matters most. Many incidents are not caused by your latest deployment. A payment provider slows down, a traffic spike hits, or a data feed starts returning bad results. There is no previous version to roll back to, but a kill switch still lets you degrade gracefully.
+
+## Use cases
+
+### Third-party dependency failures
+
+Your application depends on services you don't control: payment gateways, identity providers, email and SMS delivery, maps, search, and analytics. When one of them slows down or fails, a kill switch lets you take it out of the request path. For example, you can hide a secondary payment method, switch to a backup provider, or queue outgoing notifications for later delivery.
+
+### Load shedding during traffic spikes
+
+Some features are expensive but not essential: personalized recommendations, live activity feeds, search suggestions, and report exports. During a traffic spike or a partial outage, you can turn these off to free up capacity for the flows that matter most, such as checkout or sign-in.
+
+### Faulty releases
+
+Every [release flag](/guides/gradual-rollout) acts as a temporary kill switch while a rollout is in progress. If the new code path causes errors, you turn the flag off and all users return to the previous behavior. For high-risk capabilities, consider keeping a dedicated, permanent kill switch after you remove the release flag.
+
+### AI and LLM features
+
+AI features carry risks that are hard to catch before production: runaway token costs, provider rate limits, degraded model quality, and unsafe output. A kill switch lets you disable an AI feature or fall back to a non-AI experience in seconds. The same applies to AI-generated code: when you ship more changes faster, a kill switch around each change limits the impact of the ones that go wrong. To learn more, see [Feature flags for AI](/guides/manage-ai-models-with-feature-flags).
+
+### Security incidents
+
+When you discover a vulnerability in a specific feature, such as a file upload endpoint or an export function, a kill switch lets you take that feature offline immediately while you prepare a fix. This contains the exposure without taking the whole application down.
+
+### Background jobs and data pipelines
+
+Batch jobs, queue consumers, and scheduled tasks can do damage at scale: sending duplicate emails, writing corrupt data, or overloading a downstream system. A kill switch that each job checks before processing a batch lets you pause the work without a deployment and resume it when the problem is fixed.
+
+### Migrations and cutovers
+
+During a migration, the flag that routes traffic to the new system doubles as a kill switch. If the new path degrades, you turn the flag off and traffic returns to the legacy path. To learn more, see [Feature flags for cloud migrations and modernization](/guides/feature-flags-for-migrations#roll-back-in-seconds-without-redeploying).
+
+## Implement a kill switch
+
+### Create the flag
+
+[Create a feature flag](/guides/how-to-create-feature-flags) and select **Kill switch** as the flag type. Give it a name that states what it controls and which way it points, for example `disable-recommendations` or `kill-sms-notifications`. A [naming pattern](/concepts/feature-flags#set-a-naming-pattern) helps you keep this consistent across a project.
+
+### Choose the flag polarity
+
+You can wire a kill switch in two ways. The difference is what your application does when it has no flag data, for example when an SDK can't reach Unleash at startup. In that case, [flags evaluate as disabled](/sdks#offline-behavior) unless you specify a default value.
+
+<Tabs>
+  <Tab title="Inverted flag">
+    The capability runs while the flag is **disabled**. Enabling the flag turns the capability off.
+
+    ```js
+    if (unleash.isEnabled('disable-recommendations')) {
+      return getPopularProducts();
+    }
+
+    return getPersonalizedRecommendations(user);
+    ```
+
+    With no flag data, the capability stays on. This is the recommended setup for long-lived kill switches that protect established functionality, because losing the connection to Unleash never turns off a working feature.
+  </Tab>
+  <Tab title="Standard flag">
+    The capability runs while the flag is **enabled**. Disabling the flag turns the capability off.
+
+    ```js
+    if (unleash.isEnabled('recommendations')) {
+      return getPersonalizedRecommendations(user);
+    }
+
+    return getPopularProducts();
+    ```
+
+    With no flag data, the capability stays off. This fits capabilities that are safer off than on, such as a new integration or an AI feature, and it works with the **Disable environment** [safeguard action](#automate-a-kill-switch).
+  </Tab>
+</Tabs>
+
+Whichever you choose, apply it consistently and make it visible in the flag name and description, so nobody has to guess what a toggle does during an incident.
+
+### Build a fallback
+
+A kill switch is only as good as what happens when you activate it. Decide what the fallback is for each capability and implement it alongside the flag check:
+
+- Serve a cached or static result in place of a live one.
+- Switch to a simpler implementation or a backup provider.
+- Hide the UI element or show a short message that the feature is temporarily unavailable.
+- Queue work for later instead of processing it now.
+
+### Scope the kill switch
+
+A kill switch doesn't have to be all or nothing. Because it is a regular feature flag, you can use [activation strategies](/concepts/activation-strategies) and [constraints](/concepts/activation-strategies#constraints) to limit its effect to a region, a tenant, an application version, or a percentage of traffic. For example, you can shed load for free-tier users while keeping the capability on for paying customers.
+
+To turn off several related flags at once, you can make them children of a parent flag using [feature flag dependencies](/concepts/feature-flags#feature-flag-dependencies). Use this sparingly, because [parent-child relationships add complexity](/guides/best-practices-using-feature-flags-at-scale).
+
+### Know how fast it takes effect
+
+SDKs evaluate flags from a local cache and fetch updates from Unleash on a [refresh interval](/sdks#default-refresh-and-metrics-intervals), 15 seconds by default for backend SDKs. A kill switch takes effect when each SDK instance next refreshes. If you need a faster reaction for specific services, lower their refresh interval.
+
+## Automate a kill switch
+
+A person watching a dashboard is not always fast enough. Unleash can activate a kill switch for you based on production signals.
+
+<CardGroup cols={2}>
+  <Card title="Safeguards" icon="fa-solid fa-shield-halved">
+    [Safeguards](/concepts/impact-metrics#configure-safeguards) watch an [impact metric](/concepts/impact-metrics), such as an error count or latency, and disable the flag in an environment when the metric crosses a threshold. Because the action turns the flag off, use it with a standard flag.
+  </Card>
+  <Card title="Signals and actions" icon="fa-solid fa-bolt">
+    [Signals](/concepts/signals) let external systems, such as your monitoring or incident tooling, call into Unleash. [Actions](/concepts/actions) respond by changing flag state, so an alert can activate a kill switch without waiting for a human.
+  </Card>
+</CardGroup>
+
+## Best practices
+
+- **One capability per kill switch.** A kill switch that controls several unrelated things forces you to turn off more than you need to.
+- **Test both paths regularly.** A fallback that hasn't run in a year might not work. Activate each kill switch in a pre-production [environment](/concepts/environments) as part of your release or game-day routine, and include both flag states in your automated tests.
+- **Document it in your runbooks.** List each kill switch, what it turns off, what users see, and who can activate it. Add the same information to the flag description and use [tags](/concepts/feature-flags#tags) to make kill switches easy to find.
+- **Plan access for incidents.** Make sure on-call engineers have permission to change the flag in production. If the project uses [change requests](/concepts/change-requests), grant incident responders the [skip change requests](/concepts/rbac#environment-level-permissions) permission so approvals don't delay an emergency.
+- **Keep an audit trail.** Every change to a kill switch appears in the [event log](/concepts/events#event-log), which gives you an exact timeline for your incident review.
+- **Review the inventory.** Kill switches are permanent, but the capabilities they protect are not. When you remove a capability, remove its kill switch too.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="What is the difference between a kill switch and a circuit breaker?">
+    A circuit breaker is code inside your application that detects failures and stops calling a failing dependency on its own, usually per instance and for a short period. A kill switch is a centrally managed control that a person or an automation activates for all instances at once. The two complement each other: circuit breakers handle brief, local failures, and kill switches handle sustained incidents and deliberate decisions.
+  </Accordion>
+  <Accordion title="Does every feature need a kill switch?">
+    No. Add permanent kill switches for capabilities that depend on external services, consume significant resources, or have a history of incidents. For everything else, the release flag you use during rollout provides the same protection until the feature is stable.
+  </Accordion>
+  <Accordion title="What happens to a kill switch if Unleash is unavailable?">
+    SDKs keep evaluating flags from their local cache, so every kill switch keeps its last known state. You can't change the state until the connection is restored. An SDK that starts with no flag data evaluates flags as disabled, which is why [flag polarity](#choose-the-flag-polarity) matters.
+  </Accordion>
+  <Accordion title="Should a kill switch be removed once the feature is stable?">
+    A release flag should be removed after rollout. A dedicated kill switch stays for as long as the capability it protects carries operational risk. Unleash treats the kill switch flag type as permanent, so these flags don't appear as [technical debt](/concepts/technical-debt).
+  </Accordion>
+</AccordionGroup>
+
+## Additional resources
+
+- [Feature flag types](/concepts/feature-flags#feature-flag-types)
+- [How to perform a gradual rollout](/guides/gradual-rollout)
+- [Impact metrics and safeguards](/concepts/impact-metrics)
+- [Building and scaling feature flag systems](/guides/feature-flag-best-practices)
