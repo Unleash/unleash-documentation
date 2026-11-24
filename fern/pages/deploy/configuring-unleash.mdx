@@ -4,12 +4,14 @@ description: "Learn how to configure self-hosted Unleash using Docker environmen
 max-toc-depth: 3
 og:title: Configure Unleash
 og:site_name: Unleash
-last-updated: November 10, 2026
+last-updated: November 24, 2026
 ---
 
 This guide explains how to configure your self-hosted Unleash instance when running it via [Docker Compose or the Docker CLI](/deploy/getting-started).
 
 When running Unleash using Docker, configuration is managed through environment variables.
+
+Unleash reads environment variables at startup. After you change a variable, restart Unleash for the change to take effect.
 
 ## Configuration method
 ### Docker Compose
@@ -289,6 +291,7 @@ Unleash exposes performance metrics in Prometheus format at `/internal-backstage
 | `UNLEASH_VERSION_URL`                    | `https://version.unleash.run` | Overrides the URL used for version checks.                                                               |
 | `CLIENT_FEATURE_CACHING_ENABLED`         | `true`                      | Toggles server-side memoization for `/api/client/features`.                                                |
 | `CLIENT_FEATURE_CACHING_MAXAGE`          | `600`                       | Cache duration in milliseconds for `/api/client/features` memoization.                                     |
+| `UNLEASH_EXPERIMENTAL_CLIENT_METRICS_REQUEST_BODY_LIMIT_KB` | `100` | Maximum request body size in KiB for `POST /api/client/metrics`. Accepts whole numbers from `100` to `1024`. Values outside this range prevent Unleash from starting. Raise the limit if SDK metrics requests fail with `413 Payload Too Large`. |
 | `FRONTEND_API_REFRESH_INTERVAL_MS`       | N/A                         | Default refresh interval in milliseconds for frontend SDKs to refresh their data from the cache.                                                       |
 | `ACCESS_CONTROL_MAX_AGE`                 | `86400`                     | Configures the `Access-Control-Max-Age` CORS header in seconds.                                          |
 | `ENABLED_ENVIRONMENTS`                 | N/A                         | Comma-separated list of environment names to force enable at startup, overriding the database state. Use with caution; does not disable environments not listed. |
