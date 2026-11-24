@@ -178,6 +178,15 @@ Replace the `<API token>` string in the Authorization header with the API token 
 
 You can check our [API token and client keys documentation](/concepts/api-tokens-and-client-keys) for more specifics and see additional use cases in our [Backend SDK with Python](/sdks/python) documentation.
 
+If you use Docker Engine directly on Linux, add the following under the existing `services.app` entry in the Flask app's `docker-compose.yaml`. This lets the container resolve `host.docker.internal` to the machine running Unleash. Docker Desktop provides this hostname automatically.
+
+```yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+```
+
+See [Docker Compose networking](https://docs.docker.com/compose/how-tos/networking/#custom-dns-with-extra_hosts) for details.
+
 Next, go to your terminal and build the app using this command:
 
 ```
