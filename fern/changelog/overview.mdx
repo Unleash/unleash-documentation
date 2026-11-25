@@ -16,9 +16,23 @@ A single release note can carry more than one tag when a release touches several
 </Accordion>
 
 <Accordion title="Versioning">
-Unleash follows semantic versioning, with major versions (for example, `v7.0.0`) including significant new features and might include breaking changes, and minor versions (for example, `v7.4.0`) adding new functionality while maintaining backward compatibility.
+Unleash versions use the format `MAJOR.MINOR.BUILD`:
 
-For a comprehensive list of all Unleash releases, including patch versions and history prior to 2025, visit the [Unleash Releases](https://github.com/Unleash/unleash/releases) page on GitHub.
+- **Major versions** (for example, `v8.0.0`) introduce significant changes and can include breaking changes. Review the [upgrade guide](/deploy/upgrading-unleash) before you upgrade.
+- **Minor versions** (for example, `v8.3.0`) are feature releases. This page summarizes each one.
+- **Builds** (for example, `v8.3.1`) are published regularly between minor versions. They include dependency updates and security fixes, and can also include new features and other changes.
+
+Unleash doesn't strictly follow semantic versioning. Builds come from the same code that runs Unleash Cloud and are designed to be backward compatible. In rare cases, a build includes a change that isn't backward compatible. When that happens:
+
+- The release notes explain the change and typically include a migration or upgrade guide.
+- Deprecated functionality remains available for a grace period before it's removed.
+- Unleash contacts affected customers ahead of the change and works with them to plan the upgrade.
+
+If you self-host Unleash, test new builds in a non-production environment before you upgrade.
+
+[Unleash Open Source](/support/availability#plans) and Unleash Enterprise share major and minor versions, but their builds are numbered independently.
+- **Unleash Open Source**: For a comprehensive list of releases, including builds and history prior to 2025, visit the [Unleash Releases](https://github.com/Unleash/unleash/releases) page on GitHub.
+- **Unleash Enterprise**: Builds are published as [`unleashorg/unleash-enterprise` image tags](https://hub.docker.com/r/unleashorg/unleash-enterprise/tags) on Docker Hub. If you use Unleash Cloud, your instance is automatically on the latest build.
 
 The [Unleash MCP server](/integrate/mcp), [Unleash Enterprise Edge](/unleash-edge), and each [SDK](/sdks) are versioned independently and publish their own changelog in their respective GitHub repositories.
 </Accordion>
