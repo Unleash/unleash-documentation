@@ -23,7 +23,7 @@ Devin Cloud often works while nobody watches the session, and with the MCP serve
 <Note>
 For Devin Cloud, this page leads with the [remote MCP server](/integrate/mcp#remote-mcp-server), which your Unleash instance hosts, because Devin Cloud runs in Cognition's cloud rather than on your machine. The remote server is available on Enterprise plans.
 
-On other plans, run the [local MCP server](#local-mcp-server) on Devin's session machine instead. In the Devin CLI and Devin Desktop, you can use either server.
+On other plans, install the [Unleash plugin](#install-the-unleash-plugin) from the Devin marketplace, or add the [local MCP server](#local-mcp-server) yourself. Both use the local MCP server. In the Devin CLI and Devin Desktop, you can use either server.
 </Note>
 
 ## Prerequisites
@@ -209,18 +209,6 @@ Run `devin mcp list` to check that the server is configured, then start a sessio
 The Devin CLI and Devin Desktop import MCP servers from other coding assistants by default, including the `.mcp.json` file of Claude Code. If you already use Unleash with another assistant, Devin might already have the server, and adding it again gives you two copies of every tool. To turn off the import for a tool, see [Configuration import](https://docs.devin.ai/cli/reference/configuration/read-config-from).
 </Note>
 
-### Install the Unleash plugin
-
-The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices, such as deciding whether a change needs a flag and cleaning up stale flags. Devin installs it from the Claude Code plugin format:
-
-```bash
-devin plugins install Unleash/unleash-claude-skills
-```
-
-The plugin's MCP server needs `UNLEASH_BASE_URL` and `UNLEASH_PAT`. The CLI adds the plugin to your personal plugins, which Devin also applies to your Devin Cloud sessions. Installing the plugin from **Customize > Plugins** in the Devin web app isn't supported yet.
-
-The plugin registers its own copy of the MCP server, so don't also add the server yourself. To learn more about the skills, see [Install the Unleash plugin](/integrate/claude-code#install-the-unleash-plugin).
-
 ### Set permissions
 
 In the Devin CLI and Devin Local, MCP tools ask for approval by default. To approve read-only tools automatically and keep asking before changes, add permission rules to `.devin/config.json`:
@@ -247,6 +235,28 @@ In the Devin CLI and Devin Local, MCP tools ask for approval by default. To appr
 ```
 
 Rule names follow the pattern `mcp__<server-name>__<tool-name>`, so they depend on the name you gave the server. See [Devin CLI permissions](https://docs.devin.ai/cli/reference/permissions).
+
+## Install the Unleash plugin
+
+The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices, such as deciding whether a change needs a flag, wrapping code behind a flag, and cleaning up stale flags. It works on every Unleash plan. To learn more about the skills, see [Install the Unleash plugin](/integrate/claude-code#install-the-unleash-plugin) on the Claude Code page.
+
+The plugin registers its own copy of the MCP server, named `unleash`. Don't also add the server yourself, or every Unleash tool appears twice.
+
+### In Devin Cloud
+
+1. In the Devin web app, go to **Customize > Plugins** and find **Unleash** in the **Marketplace** list.
+2. Install the plugin for yourself or, if you have permission, for your organization.
+3. Go to **Customize > MCPs**, open the plugin's `unleash` server, and click **Connect**. Installing the plugin doesn't connect it to Unleash.
+4. Enter your instance URL, without `/api`, as `UNLEASH_BASE_URL` and your token as `UNLEASH_PAT`. For an organization-wide installation, use a [service account token](#give-devin-its-own-identity).
+5. [Set tool approvals](#set-tool-approvals) for the server.
+
+### In the Devin CLI and Devin Desktop
+
+```bash
+devin plugins install Unleash/unleash-claude-skills
+```
+
+The plugin's MCP server needs `UNLEASH_BASE_URL` and `UNLEASH_PAT`. The CLI adds the plugin to your personal plugins, which Devin also applies to your Devin Cloud sessions.
 
 ## Tools and workflows
 
