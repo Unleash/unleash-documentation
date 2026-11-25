@@ -145,29 +145,77 @@ unleash.IsEnabled("someToggle", context);
 
 ## Events
 
-Currently supported events:
--  [Impression data events](/concepts/impression-data#impression-event-data)
--  Error events
--  Toggles updated event
+To subscribe to SDK events, pass a `callback` when you create the client. The callback receives an `EventCallbackConfig` object, where you assign a handler for each event you want to handle.
+
+| Event | Description |
+|-------|-------------|
+| `ReadyEvent` | The SDK completed its first fetch of feature flags from Unleash. Raised once. |
+| `TogglesUpdatedEvent` | The SDK received and applied a new feature flag configuration. |
+| `ImpressionEvent` | A flag with [impression data](/concepts/impression-data#impression-event-data) enabled was evaluated with `IsEnabled` or `GetVariant`. |
+| `ErrorEvent` | The SDK encountered an error, such as a failed request to Unleash or a failure to read or write the local backup. |
 
 ```csharp
-
 var settings = new UnleashSettings()
 {
     // ...
 };
 
-var unleash = new DefaultUnleash(settings);
-
-// Set up handling of impression and error events
-unleash.ConfigureEvents(cfg =>
-{
-    cfg.ImpressionEvent = evt => { Console.WriteLine($"{evt.FeatureName}: {evt.Enabled}"); };
-    cfg.ErrorEvent = evt => { /* Handling code here */ Console.WriteLine($"{evt.ErrorType} occured."); };
-    cfg.TogglesUpdatedEvent = evt => { /* Handling code here */ Console.WriteLine($"Toggles updated on: {evt.UpdatedOn}"); };
-});
-
+var unleash = new DefaultUnleash(
+    settings,
+    callback: cfg =>
+    {
+        cfg.ReadyEvent = evt => { Console.WriteLine("Unleash is ready"); };
+        cfg.TogglesUpdatedEvent = evt => { Console.WriteLine($"Flags updated on: {evt.UpdatedOn}"); };
+        cfg.ImpressionEvent = evt => { Console.WriteLine($"{evt.FeatureName}: {evt.Enabled}"); };
+        cfg.ErrorEvent = evt => { Console.WriteLine($"{evt.ErrorType} occurred."); };
+    }
+);
 ```
+
+The SDK registers your handlers before it starts fetching flags, so you also receive events raised during initialization. The `CreateClient` and `CreateClientAsync` methods of `UnleashClientFactory` accept the same `callback` parameter.
+
+<Note>
+The `callback` parameter is available from version 6.0.0. In earlier versions, call `unleash.ConfigureEvents(cfg => { ... })` after you create the client.
+</Note>
+
+### Event properties
+
+`ReadyEvent` has no properties.
+
+`TogglesUpdatedEvent` has the following property:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `UpdatedOn` | `DateTime` | The UTC time when the SDK applied the new configuration. |
+
+`ImpressionEvent` has the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Type` | `string` | The evaluation that raised the event: `isEnabled` or `getVariant`. |
+| `EventId` | `string` | A unique ID for the event. |
+| `FeatureName` | `string` | The name of the evaluated flag. |
+| `Enabled` | `bool` | Whether the flag, or the variant for `getVariant` events, is enabled. |
+| `Variant` | `string` | The name of the variant. Set only for `getVariant` events. |
+| `Context` | `UnleashContext` | The [Unleash context](#unleash-context) used for the evaluation. |
+
+`ErrorEvent` has the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `ErrorType` | `ErrorType` | The category of the error. See [Error types](#error-types). |
+| `Error` | `Exception` | The exception that caused the error, when there is one. |
+| `StatusCode` | `HttpStatusCode?` | The HTTP status code, when Unleash responds with an error status. |
+| `Resource` | `string` | The URI of the request, when Unleash responds with an error status. |
+
+### Error types
+
+| Error type | Description |
+|------------|-------------|
+| `Client` | A request to Unleash failed. This covers fetching flags, registering the client, sending metrics, and streaming. |
+| `TogglesUpdate` | The SDK fetched a new flag configuration but failed to apply it. |
+| `TogglesBackup` | The SDK failed to write the local backup file. |
+| `FileCache` | The SDK failed to load the local backup file. |
 
 
 ## Activation strategies
@@ -193,8 +241,10 @@ You can also specify and implement your own [custom strategies](/concepts/custom
 IStrategy s1 = new MyAwesomeStrategy();
 IStrategy s2 = new MySuperAwesomeStrategy();
 
-IUnleash unleash = new DefaultUnleash(config, s1, s2);
+IUnleash unleash = new DefaultUnleash(config, null, s1, s2);
 ```
+
+From version 6.0.0, the constructor takes the [events](#events) `callback` before the strategies, so pass it explicitly, as `null` if you don't handle events, when you register custom strategies.
 
 ## Unleash context
 
@@ -482,3 +532,7 @@ fakeUnleash.SetVariant("MyVariantFeature", new Variant("MyVariantFeature", new P
 ## Migrating to v5
 
 If you use [bootstrapping](#bootstrap), [custom strategies](#custom-strategies), or a custom JSON serializer, read the complete [v5 migration guide](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/v5_MIGRATION_GUIDE.md) before upgrading.
+
+## Migrating to v6
+
+If you use [events](#events), [custom strategies](#custom-strategies), the `UnleashClientFactory` class, a custom scheduled task manager, or the `Environment` property on `UnleashSettings`, read the complete [v6 migration guide](https://github.com/Unleash/unleash-dotnet-sdk/blob/main/v6_MIGRATION_GUIDE.md) before upgrading.

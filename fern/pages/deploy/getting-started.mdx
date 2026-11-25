@@ -9,6 +9,8 @@ last-updated: October 30, 2026
 
 Unleash offers several [hosting options](/deploy/hosting-options), including fully self-hosted setups. This guide helps you set up Unleash Open Source or Unleash Enterprise in your own environment using Docker.
 
+[Unleash Open Source](/support/availability#plans) runs without a license key. [Unleash Enterprise](/support/availability#plans) requires a [license key](/deploy/license-keys) and runs in read-only mode until you install one. To try Unleash Enterprise, get a trial license from [License Hub](https://license.getunleash.io/sign-up).
+
 Alternatively, for Unleash Enterprise, you can sign up for a [cloud-hosted instance](https://www.getunleash.io/pricing).
 
 You can set up Unleash in your environment using two main approaches with Docker:
@@ -22,8 +24,8 @@ You can set up Unleash in your environment using two main approaches with Docker
 
 To start the Unleash server, clone the Unleash repository and start the server with [Docker Compose](https://docs.docker.com/compose/):
 
-<CodeBlocks>
-<CodeBlock title="Enterprise">
+<Tabs>
+<Tab title="Enterprise">
 
 ```shell
 git clone git@github.com:Unleash/unleash.git
@@ -34,9 +36,9 @@ docker compose -f docker-compose-enterprise.yml up -d
 
 This pulls the `unleashorg/unleash-enterprise` Docker image and uses a Docker Compose file to configure the Unleash server and its database.
 
-</CodeBlock>
+</Tab>
 
-<CodeBlock title="Open Source">
+<Tab title="Open Source">
 
 ```shell
 git clone git@github.com:Unleash/unleash.git
@@ -46,8 +48,9 @@ docker compose up -d
 ```
 
 This pulls the `unleashorg/unleash-server` Docker image and uses a Docker Compose file to configure the Unleash server and its database.
-</CodeBlock>
-</CodeBlocks>
+
+</Tab>
+</Tabs>
 
 <Note>
 This step uses `docker compose` (V2 syntax). If you have the older `docker-compose` (V1), use that command syntax instead.
@@ -82,9 +85,9 @@ docker run -d \
 
 This command starts the Unleash server, maps port `4242` on your host to the container, connects to the PostgreSQL database you started, disables database SSL, connects to the `unleash` network, and ensures you have the latest image.
 
-<CodeBlocks>
+<Tabs>
 
-<CodeBlock title="Enterprise">
+<Tab title="Enterprise">
 
 ```shell
 docker run -d -p 4242:4242 \
@@ -99,9 +102,9 @@ docker run -d -p 4242:4242 \
   unleashorg/unleash-enterprise
 ```
 
-</CodeBlock>
+</Tab>
 
-<CodeBlock title="Open Source">
+<Tab title="Open Source">
 
 ```shell
 docker run -d -p 4242:4242 \
@@ -116,15 +119,15 @@ docker run -d -p 4242:4242 \
   unleashorg/unleash-server
 ```
 
-</CodeBlock>
+</Tab>
 
-</CodeBlocks>
+</Tabs>
 
 ## Log in to the Unleash Admin UI
 
-<CodeBlocks>
+<Tabs>
 
-<CodeBlock title="Enterprise">
+<Tab title="Enterprise">
 
 In your browser, go to [http://localhost:4242](http://localhost:4242) and log in using the following credentials:
 - **username**: `admin`
@@ -144,9 +147,9 @@ If you are running Unleash Enterprise, you need to install a [license key](/depl
 
 In the Admin UI, go to **Admin settings > Instance config > License**, paste the license key, and click **Update license key**.
 
-</CodeBlock>
+</Tab>
 
-<CodeBlock title="Open Source">
+<Tab title="Open Source">
 
 In your browser, go to [http://localhost:4242](http://localhost:4242) and log in using the following credentials:
 - **username**: `admin`
@@ -160,9 +163,9 @@ The first time Unleash starts, it creates this default `admin` user. To use diff
 - `UNLEASH_DEFAULT_ADMIN_USERNAME=<your_custom_username>`
 - `UNLEASH_DEFAULT_ADMIN_PASSWORD=<your_custom_secure_password>`
 
-</CodeBlock>
+</Tab>
 
-</CodeBlocks>
+</Tabs>
 
 ## Test your server connection
 

@@ -812,8 +812,6 @@ navigation:
             href: https://gitlab.com/afontaine/unleash_ex
           - link: Haskell
             href: https://github.com/finn-no/unleash-client-haskell
-          - link: Kotlin
-            href: https://github.com/silvercar/unleash-client-kotlin
           - link: NestJS
             href: https://github.com/pmb0/nestjs-unleash
           - link: PHP (Minds)
