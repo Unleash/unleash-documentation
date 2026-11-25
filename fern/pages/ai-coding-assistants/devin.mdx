@@ -23,7 +23,7 @@ Devin Cloud often works while nobody watches the session, and with the Unleash M
 <Note>
 Because Devin Cloud runs in Cognition's cloud rather than on your machine, we default to the [remote MCP server](/integrate/mcp#remote-mcp-server). The remote MCP server is available on Enterprise plans.
 
-On other plans, install the [Unleash plugin](#install-the-unleash-plugin) from the Devin marketplace, or add the [local MCP server](#local-mcp-server). In the Devin CLI and Devin Desktop, you can use either local or remote MCP server.
+On other plans, install the [Unleash plugin](#install-the-unleash-plugin) from the Devin marketplace, or add the [local MCP server](#cloud-local). In the Devin CLI and Devin Desktop, you can use either local or remote MCP server.
 </Note>
 
 ## Prerequisites
@@ -68,7 +68,8 @@ Enable [change requests](/concepts/change-requests) on production environments. 
 
 You manage MCP servers for Devin Cloud in the Devin web app, under **Customize > MCPs**. You can add a server for yourself or, if you have permission, for your whole organization.
 
-### Remote MCP server
+<Tabs>
+<Tab title="Remote MCP server" id="cloud-remote" language="remote-mcp-server">
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
@@ -84,19 +85,20 @@ You manage MCP servers for Devin Cloud in the Devin web app, under **Customize >
 Devin Cloud can't use browser login for the remote MCP server. After login, Unleash only redirects to `localhost`, and Devin Cloud receives OAuth callbacks on its own servers. Use the **Authorization header** option with a token.
 </Warning>
 
-### Local MCP server
+</Tab>
+<Tab title="Local MCP server" id="cloud-local" language="local-mcp-server">
 
 Use the local MCP server if your Unleash plan doesn't include the remote MCP server. Devin runs the server with `npx` in your sessions.
 
-To add it in **Customize > MCPs**, follow the steps for the [remote MCP server](#remote-mcp-server), but select the **STDIO** transport and fill in these fields:
-
-| Field | Value |
-|-------|-------|
-| **Command** | `npx` |
-| **Arguments** | `-y` and `@unleash/mcp@latest` |
-| **Environment Variables** | `UNLEASH_BASE_URL` set to your instance URL, without `/api`, and `UNLEASH_PAT` set to your token |
-
-**Test tools** isn't available for STDIO servers. Click **Use MCP** to start a session that uses the server.
+1. In the Devin web app, go to **Customize > MCPs**.
+2. To add the server for your organization, switch the scope from **Myself** to your organization and click **Add custom MCP**. To add it only for yourself, click **+** and choose **New MCP**.
+3. Enter a server name, such as `Unleash`, and a short description.
+4. Select the **STDIO** transport.
+5. Fill in the server fields:
+   - **Command**: `npx`
+   - **Arguments**: `-y` and `@unleash/mcp@latest`
+   - **Environment Variables**: `UNLEASH_BASE_URL` set to your instance URL, without `/api`, and `UNLEASH_PAT` set to your token
+6. Click **Add**, then click **Use MCP** to start a session that uses the server. **Test tools** isn't available for STDIO servers.
 
 To declare the server in a plugin's `.mcp.json` file instead, use `command`, `args`, and `env`:
 
@@ -119,6 +121,9 @@ To declare the server in a plugin's `.mcp.json` file instead, use `command`, `ar
 <Note>
 Devin's MCP documentation shows its form fields as JSON, with keys such as `transport` and `env_variables`. Those keys describe the form, not a file format. In a `.mcp.json` file, Devin rejects them and reports that the server is disabled or misconfigured.
 </Note>
+
+</Tab>
+</Tabs>
 
 Connect either the remote or the local MCP server, not both. If you connect both, every Unleash tool appears twice.
 
@@ -156,7 +161,8 @@ The Devin CLI and Devin Local in Devin Desktop read the same MCP configuration f
 
 In Devin Desktop, you can also manage these servers in **Customize > MCPs**.
 
-### Remote MCP server
+<Tabs>
+<Tab title="Remote MCP server" id="cli-remote" language="remote-mcp-server">
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
@@ -184,7 +190,8 @@ To use a token instead, add the server with an `Authorization` header:
 }
 ```
 
-### Local MCP server
+</Tab>
+<Tab title="Local MCP server" id="cli-local" language="local-mcp-server">
 
 `devin mcp add` has no option for environment variables, so add the local server to a configuration file:
 
@@ -202,6 +209,9 @@ To use a token instead, add the server with an `Authorization` header:
   }
 }
 ```
+
+</Tab>
+</Tabs>
 
 Run `devin mcp list` to check that the server is configured, then start a session and ask: "List my Unleash projects".
 
@@ -319,7 +329,7 @@ Unleash only redirects to `localhost` after browser login, so Devin Cloud can't 
 </Accordion>
 
 <Accordion title="'This MCP server is disabled or misconfigured'">
-The server entry uses field names that Devin doesn't accept in a `.mcp.json` file, such as `transport` or `env_variables`. Use `command`, `args`, and `env`, as shown in [Local MCP server](#local-mcp-server).
+The server entry uses field names that Devin doesn't accept in a `.mcp.json` file, such as `transport` or `env_variables`. Use `command`, `args`, and `env`, as shown in the [local MCP server](#cloud-local) setup for Devin Cloud.
 </Accordion>
 
 <Accordion title="Authentication or API errors">
