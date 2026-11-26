@@ -13,7 +13,7 @@ The Unleash node for [n8n](https://n8n.io) evaluates feature flags in your n8n w
 
 The node reads flags through the [Frontend API](/concepts/front-end-api) with a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens), so it works on every Unleash plan and against either Unleash or [Unleash Edge](/unleash-edge). The node only reads flags. To change flags from n8n, use the [Unleash MCP server](#change-flags-with-the-unleash-mcp-server).
 
-The node is [open-source](https://github.com/Unleash/n8n-nodes-unleash) (MIT license) and verified by n8n, so you can install it from the nodes panel on both n8n Cloud and self-hosted n8n.
+The node is [open source](https://github.com/Unleash/n8n-nodes-unleash) under the MIT license and verified by n8n, so you can install it from the nodes panel on both n8n Cloud and self-hosted n8n.
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ For details, including how to upgrade the node or install a specific version, se
 
 ## Create a frontend token
 
-The node authenticates to Unleash with a frontend token. A frontend token is scoped to one or more projects and a single environment, and it can only read flags that are enabled in that environment. Frontend tokens aren't secret: they're designed to be used in client-side applications.
+The node authenticates to Unleash with a frontend token. A frontend token is scoped to one or more projects and a single environment, and it can only read flags that are enabled in that environment. Frontend tokens are not considered secret and are safe to expose client-side.
 
 To create a frontend token, follow these steps:
 
@@ -81,7 +81,7 @@ The node uses one credential, **Unleash Frontend API**. In n8n, create the crede
 Each credential covers one environment. To evaluate flags in another environment, create another credential with a frontend token for that environment.
 
 <Tip>
-For high request volumes, or to keep flag evaluation inside your network, point **Base URL** at an [Unleash Edge](/unleash-edge) instance (cloud or self-hosted).
+For high request volumes, point **Base URL** at an [Unleash Edge](/unleash-edge) instance. To keep flag evaluation inside your network, use a self-hosted Edge instance.
 </Tip>
 
 ## Operations
@@ -149,7 +149,7 @@ Both operations cache their result for 30 seconds by default, which matches the 
 
 - **Fast reactions**: For a flag that must take effect quickly, such as a kill switch, set a short duration of 1–3 seconds. Avoid 0, which calls Unleash on every execution.
 - **Revalidation**: When a cached result expires, the node sends a conditional request. If nothing changed, Unleash responds with `304 Not Modified` instead of sending every flag again.
-- **Fallback**: If a call to Unleash fails, for example because of a network error, a timeout, or a gateway error, the node returns the last cached result, however old, and logs a warning. The node fails only when it has no cached result for that context yet, such as on the first call.
+- **Fallback**: If a call to Unleash fails, for example because of a network error, a timeout, or an error response such as `401` or `502`, the node returns the last cached result, however old, and logs a warning. The node fails only when it has no cached result for that context yet, such as on the first call.
 - **Scope**: The cache lives in the n8n process, so workflows that evaluate the same context with the same credential share a cached result. In queue mode, each n8n worker keeps its own cache.
 
 ## Use the node with AI agents
@@ -169,7 +169,7 @@ To stop an agent workflow with a kill switch, evaluate the flag right after the 
 ![n8n workflow: a chat trigger, an Unleash node that evaluates a flag, and an If node named Agent allowed to act? that continues to the rest of the agent workflow when the flag is on, or stops at a Stop and Error node named Block the agent when it's off.](/assets/n8n-agent-kill-switch.png)
 </Frame>
 
-This workflow sets **Cache Duration (Seconds)** to `3`, so the node checks for updates on the next execution after its cached result expires. This is not an end-to-end kill-switch deadline: Edge polls upstream every 15 seconds by default unless streaming is enabled, and failed requests can return an older cached result. See [Caching](#caching).
+This workflow sets **Cache Duration (Seconds)** to `3`, so each execution uses a result that is at most 3 seconds old. If **Base URL** points at Unleash Edge, add the Edge refresh interval, which is 15 seconds by default. If a request to Unleash fails, the node returns its last cached result. See [Caching](#caching).
 
 ### Give an agent a tool only when a flag is on
 
@@ -198,7 +198,7 @@ A **Schedule Trigger** node starts the workflow every hour. Before the automatio
 
 ### Gate a deployment from CI
 
-Your CI system calls a **Webhook** node and passes the service name as a custom property in **Additional Context**. If the flag for that stage is on, the workflow calls your deployment API. If the flag is off, the workflow responds that the deployment is blocked. Your pipeline gets a release gate over HTTP, without needing write access to Unleash.
+Your CI system calls a **Webhook** node and passes the service name as a custom property in **Additional Context**. If the flag is on, the workflow calls your deployment API. If the flag is off, the workflow responds that the deployment is blocked. Your pipeline gets a release gate over HTTP, without needing write access to Unleash.
 
 <Frame>
 ![n8n workflow: a Webhook node that receives a CI build event, an Unleash node that evaluates a flag, and an If node named Deploy allowed? that either triggers the deployment and responds deployed, or responds blocked.](/assets/n8n-flag-gated-deploy-gate.png)
