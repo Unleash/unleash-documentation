@@ -5,8 +5,10 @@ og:title: Impact metrics - Track application-level time-series metrics in Unleas
 description: Impact metrics connect application data to your feature flags and release plans. Use internal metrics from the SDK or external metrics from Prometheus and VictoriaMetrics.
 keywords: impact metrics, release automation, safeguards, counters, gauges, histograms, prometheus, external metrics
 max-toc-depth: 3
-last-updated: November 23, 2026
+last-updated: November 26, 2026
 ---
+
+<Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
 ## Overview
 
@@ -35,14 +37,14 @@ Unleash supports two metric sources: [internal](#internal-metrics) and [external
 
 The sources available to you depend on your [hosting option](/deploy/hosting-options):
 
-- **Unleash Hosted**: Internal and external metrics.
+- **Unleash Cloud**: Internal and external metrics.
 - **Self-hosted**: External metrics only.
 
 ### Internal metrics
 
 Internal metrics are defined and recorded in your application using an [Unleash SDK](/sdks#metrics-and-impression-data). The SDK sends metrics to Unleash, where they are stored and queried. See [Record internal metrics](#record-internal-metrics) for setup instructions.
 
-Internal metrics are currently available on [Unleash Hosted](/deploy/hosting-options) only. If you self-host Unleash, use [external metrics](#external-metrics).
+Internal metrics are currently available on [Unleash Cloud](/deploy/hosting-options) only. If you self-host Unleash, use [external metrics](#external-metrics).
 
 ### External metrics
 
@@ -66,7 +68,7 @@ Impact metrics support three data types:
 
 <Warning>
 
-[Internal metrics](#internal-metrics) are currently available on [Unleash Hosted](/deploy/hosting-options) only, in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
+[Internal metrics](#internal-metrics) are currently available on [Unleash Cloud](/deploy/hosting-options) only, in a [select number of SDKs](/sdks#metrics-and-impression-data). To request support for additional SDKs, contact [beta@getunleash.io](mailto:beta@getunleash.io).
 
 If you self-host Unleash, do not record impact metrics with the SDK. [Connect external metrics](#connect-external-metrics) from your Prometheus or VictoriaMetrics instance instead.
 
@@ -151,7 +153,7 @@ If you already collect metrics in Prometheus or VictoriaMetrics, you can connect
 
 ### Enable external metrics
 
-You can configure external metrics from the Admin UI on both [Unleash Hosted](/deploy/hosting-options) and self-hosted instances.
+You can configure external metrics from the Admin UI on both [Unleash Cloud](/deploy/hosting-options) and self-hosted instances.
 
 1. In the Admin UI, go to **Admin settings > Impact Metrics**.
 2. Toggle **Enable external metrics** to **Enabled**.

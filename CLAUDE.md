@@ -100,6 +100,23 @@ The Unleash OpenAPI spec is split into 3 domains to keep the API reference navig
 - FAQ sections use `<AccordionGroup>` with one `<Accordion title="Question?">` per question, under a "Frequently asked questions" heading; never bolded questions or h3-per-question
 - Use ordered lists for sequences, unordered for non-sequential items
 
+### Product terminology
+
+Use these names consistently across all pages. [Plans and billing](fern/pages/support/billing.mdx) is the source of truth for plan and hosting-model names.
+
+| Use | Not |
+|---|---|
+| Unleash Cloud | Unleash Hosted, hosted Unleash, Unleash SaaS |
+| Self-hosted | on-premise, on-prem, customer-hosted |
+| Hybrid | partially hosted, mixed deployment |
+| Open Source | OSS (in prose; `OSS` is fine in table headers and comparison pages) |
+| Pay-as-you-go | PAYG, pay as you go |
+| Unleash Enterprise Edge | Edge Enterprise, Enterprise Edge (on its own) |
+
+Plans (Open Source, Pay-as-you-go, Enterprise) and hosting models (Unleash Cloud, Self-hosted, Hybrid) are separate dimensions. Do not present a hosting model as a plan, or the reverse. Pay-as-you-go is an Enterprise plan.
+
+Exception: `unleash-hosted.com` is the real hostname in instance URLs and SSO callback URLs. Never rewrite it.
+
 ## Custom CSS
 
 CSS architecture, specificity strategy, breakpoints, and dark mode conventions are documented in the `/custom-css-mingling` skill (`.claude/skills/custom-css-mingling.md`). Use that skill when working on styling.
