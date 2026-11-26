@@ -202,7 +202,42 @@ To use a token instead, add the server with an `Authorization` header:
 </Tab>
 <Tab title="Local MCP server" id="cli-local" language="local-mcp-server">
 
-`devin mcp add` has no option for environment variables, so add the local server to a configuration file:
+The local server reads your instance URL and token from environment variables. Keep them in a credentials file, so that your Devin configuration contains no secrets:
+
+1. Create the credentials file:
+
+   ```bash
+   mkdir -p ~/.unleash
+   cat > ~/.unleash/mcp.env << 'EOF'
+   UNLEASH_BASE_URL=https://your-instance.getunleash.io
+   UNLEASH_PAT=your-personal-access-token
+   EOF
+   chmod 600 ~/.unleash/mcp.env
+   ```
+
+2. Load the file from your shell profile, such as `~/.zshrc` or `~/.bashrc`:
+
+   ```bash
+   if [ -f ~/.unleash/mcp.env ]; then
+     source ~/.unleash/mcp.env
+     export UNLEASH_BASE_URL UNLEASH_PAT
+   fi
+   ```
+
+3. Add the server:
+
+   ```bash
+   devin mcp add -s user unleash \
+     -e 'UNLEASH_BASE_URL=${env:UNLEASH_BASE_URL}' \
+     -e 'UNLEASH_PAT=${env:UNLEASH_PAT}' \
+     -- npx -y @unleash/mcp@latest
+   ```
+
+   Devin replaces each `${env:...}` reference with the variable's value when it starts the server. The single quotes stop your shell from replacing them first.
+
+4. Open a new terminal and start Devin from it: run `devin` for the CLI, or `devin desktop` for Devin Desktop. If you open Devin Desktop from your applications instead, it might not see the variables from your shell profile.
+
+To edit the configuration file instead, add this entry:
 
 ```json title="~/.config/devin/mcp_config.json"
 {
@@ -211,8 +246,8 @@ To use a token instead, add the server with an `Authorization` header:
       "command": "npx",
       "args": ["-y", "@unleash/mcp@latest"],
       "env": {
-        "UNLEASH_BASE_URL": "https://your-instance.getunleash.io",
-        "UNLEASH_PAT": "your-personal-access-token"
+        "UNLEASH_BASE_URL": "${env:UNLEASH_BASE_URL}",
+        "UNLEASH_PAT": "${env:UNLEASH_PAT}"
       }
     }
   }
@@ -222,13 +257,37 @@ To use a token instead, add the server with an `Authorization` header:
 </Tab>
 <Tab title="Unleash plugin" id="cli-plugin" language="unleash-plugin">
 
-The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices. It works on every Unleash plan.
+The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices. It works on every Unleash plan. The plugin's MCP server reads `UNLEASH_BASE_URL` and `UNLEASH_PAT` from your environment.
 
-```bash
-devin plugins install Unleash/unleash-claude-skills
-```
+1. Create the credentials file:
 
-The plugin's MCP server needs `UNLEASH_BASE_URL` and `UNLEASH_PAT`. The CLI adds the plugin to your personal plugins, which Devin also applies to your Devin Cloud sessions.
+   ```bash
+   mkdir -p ~/.unleash
+   cat > ~/.unleash/mcp.env << 'EOF'
+   UNLEASH_BASE_URL=https://your-instance.getunleash.io
+   UNLEASH_PAT=your-personal-access-token
+   EOF
+   chmod 600 ~/.unleash/mcp.env
+   ```
+
+2. Load the file from your shell profile, such as `~/.zshrc` or `~/.bashrc`:
+
+   ```bash
+   if [ -f ~/.unleash/mcp.env ]; then
+     source ~/.unleash/mcp.env
+     export UNLEASH_BASE_URL UNLEASH_PAT
+   fi
+   ```
+
+3. Install the plugin:
+
+   ```bash
+   devin plugins install Unleash/unleash-claude-skills
+   ```
+
+4. Open a new terminal and start Devin from it: run `devin` for the CLI, or `devin desktop` for Devin Desktop. If you open Devin Desktop from your applications instead, it might not see the variables from your shell profile.
+
+These variables apply only to Devin on your machine. The CLI also adds the plugin to your personal plugins, which Devin applies to your Devin Cloud sessions. To use the plugin there, connect its `unleash` server in the web app, as described in [Unleash plugin](#cloud-plugin) for Devin Cloud. To install the plugin on this machine only, add `--local` to the install command.
 
 </Tab>
 </Tabs>
