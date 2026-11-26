@@ -60,7 +60,7 @@ You can choose to trigger updates for the following events (we might add more ev
 The Webhook integration takes the following parameters:
 
 <ParamField path="Webhook URL" type="string" required={true}>
-  The URL that Unleash sends an HTTP POST request to for each event. The URL must use `http` or `https`. If you are using a Slack application, make sure that your application is allowed to post to the channel you want to post to. For URLs on a private network, see [Private network URLs](#private-network-urls).
+  The URL that Unleash sends an HTTP POST request to for each event. The URL must use `http` or `https`. If you use a Slack application, make sure it can post to the target channel. For URLs on a private network, see [Private network URLs](#private-network-urls).
 </ParamField>
 
 <ParamField path="Content-Type" type="string" default="application/json">
@@ -72,7 +72,7 @@ The Webhook integration takes the following parameters:
 </ParamField>
 
 <ParamField path="Extra HTTP Headers" type="string">
-  Additional headers to send with the request, as a JSON object whose keys and values are strings, for example `{"X-Api-Key": "your-api-key"}`. A header with the same name as **Content-Type** or **Authorization** overrides that parameter. If the value isn't valid JSON, Unleash sends the request without the extra headers and records the [integration event](/integrate#integration-events) as having errors.
+  Additional headers to send with the request, as a JSON object whose keys and values are strings, for example `{"X-Api-Key": "your-api-key"}`. To override the **Content-Type** or **Authorization** parameter, add a header with exactly that name, including capitalization. If the value isn't valid JSON, Unleash sends the request without the extra headers and records the [integration event](/integrate#integration-events) as having errors.
 </ParamField>
 
 <ParamField path="Body template" type="string">
@@ -86,7 +86,7 @@ Unleash treats **Webhook URL**, **Authorization**, and **Extra HTTP Headers** as
 You can format the request body with a [Mustache template](https://mustache.github.io). The template has access to the following variables:
 
 - `event`: The event, in the Unleash event format shown below. For example, `{{event.type}}` or `{{event.data.name}}`.
-- `eventJson`: The whole event, serialized as a JSON string. Use triple braces, `{{{eventJson}}}`, so that Mustache doesn't escape it, and don't wrap it in quotes.
+- `eventJson`: The whole event, serialized as a JSON string. Use triple braces, `{{{eventJson}}}`, so that Mustache doesn't escape it. The rendered value includes its own surrounding quotes, so don't add quotes around it.
 - `eventMarkdown`: A formatted Markdown description of the event. Inside a quoted JSON string, such as `"{{eventMarkdown}}"`, Unleash escapes the description so that the body stays valid JSON.
 
 Example:
