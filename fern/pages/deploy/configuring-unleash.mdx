@@ -308,6 +308,14 @@ Controls requests per minute per IP for specific API endpoints.
 | `SIMPLE_LOGIN_LIMIT_PER_MINUTE`           | `10`          | POST `/auth/simple`        |
 | `CREATE_USER_RATE_LIMIT_PER_MINUTE`       | `20`          | POST `/api/admin/user-admin` |
 
+### Blocking requests to private network addresses
+
+If you don't trust your users that are allowed to configure integrations, you can block requests to private network addresses. This is useful to prevent Server-Side Request Forgery (SSRF) attacks, where an attacker could trick your Unleash server into making requests to internal services and exfiltrating sensitive data. By default, Unleash can be configured to block requests to private network addresses for impact metrics, ServiceNow integrations, and OIDC signins.
+| Environment Variable                        | Default Value |Description                                                                                     |
+| :------------------------------------------ | :------------ | :------------------------- |
+| `IMPACT_METRICS_DENY_PRIVATE_NETWORK_URLS` | `true`        | Denies requests to private network addresses for impact metrics. |
+| `UNLEASH_DENY_PRIVATE_URL_IN_SERVICENOW`   | `true`        | Denies requests to private network addresses in ServiceNow integrations. |
+| `UNLEASH_DENY_PRIVATE_URL_IN_OIDC`         | `true`        | Denies requests to private network addresses in OIDC integrations. |
 
 ### HTTP proxy support
 
