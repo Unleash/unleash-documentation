@@ -47,7 +47,7 @@ Unleash Enterprise meters two things only: **seats** and, on Unleash Cloud, **AP
 
 A seat is a user account in your Unleash instance. Seats are billed at a flat monthly rate per seat, so your cost depends on how many people have access, not how much they use Unleash.
 
-A user consumes a seat from the moment the account exists, whether or not that user ever signs in. Invited users and users provisioned through [SCIM](/concepts/scim) therefore count from creation. Users with read-only or viewer access also consume a seat.
+A seat is a user in your Unleash instance. Every user listed in **Admin settings > User config > Users** uses one seat, regardless of their [root role](/concepts/rbac#predefined-roles) or how they were added: in the Unleash Admin UI, through single sign-on, or through [SCIM](/concepts/scim). This includes users who have not signed in yet.
 
 [Service accounts](/concepts/service-accounts) do not count toward your licensed user count. Enterprise contracts can treat them differently.
 
