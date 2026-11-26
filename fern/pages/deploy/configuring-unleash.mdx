@@ -310,12 +310,29 @@ Controls requests per minute per IP for specific API endpoints.
 
 ### Blocking requests to private network addresses
 
-If you don't trust your users that are allowed to configure integrations, you can block requests to private network addresses. This is useful to prevent Server-Side Request Forgery (SSRF) attacks, where an attacker could trick your Unleash server into making requests to internal services and exfiltrating sensitive data. By default, Unleash can be configured to block requests to private network addresses for impact metrics, ServiceNow integrations, and OIDC signins.
-| Environment Variable                        | Default Value |Description                                                                                     |
-| :------------------------------------------ | :------------ | :------------------------- |
-| `IMPACT_METRICS_DENY_PRIVATE_NETWORK_URLS` | `true`        | Denies requests to private network addresses for impact metrics. |
-| `UNLEASH_DENY_PRIVATE_URL_IN_SERVICENOW`   | `true`        | Denies requests to private network addresses in ServiceNow integrations. |
-| `UNLEASH_DENY_PRIVATE_URL_IN_OIDC`         | `true`        | Denies requests to private network addresses in OIDC integrations. |
+<Button small outlined className="version-button" href="/support/availability">v8.4</Button>
+
+Some Unleash features send requests from the Unleash server to URLs that users enter in the Unleash Admin UI. A user who can configure these features could enter the URL of an internal service, such as a cloud metadata endpoint, and use Unleash to reach it. This is known as a server-side request forgery (SSRF) attack.
+
+To protect against these attacks, set the following environment variables to `true`. Unleash then rejects any URL whose hostname resolves to a private or reserved network address, such as a loopback address, a link-local address like `169.254.169.254`, or an address in `10.0.0.0/8` or `192.168.0.0/16`.
+
+Blocking is most useful when your Unleash instance is reachable from the public internet, or when you don't fully trust every user who can configure these features.
+
+| Environment Variable                       | Default Value | Description                                                                                                                                  |
+| :----------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IMPACT_METRICS_DENY_PRIVATE_NETWORK_URLS` | `false`       | Set to `true` to block requests to an [external metrics source](/concepts/impact-metrics#connect-external-metrics) for impact metrics when its URL resolves to a private network address. Applies whether you set the URL in the Unleash Admin UI or with `EXTERNAL_PROMETHEUS_IMPACT_METRICS_API`. |
+| `UNLEASH_DENY_PRIVATE_URL_IN_SERVICENOW`   | `false`       | Set to `true` to block requests from the [ServiceNow integration](/integrate/servicenow) when the ServiceNow instance URL resolves to a private network address. |
+| `UNLEASH_DENY_PRIVATE_URL_IN_OIDC`         | `false`       | Set to `true` to block [OpenID Connect](/single-sign-on/how-to-add-sso-open-id-connect) requests to private network addresses. Applies to the Discover URL and to every endpoint that the identity provider's discovery document lists, such as the token and user info endpoints. |
+
+<Warning>
+
+Before you set a variable to `true`, check that the URLs you already use for that feature don't resolve to private network addresses. For example, a Prometheus instance or an identity provider that runs on your internal network stops working when Unleash blocks its address.
+
+</Warning>
+
+Each variable blocks every private network address for its feature. `UNLEASH_ALLOW_LIST_INTEGRATION` and `UNLEASH_ALLOW_PRIVATE_URL_IN_INTEGRATION` have no effect on these three features.
+
+Webhook integrations block private network addresses by default. See [Private network URLs](/integrate/webhook#private-network-urls).
 
 ### HTTP proxy support
 
