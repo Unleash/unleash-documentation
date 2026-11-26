@@ -108,7 +108,7 @@ Configure your client without a token. When the client first connects, it opens 
 
 Leave any client ID and client secret fields in your client empty.
 
-This option works with command-line clients such as Claude Code, and with hosted clients such as Claude on the web and [Devin Cloud](/integrate/devin). If browser login fails in your client, use the **Personal access token** option instead.
+Clients that run on your machine, such as Claude Code, can always use this option: after you log in, Unleash redirects back to them on `localhost`. Hosted clients, such as Claude on the web and [Devin Cloud](/integrate/devin), need Unleash to redirect to their own servers instead. Unleash supports a fixed list of hosted clients, but this support isn't enabled on every instance yet. If browser login fails in your client, use the **Personal access token** option instead.
 
 For example, in Claude Code:
 
