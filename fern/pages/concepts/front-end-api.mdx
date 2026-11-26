@@ -5,6 +5,7 @@ og:title: Frontend API - Simplify connecting client-side applications to Unleash
 description: The Unleash Frontend API simplifies connecting client-side applications to Unleash. It has a straightforward setup and is built directly into Unleash.
 keywords: frontend api, client-side, cors, api tokens, refresh interval
 max-toc-depth: 3
+last-updated: November 26, 2026
 ---
 
 <Button small outlined className="version-button" href="/support/availability">v4.18</Button>
@@ -33,6 +34,8 @@ Point your application to the correct API endpoint: `<your-unleash-instance>/api
 
 Your application needs a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens) to interact with the Frontend API.
 
-### Configure the refresh interval for tokens
+### Configure the refresh interval
 
-Feature flag updates occur at a default refresh interval of 10 seconds plus a random offset (0-10 seconds) to prevent simultaneous database queries. You can customize the refresh interval using the `FRONTEND_API_REFRESH_INTERVAL_MS` environment variable or the `frontendApi.refreshIntervalInMs` configuration option in the SDK.
+When a flag changes, the Frontend API picks up the change within seconds. Unleash checks for flag configuration changes every second and refreshes the flags that the Frontend API serves as soon as it finds one.
+
+Your application gets the change the next time its frontend SDK fetches flags from the Frontend API. To control how often that happens, set the refresh interval in your SDK, for example `refreshInterval` in the [JavaScript SDK](/sdks/javascript-browser), which defaults to 30 seconds.

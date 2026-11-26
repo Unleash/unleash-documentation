@@ -1,0 +1,240 @@
+---
+title: n8n
+og:site_name: Unleash Documentation
+og:title: n8n - Evaluate Unleash feature flags in n8n workflows and AI agents
+description: "Install the Unleash node for n8n to evaluate feature flags and variants in workflows and AI agents through the Frontend API, with caching and fallback."
+keywords: n8n, workflow automation, community node, ai agent, frontend api, frontend token, kill switch, variants
+max-toc-depth: 3
+slug: integrate/n8n
+last-updated: November 26, 2026
+---
+
+The Unleash node for [n8n](https://n8n.io) evaluates feature flags in your n8n workflows and AI agents. Use it to pause an automation with a kill switch, route work by [variant](/concepts/strategy-variants), or let an AI agent check a flag before it acts.
+
+The node reads flags through the [Frontend API](/concepts/front-end-api) with a [frontend token](/concepts/api-tokens-and-client-keys#frontend-tokens), so it works on every Unleash plan and against either Unleash or [Unleash Edge](/unleash-edge). The node only reads flags. To change flags from n8n, use the [Unleash MCP server](#change-flags-with-the-unleash-mcp-server).
+
+The node is [open source](https://github.com/Unleash/n8n-nodes-unleash) under the MIT license and verified by n8n, so you can install it from the nodes panel on both n8n Cloud and self-hosted n8n.
+
+## Prerequisites
+
+- An n8n instance, on n8n Cloud or self-hosted. To install the node, you need the owner or admin role on the instance. After you install it, every member of the instance can use the node.
+- Permission in Unleash to create a frontend token. See [Create an API token](/concepts/api-tokens-and-client-keys#create-an-api-token).
+
+For the n8n, Unleash, and Unleash Edge versions that the node is tested with, see the [compatibility notes](https://github.com/Unleash/n8n-nodes-unleash#compatibility) in the README.
+
+## Install the node
+
+<Tabs>
+<Tab title="From the nodes panel">
+
+To install the node from the nodes panel, follow these steps:
+
+1. In n8n, open a workflow, and then open the nodes panel by selecting **+** or pressing **N**.
+2. Search for **Unleash**.
+3. In the **More from the community** section, select the Unleash node.
+4. Select **Install**.
+
+n8n installs the node for the whole instance.
+
+If the node doesn't appear in the search results, verified community nodes might be turned off for your instance. On n8n Cloud, check the **Verified community nodes** setting under **Instance settings** in the n8n Cloud console. On self-hosted n8n, environment variables control this setting. For details, see n8n's guide to [installing verified community nodes](https://docs.n8n.io/integrations/community-nodes/installation-and-management/install-verified-community-nodes).
+
+</Tab>
+<Tab title="From npm (self-hosted)">
+
+On self-hosted n8n, you can also install the node by its npm package name. To do so, follow these steps:
+
+1. In n8n, go to **Settings > Community Nodes**.
+2. Select **Install**.
+3. In **Enter npm package name**, enter `@unleash/n8n-nodes-unleash`.
+4. Confirm that you understand the risks of installing community code, and then select **Install**.
+
+For details, including how to upgrade the node or install a specific version, see n8n's [GUI installation guide](https://docs.n8n.io/integrations/community-nodes/installation-and-management/gui-installation).
+
+</Tab>
+</Tabs>
+
+## Create a frontend token
+
+The node authenticates to Unleash with a frontend token. A frontend token is scoped to one or more projects and a single environment, and it can only read flags that are enabled in that environment. Frontend tokens are not considered secret and are safe to expose client-side.
+
+To create a frontend token, follow these steps:
+
+1. In the Unleash Admin UI, go to **Admin settings > Access control > API access**. To create a token for a single project, go to **Settings > API access** inside that project instead.
+2. Create a new token, and select the **Frontend** token type.
+3. Select the projects and the environment that you want the node to evaluate flags in.
+4. Copy the token. Unleash shows the complete token only once, right after you create it.
+
+For the permissions that each option requires, see [Create an API token](/concepts/api-tokens-and-client-keys#create-an-api-token).
+
+## Add the credential
+
+The node uses one credential, **Unleash Frontend API**. In n8n, create the credential with the following fields:
+
+<ParamField path="Base URL" type="string" required={true}>
+  The Frontend API URL of your Unleash instance or Unleash Edge instance. The URL ends in `/api/frontend`, for example `https://unleash.example.com/api/frontend`.
+</ParamField>
+
+<ParamField path="Frontend Token" type="string" required={true}>
+  The frontend token that you created. The token determines which projects and which environment the node evaluates flags in.
+</ParamField>
+
+Each credential covers one environment. To evaluate flags in another environment, create another credential with a frontend token for that environment.
+
+<Tip>
+For high request volumes, point **Base URL** at an [Unleash Edge](/unleash-edge) instance. To keep flag evaluation inside your network, use a self-hosted Edge instance.
+</Tip>
+
+## Operations
+
+The node has one resource, **Flag**, with two operations: [Evaluate](#evaluate) and [Get Enabled](#get-enabled). Both operations take the same [context fields](#context-fields) and [cache their results](#caching).
+
+### Evaluate
+
+**Evaluate** checks whether one flag is enabled for a context, and returns the flag's variant:
+
+```json
+{
+  "name": "new-checkout",
+  "enabled": true,
+  "variant": {
+    "name": "blue",
+    "enabled": true,
+    "feature_enabled": true,
+    "payload": { "type": "json", "value": "{\"color\":\"blue\"}" }
+  }
+}
+```
+
+To branch on the result, add an **If** or **Switch** node that reads `{{ $json.enabled }}` or `{{ $json.variant.name }}`. The node returns a variant payload as a string. To parse a JSON payload, use `{{ JSON.parse($json.variant.payload.value) }}`.
+
+A flag that is disabled, archived, unknown, or outside the token's projects returns `enabled: false` with the `disabled` variant. The Frontend API leaves disabled flags out of its response, so the node can't tell these cases apart. A missing flag never causes an error, which means that a misspelled flag name, or a token for the wrong project or environment, also returns `enabled: false`.
+
+**Evaluate** takes the following parameters:
+
+<ParamField path="Flag Name" type="string" required={true}>
+  The name of the flag to evaluate, for example `new-checkout`.
+</ParamField>
+
+<ParamField path="Lookup Method" type="options" default="Full Flag List">
+  How the node fetches the flag. **Full Flag List** fetches every flag for the context and picks this flag out of the list, and works with any Unleash server. **Single Flag (Edge Only)** fetches only this flag through a lighter endpoint that only Unleash Edge provides, so it requires **Base URL** to point at an Edge instance.
+</ParamField>
+
+<ParamField path="Report Usage" type="boolean" default="false">
+  Whether to send a usage metric to Unleash for each evaluation. Turn it on so that flags used only in n8n still show as in use in Unleash, and n8n appears among your connected SDKs as `n8n-nodes-unleash`. Each evaluation then makes an extra call to Unleash, so leave this off unless you need Unleash's last-seen data for the flag. If the node can't send the metric, it logs a warning and the workflow continues.
+</ParamField>
+
+### Get Enabled
+
+**Get Enabled** returns one item for each flag that is enabled for the context, in the same shape as **Evaluate**. It doesn't report usage, because counting every returned flag as used would hide flags that are stale.
+
+When no flag is enabled for the context, the node returns no items and the workflow stops at the node. To continue the workflow, turn on **Always Output Data** in the node settings.
+
+### Context fields
+
+Both operations evaluate flags against an [Unleash context](/concepts/unleash-context) that you build from the following fields:
+
+| Field | Description |
+|---|---|
+| **User ID** | The user to evaluate flags for. |
+| **Session ID** | The session to use for [stickiness](/concepts/stickiness) when there's no user ID. |
+| **Additional Context > App Name** | The application name to send in the context and in usage metrics. Defaults to `n8n`. |
+| **Additional Context > Custom Properties** | Name and value pairs for strategy constraints, for example `plan` with the value `enterprise`. The node sends values as strings. |
+| **Additional Context > Remote Address** | The IP address for IP-based strategies. If you leave it empty, Unleash uses the IP address of your n8n server. |
+
+Set **User ID** or **Session ID** whenever a flag uses a gradual rollout. Without either, Unleash generates a random session ID for each request, so the same input can get a different result on every run. To pass a value from an earlier node, use an expression, for example `{{ $json.customerId }}`.
+
+## Caching
+
+Both operations cache their result for 30 seconds by default, which matches the default refresh interval of Unleash frontend SDKs. To change how long the node reuses a result for the same context and credential before it calls Unleash again, set **Cache Duration (Seconds)**.
+
+- **Fast reactions**: For a flag that must take effect quickly, such as a kill switch, set a short duration of 1–3 seconds. Avoid 0, which calls Unleash on every execution.
+- **Revalidation**: When a cached result expires, the node sends a conditional request. If nothing changed, Unleash responds with `304 Not Modified` instead of sending every flag again.
+- **Fallback**: If a call to Unleash fails, for example because of a network error, a timeout, or an error response such as `401` or `502`, the node returns the last cached result, however old, and logs a warning. The node fails only when it has no cached result for that context yet, such as on the first call.
+- **Scope**: The cache lives in the n8n process, so workflows that evaluate the same context with the same credential share a cached result. In queue mode, each n8n worker keeps its own cache.
+
+## Use the node with AI agents
+
+You can use the node with an n8n [AI Agent](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent) node in two ways:
+
+- **As a tool**: Attach the node to the AI Agent node as a tool, so the agent can check a flag itself before it acts.
+- **As a gate**: Evaluate a flag before the agent runs, and route the workflow on the result. For example, stop the workflow when a kill switch is active.
+
+Use a gate when a flag must control what the agent can do, because the agent decides for itself whether to call a tool.
+
+### Stop an agent with a kill switch
+
+To stop an agent workflow with a kill switch, evaluate the flag right after the trigger, and add an **If** node that runs the rest of the workflow only when the flag is on. Turning the flag off activates the kill switch, and the workflow stops with a **Stop and Error** node before the agent can act.
+
+<Frame>
+![n8n workflow: a chat trigger, an Unleash node that evaluates a flag, and an If node named Agent allowed to act? that continues to the rest of the agent workflow when the flag is on, or stops at a Stop and Error node named Block the agent when it's off.](/assets/n8n-agent-kill-switch.png)
+</Frame>
+
+This workflow sets **Cache Duration (Seconds)** to `3`, so each execution uses a result that is at most 3 seconds old. If **Base URL** points at Unleash Edge, add the Edge refresh interval, which is 15 seconds by default. If a request to Unleash fails, the node returns its last cached result. See [Caching](#caching).
+
+### Give an agent a tool only when a flag is on
+
+An AI Agent node offers every attached tool to the model, and n8n has no built-in way to hide one tool based on a condition. To give the agent a tool only when a flag is on, evaluate the flag first, and then use an **If** node to route to one of two AI Agent nodes:
+
+- One agent with only the tools that the model can always use.
+- One agent with the same tools, plus the tool that takes a real action, such as sending an email, changing a record, or calling a paid API.
+
+<Frame>
+![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, and an If node named Advanced tools enabled? that routes to an advanced support agent with a Gmail tool when the flag is on, or to a standard support agent without it when the flag is off.](/assets/n8n-gate-ai-agent-tools-by-flag.png)
+</Frame>
+
+Turning the flag off then removes the tool, rather than relying on the model to respect a check. To keep the screenshot focused on the gated tool, only the standard agent has a chat model attached. Attach a chat model to both agents before you run the workflow.
+
+## Example workflows
+
+In the following screenshots, nodes that you configure yourself, such as credentials, your deployment API, or a Slack channel, are left unconfigured.
+
+### Pause a scheduled automation with a kill switch
+
+A **Schedule Trigger** node starts the workflow every hour. Before the automation does anything, the Unleash node evaluates a flag, and an **If** node runs the automation only when the flag is on. When the flag is off, the workflow stops with a **Stop and Error** node. Turning the flag off in Unleash pauses the automation without changing the workflow.
+
+<Frame>
+![n8n workflow: a Schedule Trigger node, an Unleash node that evaluates a flag, and an If node named Automation allowed to run? that routes to Run the automation when the flag is on, or to a Stop and Error node named Automation disabled when it's off.](/assets/n8n-guarded-automation.png)
+</Frame>
+
+### Gate a deployment from CI
+
+Your CI system calls a **Webhook** node and passes the service name as a custom property in **Additional Context**. If the flag is on, the workflow calls your deployment API. If the flag is off, the workflow responds that the deployment is blocked. Your pipeline gets a release gate over HTTP, without needing write access to Unleash.
+
+<Frame>
+![n8n workflow: a Webhook node that receives a CI build event, an Unleash node that evaluates a flag, and an If node named Deploy allowed? that either triggers the deployment and responds deployed, or responds blocked.](/assets/n8n-flag-gated-deploy-gate.png)
+</Frame>
+
+### Route a tenant by variant
+
+Evaluate a flag with the tenant ID as **User ID**, so [stickiness](/concepts/stickiness) keeps each tenant on the same variant. A **Switch** node on `{{ $json.variant.name }}` then calls one of two sub-workflows, for example two pricing engines or two system prompts for an AI agent. To move a tenant to the new version, or to change the rollout percentage, update the flag in Unleash instead of the workflow.
+
+<Frame>
+![n8n workflow: a Webhook node, an Unleash node that evaluates a flag, a Switch node named Route by variant that runs a legacy or v2 pricing sub-workflow, a Merge node, and a Slack node that logs which variant served the tenant.](/assets/n8n-route-tenant-by-variant.png)
+</Frame>
+
+The [templates folder](https://github.com/Unleash/n8n-nodes-unleash/tree/main/templates) in the node's repository has these and other workflows as JSON files that you can import into n8n. Some templates use the Unleash MCP server and require Unleash Enterprise.
+
+## React to flag changes
+
+To start an n8n workflow when something changes in Unleash, such as a flag being turned on in an environment, use the Unleash [Webhook integration](/integrate/webhook) with n8n's built-in [Webhook](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook) node. You don't need the Unleash node for this.
+
+To set it up, follow these steps:
+
+1. In n8n, add a **Webhook** node. Set **HTTP Method** to `POST`, and set **Authentication** to **Header Auth** with a credential whose name is `Authorization` and whose value is a long random secret. Copy the production URL, and then activate the workflow.
+2. In the Unleash Admin UI, go to **Configure > Integrations**, and configure the **Webhook** integration:
+   - **Webhook URL**: The production URL from n8n.
+   - **Authorization**: The same secret. Unleash sends it in the `Authorization` header exactly as you enter it, without a `Bearer` prefix.
+   - **Events**: The [events](/concepts/events) that should start the workflow.
+3. In n8n, add a **Switch** node that routes on the event type in `{{ $json.body.type }}`.
+
+Events can arrive out of order, and the same event can arrive more than once. Use the event's numeric `id` to order events and to drop duplicates.
+
+If you self-host Unleash and n8n on a private network, Unleash rejects the webhook URL by default. To allow it, add the n8n hostname to `UNLEASH_ALLOW_LIST_INTEGRATION` on the Unleash server. See [Private network URLs](/integrate/webhook#private-network-urls).
+
+## Change flags with the Unleash MCP server
+
+The Unleash node only reads flags. To change flags from n8n, for example to turn a flag on or off, roll it out, or clean it up, connect n8n's [MCP Client](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.mcpclient) or [MCP Client Tool](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.toolmcp) node to the [Unleash MCP server](/integrate/mcp). Use the MCP Client node as a step in a workflow, or the MCP Client Tool node to give an AI Agent node access to the server's tools.
+
+Connect these nodes to the [remote MCP server](/integrate/mcp#remote-mcp-server) that your Unleash instance hosts at `https://<your-instance-url>/api/admin/mcp`. The remote MCP server is available on Unleash Enterprise. Where an environment requires [change requests](/concepts/change-requests), the server opens a change request instead of applying the change directly.
+
+For setup and the list of tools, see [Unleash MCP server](/integrate/mcp).
