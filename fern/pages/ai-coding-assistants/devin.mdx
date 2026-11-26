@@ -21,7 +21,7 @@ Devin is Cognition's AI software engineer. It runs in three places:
 Devin Cloud often works while nobody watches the session, and with the Unleash MCP server it can change flags in production. Treat it like a new teammate: give it its own identity in Unleash, a role that limits what it can change, and a reviewer for changes that reach users.
 
 <Note>
-Because Devin Cloud runs in Cognition's cloud rather than on your machine, we default to the [remote MCP server](/integrate/mcp#remote-mcp-server). The remote MCP server is available on Enterprise plans.
+Because Devin Cloud runs in Cognition's cloud rather than on your machine, we default to the [remote MCP server](/integrate/mcp#remote-mcp-server), which is available on Unleash Enterprise.
 
 On other plans, install the [Unleash plugin](#cloud-plugin) from the Devin marketplace, or add the [local MCP server](#cloud-local). In the Devin CLI and Devin Desktop, you can use either local or remote MCP server.
 </Note>
@@ -32,7 +32,7 @@ Before you begin, make sure you have the following:
 
 - A Devin account: Organization-wide MCP servers require permission to manage MCP servers in your Devin organization
 - An Unleash instance: Cloud or self-hosted, reachable from Devin. See [Network access](#network-access)
-- A token for Devin to use: A [service account token](/concepts/service-accounts) (Enterprise) or a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens)
+- A token for Devin to use, unless you connect with browser login: A [service account token](/concepts/service-accounts) (Enterprise) or a [personal access token](/concepts/api-tokens-and-client-keys#personal-access-tokens)
 - For the remote MCP server: The remote MCP server [enabled on your instance](/integrate/mcp#enable-the-remote-mcp-server)
 - For the local MCP server in the Devin CLI or Devin Desktop: Node.js 24 or later on your machine
 
@@ -40,7 +40,7 @@ Before you begin, make sure you have the following:
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
-When everyone in your organization shares one Devin connection to Unleash, connect it with a [service account](/concepts/service-accounts) instead of a person's token. Otherwise, every Devin session acts as that person. With a service account, changes that Devin makes appear in the [event log](/concepts/events#event-log) under the service account.
+When everyone in your organization shares one Devin connection to Unleash, connect it with a [service account](/concepts/service-accounts) instead of a person's token. Otherwise, every Devin session acts as that person. With a service account, changes that Devin makes appear in the [event log](/concepts/events#event-log) under the service account. If each member connects with their own [browser login](#cloud-remote) instead, Devin acts as that member.
 
 <Steps>
 
@@ -78,12 +78,15 @@ You manage MCP servers for Devin Cloud in the Devin web app, under **Customize >
 3. Enter a server name, such as `Unleash`, and a short description.
 4. Select the **HTTP** transport.
 5. For **Server URL**, enter `https://<your-instance-url>/api/admin/mcp`.
-6. For authentication, select **Authorization header** and enter `Bearer <your-token>` as the value.
-7. Click **Add**, then click **Test tools**. Devin lists the Unleash tools.
+6. Choose how Devin authenticates, then click **Add**:
+   - **Browser login**: Leave authentication on **Automatic**, or select **OAuth**. For an organization-wide server, set **Access** to **Personal** so that each member logs in with their own account. After you add the server, click **Connect** and log in to Unleash with your usual credentials.
+   - **Authorization header**: Select **Authorization header** and enter `Bearer <your-token>` as the value. After you add the server, click **Test tools**. Devin lists the Unleash tools.
 
-<Warning>
-Devin Cloud can't use browser login for the remote MCP server. After login, Unleash only redirects to `localhost`, and Devin Cloud receives OAuth callbacks on its own servers. Use the **Authorization header** option with a token.
-</Warning>
+With browser login, Devin acts with the permissions of the member who logged in, and Unleash issues a token that is valid for 24 hours. See [Browser login](/integrate/mcp#connect-a-client).
+
+<Note>
+For a server that your whole organization shares, and for sessions that start without a person, such as automations, use an **Authorization header** with a [service account token](#give-devin-its-own-identity). Service accounts can't log in through a browser, and with **Organization** access, every member's sessions act as the person who logged in.
+</Note>
 
 </Tab>
 <Tab title="Local MCP server" id="cloud-local" language="local-mcp-server">
@@ -323,8 +326,8 @@ Devin Cloud must reach your Unleash instance. Hosted Unleash instances are reach
 - Check that Devin can reach your instance. See [Network access](#network-access)
 </Accordion>
 
-<Accordion title="OAuth sign-in fails in Devin Cloud">
-Unleash only redirects to `localhost` after browser login, so Devin Cloud can't complete it. Use the **Authorization header** option with a service account token or personal access token.
+<Accordion title="Unleash tools stop working after browser login">
+With browser login, Unleash issues a token that is valid for 24 hours. When the tools stop working, reconnect the Unleash server in **Customize > MCPs** and log in again. For servers that need to keep working unattended, use an **Authorization header** with a service account token.
 </Accordion>
 
 <Accordion title="'This MCP server is disabled or misconfigured'">
