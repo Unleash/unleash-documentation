@@ -10,7 +10,8 @@ last-updated: November 26, 2026
 ---
 
 The [Unleash MCP server](/integrate/mcp) connects [Devin](https://devin.ai) to your Unleash instance, enabling AI-assisted feature flag management.
-This page covers how to connect the server in each Devin product and how to control what Devin can change. To learn what the server can do, see [Unleash MCP server](/integrate/mcp).
+This page covers how to connect the server in each Devin product and how to control what Devin can change.
+To learn what the server can do, see [Unleash MCP server](/integrate/mcp).
 
 Devin is Cognition's AI software engineer. It runs in three places:
 
@@ -18,12 +19,14 @@ Devin is Cognition's AI software engineer. It runs in three places:
 - **Devin CLI**: A local agent in your terminal that can hand work off to Devin Cloud.
 - **Devin Desktop**: The editor formerly known as Windsurf. Its local agent, Devin Local, uses the same configuration as the Devin CLI.
 
-Devin Cloud often works while nobody watches the session, and with the Unleash MCP server it can change flags in production. Treat it like a new teammate: give it its own identity in Unleash, a role that limits what it can change, and a reviewer for changes that reach users.
+Devin Cloud often works while nobody watches the session, and with the Unleash MCP server it can change flags in production.
+Treat it like a new teammate: give it its own identity in Unleash, a role that limits what it can change, and a reviewer for changes that reach users.
 
 <Note>
 Because Devin Cloud runs in Cognition's cloud rather than on your machine, we default to the [remote MCP server](/integrate/mcp#remote-mcp-server), which is available on Unleash Enterprise.
 
-On other plans, install the [Unleash plugin](#cloud-plugin) from the Devin marketplace, or add the [local MCP server](#cloud-local). In the Devin CLI and Devin Desktop, you can use either local or remote MCP server.
+On other plans, install the [Unleash plugin](#cloud-plugin) from the Devin marketplace, or add the [local MCP server](#cloud-local).
+In the Devin CLI and Devin Desktop, you can use either local or remote MCP server.
 </Note>
 
 ## Prerequisites
@@ -40,13 +43,17 @@ Before you begin, make sure you have the following:
 
 <Button small href="https://www.getunleash.io/plans" className="cta-button">Enterprise</Button>
 
-When everyone in your organization shares one Devin connection to Unleash, connect it with a [service account](/concepts/service-accounts) instead of a person's token. Otherwise, every Devin session acts as that person. With a service account, changes that Devin makes appear in the [event log](/concepts/events#event-log) under the service account. If each member connects with their own [browser login](#cloud-remote) instead, Devin acts as that member.
+When everyone in your organization shares one Devin connection to Unleash, connect it with a [service account](/concepts/service-accounts) instead of a person's token.
+Otherwise, every Devin session acts as that person. With a service account, changes that Devin makes appear in the [event log](/concepts/events#event-log) under the service account.
+If each member connects with their own [browser login](#cloud-remote) instead, Devin acts as that member.
 
 <Steps>
 
 <Step title="Create a service account">
 
-In the Unleash Admin UI, go to **Admin settings > Service accounts** and create a service account for Devin. Select the least-privileged root role that lets Devin do its job. To narrow it further, create a [custom root role](/concepts/rbac).
+In the Unleash Admin UI, go to **Admin settings > Service accounts** and create a service account for Devin.
+Select the least-privileged root role that lets Devin do its job.
+To narrow it further, create a [custom root role](/concepts/rbac).
 
 </Step>
 
@@ -58,7 +65,9 @@ Create a token for the service account and store it securely. Unleash shows the 
 
 <Step title="Require change requests in production">
 
-Enable [change requests](/concepts/change-requests) on production environments. When Devin releases a flag or flips a kill switch there, the MCP server opens a change request instead of applying the change, and a person approves and applies it. The MCP server can't approve or apply change requests. See [Change requests and approvals](/integrate/mcp#change-requests-and-approvals).
+Enable [change requests](/concepts/change-requests) on production environments.
+When Devin releases a flag or flips a kill switch there, the MCP server opens a change request instead of applying the change, and a person approves and applies it.
+The MCP server can't approve or apply change requests. See [Change requests and approvals](/integrate/mcp#change-requests-and-approvals).
 
 </Step>
 
@@ -66,7 +75,8 @@ Enable [change requests](/concepts/change-requests) on production environments. 
 
 ## Connect Devin Cloud
 
-You manage MCP servers for Devin Cloud in the Devin web app, under **Customize > MCPs**. You can add a server for yourself or, if you have permission, for your whole organization.
+You manage MCP servers for Devin Cloud in the Devin web app, under **Customize > MCPs**.
+You can add a server for yourself or, if you have permission, for your whole organization.
 
 <Tabs>
 <Tab title="Remote MCP server" id="cloud-remote" language="remote-mcp-server">
@@ -84,10 +94,6 @@ You manage MCP servers for Devin Cloud in the Devin web app, under **Customize >
 
 With browser login, Devin acts with the permissions of the member who logged in, and Unleash issues a token that is valid for 24 hours. See [Browser login](/integrate/mcp#connect-a-client).
 
-<Note>
-For a server that your whole organization shares, and for sessions that start without a person, such as automations, use an **Authorization header** with a [service account token](#give-devin-its-own-identity). Service accounts can't log in through a browser, and with **Organization** access, every member's sessions act as the person who logged in.
-</Note>
-
 </Tab>
 <Tab title="Local MCP server" id="cloud-local" language="local-mcp-server">
 
@@ -101,9 +107,9 @@ Use the local MCP server if your Unleash plan doesn't include the remote MCP ser
    - **Command**: `npx`
    - **Arguments**: `-y` and `@unleash/mcp@latest`
    - **Environment Variables**: `UNLEASH_BASE_URL` set to your instance URL, without `/api`, and `UNLEASH_PAT` set to your token
-6. Click **Add**, then click **Use MCP** to start a session that uses the server. **Test tools** isn't available for STDIO servers.
+6. Click **Add**, then click **Use MCP** to start a session that uses the server.
 
-To declare the server in a plugin's `.mcp.json` file instead, use `command`, `args`, and `env`:
+To declare the server in a plugin's `.mcp.json` file instead ("Edit source" in the web UI), use this format:
 
 ```json title=".mcp.json"
 {
@@ -121,46 +127,35 @@ To declare the server in a plugin's `.mcp.json` file instead, use `command`, `ar
 }
 ```
 
-<Note>
-Devin's MCP documentation shows its form fields as JSON, with keys such as `transport` and `env_variables`. Those keys describe the form, not a file format. In a `.mcp.json` file, Devin rejects them and reports that the server is disabled or misconfigured.
-</Note>
-
 </Tab>
 <Tab title="Unleash plugin" id="cloud-plugin" language="unleash-plugin">
 
-The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices, such as deciding whether a change needs a flag, wrapping code behind a flag, and cleaning up stale flags. It works on every Unleash plan. To learn more about the skills, see [Install the Unleash plugin](/integrate/claude-code#install-the-unleash-plugin) on the Claude Code page.
+The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices, such as deciding whether a change needs a flag, wrapping code behind a flag, and cleaning up stale flags. It works on every Unleash plan.
 
 1. In the Devin web app, go to **Customize > Plugins** and find **Unleash** in the **Marketplace** list.
 2. Install the plugin for yourself or, if you have permission, for your organization.
-3. Go to **Customize > MCPs**, open the plugin's `unleash` server, and click **Connect**. Installing the plugin doesn't connect it to Unleash.
+3. Go to **Customize > MCPs**, open the plugin's `unleash` server, and click **Connect**.
 4. Enter your instance URL, without `/api`, as `UNLEASH_BASE_URL` and your token as `UNLEASH_PAT`. For an organization-wide installation, use a [service account token](#give-devin-its-own-identity).
 
 </Tab>
 </Tabs>
 
-Use only one of these options. Each one registers the Unleash MCP server, so combining them, for example the plugin and a server you add yourself, gives you two copies of every Unleash tool.
-
 ### Set tool approvals
 
-Devin Cloud sorts the Unleash tools into three groups and shows each tool by its title. Every group starts as **Always allow**, so out of the box Devin can release flags and flip kill switches without asking anyone.
+Devin Cloud sorts the Unleash tools into three groups and shows each tool by its title.
+Every group starts as **Always allow**, so out of the box Devin can release flags and flip kill switches without asking anyone.
 
 In **Customize > MCPs**, open the Unleash server and set the **Destructive tools** group to **Needs approval**. You can also change a single tool, or select **Blocked** to hide it from Devin.
 
-| Devin group | Tools as Devin shows them | Tool name | Recommended setting |
-|-------------|---------------------------|-----------|---------------------|
-| **Read-only tools** | Find flags, projects and segments | `search` | Always allow |
-| | See flag, project and segment details | `inspect` | Always allow |
-| | Check whether a user gets a feature | `evaluate` | Always allow |
-| | See what changed in Unleash | `audit` | Always allow |
-| | Read the Unleash docs | `docs` | Always allow |
-| **Write tools** | Send anonymous feedback to Unleash | `send_feedback` | Always allow |
-| **Destructive tools** | Manage feature rollouts | `release` | Needs approval |
-| | Manage kill switches | `kill_switch` | Needs approval |
-| | Run or stop an experiment | `experiment` | Needs approval |
-| | Create, change or archive a flag | `manage_flag` | Needs approval |
-| | Manage projects, segments and context fields | `configure` | Needs approval, or Blocked if your team manages these only in the Unleash UI |
+| Devin group | Recommended setting  |
+|-------------|----------------------|
+| Read-only tools | Always allow |
+| Write tools | Always allow |
+| Destructive tools | Needs approval |
 
-A tool that needs approval waits for someone to approve it in the session. Sessions that start from automations or alerts might run when nobody is there to approve. For production, rely on change requests, which apply however the session started.
+A tool that needs approval waits for someone to approve it in the session.
+Sessions that start from automations or alerts might run when nobody is there to approve.
+For production, rely on change requests, which apply however the session started.
 
 ## Connect the Devin CLI and Devin Desktop
 
@@ -226,7 +221,7 @@ To use a token instead, add the server with an `Authorization` header:
 </Tab>
 <Tab title="Unleash plugin" id="cli-plugin" language="unleash-plugin">
 
-The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices. It works on every Unleash plan. To learn more about the skills, see [Install the Unleash plugin](/integrate/claude-code#install-the-unleash-plugin) on the Claude Code page.
+The [Unleash plugin](https://github.com/Unleash/unleash-claude-skills) bundles the local MCP server with skills that apply [FeatureOps](https://featureops.io) practices. It works on every Unleash plan.
 
 ```bash
 devin plugins install Unleash/unleash-claude-skills
@@ -237,7 +232,7 @@ The plugin's MCP server needs `UNLEASH_BASE_URL` and `UNLEASH_PAT`. The CLI adds
 </Tab>
 </Tabs>
 
-Use only one of these options, or every Unleash tool appears twice. Run `devin mcp list` to check that the server is configured, then start a session and ask: "List my Unleash projects".
+Run `devin mcp list` to check that the server is configured, then start a session and ask: "List my Unleash projects".
 
 <Note>
 The Devin CLI and Devin Desktop import MCP servers from other coding assistants by default, including the `.mcp.json` file of Claude Code. If you already use Unleash with another assistant, Devin might already have the server, and adding it again gives you two copies of every tool. To turn off the import for a tool, see [Configuration import](https://docs.devin.ai/cli/reference/configuration/read-config-from).
@@ -278,7 +273,7 @@ Because Devin Cloud starts work from tickets, chat, and schedules, you can make 
 
 - **From a Linear or Jira ticket**: "Build the new checkout flow behind a feature flag in the checkout project, off by default. Check for an existing flag first."
 - **From Slack**: "@Devin, does user 42 get new-checkout in production? Why not?"
-- **From a weekly automation**: "List stale and potentially stale flags in the checkout project, check where each one is enabled, and open a pull request that removes the flags that are safe to remove. Don't archive anything."
+- **From a weekly automation**: "List stale and potentially stale flags in the checkout project, check where each one is enabled, and open a pull request that removes the flags that are safe to remove."
 
 To apply your flag policy in every session, add it to an [`AGENTS.md`](https://docs.devin.ai/onboard-devin/agents-md) file in your repository, for example:
 
@@ -315,7 +310,7 @@ On the Unleash side:
 
 ### Network access
 
-Devin Cloud must reach your Unleash instance. Hosted Unleash instances are reachable from Devin Cloud by default. For a self-hosted instance behind a firewall, use one of Devin's private connectivity options, such as a VPN configured in your [Devin environment](https://docs.devin.ai/onboard-devin/vpn) or [Devin Connect](https://docs.devin.ai/enterprise/deployment/devin-connect).
+Devin Cloud must reach your Unleash instance. Unleash Cloud instances are reachable from Devin Cloud by default. For a self-hosted instance behind a firewall, use one of Devin's private connectivity options, such as a VPN configured in your [Devin environment](https://docs.devin.ai/onboard-devin/vpn) or [Devin Connect](https://docs.devin.ai/enterprise/deployment/devin-connect).
 
 ## Troubleshooting
 
@@ -337,7 +332,7 @@ The server entry uses field names that Devin doesn't accept in a `.mcp.json` fil
 <Accordion title="Authentication or API errors">
 - Confirm your token is valid and has not expired
 - Check that the token's role has permission for the action
-- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end (the server appends it, and a trailing `/api` produces doubled `/api/api/` paths)
+- Verify that `UNLEASH_BASE_URL` does not include `/api` at the end
 - Test directly: `curl -H "Authorization: $UNLEASH_PAT" "$UNLEASH_BASE_URL/api/admin/projects"`
 </Accordion>
 
@@ -346,7 +341,7 @@ Devin has two copies of the server. In Devin Cloud, check whether both the remot
 </Accordion>
 
 <Accordion title="Devin calls tools such as detect_flag or evaluate_change">
-These tools were removed in version 2 of the Unleash MCP server. Skills or rules written for version 0.5 still reference them, including older copies of the Unleash plugin. Update the plugin, or remove the outdated skills. See [Migrate from version 0.5](/integrate/mcp#migrate-from-version-05).
+These tools were removed in version 0.6 of the Unleash MCP server. Skills or rules written for version 0.5 still reference them, including older copies of the Unleash plugin. Update the plugin, or remove the outdated skills. See [Migrate from version 0.5](/integrate/mcp#migrate-from-version-05).
 </Accordion>
 
 <Accordion title="A change didn't take effect">
