@@ -134,9 +134,15 @@ For step-by-step instructions for both paths, see [Migrating from Unleash Open S
     No. Unleash Enterprise is covered by the Unleash commercial license on every hosting model, including Unleash Cloud. Your deployment, terms, and obligations are unchanged.
   </Accordion>
   <Accordion title="Do I need to move to Unleash Enterprise because of the license change?">
-    No. You can keep running Unleash OSS as before. If you want the Enterprise feature set or a commercial license, see [Migrating from Unleash Open Source to Unleash Enterprise](/guides/migrate-from-open-source).
+    It depends on how you use Unleash OSS:
+
+    - If you run the official Docker image or the unmodified source, you can keep running Unleash OSS as before.
+    - If you modify the Unleash source and make it available to users over a network, AGPLv3 requires you to make your modified source available under the same license. To discuss a commercial license instead, [contact us](https://www.getunleash.io/plans/enterprise).
+    - If your organization has a policy on which open-source licenses it can use, check whether AGPLv3 is permitted. Unleash Enterprise is covered by a commercial license instead.
+
+    To move to Unleash Enterprise, see [Migrating from Unleash Open Source to Unleash Enterprise](/guides/migrate-from-open-source).
   </Accordion>
   <Accordion title="Do I need to upgrade to v8 to keep using Unleash OSS?">
-    Versions earlier than v8.0.0 remain under Apache 2.0. To plan a move to v8, see [Upgrading Unleash](/deploy/upgrading-unleash#upgrading-from-v7-to-v8).
+    The license change does not require you to upgrade. Versions earlier than v8.0.0 remain under Apache 2.0. However, we recommend that you always run the latest version of Unleash, so that you get security patches, bug fixes, and new features. To plan your upgrade to v8, see [Upgrading Unleash](/deploy/upgrading-unleash#upgrading-from-v7-to-v8).
   </Accordion>
 </AccordionGroup>
